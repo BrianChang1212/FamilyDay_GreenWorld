@@ -25,6 +25,7 @@
 | 提案 PDF | `d:\Brian\FamilyDayApp_Proposal_v1.pdf`（v1，2026.04.10，Present by Angela） |
 | 需求主文件 | `docs/專案文件.md`（合併版：需求、待確認、狀態、技術） |
 | 資訊開發人員 | Ken、Brian |
+| GitHub | [BrianChang1212/FamilyDay_GreenWorld](https://github.com/BrianChang1212/FamilyDay_GreenWorld) |
 
 ### 文件來源與紀要
 
