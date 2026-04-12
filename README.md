@@ -3,12 +3,12 @@
 ## 目錄
 
 - [專案概覽](#專案概覽)
+- [技術架構](#技術架構)
+  - [系統架構圖](#系統架構圖)
 - [規格與活動內容](#規格與活動內容)
 - [使用者流程](#使用者流程)
 - [設計資產與會議](#設計資產與會議)
 - [待辦與進度](#待辦與進度)
-- [技術架構](#技術架構)
-  - [系統架構圖](#系統架構圖)
 - [儲存庫目錄結構](#儲存庫目錄結構)
 - [文件與維護](#文件與維護)
 
@@ -22,8 +22,8 @@
 |------|------|
 | 活動 | 新竹北埔**綠世界生態農場**；對象為**台北辦公室同仁及眷屬**（預估約 **1,000～1,300** 人）；活動日**確認中**（偏好**六月底**，或七月初） |
 | 產品 | 解謎 Web 應用；同仁與家人體驗生態探索，完成關卡可至指定地點領取紀念品 |
-| 提案 PDF | `d:\Brian\FamilyDayApp_Proposal_v1.pdf`（v1，2026.04.10，Present by Angela） |
-| 需求主文件 | `docs/專案文件.md`（合併版：需求、待確認、狀態、技術） |
+| 提案 PDF | `docs/proposals/FamilyDayApp_Proposal_v1.pdf`（v1，2026.04.10；另可能見 `d:\Brian\FamilyDayApp_Proposal_v1.pdf`） |
+| 需求主文件 | `docs/project/專案文件.md`（合併版：需求、待確認、狀態、技術）；索引見 `docs/README.md` |
 | 資訊開發人員 | Ken、Brian |
 | GitHub | [BrianChang1212/FamilyDay_GreenWorld](https://github.com/BrianChang1212/FamilyDay_GreenWorld) |
 
@@ -32,8 +32,89 @@
 | 項目 | 內容 |
 |------|------|
 | 需求筆記 | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`） |
-| 文件體系 | 詳見 `docs/專案文件.md`；`docs/` 另含提案 PDF 等 |
-| 最後更新 README | 2026-04-10（Brian）；已對齊 **0410 家庭日闖關遊戲開發**會議紀錄 |
+| 文件體系 | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等 |
+| 最後更新 README | 2026-04-10（Brian）；已對齊 **0410** 會議；`docs/` 已分類（`project/`、`specs/`、`architecture/` 等） |
+
+---
+
+## 技術架構
+
+| 層級 | 內容 |
+|------|------|
+| 前端 | Web UI；**草案**：Vue 3 + Vite + TS + Tailwind + Naive UI；手機／平板／電腦；RWD |
+| 後端 | **草案**：**FastAPI** + **PostgreSQL**（即時資料）；**Sheet** 輔助匯入／匯出（見 `docs/architecture/summary-backend.md`） |
+| 效能 | 約 1,300 人活動規模；**在線≠固定 RPS**；壓測見 `docs/architecture/summary-traffic.md` |
+
+### 系統架構圖
+
+以下為**邏輯架構**（實作可為自建 API、Serverless 或 Google Apps Script Web App 等，依 `docs/project/專案文件.md`「技術規格」定案）。**各關到站**以**現場關卡 QR code** 掃描由後端驗證（QR 內容須避免可被輕易偽造或重播；細節於技術規格定案）。
+
+```mermaid
+flowchart TB
+  subgraph client["使用者端"]
+    U[瀏覽器<br/>手機／平板／電腦]
+  end
+
+  subgraph entry["進場"]
+    QR[簽到專屬 QR／活動連結]
+  end
+
+  subgraph fe["前端 Web"]
+    P1[簽到介面]
+    P2[闖關介面]
+  end
+
+  subgraph be["後端應用層"]
+    API[API／應用服務<br/>驗證、業務規則、同步]
+  end
+
+  subgraph data["資料層"]
+    GS[("Google Sheet<br/>名冊／出席／輕量統計")]
+    DB[("Database<br/>闖關進度／兌獎／高併發寫入")]
+  end
+
+  subgraph onsite["現場（園區 · 各關卡）"]
+    SQ[關卡 QR code<br/>立牌／現場布置]
+  end
+
+  U --> QR
+  QR --> P1
+  P1 --> P2
+  U --> P2
+  P1 --> API
+  P2 --> API
+  API --> GS
+  API --> DB
+  P2 -.->|掃描驗證到站| SQ
+  SQ -.->|開啟／帶入關卡資訊| U
+```
+
+**主要資料流（摘要）**
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant U as 使用者
+  participant FE as 前端
+  participant API as 後端 API
+  participant GS as Google Sheet
+  participant DB as Database
+
+  U->>FE: 開啟簽到 QR／連結
+  FE->>API: 簽到（工號、姓名、同行人數）
+  API->>GS: 查名冊、寫入出席
+  API-->>FE: 報到結果
+
+  U->>FE: 闖關：掃描該關 QR、作答
+  FE->>API: 關卡／到站驗證（QR）／答案提交
+  API->>DB: 讀寫闖關狀態、嘗試紀錄
+  API->>GS: 選配：統計或稽核寫入
+  API-->>FE: 關卡結果／可否兌獎
+
+  FE->>API: 闖關禮兌換／核銷狀態（櫃檯佐證）
+  API->>DB: 寫入兌獎紀錄
+  API-->>FE: 兌換結果
+```
 
 ---
 
@@ -44,9 +125,9 @@
 | 項目 | 規格 |
 |------|------|
 | 預估人流 | 約 1,000～1,300 人 |
-| 範圍 | **本專案核心**：現場簽到 Web + 闖關遊戲 Web；**事前報名**預計用 Google 表單／企業維信表單（產出報名清冊 Excel，詳見 `docs/專案文件.md`） |
+| 範圍 | **本專案核心**：現場簽到 Web + 闖關遊戲 Web；**事前報名**預計用 Google 表單／企業維信表單（產出報名清冊 Excel，詳見 `docs/project/專案文件.md`） |
 | 平台 | Web UI（手機、平板、電腦瀏覽器） |
-| 後端 | Google Sheet + Database 混合架構（可依模組調整） |
+| 後端 | **草案**：**PostgreSQL** 扛即時簽到／闖關；**Google Sheet** 以報名清冊匯入／報表為主（見 `docs/architecture/summary-backend.md`） |
 | 介面 | **簽到頁** + **闖關頁**（兩個獨立頁面） |
 | 關卡 | 園內 **6 關**；到站掃**實體 QR**；題型建議**三選一**或圈選題（簡單有趣） |
 | 名額／費用（報名） | **1+3**（員工 + 3 名眷屬）免費；**第 5 人起**須額外收費（標準見表單規則） |
@@ -120,31 +201,31 @@
 
 ### 待確認（高優先級節錄）
 
-完整清單見 `docs/專案文件.md`。會議後仍待主辦／表單補齊者例如：
+完整清單見 `docs/project/專案文件.md`。會議後仍待主辦／表單補齊者例如：
 
 1. 活動**確切日期**（六月底 vs 七月初）  
 2. 事前報名**表單欄位明細**、收費規則說明、保險文案  
 3. 簽到 QR 與闖關入口之**導覽與資安**（專屬 QR 發放方式）  
 4. 報名清冊與現場簽到／闖關後端之**資料切分與同步**  
 
-### 技術選型（待決定）
+### 技術選型（草案已完成，待會議簽核）
 
-細節見 `docs/專案文件.md` 內「技術規格」章節。
+細節見 `docs/project/專案文件.md`（開頭補充文件表）及 `docs/architecture/summary-*.md`。
 
-1. Web 框架（React / Vue / Next.js）  
-2. Database（MySQL / PostgreSQL / Firebase / MongoDB）  
-3. RWD 需求  
-4. 與 Sheet 的同步機制  
-5. 部署平台  
+1. **前端（草案）：** Vue 3 + Vite + TypeScript + Tailwind + Naive UI  
+2. **Database（草案）：** PostgreSQL  
+3. **RWD：** 需要（手機優先）  
+4. **Sheet：** 匯入／匯出與同步時機（仍待確認）  
+5. **部署：** PaaS／Neon+Cloud Run／公司 DMZ 等（見 `docs/architecture/summary-deployment.md`）  
 
 ### 專案進度（概覽）
 
-整體約 **15%**（以規劃文件為主）。細項與風險見 `docs/專案文件.md` 內「專案狀態」章節。
+整體約 **15%**（以規劃文件為主）。細項與風險見 `docs/project/專案文件.md` 內「專案狀態」章節。
 
 | 項目 | 狀態 |
 |------|------|
 | 需求收集與整理 | 完成 |
-| 技術選型 | 進行中 |
+| 技術選型 | 草案完成，待簽核 |
 | UI/UX 設計 | 未開始 |
 | 開發 | 未開始 |
 | 測試 | 未開始 |
@@ -161,90 +242,8 @@
 
 **中優先級**
 
-- [ ] 決定前端框架  
-- [ ] 決定 Database  
-- [ ] 建立開發環境  
-
----
-
-## 技術架構
-
-| 層級 | 內容 |
-|------|------|
-| 前端 | Web UI；框架待定（React / Vue / Next.js）；手機／平板／電腦；RWD 待定 |
-| 後端 | **Sheet**：報到、輕量統計；**Database**：闖關即時資料、工號驗證、兌獎紀錄（類型待定） |
-| 效能 | 支援約 1,300 人同時操作；需壓測與優化 |
-
-### 系統架構圖
-
-以下為**邏輯架構**（實作可為自建 API、Serverless 或 Google Apps Script Web App 等，依 `docs/專案文件.md`「技術規格」定案）。**各關到站**以**現場關卡 QR code** 掃描由後端驗證（QR 內容須避免可被輕易偽造或重播；細節於技術規格定案）。
-
-```mermaid
-flowchart TB
-  subgraph client["使用者端"]
-    U[瀏覽器<br/>手機／平板／電腦]
-  end
-
-  subgraph entry["進場"]
-    QR[簽到專屬 QR／活動連結]
-  end
-
-  subgraph fe["前端 Web"]
-    P1[簽到介面]
-    P2[闖關介面]
-  end
-
-  subgraph be["後端應用層"]
-    API[API／應用服務<br/>驗證、業務規則、同步]
-  end
-
-  subgraph data["資料層"]
-    GS[("Google Sheet<br/>名冊／出席／輕量統計")]
-    DB[("Database<br/>闖關進度／兌獎／高併發寫入")]
-  end
-
-  subgraph onsite["現場（園區 · 各關卡）"]
-    SQ[關卡 QR code<br/>立牌／現場布置]
-  end
-
-  U --> QR
-  QR --> P1
-  P1 --> P2
-  U --> P2
-  P1 --> API
-  P2 --> API
-  API --> GS
-  API --> DB
-  P2 -.->|掃描驗證到站| SQ
-  SQ -.->|開啟／帶入關卡資訊| U
-```
-
-**主要資料流（摘要）**
-
-```mermaid
-sequenceDiagram
-  autonumber
-  participant U as 使用者
-  participant FE as 前端
-  participant API as 後端 API
-  participant GS as Google Sheet
-  participant DB as Database
-
-  U->>FE: 開啟簽到 QR／連結
-  FE->>API: 簽到（工號、姓名、同行人數）
-  API->>GS: 查名冊、寫入出席
-  API-->>FE: 報到結果
-
-  U->>FE: 闖關：掃描該關 QR、作答
-  FE->>API: 關卡／到站驗證（QR）／答案提交
-  API->>DB: 讀寫闖關狀態、嘗試紀錄
-  API->>GS: 選配：統計或稽核寫入
-  API-->>FE: 關卡結果／可否兌獎
-
-  FE->>API: 闖關禮兌換／核銷狀態（櫃檯佐證）
-  API->>DB: 寫入兌獎紀錄
-  API-->>FE: 兌換結果
-```
+- [ ] 會議**簽核**技術草案（`docs/specs/api-v0.1.md`、`docs/architecture/summary-*.md`）  
+- [ ] 簽核後建立開發環境並初始化 `source/`  
 
 ---
 
@@ -252,9 +251,9 @@ sequenceDiagram
 
 | 路徑 | 用途 |
 |------|------|
-| `docs/` | `專案文件.md`（主文件）、提案 PDF 等 |
+| `docs/` | 見 [`docs/README.md`](docs/README.md)；`project/` 主文件、`specs/` API、`architecture/` 摘要、`proposals/` PDF、`design/` 線框 |
 | `assets/` | 設計稿、KV、Logo、CIS（註明版本與來源） |
-| `source/` | 程式碼（技術棧定案後初始化） |
+| `source/` | 前端原型（Vue 3 + Vite + TS + Tailwind）：`npm install` → `npm run dev`（預設 `http://localhost:5173`） |
 | `test/` | 測試與驗收紀錄 |
 | `tool/` | 建置、部署、一次性腳本 |
 
@@ -267,8 +266,14 @@ sequenceDiagram
 | 類別 | 檔案 |
 |------|------|
 | 總覽 | `README.md`（本文件） |
-| 詳細規格（單檔） | `docs/專案文件.md`（需求、待確認、專案狀態、技術規格、提案來源、維護附錄） |
-| 提案 PDF | `docs/FamilyDayApp_Proposal_v1.pdf` |
+| 文件索引 | `docs/README.md`（`docs/` 分類導覽） |
+| 詳細規格（單檔） | `docs/project/專案文件.md`（需求、待確認、專案狀態、技術規格、提案來源、維護附錄） |
+| API 草案（v0.1） | `docs/specs/api-v0.1.md`（REST 端點、範例 JSON、畫面對照） |
+| 前端討論總結 | `docs/architecture/summary-frontend.md`（Vue3／Vite／模組與 UX、API 銜接） |
+| 後端討論總結 | `docs/architecture/summary-backend.md`（FastAPI／PostgreSQL、模型與安全） |
+| 架設環境討論總結 | `docs/architecture/summary-deployment.md`（雲／內網／PaaS、區域與採購注意） |
+| 流量分析討論總結 | `docs/architecture/summary-traffic.md`（在線與 RPS、尖峰、限流、壓測） |
+| 提案 PDF | `docs/proposals/FamilyDayApp_Proposal_v1.pdf` |
 | 設計資產說明 | `assets/README.md` |
 
 ### 快速查找
@@ -276,23 +281,25 @@ sequenceDiagram
 | 你想… | 請開 |
 |--------|------|
 | 5 分鐘掌握專案 | 本 README |
-| 完整需求、待辦、進度、技術 | `docs/專案文件.md`（內有章節目錄） |
+| 系統架構與資料流圖 | 本 README [技術架構](#技術架構)（緊接專案概覽之後） |
+| 完整需求、待辦、進度、技術 | `docs/project/專案文件.md`（內有章節目錄） |
+| 前後端與部署／流量定案摘要 | `docs/architecture/summary-*.md` |
 
 ### 建議閱讀順序（角色）
 
 | 角色 | 順序 |
 |------|------|
-| PM | README → `docs/專案文件.md`（先「專案狀態」「待確認」再「需求」） |
-| 開發 | README → `docs/專案文件.md`（先「技術規格」再「需求」） |
-| UI/UX | README → `docs/專案文件.md`（「需求與流程」「待確認」） |
-| 測試 | README → `docs/專案文件.md`（「需求」「技術規格」） |
+| PM | README → `docs/project/專案文件.md`（先「專案狀態」「待確認」再「需求」） |
+| 開發 | README → `docs/project/專案文件.md`（先「技術規格」再「需求」） |
+| UI/UX | README → `docs/project/專案文件.md`（「需求與流程」「待確認」） |
+| 測試 | README → `docs/project/專案文件.md`（「需求」「技術規格」） |
 
 ### 文件更新頻率（建議）
 
 | 文件 | 時機 |
 |------|------|
 | `README.md` | 重大變更、里程碑 |
-| `docs/專案文件.md` | 需求／技術／會議／進度任一變更時（更新對應章節） |
+| `docs/project/專案文件.md` | 需求／技術／會議／進度任一變更時（更新對應章節）；新路徑見 `docs/README.md` |
 
 ---
 

@@ -10,3 +10,5 @@
 | CIS | 企業識別系統規範（色彩、字體、使用準則等） |
 
 檔名建議含版本與日期，避免覆蓋。
+
+**線框圖（Wireframe）**目前集中於 `docs/design/wireframe/`（見 `docs/README.md`）。
