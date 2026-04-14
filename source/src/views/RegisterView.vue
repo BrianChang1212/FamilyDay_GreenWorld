@@ -80,7 +80,7 @@ function submit() {
 						Family Day · Green World
 					</p>
 					<h1
-						class="gw-login-title mt-3 text-[1.65rem] font-bold tracking-tight sm:text-[1.85rem]"
+						class="gw-login-title font-display mt-3 text-[1.65rem] font-bold tracking-tight sm:text-[1.85rem]"
 					>
 						登入活動
 					</h1>
@@ -170,7 +170,7 @@ function submit() {
 						<button
 							type="submit"
 							:disabled="!name.trim() || !employeeId.trim()"
-							class="gw-login-submit group relative flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-bold text-white transition duration-200 ease-out hover:brightness-[1.06] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-[0.4] disabled:shadow-none disabled:hover:brightness-100"
+							class="gw-login-submit group relative flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-bold text-white transition duration-200 ease-out hover:brightness-[1.06] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white/90 focus-visible:ring-offset-2 focus-visible:ring-offset-gw-brand disabled:cursor-not-allowed disabled:opacity-[0.4] disabled:shadow-none disabled:hover:brightness-100"
 						>
 							<span class="relative z-10">進入探索</span>
 							<svg

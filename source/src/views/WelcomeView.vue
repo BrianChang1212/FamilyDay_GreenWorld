@@ -26,13 +26,13 @@ function next() {
 					WELCOME TO 2026
 				</span>
 				<h1
-					class="gw-cover-in mt-6 text-3xl font-bold tracking-tight text-gw-navy"
+					class="gw-cover-in font-display mt-6 text-[1.85rem] font-bold leading-snug tracking-tight text-gw-navy sm:text-[2.1rem]"
 					style="--gw-d: 140ms"
 				>
 					瑞軒家庭日
 				</h1>
 				<p
-					class="gw-cover-in relative mt-3 inline-block text-xl font-bold text-gw-brand"
+					class="gw-cover-in relative mt-3 inline-block text-lg font-bold text-gw-brand sm:text-xl"
 					style="--gw-d: 210ms"
 				>
 					探索自然之美
@@ -51,7 +51,7 @@ function next() {
 			<div class="mt-8">
 				<button
 					type="button"
-					class="gw-cover-in w-full rounded-2xl bg-gw-brand py-4 text-base font-bold text-white shadow-btn transition duration-300 ease-out hover:brightness-[1.03] active:scale-[0.99]"
+					class="gw-cover-in w-full rounded-2xl bg-gw-brand py-4 text-base font-bold text-white shadow-btn transition duration-300 ease-out hover:brightness-[1.03] hover:shadow-[0_6px_20px_rgba(26,157,74,0.35)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gw-brand"
 					style="--gw-d: 360ms"
 					@click="next"
 				>

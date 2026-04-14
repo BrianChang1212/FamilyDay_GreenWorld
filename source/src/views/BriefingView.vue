@@ -35,7 +35,9 @@ function next() {
 					aria-hidden="true"
 				/>
 				<p class="gw-eyebrow text-white/70">GUIDE</p>
-				<h1 class="mt-2 text-2xl font-bold tracking-tight">遊戲說明</h1>
+				<h1 class="font-display mt-2 text-[1.65rem] font-bold leading-snug tracking-tight sm:text-[1.85rem]">
+					遊戲說明
+				</h1>
 				<p class="mt-3 text-sm leading-relaxed text-white/92">
 					歡迎參加家園探索之旅！請至各站掃描 QR Code 解鎖任務，依序完成生態小挑戰。
 				</p>
