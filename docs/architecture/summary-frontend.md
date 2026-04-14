@@ -13,7 +13,7 @@
 | 建置 | **Vite** |
 | 語言 | **TypeScript** |
 | 樣式 | **Tailwind CSS**（或 UnoCSS） |
-| 元件 | **Naive UI**，表單亦可**自製**以完全掌控質感 |
+| 元件 | **草案：** **Naive UI** 或表單自製。**實作（2026-04）：** `source/` 以 **Tailwind 自製** 為主，**尚未**加入 Naive UI；字體為 **Noto Sans TC**（內文）＋ **Noto Serif TC**（標題層級） |
 
 **未採用整站 Next.js 的理由（討論結論）**：活動站以 CSR、QR 進入為主，SEO 需求低；**Vite SPA + 後端 API** 較輕、部署單純。若未來要 SSR 再評估 Nuxt／Next。
 
@@ -77,3 +77,4 @@
 | 版本 | 日期 | 說明 |
 |------|------|------|
 | 1.0 | 2026-04-10 | 初稿：彙整 Vue3+Vite+TS+Tailwind+Naive、模組與 UX、API 銜接 |
+| 1.1 | 2026-04-15 | 補註：`source/` 原型未安裝 Naive UI；以 Tailwind 自製與雙字體策略為準，與草案並存待簽核 |

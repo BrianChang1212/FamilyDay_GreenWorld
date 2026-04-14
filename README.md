@@ -33,7 +33,7 @@
 |------|------|
 | 需求筆記 | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`） |
 | 文件體系 | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等 |
-| 最後更新 README | 2026-04-10（Brian）；已對齊 **0410** 會議；`docs/` 已分類（`project/`、`specs/`、`architecture/` 等） |
+| 最後更新 README | 2026-04-15（Brian）；補齊 **實作現況**（`source/` 前端原型、技術棧與進度表）；0410 會議結論仍為需求基線 |
 
 ---
 
@@ -41,7 +41,7 @@
 
 | 層級 | 內容 |
 |------|------|
-| 前端 | Web UI；**草案**：Vue 3 + Vite + TS + Tailwind + Naive UI；手機／平板／電腦；RWD |
+| 前端 | Web UI；**已實作原型**：Vue 3 + Vite + TypeScript + Tailwind CSS + Vue Router（`source/`）；字體：Noto Sans TC／Noto Serif TC。**Naive UI** 仍為草案選項，**尚未**安裝；表單與版面以 Tailwind 自製為主；RWD |
 | 後端 | **草案**：**FastAPI** + **PostgreSQL**（即時資料）；**Sheet** 輔助匯入／匯出（見 `docs/architecture/summary-backend.md`） |
 | 效能 | 約 1,300 人活動規模；**在線≠固定 RPS**；壓測見 `docs/architecture/summary-traffic.md` |
 
@@ -142,8 +142,8 @@ sequenceDiagram
 | 階段 | 內容 | 狀態 |
 |------|------|:----:|
 | 流程與內容規劃 | 流程架構、UX、闖關機制 | 進行中 |
-| UI 設計 | Wireframe、視覺、易用性 | 待開始 |
-| 開發與測試 | 前後端、多裝置測試、兌獎與驗收 | 待開始 |
+| UI 設計 | Wireframe／主視覺（KV、CIS）與設計稿交付 | 待開始（**程式碼級介面**已在 `source/` 迭代） |
+| 開發與測試 | 前後端、多裝置測試、兌獎與驗收 | 前端原型進行中；後端與 E2E 待開始 |
 
 ### 時程（0410 會議＋提案對照）
 
@@ -212,7 +212,7 @@ sequenceDiagram
 
 細節見 `docs/project/專案文件.md`（開頭補充文件表）及 `docs/architecture/summary-*.md`。
 
-1. **前端（草案）：** Vue 3 + Vite + TypeScript + Tailwind + Naive UI  
+1. **前端（草案簽核中；實作現況見上表）：** Vue 3 + Vite + TypeScript + Tailwind + Vue Router；**Naive UI** 可選、尚未納入 `package.json`  
 2. **Database（草案）：** PostgreSQL  
 3. **RWD：** 需要（手機優先）  
 4. **Sheet：** 匯入／匯出與同步時機（仍待確認）  
@@ -220,14 +220,14 @@ sequenceDiagram
 
 ### 專案進度（概覽）
 
-整體約 **15%**（以規劃文件為主）。細項與風險見 `docs/project/專案文件.md` 內「專案狀態」章節。
+整體約 **22%**（文件＋前端可跑原型；後端與正式測試尚未）。細項見 `docs/project/專案文件.md`「專案狀態」。
 
 | 項目 | 狀態 |
 |------|------|
 | 需求收集與整理 | 完成 |
 | 技術選型 | 草案完成，待簽核 |
-| UI/UX 設計 | 未開始 |
-| 開發 | 未開始 |
+| UI/UX 設計（設計稿／KV） | 未開始 |
+| 開發 | **前端** `source/` 可建置與預覽（示範流程）；後端 API 未接 |
 | 測試 | 未開始 |
 | 部署 | 未開始 |
 
@@ -243,7 +243,7 @@ sequenceDiagram
 **中優先級**
 
 - [ ] 會議**簽核**技術草案（`docs/specs/api-v0.1.md`、`docs/architecture/summary-*.md`）  
-- [ ] 簽核後建立開發環境並初始化 `source/`  
+- [x] 前端：`source/` 已初始化並可 `npm run dev`／`npm run build`（後端環境仍待簽核後建立）  
 
 ---
 
@@ -253,7 +253,8 @@ sequenceDiagram
 |------|------|
 | `docs/` | 見 [`docs/README.md`](docs/README.md)；`project/` 主文件、`specs/` API、`architecture/` 摘要、`proposals/` PDF、`design/` 線框 |
 | `assets/` | 設計稿、KV、Logo、CIS（註明版本與來源） |
-| `source/` | 前端原型（Vue 3 + Vite + TS + Tailwind）：`npm install` → `npm run dev`（預設 `http://localhost:5173`） |
+| `source/` | 前端（Vue 3 + Vite + TS + Tailwind + Vue Router）：於此目錄執行 `npm install` → `npm run dev`（預設 `http://localhost:5173`） |
+| `.cursor/skills/` | Cursor Agent 用技能說明（前端設計、文案／在地化等）；選用，**非**執行期依賴 |
 | `test/` | 測試與驗收紀錄 |
 | `tool/` | 建置、部署、一次性腳本 |
 
@@ -303,4 +304,4 @@ sequenceDiagram
 
 ---
 
-*README v2.0 · 2026-04-10（對齊 0410 會議紀錄）*
+*README v2.1 · 2026-04-15（對齊實作與 0410 需求基線）*
