@@ -93,8 +93,8 @@ function submit() {
 							class="h-px flex-1 max-w-[3.5rem] bg-gradient-to-l from-transparent to-gw-brand/35"
 						/>
 					</div>
-					<p class="mx-auto mt-4 max-w-[20rem] text-sm leading-relaxed text-neutral-600">
-						請填寫與簽到一致之資料，以開通當日闖關與獎項核對權限。
+					<p class="mx-auto mt-4 max-w-[20rem] text-pretty text-sm font-medium leading-relaxed text-neutral-600">
+						請填寫與簽到一致之姓名與員工編號，供現場核對身分與領獎資格。
 					</p>
 				</header>
 
@@ -159,9 +159,9 @@ function submit() {
 									/>
 								</svg>
 							</span>
-							<p class="pt-0.5">
-								請確認資訊正確；錯誤可能影響<strong class="font-semibold text-gw-navy"
-									>獲獎資格</strong>與站點紀錄。
+							<p class="pt-0.5 text-pretty">
+								送出前請再確認；若與簽到資料不符，可能影響<strong class="font-semibold text-gw-navy"
+									>領獎資格</strong>與站點紀錄。
 							</p>
 						</div>
 					</div>

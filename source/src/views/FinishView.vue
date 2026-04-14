@@ -43,19 +43,22 @@ function again() {
 					</div>
 				</div>
 				<div
-					class="absolute -bottom-2 right-4 rotate-[-8deg] rounded-xl border border-amber-200/60 bg-gradient-to-br from-amber-300 to-amber-400 px-4 py-2 text-xs font-bold text-gw-navy shadow-lg ring-2 ring-white/90"
+					class="absolute -bottom-2 right-4 rotate-[-8deg] rounded-xl border border-amber-200/60 bg-gradient-to-br from-amber-300 to-amber-400 px-4 py-2 text-center text-xs font-bold text-gw-navy shadow-[0_12px_28px_rgba(15,31,46,0.12)] ring-2 ring-white/90"
 				>
-					🏆 MISSION CLEAR
+					<span class="block tracking-wide">🏆 闖關完成</span>
+					<span class="mt-0.5 block text-[10px] font-semibold uppercase tracking-[0.12em] text-gw-navy/75"
+						>Mission clear</span
+					>
 				</div>
 			</div>
 
 			<h1
-				class="mt-14 bg-gradient-to-br from-gw-navy to-gw-navy-deep bg-clip-text text-center text-2xl font-bold tracking-tight text-transparent"
+				class="font-display mt-14 text-balance bg-gradient-to-br from-gw-navy to-gw-navy-deep bg-clip-text text-center text-[1.65rem] font-bold leading-snug tracking-tight text-transparent sm:text-2xl"
 			>
-				探索之旅圓滿達成！
+				六站完成，探索告一段落
 			</h1>
-			<p class="mt-3 max-w-sm text-center text-sm leading-relaxed text-neutral-600">
-				恭喜您完成所有站點，請至終點站領取闖關禮。
+			<p class="mt-3 max-w-sm text-center text-pretty text-sm font-medium leading-relaxed text-neutral-600">
+				請憑完成紀錄至終點服務台領取闖關禮；若有疑問可洽現場工作人員。
 			</p>
 
 			<div class="mt-10 grid w-full max-w-sm grid-cols-1 gap-3 sm:grid-cols-2">

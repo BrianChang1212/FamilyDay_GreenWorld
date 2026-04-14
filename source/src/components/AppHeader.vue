@@ -37,7 +37,7 @@ const progressPct = computed(() => (completed.value / 6) * 100);
 
 <template>
 	<header
-		class="shrink-0 border-b border-neutral-200/70 bg-white/92 px-4 py-3.5 shadow-header backdrop-blur-md"
+		class="shrink-0 border-b border-neutral-200/70 bg-white/92 px-4 py-3.5 shadow-[0_1px_0_rgba(15,31,46,0.06),0_8px_24px_-8px_rgba(26,157,74,0.06)] backdrop-blur-md"
 	>
 		<div class="flex items-start gap-3">
 			<BrandLogo size="sm" />
@@ -74,7 +74,7 @@ const progressPct = computed(() => (completed.value / 6) * 100);
 						aria-labelledby="gw-progress-label"
 					>
 						<div
-							class="h-full rounded-full bg-gradient-to-r from-gw-brand via-emerald-400 to-teal-500 shadow-sm transition-all duration-500 ease-out"
+							class="h-full rounded-full bg-gradient-to-r from-gw-brand via-emerald-400 to-teal-500 shadow-sm transition-[width] duration-500 ease-gw-smooth"
 							:style="{ width: `${progressPct}%` }"
 						/>
 					</div>

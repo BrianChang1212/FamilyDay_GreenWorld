@@ -29,6 +29,11 @@ export default {
 				"3xl": "1.375rem",
 				"4xl": "1.75rem",
 			},
+			transitionTimingFunction: {
+				/** 按壓／浮起：較有「質量」的緩動（對齊高階 UI skill，避免線性） */
+				"gw-out": "cubic-bezier(0.32, 0.72, 0, 1)",
+				"gw-smooth": "cubic-bezier(0.22, 1, 0.36, 1)",
+			},
 			boxShadow: {
 				card: "0 8px 24px rgba(15, 31, 46, 0.08)",
 				"card-lg":
@@ -39,6 +44,9 @@ export default {
 					"0 14px 36px rgba(26, 157, 74, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.2) inset",
 				header: "0 1px 0 rgba(15, 31, 46, 0.06)",
 				"glow-brand": "0 0 32px rgba(26, 157, 74, 0.2)",
+				/** 陰影帶品牌色相，減少純灰黑「模板感」 */
+				"gw-soft":
+					"0 4px 20px rgba(15, 31, 46, 0.06), 0 14px 36px -12px rgba(26, 157, 74, 0.1)",
 			},
 			backgroundImage: {
 				"gw-page-mesh":

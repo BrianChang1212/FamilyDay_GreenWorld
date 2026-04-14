@@ -64,7 +64,7 @@ function confirm() {
 
 			<div class="mt-3 h-2 overflow-hidden rounded-full bg-neutral-200/90 p-[3px] shadow-inner ring-1 ring-black/[0.04]">
 				<div
-					class="h-full rounded-full bg-gradient-to-r from-gw-brand via-emerald-400 to-teal-500 shadow-sm transition-all duration-500 ease-out"
+					class="h-full rounded-full bg-gradient-to-r from-gw-brand via-emerald-400 to-teal-500 shadow-sm transition-[width] duration-500 ease-gw-smooth"
 					:style="{ width: `${progressPct}%` }"
 				/>
 			</div>
@@ -103,7 +103,7 @@ function confirm() {
 					:key="opt"
 					type="button"
 					:class="[
-						'flex min-h-[52px] items-center justify-between gap-2 rounded-2xl border px-4 py-3.5 text-left text-base font-semibold transition duration-200 focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gw-brand focus-visible:ring-offset-2',
+						'flex min-h-[52px] items-center justify-between gap-2 rounded-2xl border px-4 py-3.5 text-left text-base font-semibold transition-[transform,box-shadow,background-color,border-color,color] duration-300 ease-gw-out focus-visible:z-10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gw-brand focus-visible:ring-offset-2',
 						selected === opt
 							? 'border-gw-brand bg-gw-cta text-white shadow-btn-lg ring-1 ring-white/25'
 							: 'border-neutral-200/90 bg-white/90 text-gw-navy shadow-sm ring-1 ring-black/[0.04] hover:border-gw-brand/30 hover:bg-white active:scale-[0.99]',

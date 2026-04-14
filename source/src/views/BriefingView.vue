@@ -69,7 +69,7 @@ function next() {
 						</div>
 						<button
 							type="button"
-							class="absolute -right-0.5 -top-0.5 z-20 flex h-12 w-12 items-center justify-center rounded-2xl bg-gw-cta text-lg text-white shadow-btn-lg ring-2 ring-white/90 transition hover:brightness-105 active:scale-95"
+							class="absolute -right-0.5 -top-0.5 z-20 flex h-12 w-12 items-center justify-center rounded-2xl bg-gw-cta text-lg text-white shadow-btn-lg ring-2 ring-white/90 transition-[filter,transform,box-shadow] duration-300 ease-gw-out hover:brightness-105 hover:shadow-[0_10px_28px_rgba(26,157,74,0.35)] active:scale-95"
 							aria-label="相機"
 							@click.prevent
 						>

@@ -26,7 +26,7 @@ function next() {
 					WELCOME TO 2026
 				</span>
 				<h1
-					class="gw-cover-in font-display mt-6 text-[1.85rem] font-bold leading-snug tracking-tight text-gw-navy sm:text-[2.1rem]"
+					class="gw-cover-in font-display mt-6 text-balance text-[1.85rem] font-bold leading-snug tracking-tight text-gw-navy sm:text-[2.1rem]"
 					style="--gw-d: 140ms"
 				>
 					瑞軒家庭日
@@ -41,17 +41,17 @@ function next() {
 					/>
 				</p>
 				<p
-					class="gw-cover-in mx-auto mt-6 max-w-sm text-sm leading-relaxed text-neutral-500"
+					class="gw-cover-in mx-auto mt-6 max-w-sm text-pretty text-sm font-medium leading-relaxed text-neutral-600"
 					style="--gw-d: 290ms"
 				>
-					與家人一同走入自然，翻開屬於我們的生活日誌，寫下美好的回憶篇章。
+					與家人走進園區，一邊解謎一邊認識生態；完成紀錄後，還有闖關禮可領取。
 				</p>
 			</div>
 
 			<div class="mt-8">
 				<button
 					type="button"
-					class="gw-cover-in w-full rounded-2xl bg-gw-brand py-4 text-base font-bold text-white shadow-btn transition duration-300 ease-out hover:brightness-[1.03] hover:shadow-[0_6px_20px_rgba(26,157,74,0.35)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gw-brand"
+					class="gw-cover-in w-full rounded-2xl bg-gw-brand py-4 text-base font-bold text-white shadow-btn transition-[filter,box-shadow,transform] duration-300 ease-gw-out hover:brightness-[1.03] hover:shadow-[0_8px_28px_rgba(26,157,74,0.38)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gw-brand"
 					style="--gw-d: 360ms"
 					@click="next"
 				>

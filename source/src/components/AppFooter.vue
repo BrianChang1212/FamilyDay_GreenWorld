@@ -1,8 +1,8 @@
 <script setup lang="ts">
 const links = [
-	{ label: "SAFETY", href: "#" },
-	{ label: "PRIVACY", href: "#" },
-	{ label: "CONTACT", href: "#" },
+	{ label: "安全說明", href: "#" },
+	{ label: "隱私權", href: "#" },
+	{ label: "聯絡資訊", href: "#" },
 ] as const;
 </script>
 
@@ -18,18 +18,18 @@ const links = [
 					>🧭</span
 				>
 				<span class="leading-snug tracking-wide text-neutral-500"
-					>POWERED BY AmTRAN Technology Co., Ltd.</span
+					>Powered by AmTRAN Technology Co., Ltd.</span
 				>
 			</div>
 			<nav
-				class="flex flex-wrap justify-end gap-x-4 font-bold tracking-[0.14em] text-neutral-500"
+				class="flex flex-wrap justify-end gap-x-4 text-[11px] font-semibold tracking-wide text-neutral-500"
 				aria-label="Footer links"
 			>
 				<a
 					v-for="l in links"
 					:key="l.label"
 					:href="l.href"
-					class="transition hover:text-gw-brand"
+					class="transition-colors duration-300 ease-gw-out hover:text-gw-brand"
 					@click.prevent
 					>{{ l.label }}</a
 				>

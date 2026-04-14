@@ -4,6 +4,7 @@
 
 html {
 	min-height: 100dvh;
+	scroll-behavior: smooth;
 }
 
 body,
@@ -66,14 +67,19 @@ body {
 		border-radius: 1rem;
 		border: 1px solid rgb(229 231 235 / 0.85);
 		background-color: rgb(255 255 255 / 0.96);
-		box-shadow: 0 4px 20px rgba(15, 31, 46, 0.06), 0 0 0 1px rgba(15, 31, 46, 0.04);
+		box-shadow:
+			0 4px 20px rgba(15, 31, 46, 0.06),
+			0 0 0 1px rgba(15, 31, 46, 0.04),
+			0 12px 32px -14px rgba(26, 157, 74, 0.07);
 	}
 
 	.gw-surface-elevated {
 		border-radius: 1rem;
 		border: 1px solid rgb(229 231 235 / 0.75);
 		background-color: #fff;
-		box-shadow: 0 8px 24px rgba(15, 31, 46, 0.08);
+		box-shadow:
+			0 8px 24px rgba(15, 31, 46, 0.08),
+			0 20px 48px -18px rgba(26, 157, 74, 0.09);
 	}
 
 	.gw-eyebrow {
@@ -100,7 +106,10 @@ body {
 		color: #fff;
 		background-image: linear-gradient(135deg, #1a9d4a 0%, #16a34a 45%, #0b7326 100%);
 		box-shadow: 0 4px 14px rgba(26, 157, 74, 0.28);
-		transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+		transition:
+			filter 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+			transform 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+			box-shadow 0.28s cubic-bezier(0.32, 0.72, 0, 1);
 	}
 
 	.gw-btn-primary:focus-visible {
@@ -165,7 +174,10 @@ body {
 		color: #fff;
 		background-image: linear-gradient(135deg, #0f1f2e 0%, #0a1628 55%, #0f1f2e 100%);
 		box-shadow: 0 10px 25px rgba(15, 31, 46, 0.2);
-		transition: filter 0.2s ease, transform 0.2s ease;
+		transition:
+			filter 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+			transform 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+			box-shadow 0.28s cubic-bezier(0.32, 0.72, 0, 1);
 	}
 
 	.gw-btn-navy:hover {
@@ -197,9 +209,12 @@ body {
 		font-weight: 700;
 		color: #0f1f2e;
 		background-color: #fff;
-		box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+		box-shadow: 0 10px 25px rgba(15, 31, 46, 0.18);
 		border: 1px solid rgb(255 255 255 / 0.5);
-		transition: background-color 0.2s ease, transform 0.2s ease;
+		transition:
+			background-color 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+			transform 0.28s cubic-bezier(0.32, 0.72, 0, 1),
+			box-shadow 0.28s cubic-bezier(0.32, 0.72, 0, 1);
 	}
 
 	.gw-btn-on-dark:hover {

@@ -58,7 +58,9 @@ function rowState(id: number): "done" | "current" | "locked" {
 					<div class="flex min-w-0 flex-1 items-start gap-3">
 						<StageMascot :stage="stage" size="sm" />
 						<div class="min-w-0">
-							<h2 class="text-base font-bold tracking-tight text-gw-navy">當前探索站點</h2>
+							<h2 class="font-display text-base font-bold tracking-tight text-gw-navy">
+								當前探索站點
+							</h2>
 							<p class="mt-1 text-xs leading-relaxed text-neutral-500">
 								抵達現場後掃描站點 QR 以解鎖
 							</p>
@@ -147,12 +149,12 @@ function rowState(id: number): "done" | "current" | "locked" {
 						v-for="id in stageIds()"
 						:key="id"
 						:class="[
-							'flex items-center gap-3 rounded-xl border px-3 py-3 transition',
+							'flex items-center gap-3 rounded-xl border px-3 py-3 transition-[transform,box-shadow,background-color,border-color] duration-300 ease-gw-out',
 							rowState(id) === 'current'
-								? 'border-gw-brand/45 bg-gw-mint/55 shadow-sm ring-1 ring-gw-brand/15'
+								? 'border-gw-brand/45 bg-gw-mint/55 shadow-gw-soft ring-1 ring-gw-brand/15'
 								: rowState(id) === 'done'
-									? 'border-neutral-200/90 bg-gradient-to-r from-neutral-50 to-white'
-									: 'border-neutral-100/90 bg-white/70 opacity-75',
+									? 'border-neutral-200/90 bg-gradient-to-r from-neutral-50 to-white hover:shadow-sm'
+									: 'border-neutral-100/90 bg-white/70 opacity-75 hover:opacity-90',
 						]"
 					>
 						<span

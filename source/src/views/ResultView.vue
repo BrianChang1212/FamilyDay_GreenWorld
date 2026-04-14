@@ -55,16 +55,16 @@ function next() {
 						</div>
 					</div>
 					<h1
-						class="mt-8 bg-gradient-to-r from-gw-brand to-gw-forest bg-clip-text text-2xl font-bold tracking-tight text-transparent"
+						class="font-display mt-8 text-balance bg-gradient-to-r from-gw-brand to-gw-forest bg-clip-text text-[1.65rem] font-bold leading-snug tracking-tight text-transparent sm:text-2xl"
 					>
-						太優秀了！
+						這一關通過了
 					</h1>
-					<p class="mt-3 text-sm leading-relaxed text-neutral-600">
-						你對大自然的觀察力簡直完美，成功完成這一關挑戰！
+					<p class="mt-3 text-pretty text-sm font-medium leading-relaxed text-neutral-600">
+						答案正確，站點紀錄已更新。以下是與本關主題相關的小知識。
 					</p>
 
 					<div
-						class="gw-surface mt-8 w-full p-4 text-left shadow-card-sm ring-gw-mint/25"
+						class="gw-surface mt-8 w-full p-4 text-left shadow-gw-soft ring-gw-mint/25"
 					>
 						<div class="flex items-center gap-2 text-sm font-bold text-gw-brand">
 							<span class="text-base" aria-hidden="true">💡</span>
@@ -89,15 +89,23 @@ function next() {
 							✕
 						</div>
 					</div>
-					<h1 class="mt-8 text-2xl font-bold tracking-tight text-[#b71c1c]">哎呀答錯了</h1>
-					<p class="mt-3 text-sm leading-relaxed text-neutral-600">
-						沒關係，大自然還有很多奧秘等著你探索！再試一次吧。
+					<h1
+						class="font-display mt-8 text-balance text-2xl font-bold leading-snug tracking-tight text-[#9a3412]"
+					>
+						這題尚未通過
+					</h1>
+					<p class="mt-3 text-pretty text-sm font-medium leading-relaxed text-neutral-600">
+						請再選擇一次答案；若需協助，可請現場工作人員確認題目與立牌說明。
 					</p>
 				</div>
 			</template>
 
 			<div class="mx-auto mt-10 w-full max-w-sm">
-				<button type="button" class="gw-btn-primary gw-btn-primary--pill" @click="next">
+				<button
+					type="button"
+					class="gw-btn-primary gw-btn-primary--pill shadow-gw-soft hover:shadow-[0_12px_36px_rgba(26,157,74,0.32)]"
+					@click="next"
+				>
 					<template v-if="ok">前往下一站 →</template>
 					<template v-else>再試一次</template>
 				</button>
