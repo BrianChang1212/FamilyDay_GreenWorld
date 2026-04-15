@@ -2,6 +2,7 @@
 
 ## 目錄
 
+- [快速開始](#快速開始)
 - [專案概覽](#專案概覽)
 - [技術架構](#技術架構)
   - [系統架構圖](#系統架構圖)
@@ -11,6 +12,85 @@
 - [待辦與進度](#待辦與進度)
 - [儲存庫目錄結構](#儲存庫目錄結構)
 - [文件與維護](#文件與維護)
+
+---
+
+## 快速開始
+
+### 取得程式庫
+
+```bash
+git clone https://github.com/BrianChang1212/FamilyDay_GreenWorld.git
+cd FamilyDay_GreenWorld
+```
+
+（若本機路徑為 `20260410_FamilyDay_GreenWorld_App`，與上列為同一專案內容時，可略過 clone，直接在該資料夾操作。）
+
+### 只讀文件／規格
+
+1. 開啟 [`docs/README.md`](docs/README.md) 了解 `docs/` 分類。  
+2. 完整需求與會議基線：[`docs/project/專案文件.md`](docs/project/專案文件.md)。  
+3. API 與架構摘要：`docs/specs/`、`docs/architecture/`（見上列索引）。
+
+### Windows：安裝 Node.js 與 npm（winget）
+
+若 PowerShell 出現 **`npm` 無法辨識**，代表尚未安裝 Node.js，或 PATH 尚未載入。
+
+**1. 以 winget 安裝（建議：無系統管理員權限時用「使用者範圍」）**
+
+全系統安裝（預設）在**非系統管理員**環境可能失敗（MSI **Error 1925**／結束代碼 **1603**：權限不足）。可改為只安裝給目前使用者：
+
+```powershell
+winget install OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements --disable-interactivity --scope user
+```
+
+成功時 winget 會提示已新增 `node` 指令，並可能提示**需重新開啟終端機**才會套用 PATH。
+
+**2. 同一個終端機內立即套用 PATH（不必重開 Cursor 時可先執行）**
+
+```powershell
+$env:Path = [System.Environment]::GetEnvironmentVariable("Path","User") + ";" + [System.Environment]::GetEnvironmentVariable("Path","Machine")
+node -v
+npm -v
+```
+
+**3. 安裝專案相依套件（在 `source/`）**
+
+```powershell
+cd D:\Brian\projects\Personal\20260410_FamilyDay_GreenWorld_App\source
+npm install
+```
+
+（本機已用上述流程完成：**Node v24.14.1**、**npm 11.x**、`npm install` 成功。）
+
+**4. 全系統安裝（選用）**
+
+若要以**系統管理員**安裝給所有使用者：以系統管理員開啟 PowerShell，執行 `winget install OpenJS.NodeJS.LTS ...`（**不要**加 `--scope user`），並依 UAC 提示同意。
+
+**5. 安裝失敗時的記錄檔（winget／MSI）**
+
+路徑範例（實際檔名含時間戳記）：
+
+`%LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\DiagOutputDir\`
+
+內可搜尋 **Error 1925**、**1603** 對照權限或舊版衝突。
+
+---
+
+### 本機執行前端原型（`source/`）
+
+**需求：** [Node.js](https://nodejs.org/) **20 LTS 或以上**皆可；本倉庫曾以 **winget LTS 套件（例如 v24.x）** 驗證。須能執行 `node`、`npm`。
+
+```bash
+cd source
+npm install
+npm run dev
+```
+
+瀏覽器開啟終端機顯示之本機網址（Vite 預設多為 **http://localhost:5173**）。  
+建置預覽：`npm run build` 後 `npm run preview`。
+
+**說明：** 後端 API 尚未串接時，畫面以 mock／靜態流程為主；定案見 `docs/specs/api-v0.1.md` 與 `docs/architecture/summary-backend.md`。
 
 ---
 
@@ -304,4 +384,4 @@ sequenceDiagram
 
 ---
 
-*README v2.1 · 2026-04-15（對齊實作與 0410 需求基線）*
+*README v2.3 · 2026-04-15（快速開始：補充 Windows／winget 安裝 Node 流程）*

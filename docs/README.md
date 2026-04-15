@@ -17,6 +17,13 @@
 
 ---
 
+## 開發環境（Windows／Node）
+
+1. **安裝 Node.js 與 npm**、**PATH 更新**、**`npm install`**：見倉庫根目錄 [`README.md`「快速開始」](../README.md#快速開始) 內 **Windows：安裝 Node.js 與 npm（winget）** 小節（含 Error 1925、`--scope user`、同一終端機刷新 PATH 等）。  
+2. **啟動前端**：於 `source/` 執行 `npm run dev`（細節同上節與根 README）。
+
+---
+
 ## 快速連結
 
 | 想找… | 檔案 |
@@ -35,4 +42,4 @@
 
 ---
 
-**最後整理：** 2026-04-10（文件分類與路徑遷移）；**2026-04-15** 起請以根目錄 `README.md` 與 `project/專案文件.md` 之「實作現況」敘述為準（前端 `source/` 已可建置）。
+**最後整理：** 2026-04-10（文件分類與路徑遷移）；**2026-04-15** 起請以根目錄 `README.md` 與 `project/專案文件.md` 之「實作現況」敘述為準（前端 `source/` 已可建置）。**2026-04-15** 補充：根 README「快速開始」內 **Windows／winget 安裝 Node** 操作流程。
