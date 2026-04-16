@@ -13,6 +13,7 @@
 | [`architecture/`](./architecture/) | **架構討論總結**（前後端技術選型、部署、流量） |
 | [`proposals/`](./proposals/) | **外部提案／簡報**（PDF） |
 | [`design/`](./design/) | **設計資產**（線框圖等） |
+| [`demo/`](./demo/) | **操作示範錄影**（MP4 等；不隨前端建置打包，見 [`demo/README.md`](./demo/README.md)） |
 | `zip/` | 壓縮備份（如線框 zip）；非正式規格來源時以展開檔為準 |
 
 ---
@@ -33,6 +34,7 @@
 | 前端／後端／部署／流量摘要 | [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) 等 |
 | 提案 PDF | [`proposals/FamilyDayApp_Proposal_v1.pdf`](./proposals/FamilyDayApp_Proposal_v1.pdf) |
 | Wireframe PNG | [`design/wireframe/`](./design/wireframe/) |
+| 操作示範錄影 | [`demo/`](./demo/)（[`demo/README.md`](./demo/README.md)） |
 
 ---
 
@@ -42,4 +44,4 @@
 
 ---
 
-**最後整理：** 2026-04-10（文件分類與路徑遷移）；**2026-04-15** 起請以根目錄 `README.md` 與 `project/專案文件.md` 之「實作現況」敘述為準（前端 `source/` 已可建置）。**2026-04-15** 補充：根 README「快速開始」內 **Windows／winget 安裝 Node** 操作流程。
+**最後整理：** 2026-04-16。歷史變更與實作細節請以**各檔案標頭**、根目錄 **`README.md`** 頁尾版本列、以及 **`project/專案文件.md`** 為準（含 **`/finish`**、`demo/` 等；見 `architecture/summary-frontend.md` v1.2）。

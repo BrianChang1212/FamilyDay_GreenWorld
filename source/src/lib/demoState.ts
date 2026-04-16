@@ -3,7 +3,26 @@ const K = {
 	name: "fdgw_name",
 	employeeId: "fdgw_employeeId",
 	inZone: "fdgw_inZone",
+	/** 完成頁已領取次數 0–3 */
+	finishClaimed: "fdgw_finishClaimed",
 } as const;
+
+/** 保證領獎機會總次數（與完成頁 UI 一致） */
+export const FINISH_REWARD_SLOTS = 3;
+
+export function getFinishClaimedCount(): number {
+	const v = sessionStorage.getItem(K.finishClaimed);
+	const n = v ? parseInt(v, 10) : 0;
+	if (!Number.isFinite(n)) return 0;
+	return Math.max(0, Math.min(FINISH_REWARD_SLOTS, n));
+}
+
+export function setFinishClaimedCount(n: number): void {
+	sessionStorage.setItem(
+		K.finishClaimed,
+		String(Math.max(0, Math.min(FINISH_REWARD_SLOTS, n))),
+	);
+}
 
 export function getStage(): number {
 	const v = sessionStorage.getItem(K.stage);
@@ -40,6 +59,7 @@ export function resetDemo(): void {
 	sessionStorage.removeItem(K.name);
 	sessionStorage.removeItem(K.employeeId);
 	sessionStorage.removeItem(K.inZone);
+	sessionStorage.removeItem(K.finishClaimed);
 }
 
 /** 與設計稿「闖關路線」站名一致 */
