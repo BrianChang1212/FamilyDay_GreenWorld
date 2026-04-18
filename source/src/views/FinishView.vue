@@ -3,13 +3,12 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
-import { getViteApiBase } from "@/lib/apiBase";
 import {
 	LEVEL_COMPLETE_STICKER_SRC,
 	getProfile,
 	getStage,
-	incrementFinishClaimed,
 } from "@/lib/demoState";
+import { incrementLocalFinishClaimIfNoApiBase } from "@/lib/provisionalFinishClaim";
 
 const router = useRouter();
 const stage = ref(6);
@@ -32,7 +31,7 @@ function closeClaimModal() {
 function confirmClaim() {
 	showClaimModal.value = false;
 	/** 領取紀錄以後端為準；僅在未設定 API 的開發原型用 session 類比 */
-	if (!getViteApiBase()) incrementFinishClaimed();
+	incrementLocalFinishClaimIfNoApiBase();
 	// 上線後於此呼叫核銷／領獎 API，成功後再導向 finishClaimSuccess
 	router.push({ name: "finishClaimSuccess" });
 }

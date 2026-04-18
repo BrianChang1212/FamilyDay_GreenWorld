@@ -1,5 +1,5 @@
 import { getViteApiBase } from "@/lib/apiBase";
-import { FINISH_REWARD_SLOTS } from "@/lib/demoState";
+import { FINISH_REWARD_SLOTS } from "@/lib/constants/finishReward";
 
 export type RewardClaimStatusPayload = {
 	claimedCount: number;

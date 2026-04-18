@@ -1,93 +1,27 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { computed, onMounted, ref } from "vue";
+import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
-import { fetchRewardClaimStatus } from "@/api/rewardClaimStatus";
-import { getViteApiBase } from "@/lib/apiBase";
+import { useRewardClaimPresentation } from "@/composables/useRewardClaimPresentation";
 import {
 	CLAIM_SUCCESS_STICKER_SRC,
-	FINISH_REWARD_SLOTS,
-	getFinishClaimedCount,
 	getProfile,
 } from "@/lib/demoState";
 
 const router = useRouter();
-const route = useRoute();
+
+const {
+	claimed,
+	maxSlots,
+	statusSource,
+	statusLoadState,
+	statusError,
+	isMockPreview,
+	loadClaimPresentation,
+} = useRewardClaimPresentation();
 
 const name = ref("");
 const employeeId = ref("");
-/** 已由後端（或原型後備）確認的領取次數，僅供畫面映射 */
-const claimed = ref(0);
-const maxSlots = ref(FINISH_REWARD_SLOTS);
-
-type StatusSource = "api" | "mock-query" | "local-fallback";
-const statusSource = ref<StatusSource>("api");
-const statusLoadState = ref<"loading" | "ok" | "error">("loading");
-const statusError = ref("");
-
-/** 僅供離線 UI 測試：?mock_claimed=0|1|2|3 覆寫顯示（不寫入 session、不代替後端） */
-function effectiveClaimedFromQuery(): number | null {
-	const raw = route.query.mock_claimed;
-	const s = Array.isArray(raw) ? raw[0] : raw;
-	if (s === undefined || s === null || String(s).trim() === "") return null;
-	const n = parseInt(String(s), 10);
-	if (!Number.isFinite(n)) return null;
-	return Math.max(0, Math.min(FINISH_REWARD_SLOTS, n));
-}
-
-const isMockPreview = computed(() => effectiveClaimedFromQuery() !== null);
-
-async function loadClaimPresentation() {
-	const mock = effectiveClaimedFromQuery();
-	if (mock !== null) {
-		claimed.value = mock;
-		maxSlots.value = FINISH_REWARD_SLOTS;
-		statusSource.value = "mock-query";
-		statusLoadState.value = "ok";
-		statusError.value = "";
-		return;
-	}
-
-	const base = getViteApiBase();
-
-	if (base) {
-		statusLoadState.value = "loading";
-		statusError.value = "";
-		try {
-			const s = await fetchRewardClaimStatus();
-			claimed.value = s.claimedCount;
-			maxSlots.value = s.maxSlots;
-			statusSource.value = "api";
-			statusLoadState.value = "ok";
-		} catch (e) {
-			statusSource.value = "api";
-			statusLoadState.value = "error";
-			statusError.value =
-				e instanceof Error ? e.message : "無法載入領獎狀態";
-		}
-		return;
-	}
-
-	claimed.value = getFinishClaimedCount();
-	maxSlots.value = FINISH_REWARD_SLOTS;
-	statusSource.value = "local-fallback";
-	statusLoadState.value = "ok";
-	statusError.value = "";
-}
-
-onMounted(() => {
-	const p = getProfile();
-	name.value = p.name || "夥伴";
-	employeeId.value = p.employeeId || "—";
-	void loadClaimPresentation();
-});
-
-watch(
-	() => route.query.mock_claimed,
-	() => {
-		void loadClaimPresentation();
-	},
-);
 
 function retryLoadStatus() {
 	void loadClaimPresentation();
@@ -112,6 +46,13 @@ const slotLabels = computed(() => {
 		c >= 2 ? "已領取" : "待領取",
 		third,
 	] as const;
+});
+
+onMounted(() => {
+	const p = getProfile();
+	name.value = p.name || "夥伴";
+	employeeId.value = p.employeeId || "—";
+	void loadClaimPresentation();
 });
 </script>
 

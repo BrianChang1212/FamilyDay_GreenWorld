@@ -1,3 +1,7 @@
+import { FINISH_REWARD_SLOTS } from "@/lib/constants/finishReward";
+
+export { FINISH_REWARD_SLOTS };
+
 const K = {
 	stage: "fdgw_stage",
 	name: "fdgw_name",
@@ -10,9 +14,6 @@ const K = {
 	/** 現場報到：是否已完成送出（原型；與闖關流程分離） */
 	checkinDone: "fdgw_checkin_done",
 } as const;
-
-/** 保證領獎機會總次數（與完成頁 UI 一致） */
-export const FINISH_REWARD_SLOTS = 3;
 
 export function getFinishClaimedCount(): number {
 	const v = sessionStorage.getItem(K.finishClaimed);
