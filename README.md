@@ -185,7 +185,7 @@ npm run dev
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
 | 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-19（頁尾 **v2.39**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
+| 最後更新 README | 2026-04-19（頁尾 **v2.40**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
 
 
 ---
@@ -481,7 +481,7 @@ sequenceDiagram
 | 總覽           | `README.md`（本文件）                                                 |
 | 文件索引         | `docs/README.md`（`docs/` 分類導覽）                                   |
 | 詳細規格（單檔）     | `docs/project/專案文件.md`（需求、待確認、專案狀態、技術規格、提案來源、維護附錄）               |
-| API 草案（v0.1） | `docs/specs/api-v0.1.md`（REST 端點、範例 JSON、畫面對照）                   |
+| API 草案（v0.1） | `docs/specs/api-v0.1.md`（REST 端點、範例 JSON、畫面對照；修訂紀錄至 **v0.1.2**） |
 | 前端討論總結       | `docs/architecture/summary-frontend.md`（Vue3／Vite／模組與 UX、API 銜接） |
 | 後端討論總結       | `docs/architecture/summary-backend.md`（FastAPI／PostgreSQL、模型與安全） |
 | 架設環境討論總結     | `docs/architecture/summary-deployment.md`（雲／內網／PaaS、區域與採購注意）     |
@@ -525,4 +525,4 @@ sequenceDiagram
 
 ---
 
-*README v2.39 · 2026-04-19（路由表路徑統一、`api-v0.1` **v0.1.2** 與 `專案文件` **v1.3.18** 索引；v2.38）*
+*README v2.40 · 2026-04-19（文件表補 **api-v0.1.2**；`source/index.html` **title** 與專案主線用語對齊；v2.39）*
