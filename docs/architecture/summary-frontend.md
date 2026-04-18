@@ -1,7 +1,7 @@
 # 前端技術與設計 — 討論總結
 
 > 本文件彙整專案關於**前端架構、介面方向、與 API 銜接**之討論結論，作為後續實作與評審依據。  
-> 相關 API 細節見 [`api-v0.1.md`](../specs/api-v0.1.md)。
+> 相關 API 細節見 [`api-v0.1.md`](../specs/api-v0.1.md)（修訂 **v0.1.4**；§11 **Vitest** 客戶端測試註記，**不重**定義 REST）。
 
 ---
 
@@ -16,6 +16,14 @@
 | 元件 | **草案：** **Naive UI** 或表單自製。**實作（2026-04）：** `source/` 以 **Tailwind 自製** 為主，**尚未**加入 Naive UI；字體為 **Noto Sans TC**（內文）＋ **Noto Serif TC**（標題層級） |
 
 **未採用整站 Next.js 的理由（討論結論）**：活動站以 CSR、QR 進入為主，SEO 需求低；**Vite SPA + 後端 API** 較輕、部署單純。若未來要 SSR 再評估 Nuxt／Next。
+
+### 1.1 自動化測試（實作 · 2026-04）
+
+- **執行器：** **Vitest**（`source/vitest.config.ts`），環境 **happy-dom**（`sessionStorage` 等）。  
+- **檔案配置：** 與原始碼並列，**`source/src/**/*.test.ts`**（例：`api/rewardClaimStatus.test.ts`、`lib/rewardClaimPresentation.test.ts`、`composables/useRewardClaimPresentation.test.ts`）。  
+- **涵蓋範圍（現況）：** `apiBase`、`fetchRewardClaimStatus`／dashboard 映射、`rewardClaimPresentation`、`demoState`、`entryIntent`、`provisionalFinishClaim`、`useRewardClaimPresentation` 等；**未**含各 `.vue` 畫面之完整 E2E。  
+- **指令：** `source/` 內 **`npm run test`**（單次）、**`npm run test:watch`**、**`npm run test:coverage`**。  
+- **CI：** [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) 對 **`main`** 之 push／PR：**`npm ci` → `npm run test` → `npm run build`**。
 
 ---
 
@@ -156,7 +164,7 @@ flowchart TD
 
 - 開發期：可於 **`vite.config`** 設定 **proxy** 指向本機或測試 API（`source/vite.config.ts` **目前未**預設 proxy，由專案依環境補上）。  
 - 正式／測試建置：於 **`source/`** 設定 **`VITE_API_BASE`** = API **主機根**（**無**尾隨 `/`），例如 `https://api.example.com` 或同源 `https://event.example.com`；程式會請求 **`{VITE_API_BASE}/api/v1/...`**（見 **`source/src/lib/apiBase.ts`**）。**舊稿若寫 `VITE_API_BASE_URL` 應改為此名稱。**  
-- **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`source/vite.config.ts`** 與根 [`README.md`](../../README.md#preview-netlify-test-ui)「**公開預覽部署 · 測試 Web UI**」（錨點 **`preview-netlify-test-ui`**；含 **Netlify 範例網址**、**`/check-in`**／**`/game`** QR 分流、與 **`main` 連動**；[`summary-deployment.md`](./summary-deployment.md) **§1.1** **v1.3** 摘要連動）。  
+- **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`source/vite.config.ts`** 與根 [`README.md`](../../README.md#preview-netlify-test-ui)「**公開預覽部署 · 測試 Web UI**」（錨點 **`preview-netlify-test-ui`**；含 **Netlify 範例網址**、**`/check-in`**／**`/game`** QR 分流、與 **`main` 連動**；[`summary-deployment.md`](./summary-deployment.md) **§1.1** **v1.4** 摘要連動）。  
 - **關卡瀏覽與領取狀態呈現**：可共用 **`GET /api/v1/me/dashboard`**（合併 API）；HTTP 與 JSON 映射見 **`source/src/api/rewardClaimStatus.ts`**；領取成功頁之 mock／API／fallback 編排見 **`lib/rewardClaimPresentation.ts`** 與 **`composables/useRewardClaimPresentation.ts`**。  
 - 完整端點列表見 [`api-v0.1.md`](../specs/api-v0.1.md)。
 
@@ -200,7 +208,7 @@ flowchart TD
 | 1.12 | 2026-04-18 | 外部索引：`CheckInCompleteView` 缺 profile 時應回 **`checkin`**（非 `register`）；根 README 路由表釐清 `?entry` 僅寫意圖 |
 | 1.13 | 2026-04-18 | **§2.1** 狀態鍵列補齊（`demoState`／`entryIntent` 與程式一致） |
 | 1.14 | 2026-04-18 | **§2.1** `/briefing`：**一律**導向 `register`；與 §2.3「說明後下一屏即登入、不先進地圖」一致；程式 `BriefingView` 已對齊 |
-| 1.15 | 2026-04-18 | **§2.1** 補 **`/finish/claimed`**、領取狀態以 **`VITE_API_BASE` + `GET /me/dashboard`** 為準與 dev 後備；**§2** 目錄建議與 `source/src/api`、`lib/apiBase` 實際對齊；**§3–§4** 修正 **`VITE_API_BASE`**（廢止 **`VITE_API_BASE_URL`** 舊稱）；刪除未使用之 doodle 元件後僅保留 **`PageCritters`** |
+| 1.15 | 2026-04-18 | **§2.1** 補 **`/finish/claimed`**、領取狀態以 **`VITE_API_BASE` + `GET /api/v1/me/dashboard`** 為準與 dev 後備；**§2** 目錄建議與 `source/src/api`、`lib/apiBase` 實際對齊；**§3–§4** 修正 **`VITE_API_BASE`**（廢止 **`VITE_API_BASE_URL`** 舊稱）；刪除未使用之 doodle 元件後僅保留 **`PageCritters`** |
 | 1.16 | 2026-04-18 | **§3**「完成頁／領取成功」列：當時明訂 **`fdgw_finishClaimed`** 後備**僅限開發建置**；**v1.18** 起改為無 **`VITE_API_BASE`** 時皆 **`local-fallback`**（含預覽建置），並於畫面標示非伺服器紀錄 |
 | 1.17 | 2026-04-18 | **§4**：釐清 `source/vite.config.ts` **尚未**預設 proxy，需依環境自行設定 |
 | 1.18 | 2026-04-18 | **§2.1／§2.3／§3／§4**：**`/finish/claimed`** 無 **`VITE_API_BASE`** 時一律 **`local-fallback`**（含預覽建置），廢止「僅 DEV／正式顯示錯誤」舊述；補 **靜態預覽** 與 **`VITE_BASE_PATH`** |
@@ -208,3 +216,4 @@ flowchart TD
 | 1.20 | 2026-04-18 | 修訂表 **v1.16** 列：補 **v1.18** 承接敘述，避免讀者誤以為仍「僅開發建置」後備；**v1.19** 列補明錨點 **`preview-netlify-test-ui`**（與根 **`README`** 一致） |
 | 1.21 | 2026-04-18 | **§4**：「靜態預覽」條目之根 **`README`** 改為可點連結 [`README.md#preview-netlify-test-ui`](../../README.md#preview-netlify-test-ui) |
 | 1.22 | 2026-04-19 | **§2** 目錄：**`api/`**／**`lib/constants/`**／**`rewardClaimPresentation`**／**`provisionalFinishClaim`**／**`composables/`** 與程式分層一致；**§2.1**「領取狀態」、**§3** 完成頁列、**§4** dashboard 條目同步 |
+| 1.23 | 2026-04-19 | **§1.1**：**Vitest** 單元測試（`source/src/**/*.test.ts`）、指令與 **`.github/workflows/ci.yml`**（`npm run test` → build） |

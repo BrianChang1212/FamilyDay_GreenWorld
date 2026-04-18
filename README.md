@@ -98,13 +98,15 @@ npm run dev
 瀏覽器開啟終端機顯示之本機網址（Vite 預設多為 **[http://localhost:5173](http://localhost:5173)**）。  
 建置預覽：`npm run build` 後 `npm run preview`。
 
+**單元測試（Vitest）：** 於 `source/` 執行 `npm run test`；開發監看可用 `npm run test:watch`；覆蓋率報告可用 `npm run test:coverage`。測試檔與程式並列（`source/src/**/*.test.ts`）。GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) 在 `npm run build` **之前**會先跑 `npm run test`。
+
 **說明：** 後端 API 尚未串接時，多數畫面仍以 mock／靜態流程為主。**未設定 `VITE_API_BASE` 時**，完成頁領獎次數會以瀏覽器 `sessionStorage` 類比（僅供預覽）；若要以**真實後端**顯示次數，請於 `source/` 建立 `.env.local`（或建置環境變數）設定 **`VITE_API_BASE`**（API 主機根、無尾隨 `/`），詳見 `docs/architecture/summary-frontend.md` §4。定案見 `docs/specs/api-v0.1.md` 與 `docs/architecture/summary-backend.md`。
 
 <a id="preview-netlify-test-ui"></a>
 
 ### 公開預覽部署 · 測試 Web UI
 
-> 給他人用手機／瀏覽器試操作，可不接後端；與 [`docs/architecture/summary-deployment.md`](docs/architecture/summary-deployment.md) **§1.1**（修訂 **v1.3**）、[`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) **§4** 互相連結。
+> 給他人用手機／瀏覽器試操作，可不接後端；與 [`docs/architecture/summary-deployment.md`](docs/architecture/summary-deployment.md) **§1.1**（修訂 **v1.4**）、[`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) **§4** 互相連結。
 
 靜態檔來自 `source/` 的 `npm run build` 產物（`source/dist`）。**建議優先使用 Netlify**（子路徑與 Vue Router 較省事）；亦可使用本倉庫內建的 GitHub Actions 發布至 GitHub Pages。
 
@@ -185,7 +187,7 @@ npm run dev
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
 | 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-19（頁尾 **v2.40**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
+| 最後更新 README | 2026-04-19（頁尾 **v2.47**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md)（合併版 **v1.3.24**；`api-v0.1` **v0.1.4**） |
 
 
 ---
@@ -222,7 +224,7 @@ npm run dev
 | `/checkin` | **報到**單頁（姓名、員編、同行人數）＋確認彈窗；完成後僅 **`/checkin/complete`**。 |
 | `/checkin/complete` | 報到完成頁；參加闖關須**另掃闖關 QR**（如 `/game`）。報到動線見 [`summary-frontend.md`](docs/architecture/summary-frontend.md) **§2.2**（含流程圖）。 |
 | `/finish` | 完成頁保證領獎原型（`FinishView.vue`）：確認領獎彈窗。規格見 [`docs/project/專案文件.md`](docs/project/專案文件.md)、[`summary-frontend.md`](docs/architecture/summary-frontend.md)。 |
-| `/finish/claimed` | 領取成功頁（`ClaimSuccessView.vue`）：已設定 **`VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 呈現三格狀態；**未**設定時（含預覽站）以 **`local-fallback`**／`sessionStorage` 類比；載入邏輯見 **`source/src/composables/useRewardClaimPresentation.ts`**、**`source/src/lib/rewardClaimPresentation.ts`**、**`source/src/api/rewardClaimStatus.ts`**。詳 [`summary-frontend.md`](docs/architecture/summary-frontend.md) §2.1、§2（**v1.22**）。 |
+| `/finish/claimed` | 領取成功頁（`ClaimSuccessView.vue`）：已設定 **`VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 呈現三格狀態；**未**設定時（含預覽站）以 **`local-fallback`**／`sessionStorage` 類比；載入邏輯見 **`source/src/composables/useRewardClaimPresentation.ts`**、**`source/src/lib/rewardClaimPresentation.ts`**、**`source/src/api/rewardClaimStatus.ts`**。詳 [`summary-frontend.md`](docs/architecture/summary-frontend.md) §2.1、§2（**v1.23**）。 |
 
 
 ### 系統架構圖
@@ -426,7 +428,7 @@ sequenceDiagram
 
 ### 專案進度（概覽）
 
-整體約 **22%**（文件＋前端可跑原型；後端與正式測試尚未）。細項見 `docs/project/專案文件.md`「專案狀態」。
+整體約 **24%**（文件＋前端可跑原型＋**前端 Vitest 單元測試與 CI**；後端、整合／E2E／壓測仍待）。細項見 `docs/project/專案文件.md`「專案狀態」。
 
 
 | 項目               | 狀態                                      |
@@ -435,8 +437,8 @@ sequenceDiagram
 | 技術選型             | 草案完成，待簽核                                |
 | UI/UX 設計（設計稿／KV） | 未開始                                     |
 | 開發               | **前端** `source/` 可建置與預覽（示範流程）；後端 API 未接 |
-| 測試               | 未開始                                     |
-| 部署               | 未開始                                     |
+| 測試               | **前端** Vitest 單元測試已納入 CI（`source/src/**/*.test.ts`）；整合／E2E／壓測仍待 |
+| 部署               | **正式／公司核可場域**尚未定案與上線；**靜態預覽**（Netlify／GitHub Pages 等）見 [公開預覽部署 · 測試 Web UI](#preview-netlify-test-ui) 與 **CI**（[`.github/workflows/ci.yml`](.github/workflows/ci.yml)） |
 
 
 ### 下一步（本週）
@@ -462,10 +464,10 @@ sequenceDiagram
 | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `docs/`           | 見 [`docs/README.md`](docs/README.md)（含 `project/`、`specs/`、`architecture/`、`demo/`、**`preview/`** 介面截圖等子目錄說明） |
 | `assets/`         | 設計稿、KV、Logo、CIS（註明版本與來源）                                                                                          |
-| `source/`         | 前端（Vue 3 + Vite + TS + Tailwind + Vue Router）：於此目錄執行 `npm install` → `npm run dev`（預設 `http://localhost:5173`）    |
+| `source/`         | 前端（Vue 3 + Vite + TS + Tailwind + Vue Router）：`npm install` → `npm run dev`（預設 `http://localhost:5173`）；**`npm run test`**（Vitest） |
 | `.cursor/skills/` | Cursor Agent 用技能說明（前端設計、文案／在地化等）；選用，**非**執行期依賴                                                                    |
-| `test/`           | 測試與驗收紀錄（**選用**；目前僅 **`.gitkeep`** 佔位，內容待補）                                                                               |
-| `tool/`           | 建置、部署、一次性腳本（**選用**；目前僅 **`.gitkeep`** 佔位，內容待補）                                                                           |
+| `test/`           | 倉庫根目錄**驗收／測試紀錄**用（**選用**；目前僅 **`.gitkeep`**）。**程式單元測試**在 **`source/src/**/*.test.ts`**（Vitest），非此資料夾 |
+| `tool/`           | 輔助腳本（**選用**）：例如 [`tool/capture-preview-screenshots.ps1`](tool/capture-preview-screenshots.ps1)（重產 [`docs/preview/screenshots/`](docs/preview/screenshots/)，見 [`docs/preview/README.md`](docs/preview/README.md)）；另含 **`.gitkeep`** |
 | `graphify-out/`   | 圖譜／分析工具輸出（HTML／JSON／報告）；**已列於 `.gitignore`**，避免大量快取進版控                                                                 |
 
 
@@ -481,7 +483,7 @@ sequenceDiagram
 | 總覽           | `README.md`（本文件）                                                 |
 | 文件索引         | `docs/README.md`（`docs/` 分類導覽）                                   |
 | 詳細規格（單檔）     | `docs/project/專案文件.md`（需求、待確認、專案狀態、技術規格、提案來源、維護附錄）               |
-| API 草案（v0.1） | `docs/specs/api-v0.1.md`（REST 端點、範例 JSON、畫面對照；修訂紀錄至 **v0.1.2**） |
+| API 草案（v0.1） | `docs/specs/api-v0.1.md`（REST 端點、範例 JSON、畫面對照；修訂紀錄至 **v0.1.4**） |
 | 前端討論總結       | `docs/architecture/summary-frontend.md`（Vue3／Vite／模組與 UX、API 銜接） |
 | 後端討論總結       | `docs/architecture/summary-backend.md`（FastAPI／PostgreSQL、模型與安全） |
 | 架設環境討論總結     | `docs/architecture/summary-deployment.md`（雲／內網／PaaS、區域與採購注意）     |
@@ -525,4 +527,4 @@ sequenceDiagram
 
 ---
 
-*README v2.40 · 2026-04-19（文件表補 **api-v0.1.2**；`source/index.html` **title** 與專案主線用語對齊；v2.39）*
+*README v2.47 · 2026-04-19（`api-v0.1` **v0.1.4** 檔首 dashboard 路徑用語；`專案文件` **v1.3.24**；v2.46）*

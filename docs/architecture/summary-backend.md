@@ -42,8 +42,8 @@
 | 項目 | 結論 |
 |------|------|
 | 簽到 vs 闖關登入 | **分開**：獨立 API 與流程（見 `api-v0.1.md` 之 `checkin` 與 `auth/login`）。 |
-| 進度模型 | **作法 A**：**無獨立 `runId`／runs 表**；以單一使用者進度 + **`fullClearCount`／輪次** 等欄位表達「最多玩 3 輪」；再開一輪用 **`POST /me/playthrough/restart`**。 |
-| 關卡瀏覽資料 | **合併 API**：**`GET /me/dashboard`** 一次回傳 stages + progress。 |
+| 進度模型 | **作法 A**：**無獨立 `runId`／runs 表**；以單一使用者進度 + **`fullClearCount`／輪次** 等欄位表達「最多玩 3 輪」；再開一輪用 **`POST /api/v1/me/playthrough/restart`**。 |
+| 關卡瀏覽資料 | **合併 API**：**`GET /api/v1/me/dashboard`** 一次回傳 stages + progress。 |
 | 限流 | 伺服器端實作 **每使用者每分鐘 30 次**（可細分 bucket）；登入／簽到可更嚴。 |
 
 ---
@@ -76,3 +76,5 @@
 | 版本 | 日期 | 說明 |
 |------|------|------|
 | 1.0 | 2026-04-10 | 初稿：FastAPI、PostgreSQL、作法 A、JWT 站點、指向 api-v0.1 |
+| 1.1 | 2026-04-19 | **§4**：合併 dashboard 端點改寫為 **`GET /api/v1/me/dashboard`**（與 `api-v0.1`、前端 `rewardClaimStatus.ts` 一致） |
+| 1.2 | 2026-04-19 | **§4**：再開一輪端點改寫為 **`POST /api/v1/me/playthrough/restart`**（與 `api-v0.1` 一致） |

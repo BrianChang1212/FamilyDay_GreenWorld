@@ -1,6 +1,6 @@
 # 家庭日綠世界闖關 Web — API 規格（v0.1 草案）
 
-> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** `GET /me/dashboard`。修訂紀錄見文末（**v0.1.2** 補前端實作分層註記，不改端點定義）。
+> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.4** 檔首用語與 § 端點表一致；**v0.1.3** 補前端 **Vitest** 對 dashboard 客戶端映射之測試註記；**v0.1.2** 起之前端分層註記仍適用；**不改**端點定義）。
 
 ---
 
@@ -229,6 +229,8 @@
 | 領取成功頁（闖關禮狀態呈現） | 與關卡瀏覽共用 **`GET /api/v1/me/dashboard`**；讀取 `progress.rewardRedeemCount`（選用）或暫用 `fullClearCount`（見 §5 示例） |
 | 領獎（若有） | `POST /api/v1/staff/redeem/token`、`POST /api/v1/staff/redeem/confirm` |
 
+**實作測試（前端 · 不變更上表契約）：** `source/src/api/rewardClaimStatus.test.ts`（**Vitest**）等，驗證客戶端對 **`dashboard.progress`** 之映射與錯誤處理；**後端**仍須依本規格實作與回傳 JSON。
+
 ---
 
 ## 修訂紀錄
@@ -238,3 +240,5 @@
 | v0.1 | 2026-04-10 | 初稿：整合簽到／登入分開、JWT 站點、作法 A、合併 dashboard |
 | v0.1.1 | 2026-04-18 | §5：`progress` 示例補**選用** `rewardRedeemCount`；§11：補「領取成功頁」與 dashboard 對照（與前端 `rewardClaimStatus.ts` 對齊） |
 | v0.1.2 | 2026-04-19 | §11：補註前端已將 dashboard 讀取與畫面編排分離（`api/rewardClaimStatus.ts`、`lib/rewardClaimPresentation.ts`、`composables/useRewardClaimPresentation.ts`）；**端點與欄位語意**仍以此規格為準 |
+| v0.1.3 | 2026-04-19 | §11：補 **Vitest** 客戶端測試註記（`rewardClaimStatus.test.ts` 等）；**不重**定義 REST 路徑或 `progress` 語意 |
+| v0.1.4 | 2026-04-19 | 檔首：**dashboard** 端點改為 **`GET /api/v1/me/dashboard`**（與本文端點表一致；**無**契約變更） |
