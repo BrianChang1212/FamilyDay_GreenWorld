@@ -1,6 +1,6 @@
 # 預覽畫面截圖（`screenshots/`）
 
-`screenshots/*.png` 為本倉庫 **`source/`** 執行 **`npm run build`** 後，以 **`vite preview`**（預設 **http://127.0.0.1:4173**）擷取之靜態畫面；viewport **390×844**（手機比例），與根 [`README.md`](../../README.md)「**介面預覽（截圖）**」一節併陳。
+`screenshots/*.png` 為本倉庫 **`source/`** 執行 **`npm run build`** 後，以 **`vite preview`**（預設 **http://127.0.0.1:4173**）擷取之靜態畫面；viewport **390×844**（手機比例），與根 [`README.md#ui-preview-screenshots`](../../README.md#ui-preview-screenshots)「**介面預覽（截圖）**」一節併陳。
 
 ## 重新產生
 

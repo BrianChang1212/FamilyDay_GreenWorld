@@ -46,4 +46,4 @@
 
 ---
 
-**最後整理：** 2026-04-19。歷史變更與實作細節請以**各檔案標頭**、根目錄 **`README.md`** 頁尾版本列、以及 **`project/專案文件.md`**（合併版 **v1.3.17**）為準；**測試 Web UI** 見根 [`README.md`](../README.md#preview-netlify-test-ui)；前端路由、`VITE_API_BASE`、`local-fallback` 與 **`api/`／`composables` 分層**見 `architecture/summary-frontend.md`（§2.1、§2，**v1.22**）；部署摘要見 `architecture/summary-deployment.md` §1.1（修訂至 **v1.3**）；`dashboard` 選用欄位見 `specs/api-v0.1.md`（**v0.1.1**）。
+**最後整理：** 2026-04-19。歷史變更與實作細節請以**各檔案標頭**、根目錄 **`README.md`** 頁尾版本列、以及 **`project/專案文件.md`**（合併版 **v1.3.18**）為準；**測試 Web UI** 見根 [`README.md`](../README.md#preview-netlify-test-ui)；前端路由、`VITE_API_BASE`、`local-fallback` 與 **`api/`／`composables` 分層**見 `architecture/summary-frontend.md`（§2.1、§2，**v1.22**）；部署摘要見 `architecture/summary-deployment.md` §1.1（修訂至 **v1.3**）；`specs/api-v0.1.md` 修訂至 **v0.1.2**（**v0.1.1** 補 `dashboard`／領取成功頁對照；**v0.1.2** 補前端分層註記，端點不變）。

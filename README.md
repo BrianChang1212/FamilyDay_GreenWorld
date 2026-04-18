@@ -185,7 +185,7 @@ npm run dev
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
 | 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-19（頁尾 **v2.38**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
+| 最後更新 README | 2026-04-19（頁尾 **v2.39**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
 
 
 ---
@@ -222,7 +222,7 @@ npm run dev
 | `/checkin` | **報到**單頁（姓名、員編、同行人數）＋確認彈窗；完成後僅 **`/checkin/complete`**。 |
 | `/checkin/complete` | 報到完成頁；參加闖關須**另掃闖關 QR**（如 `/game`）。報到動線見 [`summary-frontend.md`](docs/architecture/summary-frontend.md) **§2.2**（含流程圖）。 |
 | `/finish` | 完成頁保證領獎原型（`FinishView.vue`）：確認領獎彈窗。規格見 [`docs/project/專案文件.md`](docs/project/專案文件.md)、[`summary-frontend.md`](docs/architecture/summary-frontend.md)。 |
-| `/finish/claimed` | 領取成功頁（`ClaimSuccessView.vue`）：已設定 **`VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 呈現三格狀態；**未**設定時（含預覽站）以 **`local-fallback`**／`sessionStorage` 類比；載入邏輯見 `source/src/composables/useRewardClaimPresentation.ts`、**`lib/rewardClaimPresentation.ts`**、**`api/rewardClaimStatus.ts`**。詳 [`summary-frontend.md`](docs/architecture/summary-frontend.md) §2.1、§2（**v1.22**）。 |
+| `/finish/claimed` | 領取成功頁（`ClaimSuccessView.vue`）：已設定 **`VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 呈現三格狀態；**未**設定時（含預覽站）以 **`local-fallback`**／`sessionStorage` 類比；載入邏輯見 **`source/src/composables/useRewardClaimPresentation.ts`**、**`source/src/lib/rewardClaimPresentation.ts`**、**`source/src/api/rewardClaimStatus.ts`**。詳 [`summary-frontend.md`](docs/architecture/summary-frontend.md) §2.1、§2（**v1.22**）。 |
 
 
 ### 系統架構圖
@@ -525,4 +525,4 @@ sequenceDiagram
 
 ---
 
-*README v2.38 · 2026-04-19（文件對齊前端 API 分層、`summary-frontend` **v1.22**、`專案文件` **v1.3.17**；v2.37）*
+*README v2.39 · 2026-04-19（路由表路徑統一、`api-v0.1` **v0.1.2** 與 `專案文件` **v1.3.18** 索引；v2.38）*
