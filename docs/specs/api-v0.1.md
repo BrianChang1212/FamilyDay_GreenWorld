@@ -1,6 +1,6 @@
 # 家庭日綠世界闖關 Web — API 規格（v0.1 草案）
 
-> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** `GET /me/dashboard`。
+> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** `GET /me/dashboard`。修訂紀錄見文末（**v0.1.2** 補前端實作分層註記，不改端點定義）。
 
 ---
 
@@ -237,3 +237,4 @@
 |------|------|------|
 | v0.1 | 2026-04-10 | 初稿：整合簽到／登入分開、JWT 站點、作法 A、合併 dashboard |
 | v0.1.1 | 2026-04-18 | §5：`progress` 示例補**選用** `rewardRedeemCount`；§11：補「領取成功頁」與 dashboard 對照（與前端 `rewardClaimStatus.ts` 對齊） |
+| v0.1.2 | 2026-04-19 | §11：補註前端已將 dashboard 讀取與畫面編排分離（`api/rewardClaimStatus.ts`、`lib/rewardClaimPresentation.ts`、`composables/useRewardClaimPresentation.ts`）；**端點與欄位語意**仍以此規格為準 |

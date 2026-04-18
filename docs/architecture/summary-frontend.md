@@ -27,8 +27,10 @@
 - `features/quest` — 闖關、答題、站點 QR  
 - `features/map` 或 `zones` — 關卡瀏覽／地圖  
 - `components` — 共用元件（例：全站裝飾 **`components/doodles/PageCritters.vue`**）  
-- **`api/`** — API 請求模組（例：**`rewardClaimStatus.ts`** → `GET /api/v1/me/dashboard`）  
-- **`lib/`** — 工具與原型狀態（例：**`apiBase.ts`** 讀取 **`VITE_API_BASE`**、**`demoState.ts`**）  
+- **`api/`** — **僅** HTTP 與回應正規化（例：**`rewardClaimStatus.ts`** → `GET /api/v1/me/dashboard`；**不**依賴 Vue／`demoState`）  
+- **`lib/constants/`** — 與後端／UI 共用之常數（例：**`finishReward.ts`** 之 **`FINISH_REWARD_SLOTS`**）  
+- **`lib/`** — 工具與原型狀態（例：**`apiBase.ts`**、**`demoState.ts`**、**`entryIntent.ts`**）；**應用編排**（無 Vue）：**`rewardClaimPresentation.ts`**（領取成功頁：mock／API／`local-fallback` 決策）、**`provisionalFinishClaim.ts`**（完成頁：無 API 時遞增本機次數）  
+- **`composables/`** — Vue 黏著層（例：**`useRewardClaimPresentation.ts`** 綁 `useRoute`、loading、`watch`）  
 - `styles` / design tokens — 色票、間距、字級（主視覺／CIS 定案後統一）
 
 ### 2.1 呈現架構：路由與 QR 進入點（`source/` 實作 · 2026-04-18 · 對齊 §2.2–§2.3）
@@ -48,7 +50,7 @@
 
 **狀態鍵（原型，`sessionStorage`）：** **意圖** `fdgw_entry_intent`（`entryIntent.ts`）；**profile** `fdgw_name`、`fdgw_employeeId`；**闖關** `fdgw_stage`、`fdgw_inZone`；**報到** `fdgw_companionCount`、`fdgw_checkin_done`。  
 
-**領取狀態資料來源（與程式對齊 · `ClaimSuccessView`）：** 已設定環境變數 **`VITE_API_BASE`** 時，**`/finish/claimed`** 以 **`GET /api/v1/me/dashboard`** 回傳之 `progress` 映射次數（優先 **`rewardRedeemCount`**，草案演進欄位；暫可 **`fullClearCount`**，以前後端定案為準），見 **`source/src/api/rewardClaimStatus.ts`**。**未**設定 **`VITE_API_BASE`** 時（含本機與**正式建置之預覽站**），該頁以 **`local-fallback`** 後備使用 **`fdgw_finishClaimed`**（`demoState.ts`），並於畫面標示：**非伺服器實際紀錄、僅供原型／預覽**。**`?mock_claimed=`** 僅供離線 UI 覆寫、不寫後端。**`/finish`** 在無 **`VITE_API_BASE`** 時仍會遞增 **`fdgw_finishClaimed`** 以利流程試跑；有 API 時不寫入該鍵（領取紀錄以伺服器為準）。
+**領取狀態資料來源（與程式對齊 · `ClaimSuccessView`）：** 畫面僅透過 **`composables/useRewardClaimPresentation.ts`** 載入；**決策與呼叫 API** 在 **`lib/rewardClaimPresentation.ts`**（無 Vue 依賴）。已設定 **`VITE_API_BASE`** 時，**`/finish/claimed`** 以 **`GET /api/v1/me/dashboard`** 回傳之 `progress` 映射次數（優先 **`rewardRedeemCount`**；暫可 **`fullClearCount`**），實作見 **`source/src/api/rewardClaimStatus.ts`**（預設欄位上限與 **`lib/constants/finishReward.ts`** 對齊）。**未**設定 **`VITE_API_BASE`** 時（含預覽站），該頁以 **`local-fallback`** 後備讀取 **`fdgw_finishClaimed`**（`demoState.ts`），並標示**非伺服器紀錄**。**`?mock_claimed=`** 僅供離線 UI 覆寫。**`/finish`** 確認領獎後，若無 API 底網址則由 **`lib/provisionalFinishClaim.ts`** 遞增 **`fdgw_finishClaimed`**；有 API 時不寫入該鍵。
 
 ### 2.2 報到 UI 流程（掃描**報到** QR／連結 · 線框對齊 · 2026-04-18）
 
@@ -145,7 +147,7 @@ flowchart TD
 | 流程 | **簽到頁**與**闖關頁**分開（不同路由），資訊架構清楚。**闖關線：** 歡迎 → 遊戲說明 → **闖關登入頁（全屏，非彈窗）** → 關卡流程；**報到線**見 §2.2。**同一 SPA** 內報到與闖關可共用表單元件，但路由與欄位不同。**報到 QR** 與**闖關入口 QR** 指向不同 URL／query（`entry=checkin`／`entry=game` 等）。各關**到站 QR** 仍為獨立連結（常含站點 JWT，見 [`api-v0.1.md`](../specs/api-v0.1.md)） |
 | 闖關頁 | 以「目前關卡、題目、進度」為主；**不自動輪詢**，使用者操作才打 API |
 | 櫃台驗證 | 完成畫面需**高可讀、少動效**，利於工作人員掃視 |
-| 完成頁／領取成功 | **`/finish`**（`FinishView.vue`）：與「**3 次／3 份**」對齊之確認領獎彈窗。**`/finish/claimed`**（`ClaimSuccessView.vue`）：**已設定 `VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 顯示已領進度；**未設定 API** 時以 **`local-fallback`** 顯示 **`fdgw_finishClaimed`**（`demoState.ts`／`FINISH_REWARD_SLOTS` = 3），並標示為預覽用、非伺服器紀錄。**上線**應設定 **`VITE_API_BASE`**，且完成頁宜於**後端核銷 API 成功**後再導向領取成功頁 |
+| 完成頁／領取成功 | **`/finish`**（`FinishView.vue`）：與「**3 次／3 份**」對齊之確認領獎彈窗；無 API 時遞增本機次數見 **`provisionalFinishClaim.ts`**。**`/finish/claimed`**（`ClaimSuccessView.vue`）：**已設定 `VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 顯示已領進度；**未設定 API** 時以 **`local-fallback`** 顯示 **`fdgw_finishClaimed`**（`demoState.ts`；槽位上限 **`lib/constants/finishReward.ts`**）。編排邏輯見 **`useRewardClaimPresentation`**／**`rewardClaimPresentation.ts`**。**上線**應設定 **`VITE_API_BASE`**，且完成頁宜於**後端核銷 API 成功**後再導向領取成功頁 |
 | 視覺 | KV／Logo／CIS 定案後以 **design token** 統一兩路流程，避免兩套風格 |
 
 ---
@@ -155,7 +157,7 @@ flowchart TD
 - 開發期：可於 **`vite.config`** 設定 **proxy** 指向本機或測試 API（`source/vite.config.ts` **目前未**預設 proxy，由專案依環境補上）。  
 - 正式／測試建置：於 **`source/`** 設定 **`VITE_API_BASE`** = API **主機根**（**無**尾隨 `/`），例如 `https://api.example.com` 或同源 `https://event.example.com`；程式會請求 **`{VITE_API_BASE}/api/v1/...`**（見 **`source/src/lib/apiBase.ts`**）。**舊稿若寫 `VITE_API_BASE_URL` 應改為此名稱。**  
 - **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`source/vite.config.ts`** 與根 [`README.md`](../../README.md#preview-netlify-test-ui)「**公開預覽部署 · 測試 Web UI**」（錨點 **`preview-netlify-test-ui`**；含 **Netlify 範例網址**、**`/check-in`**／**`/game`** QR 分流、與 **`main` 連動**；[`summary-deployment.md`](./summary-deployment.md) **§1.1** **v1.3** 摘要連動）。  
-- **關卡瀏覽與領取狀態呈現**：可共用 **`GET /api/v1/me/dashboard`**（合併 API）；領取次數映射見 **`source/src/api/rewardClaimStatus.ts`**。  
+- **關卡瀏覽與領取狀態呈現**：可共用 **`GET /api/v1/me/dashboard`**（合併 API）；HTTP 與 JSON 映射見 **`source/src/api/rewardClaimStatus.ts`**；領取成功頁之 mock／API／fallback 編排見 **`lib/rewardClaimPresentation.ts`** 與 **`composables/useRewardClaimPresentation.ts`**。  
 - 完整端點列表見 [`api-v0.1.md`](../specs/api-v0.1.md)。
 
 ---
@@ -205,3 +207,4 @@ flowchart TD
 | 1.19 | 2026-04-18 | **§4**：靜態預覽條目補與根 **`README.md`**「公開預覽部署 · 測試 Web UI」（錨點 **`preview-netlify-test-ui`**）及 **`summary-deployment` §1.1 v1.2** 之**連動**（Netlify 範例、QR、`main` 部署） |
 | 1.20 | 2026-04-18 | 修訂表 **v1.16** 列：補 **v1.18** 承接敘述，避免讀者誤以為仍「僅開發建置」後備；**v1.19** 列補明錨點 **`preview-netlify-test-ui`**（與根 **`README`** 一致） |
 | 1.21 | 2026-04-18 | **§4**：「靜態預覽」條目之根 **`README`** 改為可點連結 [`README.md#preview-netlify-test-ui`](../../README.md#preview-netlify-test-ui) |
+| 1.22 | 2026-04-19 | **§2** 目錄：**`api/`**／**`lib/constants/`**／**`rewardClaimPresentation`**／**`provisionalFinishClaim`**／**`composables/`** 與程式分層一致；**§2.1**「領取狀態」、**§3** 完成頁列、**§4** dashboard 條目同步 |
