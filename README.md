@@ -2,13 +2,13 @@
 
 ## 目錄
 
-- [快速開始](#快速開始)（內含 [**公開預覽部署 · 測試 Web UI**](#preview-netlify-test-ui)：`netlify.toml`、Netlify 範例網址、報到／闖關 QR 路徑、`main` 連動部署）
+- [快速開始](#快速開始)
 - [專案概覽](#專案概覽)
+- [Demo 影片預覽](#demo-影片預覽)
 - [技術架構](#技術架構)
   - [系統架構圖](#系統架構圖)
 - [規格與活動內容](#規格與活動內容)
 - [使用者流程](#使用者流程)
-- [Demo 影片預覽](#demo-影片預覽)
 - [設計資產與會議](#設計資產與會議)
 - [待辦與進度](#待辦與進度)
 - [儲存庫目錄結構](#儲存庫目錄結構)
@@ -165,7 +165,7 @@ npm run dev
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
 | 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-18（頁尾 **v2.32**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
+| 最後更新 README | 2026-04-18（頁尾 **v2.33**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
 
 
 ---
@@ -202,7 +202,7 @@ npm run dev
 | `/checkin` | **報到**單頁（姓名、員編、同行人數）＋確認彈窗；完成後僅 **`/checkin/complete`**。 |
 | `/checkin/complete` | 報到完成頁；參加闖關須**另掃闖關 QR**（如 `/game`）。報到動線見 [`summary-frontend.md`](docs/architecture/summary-frontend.md) **§2.2**（含流程圖）。 |
 | `/finish` | 完成頁保證領獎原型（`FinishView.vue`）：確認領獎彈窗。規格見 [`docs/project/專案文件.md`](docs/project/專案文件.md)、[`summary-frontend.md`](docs/architecture/summary-frontend.md)。 |
-| `/finish/claimed` | 領取成功頁（`ClaimSuccessView.vue`）：三格狀態優先由 **`VITE_API_BASE` + `GET /api/v1/me/dashboard`** 呈現；**開發建置**且未設定 API 之 session 後備見 summary §2.1（**正式建置**未設定則錯誤）。 |
+| `/finish/claimed` | 領取成功頁（`ClaimSuccessView.vue`）：已設定 **`VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 呈現三格狀態；**未**設定時（含預覽站）以 **`local-fallback`**／`sessionStorage` 類比，畫面標示非伺服器紀錄；見 [`summary-frontend.md`](docs/architecture/summary-frontend.md) §2.1。 |
 
 
 ### 系統架構圖
@@ -477,7 +477,7 @@ sequenceDiagram
 | 你想…           | 請開                               |
 | ------------- | -------------------------------- |
 | 5 分鐘掌握專案      | 本 README                         |
-| 系統架構與資料流圖     | 本 README [技術架構](#技術架構)（緊接專案概覽之後） |
+| 系統架構與資料流圖     | 本 README [技術架構](#技術架構)（在 [Demo 影片預覽](#demo-影片預覽) 之後） |
 | 完整需求、待辦、進度、技術 | `docs/project/專案文件.md`（內有章節目錄）   |
 | 前後端與部署／流量定案摘要 | `docs/architecture/summary-*.md` |
 | 畫面操作 Demo       | 本頁 [Demo 影片預覽](#demo-影片預覽)／[`docs/demo/README.md`](docs/demo/README.md) |
@@ -505,4 +505,4 @@ sequenceDiagram
 
 ---
 
-*README v2.32 · 2026-04-18（`專案文件` **維護**列：根 [`README.md`](README.md) 可點連結；合併版 **v1.3.16**；v2.31）*
+*README v2.33 · 2026-04-18（目錄順序與正文對齊；`/finish/claimed` 列與 **`local-fallback`** 一致；v2.32）*
