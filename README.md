@@ -106,7 +106,7 @@ npm run dev
 | ------ | --------------------------------------------------------------------------------------------------------- |
 | 活動     | 新竹北埔**綠世界生態農場**；對象為**台北辦公室同仁及眷屬**（預估約 **1,000～1,300** 人）；活動日**確認中**（偏好**六月底**，或七月初）                       |
 | 產品     | 解謎 Web 應用；同仁與家人體驗生態探索，完成關卡可至指定地點領取紀念品                                                                     |
-| 提案 PDF | `docs/proposals/FamilyDayApp_Proposal_v1.pdf`（v1，2026.04.10；另可能見 `d:\Brian\FamilyDayApp_Proposal_v1.pdf`） |
+| 提案／線框 PDF | `docs/proposals/FamilyDayApp_Proposal_v1.pdf`（v1，2026.04.10）、[`FamilyDayApp_wireframe_v2.pdf`](docs/proposals/FamilyDayApp_wireframe_v2.pdf)（線框 v2）；靜態圖另見 [`docs/design/wireframe/`](docs/design/wireframe/) |
 | 需求主文件  | `docs/project/專案文件.md`（合併版：需求、待確認、狀態、技術）；索引見 `docs/README.md`                                             |
 | 資訊開發人員 | Ken、Brian                                                                                                 |
 | GitHub | [BrianChang1212/FamilyDay_GreenWorld](https://github.com/BrianChang1212/FamilyDay_GreenWorld)             |
@@ -160,7 +160,7 @@ npm run dev
 
 ### 系統架構圖
 
-以下為**邏輯架構**（實作可為自建 API、Serverless 或 Google Apps Script Web App 等，依 `docs/project/專案文件.md`「技術規格」定案）。**各關到站**以**現場關卡 QR code** 掃描由後端驗證（QR 內容須避免可被輕易偽造或重播；細節於技術規格定案）。
+以下為**邏輯架構**（實作可為自建 API、Serverless 或 Google Apps Script Web App 等，依 `docs/project/專案文件.md`「技術規格」定案）。**原型與產品準線：** **報到**與**闖關入口**為**不同 QR／URL**（見 [使用者流程](#使用者流程)）；報到完成後**不**自動進入闖關，須**另掃闖關 QR**（與舊版「簽到後直連闖關」示意圖不同）。**各關到站**以**現場關卡 QR code** 掃描由後端驗證（QR 內容須避免可被輕易偽造或重播；細節於技術規格定案）。
 
 ```mermaid
 flowchart TB
@@ -168,13 +168,14 @@ flowchart TB
     U[瀏覽器<br/>手機／平板／電腦]
   end
 
-  subgraph entry["進場"]
-    QR[簽到專屬 QR／活動連結]
+  subgraph entry["進場（兩類入口 · 分流）"]
+    QR1[報到專用 QR／連結<br/>例如 /check-in]
+    QR2[闖關入口 QR／連結<br/>例如 /game]
   end
 
-  subgraph fe["前端 Web"]
-    P1[簽到介面]
-    P2[闖關介面]
+  subgraph fe["前端 Web（同一 SPA · 不同路由）"]
+    P1[簽到介面<br/>報到表單／完成頁]
+    P2[闖關介面<br/>歡迎→說明→登入→地圖／答題…]
   end
 
   subgraph be["後端應用層"]
@@ -190,10 +191,11 @@ flowchart TB
     SQ[關卡 QR code<br/>立牌／現場布置]
   end
 
-  U --> QR
-  QR --> P1
-  P1 --> P2
-  U --> P2
+  U --> QR1
+  U --> QR2
+  QR1 --> P1
+  QR2 --> P2
+  P1 -.->|不自動銜接<br/>須另掃闖關 QR| QR2
   P1 --> API
   P2 --> API
   API --> GS
@@ -417,7 +419,7 @@ sequenceDiagram
 | 後端討論總結       | `docs/architecture/summary-backend.md`（FastAPI／PostgreSQL、模型與安全） |
 | 架設環境討論總結     | `docs/architecture/summary-deployment.md`（雲／內網／PaaS、區域與採購注意）     |
 | 流量分析討論總結     | `docs/architecture/summary-traffic.md`（在線與 RPS、尖峰、限流、壓測）         |
-| 提案 PDF       | `docs/proposals/FamilyDayApp_Proposal_v1.pdf`                    |
+| 提案／線框 PDF   | `docs/proposals/FamilyDayApp_Proposal_v1.pdf`、`FamilyDayApp_wireframe_v2.pdf` |
 | 設計資產說明       | `assets/README.md`                                               |
 | 操作示範錄影       | [`docs/demo/README.md`](docs/demo/README.md)（內嵌播放見本 README [Demo 影片預覽](#demo-影片預覽)） |
 
@@ -456,4 +458,4 @@ sequenceDiagram
 
 ---
 
-*README v2.21 · 2026-04-18（刪除 `tasks/` 目錄與目錄表列；v2.20）*
+*README v2.23 · 2026-04-18（系統架構圖：報到／闖關分流，非簽到直連闖關；v2.22）*
