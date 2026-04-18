@@ -21,11 +21,25 @@ export function getFinishClaimedCount(): number {
 	return Math.max(0, Math.min(FINISH_REWARD_SLOTS, n));
 }
 
-export function setFinishClaimedCount(n: number): void {
+function setFinishClaimedCount(n: number): void {
 	sessionStorage.setItem(
 		K.finishClaimed,
 		String(Math.max(0, Math.min(FINISH_REWARD_SLOTS, n))),
 	);
+}
+
+/** 領獎確認後遞增，回傳更新後的次數（已滿則不變） */
+export function incrementFinishClaimed(): number {
+	const n = getFinishClaimedCount();
+	if (n >= FINISH_REWARD_SLOTS) return n;
+	const next = n + 1;
+	setFinishClaimedCount(next);
+	return next;
+}
+
+/** 原型除錯：將闖關禮已領次數歸零（不影響其他 session 狀態） */
+export function clearFinishClaimedDemo(): void {
+	sessionStorage.removeItem(K.finishClaimed);
 }
 
 export function getStage(): number {
@@ -36,6 +50,24 @@ export function getStage(): number {
 
 export function setStage(n: number): void {
 	sessionStorage.setItem(K.stage, String(Math.min(6, Math.max(1, n))));
+}
+
+/**
+ * 從歡迎頁／遊戲說明／註冊再次進入闖關時重置進度，避免沿用上一輪 session 的關卡（例如仍停在第 6 關）。
+ * 不會清除姓名、員編、報到或領獎次數。
+ */
+export function resetScavengerRun(): void {
+	setStage(1);
+	setInZone(false);
+}
+
+/** 答對後前進一站並重置到站狀態（最後一站不遞增） */
+export function advanceStage(): void {
+	const s = getStage();
+	if (s < 6) {
+		setStage(s + 1);
+		setInZone(false);
+	}
 }
 
 export function getInZone(): boolean {
@@ -80,28 +112,39 @@ export function setCheckInDone(v: boolean): void {
 	sessionStorage.setItem(K.checkinDone, v ? "1" : "0");
 }
 
-export function resetDemo(): void {
-	sessionStorage.removeItem(K.stage);
-	sessionStorage.removeItem(K.name);
-	sessionStorage.removeItem(K.employeeId);
-	sessionStorage.removeItem(K.inZone);
-	sessionStorage.removeItem(K.finishClaimed);
-	sessionStorage.removeItem(K.companionCount);
-	sessionStorage.removeItem(K.checkinDone);
-}
-
-/** 與設計稿「闖關路線」站名一致 */
+/** 與線框／專案文件「關卡地點」順序一致（場勘後可再調） */
 const STAGE_NAMES: Record<number, string> = {
 	1: "天鵝湖",
-	2: "青青草原",
-	3: "森林小徑",
-	4: "松鼠之家",
-	5: "昆蟲飯店",
-	6: "終點舞台",
+	2: "大探奇區",
+	3: "水生植物公園",
+	4: "鳥園",
+	5: "蝴蝶園",
+	6: "生物多樣性探索區",
 };
 
 export function stageTitle(n: number): string {
 	return STAGE_NAMES[n] ?? `第 ${n} 站`;
+}
+
+/** 恭喜完成所有關卡／慶祝主視覺（`public/images/`） */
+export const LEVEL_COMPLETE_STICKER_SRC =
+	"/images/level-complete-celebration.png" as const;
+
+/** 領取成功頁專用主視覺（禮品／兌換成功意象，`public/images/`） */
+export const CLAIM_SUCCESS_STICKER_SRC =
+	"/images/claim-success-sticker.png" as const;
+
+/** 掃描 QR code 全屏示意貼圖（`public/images/`） */
+export const QR_SCAN_STICKER_SRC = "/images/qr-scan-sticker.png" as const;
+
+/** 完成報到頁主視覺（`public/images/`） */
+export const CHECKIN_COMPLETE_STICKER_SRC =
+	"/images/checkin-complete-sticker.png" as const;
+
+/** 關卡貼圖（`public/images/stages/`），與 STAGE_NAMES 順序一致 */
+export function stageStickerSrc(n: number): string {
+	if (n < 1 || n > 6) return "";
+	return `/images/stages/stage-${String(n).padStart(2, "0")}.png`;
 }
 
 export function stageIds(): number[] {

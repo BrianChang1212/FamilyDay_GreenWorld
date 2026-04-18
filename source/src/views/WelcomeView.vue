@@ -1,105 +1,57 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
-import WelcomeForestDecor from "@/components/doodles/WelcomeForestDecor.vue";
-import WelcomeHeroForest from "@/components/doodles/WelcomeHeroForest.vue";
+import { resetScavengerRun } from "@/lib/demoState";
 
 const router = useRouter();
 
 function next() {
+	resetScavengerRun();
 	router.push({ name: "briefing" });
 }
 </script>
 
 <template>
-	<div class="relative flex min-h-full flex-col overflow-hidden bg-white">
-		<WelcomeForestDecor />
-		<AppHeader class="relative z-[2]" :show-progress="false" :show-user="false" />
+	<div class="relative flex min-h-full flex-col bg-[#f0f9f4]">
+		<main
+			class="relative z-[1] flex flex-1 flex-col px-4 pb-5 pt-3 sm:mx-auto sm:max-w-xl sm:px-6 sm:pb-6 sm:pt-5"
+		>
+			<!-- 手機：左右出血加寬圖；sm+：維持圓角卡 -->
+			<div
+				class="relative -mx-4 w-[calc(100%+2rem)] overflow-hidden border-y border-gw-mint-soft/70 bg-white shadow-[0_8px_24px_rgba(15,31,46,0.06)] sm:mx-0 sm:w-full sm:rounded-3xl sm:border sm:border-gw-mint-soft/80 sm:shadow-md sm:ring-1 sm:ring-black/[0.04]"
+			>
+				<img
+					src="/images/family-day-forest-walk.png"
+					width="1024"
+					height="1024"
+					alt="一家四口在陽光森林步道上手牽手散步，歡迎來到瑞軒家庭日"
+					class="aspect-[5/4] h-auto min-h-[13.5rem] w-full object-cover object-[center_36%] sm:aspect-[16/10] sm:min-h-[17rem]"
+					loading="eager"
+					decoding="async"
+					fetchpriority="high"
+				/>
+			</div>
 
-		<main class="relative z-[2] flex flex-1 flex-col px-5 pb-4 pt-2">
-			<div class="text-center">
-				<span
-					class="gw-cover-in inline-block rounded-full border border-gw-mint-soft bg-gw-mint/80 px-4 py-1.5 text-[11px] font-semibold tracking-wide text-gw-brand-dark"
-					style="--gw-d: 70ms"
-				>
-					WELCOME TO 2026
-				</span>
-				<h1
-					class="gw-cover-in font-display mt-6 text-balance text-[1.85rem] font-bold leading-snug tracking-tight text-gw-navy sm:text-[2.1rem]"
-					style="--gw-d: 140ms"
-				>
-					瑞軒家庭日
-				</h1>
-				<p
-					class="gw-cover-in relative mt-3 inline-block text-lg font-bold text-gw-brand sm:text-xl"
-					style="--gw-d: 210ms"
-				>
-					探索自然之美
-					<span
-						class="gw-cover-line absolute -bottom-1 left-0 right-0 mx-auto h-1 w-[7rem] rounded-full bg-gw-mint-soft"
-					/>
-				</p>
-				<p
-					class="gw-cover-in mx-auto mt-6 max-w-sm text-pretty text-sm font-medium leading-relaxed text-neutral-600"
-					style="--gw-d: 290ms"
-				>
-					與家人走進園區，一邊解謎一邊認識生態；完成紀錄後，還有闖關禮可領取。
+			<div class="mt-4 text-center sm:mt-5">
+				<h1 class="font-display text-2xl font-bold text-gw-navy sm:text-[1.75rem]">歡迎來到2026</h1>
+				<p class="font-display mt-1.5 text-xl font-bold italic text-gw-brand">瑞軒家庭日</p>
+				<p class="mx-auto mt-3 max-w-sm text-pretty text-sm leading-relaxed text-neutral-600 sm:mt-4">
+					與家人一同走入自然，翻開屬於我們的生活日誌，寫下美好的回憶篇章。
 				</p>
 			</div>
 
-			<div class="mt-8">
+			<div class="mt-5 sm:mt-6">
 				<button
 					type="button"
-					class="gw-cover-in w-full rounded-2xl bg-gw-brand py-4 text-base font-bold text-white shadow-btn transition-[filter,box-shadow,transform] duration-300 ease-gw-out hover:brightness-[1.03] hover:shadow-[0_8px_28px_rgba(26,157,74,0.38)] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-gw-brand"
-					style="--gw-d: 360ms"
+					class="flex w-full items-center justify-center gap-2 rounded-full bg-gw-brand py-4 text-base font-bold text-white shadow-[0_10px_28px_rgba(26,157,74,0.35)] transition hover:brightness-105 active:scale-[0.99]"
 					@click="next"
 				>
-					開始探索 →
+					開始探索
+					<span aria-hidden="true">→</span>
 				</button>
-			</div>
-
-			<div
-				class="gw-cover-in gw-cover-in--hero gw-cover-feature-card relative mt-8 rounded-3xl border border-gw-mint-soft bg-gradient-to-br from-gw-mint/50 to-white px-4 py-4 sm:px-5 sm:py-5"
-				style="--gw-d: 460ms"
-			>
-				<!-- 插圖區角落小裝飾：手繪蘑菇與小花 -->
-				<svg
-					class="pointer-events-none absolute -left-1 bottom-8 z-[1] h-10 w-10 text-[#2d6a4f] opacity-50"
-					viewBox="0 0 40 40"
-					fill="none"
-					aria-hidden="true"
-				>
-					<path stroke="#8b4513" stroke-width="1.8" stroke-linecap="round" d="M20 18v14" />
-					<path
-						fill="#f4a261"
-						stroke="#e76f51"
-						stroke-width="1.5"
-						d="M20 8c-8 0-12 8-8 12 4 4 12 4 16 0 4-4 0-12-8-12z"
-					/>
-				</svg>
-				<svg
-					class="pointer-events-none absolute -right-1 top-6 z-[1] h-9 w-9 rotate-6 text-[#e9c46a] opacity-55"
-					viewBox="0 0 36 36"
-					fill="none"
-					aria-hidden="true"
-				>
-					<circle cx="18" cy="18" r="5" fill="#fef3c7" stroke="#d4a373" stroke-width="1.5" />
-					<path
-						stroke="#fbbf24"
-						stroke-width="1.5"
-						stroke-linecap="round"
-						d="M18 8v4M18 24v4M8 18h4M24 18h4M11 11l3 3M22 22l3 3M25 11l-3 3M14 22l-3 3"
-					/>
-				</svg>
-				<div
-					class="relative z-[1] w-full overflow-hidden rounded-2xl border border-sky-100/80 bg-sky-50/40 shadow-inner ring-1 ring-white/60"
-				>
-					<WelcomeHeroForest class="block w-full min-w-0" />
-				</div>
 			</div>
 		</main>
 
-		<AppFooter class="relative z-[2]" />
+		<AppFooter class="relative z-[1] border-t-0 bg-transparent" />
 	</div>
 </template>

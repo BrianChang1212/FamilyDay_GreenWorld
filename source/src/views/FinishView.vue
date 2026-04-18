@@ -1,212 +1,134 @@
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
+import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
-import PageCritters from "@/components/doodles/PageCritters.vue";
+import { getViteApiBase } from "@/lib/apiBase";
 import {
-	FINISH_REWARD_SLOTS,
-	getFinishClaimedCount,
+	LEVEL_COMPLETE_STICKER_SRC,
 	getProfile,
-	resetDemo,
-	setFinishClaimedCount,
+	getStage,
+	incrementFinishClaimed,
 } from "@/lib/demoState";
 
 const router = useRouter();
+const stage = ref(6);
+const name = ref("");
+const showClaimModal = ref(false);
 
-const profile = computed(() => getProfile());
-const employeeDisplay = computed(() => {
-	const id = profile.value.employeeId.trim();
-	return id.length > 0 ? id : "—";
+onMounted(() => {
+	stage.value = getStage();
+	name.value = getProfile().name || "夥伴";
 });
 
-const claimedCount = ref(getFinishClaimedCount());
-
-const totalSlots = FINISH_REWARD_SLOTS;
-const remaining = computed(() => Math.max(0, totalSlots - claimedCount.value));
-
-/** 即將領取的是第幾次（1-based） */
-const pendingPrizeRound = computed(() => claimedCount.value + 1);
-
-const showConfirm = ref(false);
-
-function openConfirm() {
-	if (remaining.value <= 0) return;
-	showConfirm.value = true;
+function openClaimModal() {
+	showClaimModal.value = true;
 }
 
-function closeConfirm() {
-	showConfirm.value = false;
+function closeClaimModal() {
+	showClaimModal.value = false;
 }
 
 function confirmClaim() {
-	if (remaining.value <= 0) {
-		closeConfirm();
-		return;
-	}
-	claimedCount.value += 1;
-	setFinishClaimedCount(claimedCount.value);
-	closeConfirm();
+	showClaimModal.value = false;
+	/** 領取紀錄以後端為準；僅在未設定 API 的開發原型用 session 類比 */
+	if (!getViteApiBase()) incrementFinishClaimed();
+	// 上線後於此呼叫核銷／領獎 API，成功後再導向 finishClaimSuccess
+	router.push({ name: "finishClaimSuccess" });
 }
 
 function goHome() {
-	resetDemo();
 	router.push({ name: "welcome" });
-}
-
-function slotClaimed(index: number): boolean {
-	return index < claimedCount.value;
 }
 </script>
 
 <template>
-	<div class="gw-page-fill relative flex min-h-full flex-col">
-		<PageCritters />
-		<main class="relative z-[2] flex flex-1 flex-col items-center px-4 pb-6 pt-8 sm:px-5">
-			<h1
-				class="font-display text-center text-[1.35rem] font-bold leading-tight tracking-tight text-gw-navy sm:text-2xl"
-			>
-				瑞軒家庭日 2026
-			</h1>
+	<div class="relative flex min-h-full flex-col bg-[#f5f6f4]">
+		<AppHeader class="relative z-[2]" :stage="stage" show-progress show-user />
+
+		<main class="relative z-[2] flex flex-1 flex-col px-4 pb-6 pt-4 sm:mx-auto sm:max-w-md sm:w-full">
+			<div class="rounded-2xl bg-gw-brand px-4 py-4 text-center shadow-md">
+				<p class="text-xs font-bold uppercase tracking-wider text-white/90">Congratulations</p>
+				<p class="mt-1 font-display text-xl font-bold text-white">闖關完成！</p>
+			</div>
 
 			<div
-				class="mt-4 flex items-center gap-2 rounded-full border border-neutral-200/90 bg-white/95 px-4 py-2.5 shadow-sm ring-1 ring-black/[0.03]"
+				class="mt-6 overflow-hidden rounded-3xl border border-gw-brand/15 bg-[#f5f0e8] shadow-card-sm ring-1 ring-black/[0.04]"
 			>
-				<span class="text-sm font-medium text-neutral-600">工號</span>
-				<span class="text-base font-bold tracking-wide text-sky-600">{{ employeeDisplay }}</span>
-				<span
-					class="h-2.5 w-2.5 shrink-0 rounded-full bg-emerald-500 shadow-[0_0_0_2px_rgba(255,255,255,0.9)]"
-					aria-hidden="true"
+				<img
+					:src="LEVEL_COMPLETE_STICKER_SRC"
+					width="1200"
+					height="900"
+					alt="森林慶祝場景：動物們與派對元素，恭喜完成闖關"
+					class="aspect-[4/3] h-auto w-full object-cover object-center"
+					loading="lazy"
+					decoding="async"
 				/>
 			</div>
 
-			<div
-				class="relative mt-8 w-full max-w-[22rem] overflow-hidden rounded-[1.65rem] border border-neutral-200/80 bg-white px-5 pb-6 pt-8 shadow-card-lg ring-1 ring-white/90"
-			>
-				<p
-					class="pointer-events-none absolute right-3 top-2 text-5xl leading-none opacity-[0.12] saturate-150"
-					aria-hidden="true"
-				>
-					🐝
-				</p>
+			<p class="mt-8 text-center text-base font-bold leading-relaxed text-gw-navy">
+				親愛的 {{ name }}，恭喜你完成所有站點挑戰！請至服務台出示此畫面領取紀念品。
+			</p>
 
-				<div class="flex flex-col items-center text-center">
-					<div
-						class="flex h-[4.25rem] w-[4.25rem] items-center justify-center rounded-full bg-emerald-100/90 shadow-inner ring-2 ring-white"
-					>
-						<span class="text-[2.75rem] leading-none drop-shadow-sm" aria-hidden="true">🏆</span>
-					</div>
-					<h2 class="font-display mt-5 text-[1.35rem] font-bold leading-snug text-gw-navy sm:text-2xl">
-						闖關任務完成！
-					</h2>
-					<p class="mt-2 text-pretty text-sm font-medium leading-relaxed text-neutral-600">
-						恭喜您獲得
-						<span class="font-bold text-gw-navy">{{ totalSlots }}</span>
-						次 保證領獎機會
-					</p>
-				</div>
-
-				<div class="my-6 h-px w-full bg-gradient-to-r from-transparent via-neutral-200 to-transparent" />
-
-				<div class="grid grid-cols-3 gap-2 sm:gap-3">
-					<div
-						v-for="i in totalSlots"
-						:key="i"
-						class="flex flex-col items-center rounded-2xl border px-1.5 py-3 text-center transition-colors duration-200 sm:px-2"
-						:class="
-							slotClaimed(i - 1)
-								? 'border-sky-300/90 bg-sky-50/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.85)]'
-								: 'border-neutral-200/90 bg-neutral-50/50'
-						"
-					>
-						<p
-							class="text-[11px] font-semibold sm:text-xs"
-							:class="slotClaimed(i - 1) ? 'text-sky-700' : 'text-neutral-400'"
-						>
-							第 {{ i }} 次
-						</p>
-						<span class="my-2 text-2xl sm:text-[1.75rem]" aria-hidden="true">
-							{{ slotClaimed(i - 1) ? "🎁" : "🔒" }}
-						</span>
-						<p
-							class="text-[11px] font-semibold sm:text-xs"
-							:class="slotClaimed(i - 1) ? 'text-sky-700' : 'text-neutral-400'"
-						>
-							{{ slotClaimed(i - 1) ? "已領取" : "待領取" }}
-						</p>
-					</div>
-				</div>
-
+			<div class="mt-auto flex flex-col gap-3 pt-10">
 				<button
 					type="button"
-					class="mt-7 flex w-full items-center justify-center gap-2 rounded-2xl border border-amber-300/60 bg-gradient-to-b from-[#fde047] to-[#facc15] py-3.5 text-base font-bold text-gw-navy shadow-[0_8px_24px_rgba(234,179,8,0.35)] transition-[filter,transform] duration-200 ease-gw-out enabled:hover:brightness-[1.03] enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-55"
-					:disabled="remaining <= 0"
-					@click="openConfirm"
+					class="w-full rounded-full bg-[#1a5f2a] py-4 text-base font-bold text-white shadow-lg transition hover:brightness-110"
+					@click="openClaimModal"
 				>
-					<span v-if="remaining > 0">點擊領取 (剩餘 {{ remaining }} 次)</span>
-					<span v-else>已領取完畢</span>
-					<span class="text-lg leading-none" aria-hidden="true">🎁</span>
+					我已領獎
+				</button>
+				<button
+					type="button"
+					class="w-full rounded-full border-2 border-[#1a5f2a] bg-white py-3.5 text-base font-bold text-[#1a5f2a] transition hover:bg-neutral-50"
+					@click="goHome"
+				>
+					返回首頁
 				</button>
 			</div>
-
-			<p class="mt-4 max-w-sm text-center text-xs text-neutral-400">
-				※ 請於工作人員面前點擊確認
-			</p>
-
-			<button
-				type="button"
-				class="mt-8 text-sm font-semibold text-neutral-500 underline decoration-neutral-300 underline-offset-4 transition-colors hover:text-gw-brand"
-				@click="goHome"
-			>
-				返回首頁
-			</button>
-
-			<p class="mt-6 text-center text-[11px] text-neutral-400">
-				原型僅供操作體驗 · 資料未送出伺服器
-			</p>
 		</main>
 
 		<AppFooter class="relative z-[2]" />
 
 		<Teleport to="body">
 			<div
-				v-if="showConfirm"
-				class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+				v-if="showClaimModal"
+				class="fixed inset-0 z-[200] flex items-center justify-center bg-black/45 px-5 backdrop-blur-[2px]"
 				role="dialog"
 				aria-modal="true"
-				aria-labelledby="finish-confirm-title"
+				aria-labelledby="finish-claim-modal-title"
+				@click.self="closeClaimModal"
 			>
-				<button
-					type="button"
-					class="absolute inset-0 bg-gw-navy/55 backdrop-blur-[6px] transition-opacity"
-					aria-label="關閉"
-					@click="closeConfirm"
-				/>
 				<div
-					class="relative z-[1] w-full max-w-[20rem] rounded-[1.35rem] bg-white px-6 pb-6 pt-8 text-center shadow-[0_24px_64px_rgba(15,31,46,0.22)] ring-1 ring-black/[0.04]"
+					class="w-full max-w-sm overflow-hidden rounded-3xl border border-neutral-200 bg-white p-6 shadow-2xl"
+					@click.stop
 				>
-					<div class="text-5xl leading-none" aria-hidden="true">🎁</div>
-					<h3 id="finish-confirm-title" class="font-display mt-4 text-xl font-bold text-gw-navy">
-						確認領取？
-					</h3>
-					<p class="mt-3 text-sm leading-relaxed text-neutral-500">
-						您即將領取第
-						<span class="font-bold text-sky-600">{{ pendingPrizeRound }}</span>
-						次獎品。確認後無法取消喔！
+					<div
+						class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gw-mint text-3xl"
+						aria-hidden="true"
+					>
+						🎁
+					</div>
+					<h2 id="finish-claim-modal-title" class="mt-4 text-center text-lg font-bold text-gw-navy">
+						領獎確認
+					</h2>
+					<p class="mt-2 text-center text-sm text-neutral-600">
+						確認已在服務台領取紀念品？確認後將前往領取成功畫面。
 					</p>
-					<div class="mt-7 flex gap-3">
+					<div class="mt-6 flex flex-col gap-2">
 						<button
 							type="button"
-							class="flex-1 rounded-xl border border-neutral-200 bg-neutral-100 py-3 text-sm font-bold text-gw-navy transition hover:bg-neutral-200/90"
-							@click="closeConfirm"
+							class="w-full rounded-full bg-gw-brand py-3.5 text-base font-bold text-white shadow-md transition hover:brightness-110"
+							@click="confirmClaim"
 						>
-							取消
+							確定
 						</button>
 						<button
 							type="button"
-							class="flex-1 rounded-xl bg-gradient-to-br from-sky-500 to-sky-600 py-3 text-sm font-bold text-white shadow-[0_8px_24px_rgba(14,165,233,0.45)] ring-1 ring-white/20 transition hover:brightness-105 active:scale-[0.99]"
-							@click="confirmClaim"
+							class="w-full rounded-full border-2 border-neutral-200 bg-white py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
+							@click="closeClaimModal"
 						>
-							確定領取
+							取消
 						</button>
 					</div>
 				</div>

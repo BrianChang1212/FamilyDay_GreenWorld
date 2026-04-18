@@ -109,13 +109,14 @@
     "completedStageIds": [1, 2],
     "allCompleted": false,
     "fullClearCount": 0,
+    "rewardRedeemCount": 0,
     "canStartNewRound": true,
     "maxRounds": 3
   }
 }
 ```
 
-**作法 A（無獨立 runId）**：進度以單一使用者狀態表示；`fullClearCount`、`canStartNewRound` 等欄位名稱可依實作調整。
+**作法 A（無獨立 runId）**：進度以單一使用者狀態表示；`fullClearCount`、`canStartNewRound` 等欄位名稱可依實作調整。**選用：** `rewardRedeemCount`（櫃台核銷／領獎次數）供前端「領取成功」三格狀態呈現；未實作時前端可暫以 `fullClearCount` 映射（以前後端定案為準）。
 
 ---
 
@@ -225,6 +226,7 @@
 | 掃站點 QR | `POST /api/v1/stations/verify` |
 | 載入題目／作答 | `GET /api/v1/challenges/{challengeId}`、`POST /api/v1/challenges/{challengeId}/attempts` |
 | 再玩一輪 | `POST /api/v1/me/playthrough/restart` |
+| 領取成功頁（闖關禮狀態呈現） | 與關卡瀏覽共用 **`GET /api/v1/me/dashboard`**；讀取 `progress.rewardRedeemCount`（選用）或暫用 `fullClearCount`（見 §5 示例） |
 | 領獎（若有） | `POST /api/v1/staff/redeem/token`、`POST /api/v1/staff/redeem/confirm` |
 
 ---
@@ -234,3 +236,4 @@
 | 版本 | 日期 | 說明 |
 |------|------|------|
 | v0.1 | 2026-04-10 | 初稿：整合簽到／登入分開、JWT 站點、作法 A、合併 dashboard |
+| v0.1.1 | 2026-04-18 | §5：`progress` 示例補**選用** `rewardRedeemCount`；§11：補「領取成功頁」與 dashboard 對照（與前端 `rewardClaimStatus.ts` 對齊） |

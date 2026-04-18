@@ -8,6 +8,7 @@ import StageView from "@/views/StageView.vue";
 import QuizView from "@/views/QuizView.vue";
 import ResultView from "@/views/ResultView.vue";
 import FinishView from "@/views/FinishView.vue";
+import ClaimSuccessView from "@/views/ClaimSuccessView.vue";
 import {
 	setEntryIntent,
 	normalizeQueryEntry,
@@ -45,6 +46,11 @@ const router = createRouter({
 		{ path: "/quiz", name: "quiz", component: QuizView },
 		{ path: "/result", name: "result", component: ResultView },
 		{ path: "/finish", name: "finish", component: FinishView },
+		{
+			path: "/finish/claimed",
+			name: "finishClaimSuccess",
+			component: ClaimSuccessView,
+		},
 	],
 });
 

@@ -93,7 +93,7 @@ npm run dev
 瀏覽器開啟終端機顯示之本機網址（Vite 預設多為 **[http://localhost:5173](http://localhost:5173)**）。  
 建置預覽：`npm run build` 後 `npm run preview`。
 
-**說明：** 後端 API 尚未串接時，畫面以 mock／靜態流程為主；定案見 `docs/specs/api-v0.1.md` 與 `docs/architecture/summary-backend.md`。
+**說明：** 後端 API 尚未串接時，多數畫面仍以 mock／靜態流程為主；若需預覽**領取成功頁**由伺服器回傳的次數，請於 `source/` 建立 `.env.local`（或建置環境）設定 **`VITE_API_BASE`**（API 主機根、無尾隨 `/`），詳見 `docs/architecture/summary-frontend.md` §4。定案見 `docs/specs/api-v0.1.md` 與 `docs/architecture/summary-backend.md`。
 
 ---
 
@@ -155,7 +155,8 @@ npm run dev
 | `/register` | **闖關登入**（姓名／員編）；送出後 **`/stage`**。若意圖誤為報到則導向 **`/checkin`**。 |
 | `/checkin` | **報到**單頁（姓名、員編、同行人數）＋確認彈窗；完成後僅 **`/checkin/complete`**。 |
 | `/checkin/complete` | 報到完成頁；參加闖關須**另掃闖關 QR**（如 `/game`）。報到動線見 [`summary-frontend.md`](docs/architecture/summary-frontend.md) **§2.2**（含流程圖）。 |
-| `/finish` | 完成頁保證領獎原型（`FinishView.vue`）。規格與暫存鍵見 [`docs/project/專案文件.md`](docs/project/專案文件.md)、[`summary-frontend.md`](docs/architecture/summary-frontend.md)。 |
+| `/finish` | 完成頁保證領獎原型（`FinishView.vue`）：確認領獎彈窗。規格見 [`docs/project/專案文件.md`](docs/project/專案文件.md)、[`summary-frontend.md`](docs/architecture/summary-frontend.md)。 |
+| `/finish/claimed` | 領取成功頁（`ClaimSuccessView.vue`）：三格狀態優先由 **`VITE_API_BASE` + `GET /api/v1/me/dashboard`** 呈現；**開發建置**且未設定 API 之 session 後備見 summary §2.1（**正式建置**未設定則錯誤）。 |
 
 
 ### 系統架構圖
@@ -458,4 +459,4 @@ sequenceDiagram
 
 ---
 
-*README v2.23 · 2026-04-18（系統架構圖：報到／闖關分流，非簽到直連闖關；v2.22）*
+*README v2.24 · 2026-04-18（`/finish/claimed` 列與 `docs` 基線：`專案文件` v1.3.10、`summary-frontend` v1.17、`api-v0.1` v0.1.1；v2.23）*

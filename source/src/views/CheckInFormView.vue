@@ -1,14 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 import { useRouter } from "vue-router";
-import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
-import BrandLogo from "@/components/BrandLogo.vue";
-import PageCritters from "@/components/doodles/PageCritters.vue";
 import {
 	getCompanionCount,
 	getProfile,
-	isCheckInDone,
 	setCheckInDone,
 	setCompanionCount,
 	setProfile,
@@ -23,14 +19,10 @@ const employeeId = ref(p0.employeeId);
 const companionCount = ref(getCompanionCount());
 const showConfirm = ref(false);
 
-const inputClass =
-	"w-full rounded-2xl border border-white/90 bg-white/92 px-4 py-3.5 text-base text-gw-navy shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_4px_20px_rgba(26,157,74,0.06)] outline-none ring-1 ring-gw-mint-soft/40 transition-[border-color,box-shadow,ring-color] placeholder:text-neutral-400 focus:border-gw-brand/80 focus:ring-4 focus:ring-gw-brand/[0.14]";
+const companionOptions = Array.from({ length: 20 }, (_, i) => i + 1);
 
-onMounted(() => {
-	if (isCheckInDone()) {
-		router.replace({ name: "checkinComplete" });
-	}
-});
+const inputClass =
+	"w-full rounded-2xl border-0 bg-[#eef0ed] px-4 py-3.5 text-base text-gw-navy shadow-inner outline-none ring-1 ring-black/[0.04] transition focus:ring-2 focus:ring-gw-brand/35 placeholder:text-neutral-400";
 
 function formValid(): boolean {
 	return (
@@ -64,188 +56,167 @@ function commitCheckIn() {
 </script>
 
 <template>
-	<div
-		class="relative flex min-h-full flex-col overflow-hidden bg-gradient-to-b from-gw-mint/55 via-white to-[#ecfdf5]/95"
-	>
-		<div class="pointer-events-none absolute inset-0 z-0 overflow-hidden" aria-hidden="true">
-			<div
-				class="gw-login-blob -left-[28%] -top-[18%] h-[22rem] w-[22rem] bg-gw-brand/30"
-				style="animation-delay: -4s"
-			/>
-			<div
-				class="gw-login-blob -right-[24%] top-[12%] h-[26rem] w-[26rem] bg-sky-200/50"
-				style="animation-delay: -9s"
-			/>
-			<div
-				class="absolute inset-0 bg-[radial-gradient(ellipse_90%_60%_at_50%_-10%,rgba(26,157,74,0.12),transparent_55%)]"
-			/>
-		</div>
+	<div class="relative flex min-h-full flex-col bg-[#f7f8f6]">
+		<main class="relative z-[1] flex flex-1 flex-col px-5 pb-6 pt-8 sm:mx-auto sm:max-w-md sm:px-6">
+			<header class="text-left">
+				<div class="flex items-start gap-2">
+					<span class="text-xl leading-none text-gw-brand" aria-hidden="true">🌲</span>
+					<span
+						class="inline-flex rounded-full bg-gw-mint/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-gw-brand-dark ring-1 ring-gw-mint-soft"
+					>
+						2026 AMTRAN FAMILY DAY
+					</span>
+				</div>
+				<h1 class="font-display mt-6 text-[1.4rem] font-bold leading-snug tracking-tight text-gw-navy sm:text-[1.55rem]">
+					歡迎來到瑞軒科技2026家庭日
+				</h1>
+				<p class="mt-3 text-base font-bold text-gw-brand">請輸入以下資料完成報到</p>
+				<div class="mt-2 h-1 w-12 rounded-full bg-[#e8a87c]" aria-hidden="true" />
+			</header>
 
-		<div class="pointer-events-none absolute inset-0 z-[1] opacity-[0.95]" aria-hidden="true">
-			<PageCritters variant="inline" />
-		</div>
-
-		<div
-			class="pointer-events-none absolute inset-x-0 top-0 z-[2] h-[3px] bg-gradient-to-r from-transparent via-gw-brand/70 to-transparent shadow-[0_2px_16px_rgba(26,157,74,0.35)]"
-			aria-hidden="true"
-		/>
-
-		<AppHeader class="relative z-[3]" :show-progress="false" :show-user="false" />
-
-		<main class="relative z-[3] flex flex-1 flex-col px-4 pb-6 pt-2 sm:px-7">
-			<div
-				class="gw-login-panel gw-cover-in mx-auto mt-2 flex w-full max-w-[420px] flex-1 flex-col rounded-[1.85rem] border border-white/80 bg-white/72 p-6 shadow-[0_24px_64px_-18px_rgba(26,157,74,0.22),0_12px_40px_rgba(15,31,46,0.1)] backdrop-blur-xl sm:p-8 sm:pb-10"
-				style="--gw-d: 40ms"
-			>
-				<header class="text-center">
-					<div class="relative mx-auto flex h-[4.25rem] w-[4.25rem] items-center justify-center">
-						<div
-							class="absolute inset-[-10px] rounded-[1.35rem] bg-gradient-to-br from-gw-brand/25 via-white/40 to-amber-100/30 opacity-90 blur-md"
-							aria-hidden="true"
-						/>
-						<BrandLogo size="lg" class="relative z-10 drop-shadow-sm" />
-					</div>
-					<p class="mt-5 text-[10px] font-bold uppercase tracking-[0.28em] text-gw-brand/70">
-						CHECK-IN
-					</p>
-					<h1 class="gw-login-title font-display mt-3 text-[1.65rem] font-bold tracking-tight sm:text-[1.85rem]">
-						現場報到
-					</h1>
-					<p class="mx-auto mt-4 max-w-[20rem] text-pretty text-sm font-medium leading-relaxed text-neutral-600">
-						請填寫下列資料；確認後將顯示報到完成頁（原型暫存於瀏覽器）。
-					</p>
-				</header>
-
-				<form class="mt-9 flex flex-1 flex-col gap-6" @submit.prevent="openConfirm" novalidate>
-					<div class="space-y-2">
-						<label
-							for="checkin-name"
-							class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-gw-brand-dark/70"
-						>
-							姓名
-						</label>
-						<input
-							id="checkin-name"
-							v-model="name"
-							type="text"
-							name="name"
-							autocomplete="name"
-							placeholder="請輸入姓名"
-							:class="inputClass"
-						/>
-					</div>
-					<div class="space-y-2">
-						<label
-							for="checkin-employee-id"
-							class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-gw-brand-dark/70"
-						>
-							員工編號
-						</label>
-						<input
-							id="checkin-employee-id"
-							v-model="employeeId"
-							type="text"
-							name="username"
-							autocomplete="username"
-							placeholder="例如 1141041"
-							:class="inputClass"
-						/>
-					</div>
-					<div class="space-y-2">
-						<label
-							for="checkin-companions"
-							class="block text-[11px] font-semibold uppercase tracking-[0.14em] text-gw-brand-dark/70"
-						>
-							同行人數
-						</label>
-						<input
+			<form class="mt-10 flex flex-1 flex-col gap-6" @submit.prevent="openConfirm" novalidate>
+				<div class="space-y-2">
+					<label for="checkin-name" class="text-sm font-bold text-neutral-600">姓名</label>
+					<input
+						id="checkin-name"
+						v-model="name"
+						type="text"
+						name="name"
+						autocomplete="name"
+						placeholder="請輸入您的姓名"
+						:class="inputClass"
+					/>
+				</div>
+				<div class="space-y-2">
+					<label for="checkin-employee-id" class="text-sm font-bold text-neutral-600">員工編號</label>
+					<input
+						id="checkin-employee-id"
+						v-model="employeeId"
+						type="text"
+						name="username"
+						autocomplete="username"
+						placeholder="例如：AM12345"
+						:class="inputClass"
+					/>
+				</div>
+				<div class="space-y-2">
+					<label for="checkin-companions" class="text-sm font-bold text-neutral-600">同行人數</label>
+					<div class="relative">
+						<select
 							id="checkin-companions"
 							v-model.number="companionCount"
-							type="number"
-							min="1"
-							max="99"
-							:class="inputClass"
-						/>
-					</div>
-
-					<div
-						class="relative overflow-hidden rounded-2xl border border-amber-200/50 bg-gradient-to-br from-amber-50/90 via-white to-gw-mint/25 px-4 py-3.5 text-sm leading-relaxed text-amber-950/85 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] ring-1 ring-amber-100/60"
-						role="status"
-					>
-						<p class="text-pretty">
-							送出前請再確認；若與報名資料不符，可能影響<strong class="font-semibold text-gw-navy"
-								>領獎與現場核對</strong>。
-						</p>
-					</div>
-
-					<div class="mt-auto pt-2">
-						<button
-							type="submit"
-							:disabled="!formValid()"
-							class="gw-login-submit group relative flex w-full items-center justify-center gap-2 rounded-2xl bg-gw-brand py-4 text-base font-bold text-white transition duration-200 ease-out hover:brightness-[1.06] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white/90 focus-visible:ring-offset-2 focus-visible:ring-offset-gw-brand disabled:cursor-not-allowed disabled:opacity-[0.4] disabled:shadow-none disabled:hover:brightness-100"
+							:class="[
+								inputClass,
+								'cursor-pointer appearance-none bg-[#eef0ed] pr-10',
+							]"
 						>
-							<span class="relative z-10">確定</span>
-						</button>
-						<p class="mt-3 text-center text-xs text-neutral-500">
-							將先顯示確認視窗；完成後僅報到完成頁，闖關請另掃<strong class="font-semibold text-neutral-700"
-								>闖關 QR</strong>。
-						</p>
+							<option v-for="n in companionOptions" :key="n" :value="n">
+								{{ n }} 位{{ n === 1 ? "（本人）" : "" }}
+							</option>
+						</select>
+						<span
+							class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gw-brand"
+							aria-hidden="true"
+							>⌄</span
+						>
 					</div>
-				</form>
-			</div>
+				</div>
+
+				<div
+					class="flex gap-3 rounded-2xl border border-neutral-200/80 bg-white px-4 py-4 shadow-sm ring-1 ring-black/[0.03]"
+					role="status"
+				>
+					<span
+						class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-600"
+						aria-hidden="true"
+					>
+						<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
+							<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" />
+							<path
+								d="M12 10v5M12 7h.01"
+								stroke="currentColor"
+								stroke-width="2"
+								stroke-linecap="round"
+							/>
+						</svg>
+					</span>
+					<p class="border-l-4 border-[#8b6914]/40 pl-3 text-sm leading-relaxed text-neutral-700">
+						資料將用於家庭日當天<strong class="text-gw-navy">出席紀錄與人數核對</strong>，請確保資訊填寫正確。
+					</p>
+				</div>
+
+				<div class="mt-auto pt-4">
+					<button
+						type="submit"
+						:disabled="!formValid()"
+						class="flex w-full items-center justify-center gap-2 rounded-full bg-[#1a5f2a] py-4 text-base font-bold text-white shadow-[0_8px_24px_rgba(26,95,42,0.25)] transition enabled:active:scale-[0.99] enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+					>
+						確定
+						<span aria-hidden="true">›</span>
+					</button>
+				</div>
+			</form>
+
+			<p class="mt-6 text-center text-xs text-neutral-400">© 2026 AmTRAN Technology Co., Ltd.</p>
 		</main>
 
-		<AppFooter class="relative z-[3]" />
+		<AppFooter class="relative z-[1] border-t-0 bg-transparent" />
 
 		<Teleport to="body">
 			<div
 				v-if="showConfirm"
-				class="fixed inset-0 z-[100] flex items-end justify-center bg-black/45 px-4 pb-8 pt-12 sm:items-center sm:pb-12"
+				class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4 backdrop-blur-[2px]"
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="checkin-confirm-title"
 			>
 				<div
-					class="max-h-[min(85dvh,32rem)] w-full max-w-md overflow-y-auto rounded-2xl border border-white/80 bg-white p-6 shadow-2xl ring-1 ring-black/5"
+					class="w-full max-w-md rounded-[1.35rem] bg-white p-6 shadow-2xl ring-1 ring-black/5"
 					@click.stop
 				>
-					<div
-						class="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gw-mint/60 text-2xl text-gw-brand-dark"
-						aria-hidden="true"
-					>
-						✓
+					<div class="flex flex-col items-center">
+						<div
+							class="flex h-16 w-16 items-center justify-center rounded-full bg-gw-mint ring-4 ring-gw-mint-soft/50"
+							aria-hidden="true"
+						>
+							<div
+								class="flex h-11 w-11 items-center justify-center rounded-full bg-gw-brand text-lg text-white"
+							>
+								✓
+							</div>
+						</div>
+						<h2
+							id="checkin-confirm-title"
+							class="font-display mt-5 text-center text-lg font-bold text-gw-navy"
+						>
+							請確認以下報到資訊正確
+						</h2>
 					</div>
-					<h2
-						id="checkin-confirm-title"
-						class="font-display mt-4 text-center text-lg font-bold text-gw-navy"
-					>
-						請確認以下資料無誤
-					</h2>
-					<dl class="mt-5 space-y-3 rounded-xl bg-neutral-50/90 px-4 py-4 text-sm">
-						<div class="flex justify-between gap-3 border-b border-neutral-200/80 pb-3">
+					<dl class="mt-6 divide-y divide-neutral-100">
+						<div class="flex justify-between gap-3 py-3 text-sm">
 							<dt class="text-neutral-500">姓名</dt>
-							<dd class="font-semibold text-gw-navy">{{ name.trim() }}</dd>
+							<dd class="font-bold text-gw-navy">{{ name.trim() }}</dd>
 						</div>
-						<div class="flex justify-between gap-3 border-b border-neutral-200/80 pb-3">
+						<div class="flex justify-between gap-3 py-3 text-sm">
 							<dt class="text-neutral-500">員工編號</dt>
-							<dd class="font-semibold text-gw-navy">{{ employeeId.trim() }}</dd>
+							<dd class="font-bold text-gw-navy">{{ employeeId.trim() }}</dd>
 						</div>
-						<div class="flex justify-between gap-3">
+						<div class="flex justify-between gap-3 py-3 text-sm">
 							<dt class="text-neutral-500">同行人數</dt>
-							<dd class="font-semibold text-gw-navy">{{ companionCount }} 位</dd>
+							<dd class="font-bold text-gw-navy">{{ companionCount }} 位</dd>
 						</div>
 					</dl>
-					<div class="mt-6 flex flex-col gap-3 sm:flex-row-reverse sm:justify-end">
+					<div class="mt-6 flex flex-col gap-3">
 						<button
 							type="button"
-							class="rounded-2xl bg-gw-brand py-3.5 text-center text-base font-bold text-white shadow-btn transition hover:brightness-[1.05] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gw-brand focus-visible:ring-offset-2 sm:min-w-[8rem]"
+							class="w-full rounded-full bg-[#1a5f2a] py-3.5 text-center text-base font-bold text-white shadow-md transition hover:brightness-110 active:scale-[0.99]"
 							@click="commitCheckIn"
 						>
 							確認
 						</button>
 						<button
 							type="button"
-							class="rounded-2xl border border-neutral-200 bg-white py-3.5 text-center text-base font-semibold text-gw-navy transition hover:bg-neutral-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-neutral-300 focus-visible:ring-offset-2 sm:min-w-[8rem]"
+							class="w-full rounded-full bg-[#e8e4dc] py-3.5 text-center text-base font-semibold text-neutral-800 transition hover:bg-[#ded9cf] active:scale-[0.99]"
 							@click="closeConfirm"
 						>
 							回上頁
