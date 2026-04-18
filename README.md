@@ -140,7 +140,8 @@ npm run dev
 1. 將變更推上 GitHub 預設分支（如 `main`）。  
 2. 儲存庫 **Settings → Pages**：**Build and deployment** 的 **Source** 選 **GitHub Actions**（首次需儲存設定）。  
 3. 工作流程：[`.github/workflows/deploy-github-pages.yml`](.github/workflows/deploy-github-pages.yml) 會在 `source/` 內建置，並設定 `VITE_BASE_PATH=/<repo名稱>/`，產物並複製 `index.html` 為 `404.html` 以利 SPA。  
-4. 網址形如：`https://<你的帳號>.github.io/<repo名稱>/`（以實際帳號／倉庫名為準）。
+4. 至 **Actions** 手動執行 **Deploy GitHub Pages**（`workflow_dispatch`）；**勿**在未完成 Pages 設定前強求每次 push 自動部署（避免檢查顯示失敗）。例行 push 僅執行建置驗證：[`ci.yml`](.github/workflows/ci.yml)。  
+5. 網址形如：`https://<你的帳號>.github.io/<repo名稱>/`（以實際帳號／倉庫名為準）。
 
 **同區網快速試機（不經 Netlify／GitHub）**
 
@@ -184,7 +185,7 @@ npm run dev
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
 | 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-18（頁尾 **v2.35**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
+| 最後更新 README | 2026-04-18（頁尾 **v2.36**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
 
 
 ---
@@ -524,4 +525,4 @@ sequenceDiagram
 
 ---
 
-*README v2.35 · 2026-04-18（開頭主視覺：`source/public/images/family-day-forest-walk.png`；v2.34）*
+*README v2.36 · 2026-04-18（GitHub Actions：**CI** 例行建置；**Pages** 改手動觸發；v2.35）*

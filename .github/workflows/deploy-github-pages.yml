@@ -1,11 +1,14 @@
 # Optional: GitHub Pages at https://<user>.github.io/<repo>/
 # Repo Settings → Pages → Build and deployment → Source: GitHub Actions (enable once).
+#
+# Runs only on manual trigger so pushes to main are not blocked if Pages is not
+# configured yet. To auto-deploy on every push, add under "on:":
+#   push:
+#     branches: ["main"]
 
 name: Deploy GitHub Pages
 
 on:
-  push:
-    branches: ["main"]
   workflow_dispatch:
 
 permissions:
