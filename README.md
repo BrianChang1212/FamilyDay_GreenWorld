@@ -3,6 +3,7 @@
 ## 目錄
 
 - [快速開始](#快速開始)
+  - [介面預覽（截圖）](#ui-preview-screenshots)
 - [專案概覽](#專案概覽)
 - [Demo 影片預覽](#demo-影片預覽)
 - [技術架構](#技術架構)
@@ -141,6 +142,20 @@ npm run dev
 
 在 `source/` 執行 `npm run dev -- --host`，以手機與電腦連同一 Wi‑Fi，手機瀏覽器開 `http://<電腦區網IP>:5173`（防火牆需允許該連接埠）。
 
+<a id="ui-preview-screenshots"></a>
+
+### 介面預覽（截圖）
+
+以下為 **`source/` 生產建置**（`npm run build`）後，以 **390×844**（常見手機寬度）全頁截圖；與 [Netlify 測試站](#preview-netlify-test-ui)／本機 `npm run preview` **同一套輸出**。原始檔置於 [`docs/preview/screenshots/`](docs/preview/screenshots/)（重新產生步驟見 [`docs/preview/README.md`](docs/preview/README.md)）。
+
+| 歡迎 `/` | 報到 `/checkin` |
+| :---: | :---: |
+| [![歡迎頁](docs/preview/screenshots/preview-welcome.png)](docs/preview/screenshots/preview-welcome.png) | [![報到表單](docs/preview/screenshots/preview-checkin-form.png)](docs/preview/screenshots/preview-checkin-form.png) |
+| 闖關登入 `/register` | 闖關地圖 `/stage` |
+| [![闖關登入](docs/preview/screenshots/preview-register.png)](docs/preview/screenshots/preview-register.png) | [![闖關地圖](docs/preview/screenshots/preview-stage.png)](docs/preview/screenshots/preview-stage.png) |
+
+**領取成功**（`/finish/claimed`）— [![領取成功](docs/preview/screenshots/preview-claim-success.png)](docs/preview/screenshots/preview-claim-success.png)
+
 ---
 
 ## 專案概覽
@@ -165,7 +180,7 @@ npm run dev
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
 | 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-18（頁尾 **v2.33**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
+| 最後更新 README | 2026-04-18（頁尾 **v2.34**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
 
 
 ---
@@ -440,7 +455,7 @@ sequenceDiagram
 
 | 路徑                | 用途                                                                                                                |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `docs/`           | 見 [`docs/README.md`](docs/README.md)（含 `project/`、`specs/`、`architecture/`、`demo/` 等子目錄說明） |
+| `docs/`           | 見 [`docs/README.md`](docs/README.md)（含 `project/`、`specs/`、`architecture/`、`demo/`、**`preview/`** 介面截圖等子目錄說明） |
 | `assets/`         | 設計稿、KV、Logo、CIS（註明版本與來源）                                                                                          |
 | `source/`         | 前端（Vue 3 + Vite + TS + Tailwind + Vue Router）：於此目錄執行 `npm install` → `npm run dev`（預設 `http://localhost:5173`）    |
 | `.cursor/skills/` | Cursor Agent 用技能說明（前端設計、文案／在地化等）；選用，**非**執行期依賴                                                                    |
@@ -505,4 +520,4 @@ sequenceDiagram
 
 ---
 
-*README v2.33 · 2026-04-18（目錄順序與正文對齊；`/finish/claimed` 列與 **`local-fallback`** 一致；v2.32）*
+*README v2.34 · 2026-04-18（**介面預覽**截圖：`docs/preview/`；v2.33）*

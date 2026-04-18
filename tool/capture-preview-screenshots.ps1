@@ -13,14 +13,15 @@ $routes = @(
 	@{ Path = "/"; File = "preview-welcome.png" },
 	@{ Path = "/checkin"; File = "preview-checkin-form.png" },
 	@{ Path = "/register"; File = "preview-register.png" },
-	@{ Path = "/stage"; File = "preview-stage.png" }
+	@{ Path = "/stage"; File = "preview-stage.png" },
+	@{ Path = "/finish/claimed"; File = "preview-claim-success.png" }
 )
 
 Set-Location $root
 foreach ($r in $routes) {
 	$url = $base + $r.Path
 	$dest = Join-Path $outDir $r.File
-	npx --yes playwright@1.50.1 screenshot $url $dest --viewport-size=$viewport --full-page
+	npx --yes playwright@1.51.0 screenshot $url $dest --viewport-size=$viewport --full-page
 	if ($LASTEXITCODE -ne 0) { throw "playwright failed for $($r.File)" }
 }
 

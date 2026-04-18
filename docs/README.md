@@ -14,7 +14,7 @@
 | [`proposals/`](./proposals/) | **外部提案／簡報**（PDF） |
 | [`design/`](./design/) | **設計資產**（線框圖等） |
 | [`demo/`](./demo/) | **操作示範錄影**（MP4 等；不隨前端建置打包，見 [`demo/README.md`](./demo/README.md)） |
-| [`preview/`](./preview/) | **README 用預覽截圖**（PNG；見 [`preview/README.md`](./preview/README.md)） |
+| [`preview/`](./preview/) | **介面截圖**（README 用；與 `source` 生產建置對齊，見根 [`README.md`「介面預覽（截圖）」](../README.md#ui-preview-screenshots)） |
 | `zip/` | 壓縮備份（如線框 zip）；非正式規格來源時以展開檔為準 |
 
 ---
@@ -37,7 +37,6 @@
 | 提案 PDF | [`proposals/FamilyDayApp_Proposal_v1.pdf`](./proposals/FamilyDayApp_Proposal_v1.pdf) |
 | Wireframe PNG | [`design/wireframe/`](./design/wireframe/) |
 | 操作示範錄影 | [`demo/`](./demo/)（[`demo/README.md`](./demo/README.md)） |
-| 預覽畫面截圖（靜態 PNG） | [`preview/README.md`](./preview/README.md)（根 README **公開預覽部署**節併陳） |
 
 ---
 
