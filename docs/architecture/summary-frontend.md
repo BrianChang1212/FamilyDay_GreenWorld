@@ -154,7 +154,7 @@ flowchart TD
 
 - 開發期：可於 **`vite.config`** 設定 **proxy** 指向本機或測試 API（`source/vite.config.ts` **目前未**預設 proxy，由專案依環境補上）。  
 - 正式／測試建置：於 **`source/`** 設定 **`VITE_API_BASE`** = API **主機根**（**無**尾隨 `/`），例如 `https://api.example.com` 或同源 `https://event.example.com`；程式會請求 **`{VITE_API_BASE}/api/v1/...`**（見 **`source/src/lib/apiBase.ts`**）。**舊稿若寫 `VITE_API_BASE_URL` 應改為此名稱。**  
-- **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`source/vite.config.ts`** 與根 **`README.md`**「公開預覽部署」。  
+- **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`source/vite.config.ts`** 與根 [`README.md`](../../README.md#preview-netlify-test-ui)「**公開預覽部署 · 測試 Web UI**」（錨點 **`preview-netlify-test-ui`**；含 **Netlify 範例網址**、**`/check-in`**／**`/game`** QR 分流、與 **`main` 連動**；[`summary-deployment.md`](./summary-deployment.md) **§1.1** **v1.3** 摘要連動）。  
 - **關卡瀏覽與領取狀態呈現**：可共用 **`GET /api/v1/me/dashboard`**（合併 API）；領取次數映射見 **`source/src/api/rewardClaimStatus.ts`**。  
 - 完整端點列表見 [`api-v0.1.md`](../specs/api-v0.1.md)。
 
@@ -199,6 +199,9 @@ flowchart TD
 | 1.13 | 2026-04-18 | **§2.1** 狀態鍵列補齊（`demoState`／`entryIntent` 與程式一致） |
 | 1.14 | 2026-04-18 | **§2.1** `/briefing`：**一律**導向 `register`；與 §2.3「說明後下一屏即登入、不先進地圖」一致；程式 `BriefingView` 已對齊 |
 | 1.15 | 2026-04-18 | **§2.1** 補 **`/finish/claimed`**、領取狀態以 **`VITE_API_BASE` + `GET /me/dashboard`** 為準與 dev 後備；**§2** 目錄建議與 `source/src/api`、`lib/apiBase` 實際對齊；**§3–§4** 修正 **`VITE_API_BASE`**（廢止 **`VITE_API_BASE_URL`** 舊稱）；刪除未使用之 doodle 元件後僅保留 **`PageCritters`** |
-| 1.16 | 2026-04-18 | **§3**「完成頁／領取成功」列：明訂 **`fdgw_finishClaimed`** 後備**僅限開發建置**；正式建置未設定 API 時不以前端暫存代替後端 |
+| 1.16 | 2026-04-18 | **§3**「完成頁／領取成功」列：當時明訂 **`fdgw_finishClaimed`** 後備**僅限開發建置**；**v1.18** 起改為無 **`VITE_API_BASE`** 時皆 **`local-fallback`**（含預覽建置），並於畫面標示非伺服器紀錄 |
 | 1.17 | 2026-04-18 | **§4**：釐清 `source/vite.config.ts` **尚未**預設 proxy，需依環境自行設定 |
 | 1.18 | 2026-04-18 | **§2.1／§2.3／§3／§4**：**`/finish/claimed`** 無 **`VITE_API_BASE`** 時一律 **`local-fallback`**（含預覽建置），廢止「僅 DEV／正式顯示錯誤」舊述；補 **靜態預覽** 與 **`VITE_BASE_PATH`** |
+| 1.19 | 2026-04-18 | **§4**：靜態預覽條目補與根 **`README.md`**「公開預覽部署 · 測試 Web UI」（錨點 **`preview-netlify-test-ui`**）及 **`summary-deployment` §1.1 v1.2** 之**連動**（Netlify 範例、QR、`main` 部署） |
+| 1.20 | 2026-04-18 | 修訂表 **v1.16** 列：補 **v1.18** 承接敘述，避免讀者誤以為仍「僅開發建置」後備；**v1.19** 列補明錨點 **`preview-netlify-test-ui`**（與根 **`README`** 一致） |
+| 1.21 | 2026-04-18 | **§4**：「靜態預覽」條目之根 **`README`** 改為可點連結 [`README.md#preview-netlify-test-ui`](../../README.md#preview-netlify-test-ui) |

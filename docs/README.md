@@ -32,6 +32,7 @@
 | 需求與專案狀態 | [`project/專案文件.md`](./project/專案文件.md) |
 | API v0.1 草案 | [`specs/api-v0.1.md`](./specs/api-v0.1.md) |
 | 前端／後端／部署／流量摘要 | [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) 等 |
+| 測試 Web UI（Netlify、QR） | 根 [`README.md`](../README.md#preview-netlify-test-ui)（錨點 **`preview-netlify-test-ui`**）；部署摘要 [`architecture/summary-deployment.md`](./architecture/summary-deployment.md) **§1.1**（**v1.3**） |
 | 提案 PDF | [`proposals/FamilyDayApp_Proposal_v1.pdf`](./proposals/FamilyDayApp_Proposal_v1.pdf) |
 | Wireframe PNG | [`design/wireframe/`](./design/wireframe/) |
 | 操作示範錄影 | [`demo/`](./demo/)（[`demo/README.md`](./demo/README.md)） |
@@ -44,4 +45,4 @@
 
 ---
 
-**最後整理：** 2026-04-18。歷史變更與實作細節請以**各檔案標頭**、根目錄 **`README.md`** 頁尾版本列、以及 **`project/專案文件.md`**（合併版 **v1.3.11**）為準；前端路由、QR 動線、`VITE_API_BASE`、`local-fallback` 與 `sessionStorage` 鍵見 `architecture/summary-frontend.md`（§2.1，修訂至 **v1.18**）；`dashboard` 選用欄位見 `specs/api-v0.1.md`（**v0.1.1**）。
+**最後整理：** 2026-04-18。歷史變更與實作細節請以**各檔案標頭**、根目錄 **`README.md`** 頁尾版本列、以及 **`project/專案文件.md`**（合併版 **v1.3.16**）為準；**測試 Web UI** 見根 [`README.md`](../README.md#preview-netlify-test-ui)；前端路由與 `VITE_API_BASE`、`local-fallback` 見 `architecture/summary-frontend.md`（§2.1，**v1.21**）；部署摘要見 `architecture/summary-deployment.md` §1.1（修訂至 **v1.3**）；`dashboard` 選用欄位見 `specs/api-v0.1.md`（**v0.1.1**）。

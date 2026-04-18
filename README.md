@@ -2,7 +2,7 @@
 
 ## 目錄
 
-- [快速開始](#快速開始)
+- [快速開始](#快速開始)（內含 [**公開預覽部署 · 測試 Web UI**](#preview-netlify-test-ui)：`netlify.toml`、Netlify 範例網址、報到／闖關 QR 路徑、`main` 連動部署）
 - [專案概覽](#專案概覽)
 - [技術架構](#技術架構)
   - [系統架構圖](#系統架構圖)
@@ -95,15 +95,40 @@ npm run dev
 
 **說明：** 後端 API 尚未串接時，多數畫面仍以 mock／靜態流程為主。**未設定 `VITE_API_BASE` 時**，完成頁領獎次數會以瀏覽器 `sessionStorage` 類比（僅供預覽）；若要以**真實後端**顯示次數，請於 `source/` 建立 `.env.local`（或建置環境變數）設定 **`VITE_API_BASE`**（API 主機根、無尾隨 `/`），詳見 `docs/architecture/summary-frontend.md` §4。定案見 `docs/specs/api-v0.1.md` 與 `docs/architecture/summary-backend.md`。
 
-### 公開預覽部署（給他人用手機／瀏覽器試操作，可不接後端）
+<a id="preview-netlify-test-ui"></a>
+
+### 公開預覽部署 · 測試 Web UI
+
+> 給他人用手機／瀏覽器試操作，可不接後端；與 [`docs/architecture/summary-deployment.md`](docs/architecture/summary-deployment.md) **§1.1**（修訂 **v1.3**）、[`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) **§4** 互相連結。
 
 靜態檔來自 `source/` 的 `npm run build` 產物（`source/dist`）。**建議優先使用 Netlify**（子路徑與 Vue Router 較省事）；亦可使用本倉庫內建的 GitHub Actions 發布至 GitHub Pages。
+
+> **用途標記 · 測試 Web UI 操作**  
+> 下表 **Netlify 網址**與 **QR 用連結**僅供 **測試介面與流程**（內部／利害關係人預覽）。**非**正式活動對外定案之網域或 SLA；正式上線請改用公司核可的網域、後端與資安設定。若於 Netlify **變更站名或自訂網域**，請同步更新本段與實體 QR 內嵌網址。
+
+#### 測試 Web UI：Netlify 預覽站（與 GitHub 連動）
+
+| 項目 | 說明 |
+|------|------|
+| **預覽網址（範例）** | **[https://familyday-greenworld.netlify.app](https://familyday-greenworld.netlify.app)** — 以 Netlify **Domain management** 顯示為準 |
+| **自動更新** | 站台已 **Connect to Git** 時，對 **`main`**（或綁定分支）**push** 且建置成功後，線上 UI 即為新版；失敗時仍為上一版 **Published** |
+| **首次匯入注意** | 設定畫面須填 **Base directory：`source`**（與 [`netlify.toml`](netlify.toml) 一致）；**Publish directory：`dist`**；**勿**設 `VITE_BASE_PATH`（站點在網域根目錄） |
+| **存續** | 站點未刪除、帳號與方案有效時，網址通常**持續可用**；免費方案有建置分鐘／流量等額度，見 [Netlify 方案說明](https://www.netlify.com/pricing/) |
+
+**報到／闖關分流（同一預覽站、不同路徑 — 印靜態 QR 時請含完整 `https`）**
+
+| 用途 | 測試用連結（範例網域同上；若更換請只替換主機名） |
+|------|------|
+| 報到 | `https://familyday-greenworld.netlify.app/check-in` |
+| 闖關 | `https://familyday-greenworld.netlify.app/game` |
+
+**QR 產生器（靜態碼，內容＝上列網址即可）：** 例如 [MakeQRCode](https://makeqrcode.app/)、[The Free QR Code Generator](https://the-free-qrcode-generator.com/)、需 Logo／印刷輸出時 [QRCode Monkey](https://www.qrcode-monkey.com/)。列印建議錯誤修正 **Q 或 H**，印出前務必實掃確認。
 
 **方式 A：Netlify（建議）**
 
 1. 登入 [Netlify](https://www.netlify.com/)，**Add new site → Import an existing project**，授權並選取本 GitHub 儲存庫。  
-2. 建置設定會由倉庫根目錄的 [`netlify.toml`](netlify.toml) 帶入：`base = source`、`build = npm run build`、`publish = dist`，並已設定 SPA 導向（子路徑重新整理可開）。  
-3. 部署完成後將站點網址（如 `https://xxx.netlify.app`）傳給預覽者即可。**勿設定 `VITE_BASE_PATH`**（站點在網域根目錄，`vite.config` 預設 `base: '/'`）。
+2. 建置設定由 [`netlify.toml`](netlify.toml) 帶入；若 UI 未帶出，手動確認 **Base directory = `source`**、`npm run build`、**Publish directory = `dist`**，並已設定 SPA 導向（子路徑重新整理可開）。  
+3. 部署完成後將 **`https://…netlify.app`** 傳給預覽者。**勿設定 `VITE_BASE_PATH`**（`vite.config` 預設 `base: '/'`）。
 
 **方式 B：GitHub Pages**
 
@@ -140,7 +165,7 @@ npm run dev
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
 | 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-18；細節見頁尾版本列與 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
+| 最後更新 README | 2026-04-18（頁尾 **v2.32**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
 
 
 ---
@@ -480,4 +505,4 @@ sequenceDiagram
 
 ---
 
-*README v2.25 · 2026-04-18（公開預覽：`netlify.toml`、GitHub Pages workflow、`VITE_BASE_PATH`；無 API 時完成頁 session 類比；v2.24）*
+*README v2.32 · 2026-04-18（`專案文件` **維護**列：根 [`README.md`](README.md) 可點連結；合併版 **v1.3.16**；v2.31）*
