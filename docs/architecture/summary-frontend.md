@@ -48,7 +48,7 @@
 
 **狀態鍵（原型，`sessionStorage`）：** **意圖** `fdgw_entry_intent`（`entryIntent.ts`）；**profile** `fdgw_name`、`fdgw_employeeId`；**闖關** `fdgw_stage`、`fdgw_inZone`；**報到** `fdgw_companionCount`、`fdgw_checkin_done`。  
 
-**領取狀態資料來源（與程式對齊）：** 已設定環境變數 **`VITE_API_BASE`** 並建置時，**`/finish/claimed`** 以 **`GET /api/v1/me/dashboard`** 回傳之 `progress` 映射次數（優先 **`rewardRedeemCount`**，草案演進欄位；暫可 **`fullClearCount`**，以前後端定案為準），見 **`source/src/api/rewardClaimStatus.ts`**。僅當 **`import.meta.env.DEV`** 且**未**設定 **`VITE_API_BASE`** 時，該頁才後備使用 **`fdgw_finishClaimed`**（`demoState.ts`）；**`?mock_claimed=`** 僅供離線 UI 覆寫、不寫後端。**`/finish`** 在無 **`VITE_API_BASE`** 時仍會遞增 **`fdgw_finishClaimed`** 以利本地原型；有 API 時不寫入該鍵（領取紀錄以伺服器為準）。
+**領取狀態資料來源（與程式對齊 · `ClaimSuccessView`）：** 已設定環境變數 **`VITE_API_BASE`** 時，**`/finish/claimed`** 以 **`GET /api/v1/me/dashboard`** 回傳之 `progress` 映射次數（優先 **`rewardRedeemCount`**，草案演進欄位；暫可 **`fullClearCount`**，以前後端定案為準），見 **`source/src/api/rewardClaimStatus.ts`**。**未**設定 **`VITE_API_BASE`** 時（含本機與**正式建置之預覽站**），該頁以 **`local-fallback`** 後備使用 **`fdgw_finishClaimed`**（`demoState.ts`），並於畫面標示：**非伺服器實際紀錄、僅供原型／預覽**。**`?mock_claimed=`** 僅供離線 UI 覆寫、不寫後端。**`/finish`** 在無 **`VITE_API_BASE`** 時仍會遞增 **`fdgw_finishClaimed`** 以利流程試跑；有 API 時不寫入該鍵（領取紀錄以伺服器為準）。
 
 ### 2.2 報到 UI 流程（掃描**報到** QR／連結 · 線框對齊 · 2026-04-18）
 
@@ -107,7 +107,7 @@ flowchart TD
 
 1. **完成闖關** — 恭喜文案、姓名／員編、領獎地點說明；獎項／點數圖示（狀態依是否已領）；「領取闖關禮」；**工作人員**核銷提示。  
 2. **確認領取（Modal）** — 第 n 次領取、不可復原提示；確認／取消。  
-3. **領取成功**（**`/finish/claimed`**）— 感謝文案；三格領獎狀態由**後端** `dashboard.progress` 供數、前端映射（`FINISH_REWARD_SLOTS` 與 **`maxRounds`** 對齊）；無 API 之開發模式見上表「領取狀態資料來源」。
+3. **領取成功**（**`/finish/claimed`**）— 感謝文案；三格領獎狀態由**後端** `dashboard.progress` 供數、前端映射（`FINISH_REWARD_SLOTS` 與 **`maxRounds`** 對齊）；**未接 API** 時見上表「領取狀態資料來源」（**`local-fallback`**、`sessionStorage` 類比，畫面有預覽提示）。
 
 #### 闖關流程圖（Mermaid）
 
@@ -145,7 +145,7 @@ flowchart TD
 | 流程 | **簽到頁**與**闖關頁**分開（不同路由），資訊架構清楚。**闖關線：** 歡迎 → 遊戲說明 → **闖關登入頁（全屏，非彈窗）** → 關卡流程；**報到線**見 §2.2。**同一 SPA** 內報到與闖關可共用表單元件，但路由與欄位不同。**報到 QR** 與**闖關入口 QR** 指向不同 URL／query（`entry=checkin`／`entry=game` 等）。各關**到站 QR** 仍為獨立連結（常含站點 JWT，見 [`api-v0.1.md`](../specs/api-v0.1.md)） |
 | 闖關頁 | 以「目前關卡、題目、進度」為主；**不自動輪詢**，使用者操作才打 API |
 | 櫃台驗證 | 完成畫面需**高可讀、少動效**，利於工作人員掃視 |
-| 完成頁／領取成功 | **`/finish`**（`FinishView.vue`）：與「**3 次／3 份**」對齊之確認領獎彈窗。**`/finish/claimed`**（`ClaimSuccessView.vue`）：**已設定 `VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 顯示已領進度；**僅開發建置（`import.meta.env.DEV`）且未設定 `VITE_API_BASE`** 時後備 **`fdgw_finishClaimed`**（`demoState.ts`／`FINISH_REWARD_SLOTS` = 3）；**正式建置未設定 API** 則顯示錯誤、不以前端暫存代替後端。上線後完成頁應於**後端核銷 API 成功**後再導向領取成功頁 |
+| 完成頁／領取成功 | **`/finish`**（`FinishView.vue`）：與「**3 次／3 份**」對齊之確認領獎彈窗。**`/finish/claimed`**（`ClaimSuccessView.vue`）：**已設定 `VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 顯示已領進度；**未設定 API** 時以 **`local-fallback`** 顯示 **`fdgw_finishClaimed`**（`demoState.ts`／`FINISH_REWARD_SLOTS` = 3），並標示為預覽用、非伺服器紀錄。**上線**應設定 **`VITE_API_BASE`**，且完成頁宜於**後端核銷 API 成功**後再導向領取成功頁 |
 | 視覺 | KV／Logo／CIS 定案後以 **design token** 統一兩路流程，避免兩套風格 |
 
 ---
@@ -154,6 +154,7 @@ flowchart TD
 
 - 開發期：可於 **`vite.config`** 設定 **proxy** 指向本機或測試 API（`source/vite.config.ts` **目前未**預設 proxy，由專案依環境補上）。  
 - 正式／測試建置：於 **`source/`** 設定 **`VITE_API_BASE`** = API **主機根**（**無**尾隨 `/`），例如 `https://api.example.com` 或同源 `https://event.example.com`；程式會請求 **`{VITE_API_BASE}/api/v1/...`**（見 **`source/src/lib/apiBase.ts`**）。**舊稿若寫 `VITE_API_BASE_URL` 應改為此名稱。**  
+- **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`source/vite.config.ts`** 與根 **`README.md`**「公開預覽部署」。  
 - **關卡瀏覽與領取狀態呈現**：可共用 **`GET /api/v1/me/dashboard`**（合併 API）；領取次數映射見 **`source/src/api/rewardClaimStatus.ts`**。  
 - 完整端點列表見 [`api-v0.1.md`](../specs/api-v0.1.md)。
 
@@ -200,3 +201,4 @@ flowchart TD
 | 1.15 | 2026-04-18 | **§2.1** 補 **`/finish/claimed`**、領取狀態以 **`VITE_API_BASE` + `GET /me/dashboard`** 為準與 dev 後備；**§2** 目錄建議與 `source/src/api`、`lib/apiBase` 實際對齊；**§3–§4** 修正 **`VITE_API_BASE`**（廢止 **`VITE_API_BASE_URL`** 舊稱）；刪除未使用之 doodle 元件後僅保留 **`PageCritters`** |
 | 1.16 | 2026-04-18 | **§3**「完成頁／領取成功」列：明訂 **`fdgw_finishClaimed`** 後備**僅限開發建置**；正式建置未設定 API 時不以前端暫存代替後端 |
 | 1.17 | 2026-04-18 | **§4**：釐清 `source/vite.config.ts` **尚未**預設 proxy，需依環境自行設定 |
+| 1.18 | 2026-04-18 | **§2.1／§2.3／§3／§4**：**`/finish/claimed`** 無 **`VITE_API_BASE`** 時一律 **`local-fallback`**（含預覽建置），廢止「僅 DEV／正式顯示錯誤」舊述；補 **靜態預覽** 與 **`VITE_BASE_PATH`** |

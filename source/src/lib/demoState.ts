@@ -37,11 +37,6 @@ export function incrementFinishClaimed(): number {
 	return next;
 }
 
-/** 原型除錯：將闖關禮已領次數歸零（不影響其他 session 狀態） */
-export function clearFinishClaimedDemo(): void {
-	sessionStorage.removeItem(K.finishClaimed);
-}
-
 export function getStage(): number {
 	const v = sessionStorage.getItem(K.stage);
 	const n = v ? parseInt(v, 10) : 1;

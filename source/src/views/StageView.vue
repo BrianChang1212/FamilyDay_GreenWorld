@@ -33,11 +33,6 @@ function simulateScan() {
 	setInZone(true);
 }
 
-function resetScanDemo() {
-	inZone.value = false;
-	setInZone(false);
-}
-
 function startQuiz() {
 	router.push({ name: "quiz" });
 }
@@ -192,13 +187,6 @@ function rowState(id: number): "done" | "current" | "locked" {
 						開始作答挑戰 →
 					</button>
 				</div>
-				<button
-					type="button"
-					class="mt-4 text-xs text-neutral-500 underline underline-offset-2"
-					@click="resetScanDemo"
-				>
-					（測試）重設掃描狀態
-				</button>
 			</div>
 
 			<section class="mt-8 rounded-2xl border border-neutral-200/80 bg-white p-4 shadow-sm">

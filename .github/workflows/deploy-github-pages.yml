@@ -1,0 +1,56 @@
+# Optional: GitHub Pages at https://<user>.github.io/<repo>/
+# Repo Settings → Pages → Build and deployment → Source: GitHub Actions (enable once).
+
+name: Deploy GitHub Pages
+
+on:
+  push:
+    branches: ["main"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: npm
+          cache-dependency-path: source/package-lock.json
+
+      - name: Install & build
+        working-directory: source
+        env:
+          VITE_BASE_PATH: /${{ github.event.repository.name }}/
+        run: |
+          npm ci
+          npm run build
+          cp dist/index.html dist/404.html
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: source/dist
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5

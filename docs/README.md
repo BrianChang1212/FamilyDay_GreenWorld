@@ -44,4 +44,4 @@
 
 ---
 
-**最後整理：** 2026-04-18。歷史變更與實作細節請以**各檔案標頭**、根目錄 **`README.md`** 頁尾版本列、以及 **`project/專案文件.md`**（合併版 **v1.3.10**）為準；前端路由、QR 動線、`VITE_API_BASE`、領取狀態與 `sessionStorage` 鍵見 `architecture/summary-frontend.md`（§2.1，修訂至 **v1.17**）；`dashboard` 選用欄位見 `specs/api-v0.1.md`（**v0.1.1**）。
+**最後整理：** 2026-04-18。歷史變更與實作細節請以**各檔案標頭**、根目錄 **`README.md`** 頁尾版本列、以及 **`project/專案文件.md`**（合併版 **v1.3.11**）為準；前端路由、QR 動線、`VITE_API_BASE`、`local-fallback` 與 `sessionStorage` 鍵見 `architecture/summary-frontend.md`（§2.1，修訂至 **v1.18**）；`dashboard` 選用欄位見 `specs/api-v0.1.md`（**v0.1.1**）。

@@ -58,7 +58,7 @@ npm -v
 **3. 安裝專案相依套件（在 `source/`）**
 
 ```powershell
-cd D:\Brian\projects\Personal\20260410_FamilyDay_GreenWorld_App\source
+cd D:\Brian\dev\FamilyDay_GreenWorld\source
 npm install
 ```
 
@@ -93,7 +93,28 @@ npm run dev
 瀏覽器開啟終端機顯示之本機網址（Vite 預設多為 **[http://localhost:5173](http://localhost:5173)**）。  
 建置預覽：`npm run build` 後 `npm run preview`。
 
-**說明：** 後端 API 尚未串接時，多數畫面仍以 mock／靜態流程為主；若需預覽**領取成功頁**由伺服器回傳的次數，請於 `source/` 建立 `.env.local`（或建置環境）設定 **`VITE_API_BASE`**（API 主機根、無尾隨 `/`），詳見 `docs/architecture/summary-frontend.md` §4。定案見 `docs/specs/api-v0.1.md` 與 `docs/architecture/summary-backend.md`。
+**說明：** 後端 API 尚未串接時，多數畫面仍以 mock／靜態流程為主。**未設定 `VITE_API_BASE` 時**，完成頁領獎次數會以瀏覽器 `sessionStorage` 類比（僅供預覽）；若要以**真實後端**顯示次數，請於 `source/` 建立 `.env.local`（或建置環境變數）設定 **`VITE_API_BASE`**（API 主機根、無尾隨 `/`），詳見 `docs/architecture/summary-frontend.md` §4。定案見 `docs/specs/api-v0.1.md` 與 `docs/architecture/summary-backend.md`。
+
+### 公開預覽部署（給他人用手機／瀏覽器試操作，可不接後端）
+
+靜態檔來自 `source/` 的 `npm run build` 產物（`source/dist`）。**建議優先使用 Netlify**（子路徑與 Vue Router 較省事）；亦可使用本倉庫內建的 GitHub Actions 發布至 GitHub Pages。
+
+**方式 A：Netlify（建議）**
+
+1. 登入 [Netlify](https://www.netlify.com/)，**Add new site → Import an existing project**，授權並選取本 GitHub 儲存庫。  
+2. 建置設定會由倉庫根目錄的 [`netlify.toml`](netlify.toml) 帶入：`base = source`、`build = npm run build`、`publish = dist`，並已設定 SPA 導向（子路徑重新整理可開）。  
+3. 部署完成後將站點網址（如 `https://xxx.netlify.app`）傳給預覽者即可。**勿設定 `VITE_BASE_PATH`**（站點在網域根目錄，`vite.config` 預設 `base: '/'`）。
+
+**方式 B：GitHub Pages**
+
+1. 將變更推上 GitHub 預設分支（如 `main`）。  
+2. 儲存庫 **Settings → Pages**：**Build and deployment** 的 **Source** 選 **GitHub Actions**（首次需儲存設定）。  
+3. 工作流程：[`.github/workflows/deploy-github-pages.yml`](.github/workflows/deploy-github-pages.yml) 會在 `source/` 內建置，並設定 `VITE_BASE_PATH=/<repo名稱>/`，產物並複製 `index.html` 為 `404.html` 以利 SPA。  
+4. 網址形如：`https://<你的帳號>.github.io/<repo名稱>/`（以實際帳號／倉庫名為準）。
+
+**同區網快速試機（不經 Netlify／GitHub）**
+
+在 `source/` 執行 `npm run dev -- --host`，以手機與電腦連同一 Wi‑Fi，手機瀏覽器開 `http://<電腦區網IP>:5173`（防火牆需允許該連接埠）。
 
 ---
 
@@ -459,4 +480,4 @@ sequenceDiagram
 
 ---
 
-*README v2.24 · 2026-04-18（`/finish/claimed` 列與 `docs` 基線：`專案文件` v1.3.10、`summary-frontend` v1.17、`api-v0.1` v0.1.1；v2.23）*
+*README v2.25 · 2026-04-18（公開預覽：`netlify.toml`、GitHub Pages workflow、`VITE_BASE_PATH`；無 API 時完成頁 session 類比；v2.24）*

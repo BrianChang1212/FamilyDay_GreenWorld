@@ -7,7 +7,6 @@ import { getViteApiBase } from "@/lib/apiBase";
 import {
 	CLAIM_SUCCESS_STICKER_SRC,
 	FINISH_REWARD_SLOTS,
-	clearFinishClaimedDemo,
 	getFinishClaimedCount,
 	getProfile,
 } from "@/lib/demoState";
@@ -21,12 +20,10 @@ const employeeId = ref("");
 const claimed = ref(0);
 const maxSlots = ref(FINISH_REWARD_SLOTS);
 
-type StatusSource = "api" | "mock-query" | "dev-fallback";
+type StatusSource = "api" | "mock-query" | "local-fallback";
 const statusSource = ref<StatusSource>("api");
 const statusLoadState = ref<"loading" | "ok" | "error">("loading");
 const statusError = ref("");
-
-const isDev = import.meta.env.DEV;
 
 /** 僅供離線 UI 測試：?mock_claimed=0|1|2|3 覆寫顯示（不寫入 session、不代替後端） */
 function effectiveClaimedFromQuery(): number | null {
@@ -71,19 +68,11 @@ async function loadClaimPresentation() {
 		return;
 	}
 
-	if (isDev) {
-		claimed.value = getFinishClaimedCount();
-		maxSlots.value = FINISH_REWARD_SLOTS;
-		statusSource.value = "dev-fallback";
-		statusLoadState.value = "ok";
-		statusError.value = "";
-		return;
-	}
-
-	statusSource.value = "api";
-	statusLoadState.value = "error";
-	statusError.value =
-		"未設定 VITE_API_BASE，無法向後端取得領獎狀態";
+	claimed.value = getFinishClaimedCount();
+	maxSlots.value = FINISH_REWARD_SLOTS;
+	statusSource.value = "local-fallback";
+	statusLoadState.value = "ok";
+	statusError.value = "";
 }
 
 onMounted(() => {
@@ -99,12 +88,6 @@ watch(
 		void loadClaimPresentation();
 	},
 );
-
-function resetClaimCountDemo() {
-	if (statusSource.value !== "dev-fallback") return;
-	clearFinishClaimedDemo();
-	claimed.value = getFinishClaimedCount();
-}
 
 function retryLoadStatus() {
 	void loadClaimPresentation();
@@ -191,12 +174,12 @@ const slotLabels = computed(() => {
 					離線測試：網址參數 <code class="rounded bg-white/80 px-1">mock_claimed</code> 只影響此頁顯示，不代表後端紀錄。
 				</p>
 				<p
-					v-if="statusSource === 'dev-fallback'"
+					v-if="statusSource === 'local-fallback'"
 					class="mb-3 rounded-xl border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-center text-[11px] text-amber-900/90"
 					role="note"
 				>
-					開發模式且未設定 <code class="rounded bg-white/80 px-1">VITE_API_BASE</code>：暫以瀏覽器
-					<code class="rounded bg-white/80 px-1">sessionStorage</code> 類比次數，上線後請改由後端提供。
+					未設定 <code class="rounded bg-white/80 px-1">VITE_API_BASE</code>：暫以瀏覽器
+					<code class="rounded bg-white/80 px-1">sessionStorage</code> 類比領獎次數（僅供預覽／原型），上線請改由後端提供。
 				</p>
 				<h2 class="text-center text-base font-bold text-[#b45309]">
 					闖關禮領取狀態
@@ -230,14 +213,6 @@ const slotLabels = computed(() => {
 						重試
 					</button>
 				</div>
-				<button
-					v-if="isDev && statusSource === 'dev-fallback'"
-					type="button"
-					class="mx-auto mt-2 block text-center text-[11px] text-gw-brand underline underline-offset-2"
-					@click="resetClaimCountDemo"
-				>
-					（開發）將暫存領獎次數歸零
-				</button>
 				<div
 					v-if="statusLoadState === 'ok'"
 					class="mt-6 flex justify-between gap-2 px-1"

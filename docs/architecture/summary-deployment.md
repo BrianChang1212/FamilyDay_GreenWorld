@@ -15,6 +15,10 @@
 
 **現場網路**：瓶頸多在**最後一哩**（訊號、WiFi 容量），其次才是機房與 API；建議場勘實測，靜態資源走 **CDN**。
 
+### 1.1 前端原型靜態預覽（無後端）
+
+與下方「全端／API 上線」不同：僅將 **Vite 建置產物**（`source/dist`）放於 **Netlify**、**GitHub Pages** 等靜態主機，供手機試操作。倉庫內含 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；步驟見根目錄 **`README.md`**「公開預覽部署」。**未接 API** 時，領取成功頁以前端 **`sessionStorage`** 類比並標示預覽用（見 [`summary-frontend.md`](./summary-frontend.md) §2.1 **`local-fallback`**）。
+
 ---
 
 ## 2. 曾討論的架構選項（由複雜到簡化）
@@ -71,3 +75,4 @@
 | 版本 | 日期 | 說明 |
 |------|------|------|
 | 1.0 | 2026-04-10 | 初稿：DMZ／VPS／PaaS、區域、採購注意、決策流程 |
+| 1.1 | 2026-04-18 | **§1.1**：前端原型靜態預覽（Netlify／GitHub Pages、與全端部署區隔） |
