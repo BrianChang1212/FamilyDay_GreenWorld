@@ -1,4 +1,4 @@
-# 瑞軒 2026 家庭日 — 解謎 App（綠世界生態農場）
+# 瑞軒 2026 家庭日 — 解謎闖關遊戲（綠世界生態農場）
 
 <p align="center">
   <img src="source/public/images/family-day-forest-walk.png" alt="瑞軒家庭日綠世界主視覺：一家人攜手漫步林間小徑" width="720" />
@@ -185,7 +185,7 @@ npm run dev
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
 | 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-18（頁尾 **v2.36**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
+| 最後更新 README | 2026-04-18（頁尾 **v2.37**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md) |
 
 
 ---
@@ -525,4 +525,4 @@ sequenceDiagram
 
 ---
 
-*README v2.36 · 2026-04-18（GitHub Actions：**CI** 例行建置；**Pages** 改手動觸發；v2.35）*
+*README v2.37 · 2026-04-18（**標題**：瑞軒 2026 家庭日 — 解謎闖關遊戲（綠世界生態農場）；v2.36）*
