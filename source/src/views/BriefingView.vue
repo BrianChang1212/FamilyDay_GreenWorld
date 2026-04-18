@@ -3,6 +3,7 @@ import { useRouter } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 import BriefingAnimalsDecor from "@/components/doodles/BriefingAnimalsDecor.vue";
+import { getProfile } from "@/lib/demoState";
 
 const router = useRouter();
 
@@ -14,6 +15,11 @@ const steps = [
 ];
 
 function next() {
+	const { name, employeeId } = getProfile();
+	if (name.trim() && employeeId.trim()) {
+		router.push({ name: "stage" });
+		return;
+	}
 	router.push({ name: "register" });
 }
 </script>

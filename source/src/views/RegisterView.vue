@@ -1,15 +1,29 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 import BrandLogo from "@/components/BrandLogo.vue";
 import PageCritters from "@/components/doodles/PageCritters.vue";
 import { setInZone, setProfile } from "@/lib/demoState";
+import { getEntryIntent } from "@/lib/entryIntent";
 
 const router = useRouter();
 const name = ref("");
 const employeeId = ref("");
+
+const loginHeadline = computed(() =>
+	getEntryIntent() === "game" ? "請輸入您的基本資料" : "登入活動",
+);
+const primaryCtaLabel = computed(() =>
+	getEntryIntent() === "game" ? "確定" : "進入探索",
+);
+
+onMounted(() => {
+	if (getEntryIntent() === "checkin") {
+		router.replace({ name: "checkin" });
+	}
+});
 
 const inputClass =
 	"w-full rounded-2xl border border-white/90 bg-white/92 px-4 py-3.5 text-base text-gw-navy shadow-[inset_0_1px_0_rgba(255,255,255,0.85),0_4px_20px_rgba(26,157,74,0.06)] outline-none ring-1 ring-gw-mint-soft/40 transition-[border-color,box-shadow,ring-color] placeholder:text-neutral-400 focus:border-gw-brand/80 focus:ring-4 focus:ring-gw-brand/[0.14]";
@@ -18,6 +32,11 @@ function submit() {
 	if (!name.value.trim() || !employeeId.value.trim()) return;
 	setProfile(name.value, employeeId.value);
 	setInZone(false);
+	const intent = getEntryIntent();
+	if (intent === "game") {
+		router.push({ name: "stage" });
+		return;
+	}
 	router.push({ name: "stage" });
 }
 </script>
@@ -82,7 +101,7 @@ function submit() {
 					<h1
 						class="gw-login-title font-display mt-3 text-[1.65rem] font-bold tracking-tight sm:text-[1.85rem]"
 					>
-						登入活動
+						{{ loginHeadline }}
 					</h1>
 					<div class="mx-auto mt-4 flex max-w-[16rem] items-center justify-center gap-2.5">
 						<span
@@ -172,7 +191,7 @@ function submit() {
 							:disabled="!name.trim() || !employeeId.trim()"
 							class="gw-login-submit group relative flex w-full items-center justify-center gap-2 rounded-2xl py-4 text-base font-bold text-white transition duration-200 ease-out hover:brightness-[1.06] active:scale-[0.99] focus-visible:outline-none focus-visible:ring-[3px] focus-visible:ring-white/90 focus-visible:ring-offset-2 focus-visible:ring-offset-gw-brand disabled:cursor-not-allowed disabled:opacity-[0.4] disabled:shadow-none disabled:hover:brightness-100"
 						>
-							<span class="relative z-10">進入探索</span>
+							<span class="relative z-10">{{ primaryCtaLabel }}</span>
 							<svg
 								class="relative z-10 h-5 w-5 transition-transform enabled:group-hover:translate-x-0.5"
 								viewBox="0 0 24 24"

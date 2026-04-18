@@ -44,4 +44,4 @@
 
 ---
 
-**最後整理：** 2026-04-16。歷史變更與實作細節請以**各檔案標頭**、根目錄 **`README.md`** 頁尾版本列、以及 **`project/專案文件.md`** 為準（含 **`/finish`**、`demo/` 等；見 `architecture/summary-frontend.md` v1.2）。
+**最後整理：** 2026-04-18。歷史變更與實作細節請以**各檔案標頭**、根目錄 **`README.md`** 頁尾版本列、以及 **`project/專案文件.md`**（例如合併版 v1.3.7）為準；前端路由、QR 動線與 `sessionStorage` 鍵見 `architecture/summary-frontend.md`（§2.1，修訂至 **v1.13**）。
