@@ -1,18 +1,19 @@
 import { FINISH_REWARD_SLOTS } from "@/lib/constants/finishReward";
+import { GAME_CONFIG, STORAGE_KEYS } from "@/constants";
 
 export { FINISH_REWARD_SLOTS };
 
 const K = {
-	stage: "fdgw_stage",
-	name: "fdgw_name",
-	employeeId: "fdgw_employeeId",
-	inZone: "fdgw_inZone",
+	stage: STORAGE_KEYS.stage,
+	name: STORAGE_KEYS.name,
+	employeeId: STORAGE_KEYS.employeeId,
+	inZone: STORAGE_KEYS.inZone,
 	/** 完成頁已領取次數 0–3 */
-	finishClaimed: "fdgw_finishClaimed",
+	finishClaimed: STORAGE_KEYS.finishClaimed,
 	/** 現場報到：同行人數（原型暫存） */
-	companionCount: "fdgw_companionCount",
+	companionCount: STORAGE_KEYS.companionCount,
 	/** 現場報到：是否已完成送出（原型；與闖關流程分離） */
-	checkinDone: "fdgw_checkin_done",
+	checkinDone: STORAGE_KEYS.checkinDone,
 } as const;
 
 export function getFinishClaimedCount(): number {
@@ -40,12 +41,24 @@ export function incrementFinishClaimed(): number {
 
 export function getStage(): number {
 	const v = sessionStorage.getItem(K.stage);
-	const n = v ? parseInt(v, 10) : 1;
-	return Number.isFinite(n) && n >= 1 && n <= 6 ? n : 1;
+	const n = v ? parseInt(v, 10) : GAME_CONFIG.MIN_STAGE;
+	return Number.isFinite(n) &&
+		n >= GAME_CONFIG.MIN_STAGE &&
+		n <= GAME_CONFIG.TOTAL_STAGES
+		? n
+		: GAME_CONFIG.MIN_STAGE;
 }
 
 export function setStage(n: number): void {
-	sessionStorage.setItem(K.stage, String(Math.min(6, Math.max(1, n))));
+	sessionStorage.setItem(
+		K.stage,
+		String(
+			Math.min(
+				GAME_CONFIG.TOTAL_STAGES,
+				Math.max(GAME_CONFIG.MIN_STAGE, n),
+			),
+		),
+	);
 }
 
 /**
@@ -53,14 +66,14 @@ export function setStage(n: number): void {
  * 不會清除姓名、員編、報到或領獎次數。
  */
 export function resetScavengerRun(): void {
-	setStage(1);
+	setStage(GAME_CONFIG.MIN_STAGE);
 	setInZone(false);
 }
 
 /** 答對後前進一站並重置到站狀態（最後一站不遞增） */
 export function advanceStage(): void {
 	const s = getStage();
-	if (s < 6) {
+	if (s < GAME_CONFIG.TOTAL_STAGES) {
 		setStage(s + 1);
 		setInZone(false);
 	}
@@ -139,10 +152,10 @@ export const CHECKIN_COMPLETE_STICKER_SRC =
 
 /** 關卡貼圖（`public/images/stages/`），與 STAGE_NAMES 順序一致 */
 export function stageStickerSrc(n: number): string {
-	if (n < 1 || n > 6) return "";
+	if (n < GAME_CONFIG.MIN_STAGE || n > GAME_CONFIG.TOTAL_STAGES) return "";
 	return `/images/stages/stage-${String(n).padStart(2, "0")}.png`;
 }
 
 export function stageIds(): number[] {
-	return [1, 2, 3, 4, 5, 6];
+	return Array.from({ length: GAME_CONFIG.TOTAL_STAGES }, (_, i) => i + 1);
 }

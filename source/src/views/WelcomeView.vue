@@ -2,8 +2,10 @@
 import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import { resetScavengerRun } from "@/lib/demoState";
+import { useI18n } from "@/composables/useI18n";
 
 const router = useRouter();
+const { t } = useI18n();
 
 function next() {
 	resetScavengerRun();
@@ -24,7 +26,7 @@ function next() {
 					src="/images/family-day-forest-walk.png"
 					width="1024"
 					height="1024"
-					alt="一家四口在陽光森林步道上手牽手散步，歡迎來到瑞軒家庭日"
+					:alt="t('welcome.heroAlt')"
 					class="aspect-[5/4] h-auto min-h-[13.5rem] w-full object-cover object-[center_36%] sm:aspect-[16/10] sm:min-h-[17rem]"
 					loading="eager"
 					decoding="async"
@@ -33,10 +35,10 @@ function next() {
 			</div>
 
 			<div class="mt-4 text-center sm:mt-5">
-				<h1 class="font-display text-2xl font-bold text-gw-navy sm:text-[1.75rem]">歡迎來到2026</h1>
-				<p class="font-display mt-1.5 text-xl font-bold italic text-gw-brand">瑞軒家庭日</p>
+				<h1 class="font-display text-2xl font-bold text-gw-navy sm:text-[1.75rem]">{{ t('welcome.title') }}</h1>
+				<p class="font-display mt-1.5 text-xl font-bold italic text-gw-brand">{{ t('welcome.subtitle') }}</p>
 				<p class="mx-auto mt-3 max-w-sm text-pretty text-sm leading-relaxed text-neutral-600 sm:mt-4">
-					與家人一同走入自然，翻開屬於我們的生活日誌，寫下美好的回憶篇章。
+					{{ t('welcome.description') }}
 				</p>
 			</div>
 
@@ -46,7 +48,7 @@ function next() {
 					class="flex w-full items-center justify-center gap-2 rounded-full bg-gw-brand py-4 text-base font-bold text-white shadow-[0_10px_28px_rgba(26,157,74,0.35)] transition hover:brightness-105 active:scale-[0.99]"
 					@click="next"
 				>
-					開始探索
+					{{ t('welcome.startButton') }}
 					<span aria-hidden="true">→</span>
 				</button>
 			</div>

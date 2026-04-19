@@ -19,6 +19,7 @@ import {
 	stageStickerSrc,
 	stageTitle,
 } from "@/lib/demoState";
+import { GAME_CONFIG, STORAGE_KEYS } from "@/constants";
 
 describe("demoState", () => {
 	beforeEach(() => {
@@ -37,9 +38,9 @@ describe("demoState", () => {
 		});
 
 		it("getFinishClaimedCount clamps stored garbage", () => {
-			sessionStorage.setItem("fdgw_finishClaimed", "not-a-number");
+			sessionStorage.setItem(STORAGE_KEYS.finishClaimed, "not-a-number");
 			expect(getFinishClaimedCount()).toBe(0);
-			sessionStorage.setItem("fdgw_finishClaimed", "99");
+			sessionStorage.setItem(STORAGE_KEYS.finishClaimed, "99");
 			expect(getFinishClaimedCount()).toBe(FINISH_REWARD_SLOTS);
 		});
 	});
@@ -50,40 +51,40 @@ describe("demoState", () => {
 		});
 
 		it("getStage falls back to 1 for out-of-range or non-numeric storage", () => {
-			sessionStorage.setItem("fdgw_stage", "0");
+			sessionStorage.setItem(STORAGE_KEYS.stage, "0");
 			expect(getStage()).toBe(1);
-			sessionStorage.setItem("fdgw_stage", "7");
+			sessionStorage.setItem(STORAGE_KEYS.stage, "7");
 			expect(getStage()).toBe(1);
-			sessionStorage.setItem("fdgw_stage", "x");
+			sessionStorage.setItem(STORAGE_KEYS.stage, "x");
 			expect(getStage()).toBe(1);
 		});
 
-		it("setStage clamps to [1, 6]", () => {
+		it("setStage clamps to stage range", () => {
 			setStage(0);
-			expect(getStage()).toBe(1);
+			expect(getStage()).toBe(GAME_CONFIG.MIN_STAGE);
 			setStage(10);
-			expect(getStage()).toBe(6);
+			expect(getStage()).toBe(GAME_CONFIG.TOTAL_STAGES);
 			setStage(3);
 			expect(getStage()).toBe(3);
 		});
 
-		it("advanceStage moves forward until 6", () => {
+		it("advanceStage moves forward until max stage", () => {
 			setStage(1);
 			setInZone(true);
 			advanceStage();
 			expect(getStage()).toBe(2);
 			expect(getInZone()).toBe(false);
-			setStage(6);
+			setStage(GAME_CONFIG.TOTAL_STAGES);
 			setInZone(true);
 			advanceStage();
-			expect(getStage()).toBe(6);
+			expect(getStage()).toBe(GAME_CONFIG.TOTAL_STAGES);
 		});
 
 		it("advanceStage at last station does not clear in-zone", () => {
-			setStage(6);
+			setStage(GAME_CONFIG.TOTAL_STAGES);
 			setInZone(true);
 			advanceStage();
-			expect(getStage()).toBe(6);
+			expect(getStage()).toBe(GAME_CONFIG.TOTAL_STAGES);
 			expect(getInZone()).toBe(true);
 		});
 
@@ -108,8 +109,13 @@ describe("demoState", () => {
 			expect(stageStickerSrc(7)).toBe("");
 		});
 
-		it("stageIds lists six stations", () => {
-			expect(stageIds()).toEqual([1, 2, 3, 4, 5, 6]);
+		it("stageIds lists all stations by configured range", () => {
+			expect(stageIds()).toEqual(
+				Array.from(
+					{ length: GAME_CONFIG.TOTAL_STAGES },
+					(_, i) => i + GAME_CONFIG.MIN_STAGE,
+				),
+			);
 		});
 	});
 
@@ -142,7 +148,7 @@ describe("demoState", () => {
 		});
 
 		it("getCompanionCount treats non-finite stored value as default 1", () => {
-			sessionStorage.setItem("fdgw_companionCount", "NaN");
+			sessionStorage.setItem(STORAGE_KEYS.companionCount, "NaN");
 			expect(getCompanionCount()).toBe(1);
 		});
 

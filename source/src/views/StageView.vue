@@ -12,8 +12,10 @@ import {
 	stageStickerSrc,
 	stageTitle,
 } from "@/lib/demoState";
+import { useI18n } from "@/composables/useI18n";
 
 const router = useRouter();
+const { t } = useI18n();
 const stage = ref(1);
 const inZone = ref(false);
 
@@ -69,9 +71,11 @@ function rowState(id: number): "done" | "current" | "locked" {
 			<div class="pointer-events-none absolute right-4 top-6 text-3xl opacity-25" aria-hidden="true">
 				🍃
 			</div>
-			<h1 class="text-center text-lg font-bold text-gw-navy">請掃描 QR code</h1>
+			<h1 class="text-center text-lg font-bold text-gw-navy">
+				{{ t("stage.scanTitle") }}
+			</h1>
 			<p class="mt-2 text-center font-serif text-xs text-neutral-600">
-				將 QR 對準框線以解鎖站點（原型示意）
+				{{ t("stage.scanHint") }}
 			</p>
 
 			<div class="relative mx-auto mt-8 w-full max-w-[18rem]">
@@ -82,7 +86,7 @@ function rowState(id: number): "done" | "current" | "locked" {
 						:src="QR_SCAN_STICKER_SRC"
 						width="1024"
 						height="1024"
-						alt="掃描 QR code：簡潔取景框與掃描線示意"
+						:alt="t('stage.qrImageAlt')"
 						class="aspect-square h-auto w-full object-cover object-center"
 						loading="lazy"
 						decoding="async"
@@ -96,7 +100,7 @@ function rowState(id: number): "done" | "current" | "locked" {
 					class="w-full rounded-full bg-gw-brand py-3.5 text-base font-bold text-white shadow-lg transition hover:brightness-110"
 					@click="finishScanDemo"
 				>
-					模擬掃描成功
+					{{ t("stage.scanSuccessButton") }}
 				</button>
 				<button
 					type="button"
@@ -104,11 +108,11 @@ function rowState(id: number): "done" | "current" | "locked" {
 					@click="closeScanUi"
 				>
 					<span aria-hidden="true">←</span>
-					返回
+					{{ t("stage.scanBackButton") }}
 				</button>
 			</div>
 			<p class="mt-6 text-center font-serif text-[10px] uppercase tracking-[0.2em] text-neutral-400">
-				The Living Journal · prototype
+				{{ t("stage.prototypeLabel") }}
 			</p>
 		</div>
 
@@ -126,9 +130,11 @@ function rowState(id: number): "done" | "current" | "locked" {
 					class="w-full max-w-md overflow-hidden rounded-3xl border border-neutral-200/90 bg-white shadow-md ring-1 ring-black/[0.04]"
 				>
 					<div class="px-5 pb-3 pt-5">
-						<p class="text-center text-xs font-bold tracking-wide text-gw-navy">SCAVENGER HUNT</p>
+						<p class="text-center text-xs font-bold tracking-wide text-gw-navy">
+							{{ t("stage.cardTag") }}
+						</p>
 						<p class="text-center text-[10px] font-medium uppercase tracking-wider text-neutral-500">
-							IN-ZONE NAVIGATION
+							{{ t("stage.cardSubTag") }}
 						</p>
 					</div>
 					<!-- 貼圖區：左右貼齊白卡，依圖檔比例完整顯示（不裁切 START／構圖邊緣） -->
@@ -140,7 +146,7 @@ function rowState(id: number): "done" | "current" | "locked" {
 								:src="stationSticker"
 								width="1024"
 								height="1024"
-								:alt="`${stationName} 關卡貼圖`"
+								:alt="t('stage.stageImageAlt', { stationName })"
 								class="block h-auto w-full max-w-full"
 								loading="lazy"
 								decoding="async"
@@ -149,14 +155,18 @@ function rowState(id: number): "done" | "current" | "locked" {
 					</div>
 				</div>
 
-				<p class="mt-8 text-sm text-neutral-800">請前往第 {{ stage }} 關</p>
+				<p class="mt-8 text-sm text-neutral-800">
+					{{ t("stage.goToStage", { stage }) }}
+				</p>
 				<p class="font-display mt-2 text-3xl font-bold text-gw-brand">{{ stationName }}</p>
-				<p class="mt-2 text-center text-sm text-neutral-600">抵達後，點擊掃描模擬相機</p>
+				<p class="mt-2 text-center text-sm text-neutral-600">
+					{{ t("stage.arrivalHint") }}
+				</p>
 
 				<button
 					type="button"
 					class="mt-10 flex h-[4.5rem] w-[4.5rem] items-center justify-center rounded-full bg-gw-brand text-2xl text-white shadow-[0_12px_32px_rgba(26,157,74,0.45)] transition hover:brightness-110 active:scale-95"
-					aria-label="開啟掃碼（模擬）"
+					:aria-label="t('stage.scanAriaLabel')"
 					@click="openScanUi"
 				>
 					📷
@@ -172,25 +182,27 @@ function rowState(id: number): "done" | "current" | "locked" {
 						:src="stationSticker"
 						width="1024"
 						height="768"
-						:alt="`${stationName} 關卡貼圖`"
+						:alt="t('stage.stageImageAlt', { stationName })"
 						class="mx-auto h-24 w-full max-w-[12rem] rounded-2xl border border-white/80 bg-white object-contain object-center shadow-sm"
 						loading="lazy"
 						decoding="async"
 					/>
-					<p class="mt-4 text-sm font-semibold text-gw-navy">任務已解鎖</p>
+					<p class="mt-4 text-sm font-semibold text-gw-navy">
+						{{ t("stage.unlocked") }}
+					</p>
 					<p class="mt-1 text-lg font-bold text-gw-brand">{{ stationName }}</p>
 					<button
 						type="button"
 						class="mt-6 w-full rounded-full bg-gw-brand py-3.5 text-base font-bold text-white shadow-lg transition hover:brightness-110"
 						@click="startQuiz"
 					>
-						開始作答挑戰 →
+						{{ t("stage.startQuizButton") }}
 					</button>
 				</div>
 			</div>
 
 			<section class="mt-8 rounded-2xl border border-neutral-200/80 bg-white p-4 shadow-sm">
-				<h3 class="text-sm font-bold text-gw-navy">闖關路線</h3>
+				<h3 class="text-sm font-bold text-gw-navy">{{ t("stage.routeTitle") }}</h3>
 				<ul class="mt-3 space-y-2">
 					<li
 						v-for="id in stageIds()"
@@ -219,7 +231,7 @@ function rowState(id: number): "done" | "current" | "locked" {
 							:src="stageStickerSrc(id)"
 							width="80"
 							height="80"
-							:alt="`${stageTitle(id)} 貼圖`"
+							:alt="t('stage.stageImageAlt', { stationName: stageTitle(id) })"
 							class="h-10 w-10 shrink-0 rounded-xl border border-neutral-200/80 bg-neutral-50 object-contain object-center shadow-sm"
 							loading="lazy"
 						/>

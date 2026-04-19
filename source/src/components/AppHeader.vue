@@ -2,6 +2,8 @@
 import { computed } from "vue";
 import BrandLogo from "@/components/BrandLogo.vue";
 import { getProfile } from "@/lib/demoState";
+import { useI18n } from "@/composables/useI18n";
+import { GAME_CONFIG } from "@/constants";
 
 const props = withDefaults(
 	defineProps<{
@@ -20,6 +22,7 @@ const props = withDefaults(
 	},
 );
 
+const { t } = useI18n();
 const profile = computed(() => getProfile());
 const showProfile = computed(
 	() => props.showUser && profile.value.name.length > 0,
@@ -27,12 +30,20 @@ const showProfile = computed(
 
 const completed = computed(() => {
 	if (props.completedOverride != null) {
-		return Math.max(0, Math.min(6, props.completedOverride));
+		return Math.max(
+			0,
+			Math.min(GAME_CONFIG.TOTAL_STAGES, props.completedOverride),
+		);
 	}
-	return Math.max(0, Math.min(6, props.stage - 1));
+	return Math.max(
+		0,
+		Math.min(GAME_CONFIG.TOTAL_STAGES, props.stage - 1),
+	);
 });
 
-const progressPct = computed(() => (completed.value / 6) * 100);
+const progressPct = computed(
+	() => (completed.value / GAME_CONFIG.TOTAL_STAGES) * 100,
+);
 </script>
 
 <template>
@@ -45,10 +56,10 @@ const progressPct = computed(() => (completed.value / 6) * 100);
 				<p
 					class="font-display text-[0.95rem] font-bold leading-tight tracking-tight text-gw-navy sm:text-base"
 				>
-					2026 瑞軒家庭日
+					{{ t("header.title") }}
 				</p>
 				<p class="mt-0.5 text-[10px] font-semibold uppercase tracking-[0.18em] text-neutral-400">
-					AMTRAN FAMILY DAY
+					{{ t("header.subtitle") }}
 				</p>
 			</div>
 			<div v-if="showProfile || showProgress" class="flex shrink-0 flex-col items-end gap-2.5 text-right">
@@ -62,15 +73,19 @@ const progressPct = computed(() => (completed.value / 6) * 100);
 				</div>
 				<div v-if="showProgress" class="w-40">
 					<div class="flex items-center justify-end gap-2 text-[10px] font-bold text-gw-navy">
-						<span id="gw-progress-label" class="text-neutral-400">闖關進度</span>
-						<span class="tabular-nums text-gw-brand">{{ completed }}/6</span>
+							<span id="gw-progress-label" class="text-neutral-400">{{
+								t("header.progressLabel")
+							}}</span>
+						<span class="tabular-nums text-gw-brand">
+							{{ completed }}/{{ GAME_CONFIG.TOTAL_STAGES }}
+						</span>
 					</div>
 					<div
 						class="mt-1.5 h-2 overflow-hidden rounded-full bg-neutral-200/90 p-[3px] shadow-inner ring-1 ring-black/[0.04]"
 						role="progressbar"
 						:aria-valuenow="completed"
 						aria-valuemin="0"
-						aria-valuemax="6"
+						:aria-valuemax="GAME_CONFIG.TOTAL_STAGES"
 						aria-labelledby="gw-progress-label"
 					>
 						<div

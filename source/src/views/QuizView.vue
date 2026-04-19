@@ -5,8 +5,11 @@ import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 import { getStage, stageStickerSrc, stageTitle } from "@/lib/demoState";
 import { getStageQuiz } from "@/lib/stageQuestions";
+import { useI18n } from "@/composables/useI18n";
+import { GAME_CONFIG } from "@/constants";
 
 const router = useRouter();
+const { t } = useI18n();
 const stage = ref(1);
 
 const quiz = computed(() => getStageQuiz(stage.value));
@@ -19,7 +22,9 @@ onMounted(() => {
 	selected.value = null;
 });
 
-const progressPct = computed(() => (stage.value / 6) * 100);
+const progressPct = computed(
+	() => (stage.value / GAME_CONFIG.TOTAL_STAGES) * 100,
+);
 
 function confirm() {
 	if (!selected.value) return;
@@ -39,18 +44,20 @@ function confirm() {
 						:src="stageStickerSrc(stage)"
 						width="112"
 						height="112"
-						:alt="`${stageTitle(stage)} 關卡貼圖`"
+						:alt="t('quiz.stageAlt', { stationName: stageTitle(stage) })"
 						class="h-14 w-14 shrink-0 rounded-2xl border border-neutral-200/90 bg-neutral-50 object-contain object-center shadow-sm"
 						loading="lazy"
 					/>
 					<div class="min-w-0">
-						<p class="text-sm font-bold text-gw-navy">闖關進度</p>
+						<p class="text-sm font-bold text-gw-navy">{{ t("quiz.progressTitle") }}</p>
 						<p class="mt-0.5 truncate text-xs text-neutral-500">{{ stageTitle(stage) }}</p>
 					</div>
 				</div>
 				<p class="text-sm font-bold tabular-nums">
 					<span class="text-gw-brand">{{ String(stage).padStart(2, "0") }}</span>
-					<span class="text-neutral-400"> / 06</span>
+					<span class="text-neutral-400">
+						/ {{ String(GAME_CONFIG.TOTAL_STAGES).padStart(2, "0") }}
+					</span>
 				</p>
 			</div>
 			<div class="mt-2 h-2 overflow-hidden rounded-full bg-neutral-200 p-0.5">
@@ -108,7 +115,7 @@ function confirm() {
 					"
 					@click="confirm"
 				>
-					確定
+					{{ t("common.confirm") }}
 				</button>
 			</div>
 		</main>

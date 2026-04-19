@@ -1,3 +1,5 @@
+import { STORAGE_KEYS } from "@/constants";
+
 /**
  * QR／URL 進入意圖（與 docs/project/專案文件 §2.4、summary-frontend §2.1 對齊）
  * — `checkin`／`game` 寫入 sessionStorage；報到表單為 `/checkin`，闖關登入為 `/register`（非同一頁）。
@@ -5,7 +7,7 @@
 
 export type EntryIntent = "checkin" | "game";
 
-const STORAGE_KEY = "fdgw_entry_intent";
+const STORAGE_KEY = STORAGE_KEYS.entryIntent;
 
 export function setEntryIntent(intent: EntryIntent): void {
 	sessionStorage.setItem(STORAGE_KEY, intent);

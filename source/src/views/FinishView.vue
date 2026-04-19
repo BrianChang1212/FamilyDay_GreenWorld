@@ -9,15 +9,18 @@ import {
 	getStage,
 } from "@/lib/demoState";
 import { incrementLocalFinishClaimIfNoApiBase } from "@/lib/provisionalFinishClaim";
+import { useI18n } from "@/composables/useI18n";
+import { GAME_CONFIG } from "@/constants";
 
 const router = useRouter();
-const stage = ref(6);
+const { t } = useI18n();
+const stage = ref(GAME_CONFIG.TOTAL_STAGES);
 const name = ref("");
 const showClaimModal = ref(false);
 
 onMounted(() => {
 	stage.value = getStage();
-	name.value = getProfile().name || "夥伴";
+	name.value = getProfile().name || t("finish.fallbackName");
 });
 
 function openClaimModal() {
@@ -47,8 +50,12 @@ function goHome() {
 
 		<main class="relative z-[2] flex flex-1 flex-col px-4 pb-6 pt-4 sm:mx-auto sm:max-w-md sm:w-full">
 			<div class="rounded-2xl bg-gw-brand px-4 py-4 text-center shadow-md">
-				<p class="text-xs font-bold uppercase tracking-wider text-white/90">Congratulations</p>
-				<p class="mt-1 font-display text-xl font-bold text-white">闖關完成！</p>
+				<p class="text-xs font-bold uppercase tracking-wider text-white/90">
+					{{ t("finish.bannerTitle") }}
+				</p>
+				<p class="mt-1 font-display text-xl font-bold text-white">
+					{{ t("finish.title") }}
+				</p>
 			</div>
 
 			<div
@@ -58,7 +65,7 @@ function goHome() {
 					:src="LEVEL_COMPLETE_STICKER_SRC"
 					width="1200"
 					height="900"
-					alt="森林慶祝場景：動物們與派對元素，恭喜完成闖關"
+					:alt="t('finish.imageAlt')"
 					class="aspect-[4/3] h-auto w-full object-cover object-center"
 					loading="lazy"
 					decoding="async"
@@ -66,7 +73,7 @@ function goHome() {
 			</div>
 
 			<p class="mt-8 text-center text-base font-bold leading-relaxed text-gw-navy">
-				親愛的 {{ name }}，恭喜你完成所有站點挑戰！請至服務台出示此畫面領取紀念品。
+				{{ t("finish.completeMessage", { name }) }}
 			</p>
 
 			<div class="mt-auto flex flex-col gap-3 pt-10">
@@ -75,14 +82,14 @@ function goHome() {
 					class="w-full rounded-full bg-[#1a5f2a] py-4 text-base font-bold text-white shadow-lg transition hover:brightness-110"
 					@click="openClaimModal"
 				>
-					我已領獎
+					{{ t("finish.claimButton") }}
 				</button>
 				<button
 					type="button"
 					class="w-full rounded-full border-2 border-[#1a5f2a] bg-white py-3.5 text-base font-bold text-[#1a5f2a] transition hover:bg-neutral-50"
 					@click="goHome"
 				>
-					返回首頁
+					{{ t("finish.backHomeButton") }}
 				</button>
 			</div>
 		</main>
@@ -109,10 +116,10 @@ function goHome() {
 						🎁
 					</div>
 					<h2 id="finish-claim-modal-title" class="mt-4 text-center text-lg font-bold text-gw-navy">
-						領獎確認
+						{{ t("finish.modalTitle") }}
 					</h2>
 					<p class="mt-2 text-center text-sm text-neutral-600">
-						確認已在服務台領取紀念品？確認後將前往領取成功畫面。
+						{{ t("finish.modalMessage") }}
 					</p>
 					<div class="mt-6 flex flex-col gap-2">
 						<button
@@ -120,14 +127,14 @@ function goHome() {
 							class="w-full rounded-full bg-gw-brand py-3.5 text-base font-bold text-white shadow-md transition hover:brightness-110"
 							@click="confirmClaim"
 						>
-							確定
+							{{ t("common.confirm") }}
 						</button>
 						<button
 							type="button"
 							class="w-full rounded-full border-2 border-neutral-200 bg-white py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
 							@click="closeClaimModal"
 						>
-							取消
+							{{ t("common.cancel") }}
 						</button>
 					</div>
 				</div>

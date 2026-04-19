@@ -2,6 +2,8 @@
  * 各關示範題庫（原型用，之後改由 API／後台維護）。
  * 答錯不顯示解答；答對後可顯示 successTip「小知識時間」（不影響下一題）。
  */
+import { GAME_CONFIG } from "@/constants";
+
 export type StageQuiz = {
 	question: string;
 	options: [string, string, string, string];
@@ -49,6 +51,10 @@ export const STAGE_QUIZZES: Record<number, StageQuiz> = {
 };
 
 export function getStageQuiz(stage: number): StageQuiz {
-	const n = Number.isFinite(stage) && stage >= 1 && stage <= 6 ? stage : 1;
+	const n = Number.isFinite(stage) &&
+		stage >= GAME_CONFIG.MIN_STAGE &&
+		stage <= GAME_CONFIG.TOTAL_STAGES
+		? stage
+		: GAME_CONFIG.MIN_STAGE;
 	return STAGE_QUIZZES[n] ?? STAGE_QUIZZES[1];
 }

@@ -4,8 +4,10 @@ import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import { resetScavengerRun, setProfile } from "@/lib/demoState";
 import { getEntryIntent } from "@/lib/entryIntent";
+import { useI18n } from "@/composables/useI18n";
 
 const router = useRouter();
+const { t } = useI18n();
 const name = ref("");
 const employeeId = ref("");
 
@@ -37,38 +39,44 @@ function submit() {
 					<span
 						class="inline-flex rounded-full bg-gw-mint/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-gw-brand-dark ring-1 ring-gw-mint-soft"
 					>
-						2026 AMTRAN FAMILY DAY
+						{{ t("register.tag") }}
 					</span>
 				</div>
 				<h1 class="font-display mt-8 text-[1.35rem] font-bold leading-snug text-gw-navy">
-					<span class="block">請輸入您的</span>
-					<span class="mt-1 block font-bold italic text-[#1a5f2a]">基本資料</span>
+					<span class="block">{{ t("register.titleLine1") }}</span>
+					<span class="mt-1 block font-bold italic text-[#1a5f2a]">{{
+						t("register.titleLine2")
+					}}</span>
 				</h1>
 				<div class="mt-3 h-1 w-14 rounded-full bg-[#e8a87c]" aria-hidden="true" />
 			</header>
 
 			<form class="mt-10 flex flex-1 flex-col gap-6" @submit.prevent="submit" novalidate>
 				<div class="space-y-2">
-					<label for="reg-name" class="text-sm font-bold text-neutral-600">姓名</label>
+					<label for="reg-name" class="text-sm font-bold text-neutral-600">{{
+						t("checkin.form.name")
+					}}</label>
 					<input
 						id="reg-name"
 						v-model="name"
 						type="text"
 						name="name"
 						autocomplete="name"
-						placeholder="請輸入您的姓名"
+						:placeholder="t('checkin.form.namePlaceholder')"
 						:class="inputClass"
 					/>
 				</div>
 				<div class="space-y-2">
-					<label for="reg-employee-id" class="text-sm font-bold text-neutral-600">員工編號</label>
+					<label for="reg-employee-id" class="text-sm font-bold text-neutral-600">{{
+						t("checkin.form.employeeId")
+					}}</label>
 					<input
 						id="reg-employee-id"
 						v-model="employeeId"
 						type="text"
 						name="username"
 						autocomplete="username"
-						placeholder="例如：AM12345"
+						:placeholder="t('checkin.form.employeeIdPlaceholder')"
 						:class="inputClass"
 					/>
 				</div>
@@ -92,7 +100,7 @@ function submit() {
 						</svg>
 					</span>
 					<p class="border-l-4 border-[#8b6914]/40 pl-3 text-sm leading-relaxed text-neutral-700">
-						資料將用於家庭日當天<strong class="text-gw-navy">闖關紀錄與抽獎資格核對</strong>，請確保資訊填寫正確。
+						{{ t("register.infoNotice") }}
 					</p>
 				</div>
 
@@ -102,16 +110,16 @@ function submit() {
 						:disabled="!name.trim() || !employeeId.trim()"
 						class="flex w-full items-center justify-center gap-2 rounded-full bg-[#1a5f2a] py-4 text-base font-bold text-white shadow-[0_8px_24px_rgba(26,95,42,0.25)] transition enabled:active:scale-[0.99] enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
 					>
-						確定
+						{{ t("register.submitButton") }}
 						<span aria-hidden="true">›</span>
 					</button>
 				</div>
 			</form>
 
 			<p v-if="!isGame" class="mt-4 text-center text-xs text-neutral-500">
-				一般動線：填寫後將進入闖關地圖。
+				{{ t("register.normalFlowHint") }}
 			</p>
-			<p class="mt-6 text-center text-xs text-neutral-400">© 2026 AmTRAN Technology Co., Ltd.</p>
+			<p class="mt-6 text-center text-xs text-neutral-400">{{ t("footer.copyright") }}</p>
 		</main>
 
 		<AppFooter class="relative z-[1] border-t-0 bg-transparent" />

@@ -3,12 +3,14 @@ import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import { useRewardClaimPresentation } from "@/composables/useRewardClaimPresentation";
+import { useI18n } from "@/composables/useI18n";
 import {
 	CLAIM_SUCCESS_STICKER_SRC,
 	getProfile,
 } from "@/lib/demoState";
 
 const router = useRouter();
+const { t } = useI18n();
 
 const {
 	claimed,
@@ -40,17 +42,17 @@ function slotActive(index: number): boolean {
 const slotLabels = computed(() => {
 	const c = claimed.value;
 	const cap = maxSlots.value;
-	const third = c >= cap ? "已領滿" : "終點站";
+	const third = c >= cap ? t("claimSuccess.slotFullClaimed") : t("claimSuccess.slotFinalPending");
 	return [
-		c >= 1 ? "已領取" : "待領取",
-		c >= 2 ? "已領取" : "待領取",
+		c >= 1 ? t("claimSuccess.slotClaimed") : t("claimSuccess.slotPending"),
+		c >= 2 ? t("claimSuccess.slotClaimed") : t("claimSuccess.slotPending"),
 		third,
 	] as const;
 });
 
 onMounted(() => {
 	const p = getProfile();
-	name.value = p.name || "夥伴";
+	name.value = p.name || t("finish.fallbackName");
 	employeeId.value = p.employeeId || "—";
 	void loadClaimPresentation();
 });
@@ -67,7 +69,7 @@ onMounted(() => {
 					class="bg-gradient-to-r from-gw-forest to-gw-brand px-4 py-3 text-center shadow-[inset_0_-1px_0_rgba(0,0,0,0.08)]"
 				>
 					<p class="text-[11px] font-bold uppercase tracking-[0.18em] text-white">
-						CELEBRATION TIME!
+						{{ t("claimSuccess.bannerTitle") }}
 					</p>
 				</div>
 				<div class="relative px-4 pb-5 pt-5">
@@ -78,7 +80,7 @@ onMounted(() => {
 							:src="CLAIM_SUCCESS_STICKER_SRC"
 							width="1200"
 							height="900"
-							alt="領取成功：禮物與自然慶祝元素"
+							:alt="t('claimSuccess.imageAlt')"
 							class="aspect-[4/3] h-auto w-full object-cover object-center"
 							loading="lazy"
 							decoding="async"
@@ -90,20 +92,20 @@ onMounted(() => {
 							class="rounded-full bg-[#e85d04] px-8 py-2 text-xs font-bold uppercase tracking-wider text-white shadow-md transition hover:brightness-105 active:scale-[0.98]"
 							@click="router.push({ name: 'welcome' })"
 						>
-							Continue
+							{{ t("claimSuccess.continueButton") }}
 						</button>
 					</div>
 				</div>
 			</div>
 
 			<h1 class="mt-10 text-center font-display text-2xl font-bold text-gw-forest sm:text-[1.65rem]">
-				領取成功
+				{{ t("claimSuccess.title") }}
 			</h1>
 			<p class="mt-3 text-center text-base font-bold text-gw-navy">
 				{{ userLine }}
 			</p>
 			<p class="mx-auto mt-4 max-w-[22rem] text-center text-sm leading-relaxed text-neutral-600">
-				兌換完成，感謝您參與瑞軒科技2026家庭日，祝您擁有美好的一天。
+				{{ t("claimSuccess.successMessage") }}
 			</p>
 
 			<section class="mt-10">
@@ -112,33 +114,30 @@ onMounted(() => {
 					class="mb-3 rounded-xl border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-center text-[11px] text-amber-900/90"
 					role="note"
 				>
-					離線測試：網址參數 <code class="rounded bg-white/80 px-1">mock_claimed</code> 只影響此頁顯示，不代表後端紀錄。
+					{{ t("claimSuccess.mockPreviewNote") }}
 				</p>
 				<p
 					v-if="statusSource === 'local-fallback'"
 					class="mb-3 rounded-xl border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-center text-[11px] text-amber-900/90"
 					role="note"
 				>
-					未設定 <code class="rounded bg-white/80 px-1">VITE_API_BASE</code>：暫以瀏覽器
-					<code class="rounded bg-white/80 px-1">sessionStorage</code> 類比領獎次數（僅供預覽／原型），上線請改由後端提供。
+					{{ t("claimSuccess.localFallbackNote") }}
 				</p>
 				<h2 class="text-center text-base font-bold text-[#b45309]">
-					闖關禮領取狀態
+					{{ t("claimSuccess.statusTitle") }}
 				</h2>
 				<p
 					v-if="statusSource === 'api' && statusLoadState === 'ok'"
 					class="mx-auto mt-2 max-w-[22rem] text-center text-[11px] leading-relaxed text-neutral-500"
 				>
-					以下狀態由<strong class="text-gw-navy">伺服器</strong>回傳資料呈現（已領
-					<strong class="text-gw-navy">{{ claimed }}／{{ maxSlots }}</strong>
-					次）。三格圖示僅為 UI 映射。
+					{{ t("claimSuccess.apiStatusHint", { claimed, maxSlots }) }}
 				</p>
 				<div
 					v-if="statusLoadState === 'loading'"
 					class="mt-6 text-center text-sm text-neutral-500"
 					aria-live="polite"
 				>
-					載入領獎狀態…
+					{{ t("claimSuccess.loadingStatus") }}
 				</div>
 				<div
 					v-else-if="statusLoadState === 'error'"
@@ -151,7 +150,7 @@ onMounted(() => {
 						class="mt-2 text-[11px] font-semibold text-gw-brand underline underline-offset-2"
 						@click="retryLoadStatus"
 					>
-						重試
+						{{ t("claimSuccess.retryButton") }}
 					</button>
 				</div>
 				<div

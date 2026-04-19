@@ -10,8 +10,11 @@ import {
 	setProfile,
 } from "@/lib/demoState";
 import { clearEntryIntent } from "@/lib/entryIntent";
+import { useI18n } from "@/composables/useI18n";
+import { APP_CONFIG } from "@/constants";
 
 const router = useRouter();
+const { t } = useI18n();
 
 const p0 = getProfile();
 const name = ref(p0.name);
@@ -19,7 +22,10 @@ const employeeId = ref(p0.employeeId);
 const companionCount = ref(getCompanionCount());
 const showConfirm = ref(false);
 
-const companionOptions = Array.from({ length: 20 }, (_, i) => i + 1);
+const companionOptions = Array.from(
+	{ length: APP_CONFIG.MAX_COMPANIONS },
+	(_, i) => i + 1,
+);
 
 const inputClass =
 	"w-full rounded-2xl border-0 bg-[#eef0ed] px-4 py-3.5 text-base text-gw-navy shadow-inner outline-none ring-1 ring-black/[0.04] transition focus:ring-2 focus:ring-gw-brand/35 placeholder:text-neutral-400";
@@ -64,43 +70,43 @@ function commitCheckIn() {
 					<span
 						class="inline-flex rounded-full bg-gw-mint/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-gw-brand-dark ring-1 ring-gw-mint-soft"
 					>
-						2026 AMTRAN FAMILY DAY
+						{{ t('checkin.tag') }}
 					</span>
 				</div>
 				<h1 class="font-display mt-6 text-[1.4rem] font-bold leading-snug tracking-tight text-gw-navy sm:text-[1.55rem]">
-					歡迎來到瑞軒科技2026家庭日
+					{{ t('checkin.title') }}
 				</h1>
-				<p class="mt-3 text-base font-bold text-gw-brand">請輸入以下資料完成報到</p>
+				<p class="mt-3 text-base font-bold text-gw-brand">{{ t('checkin.subtitle') }}</p>
 				<div class="mt-2 h-1 w-12 rounded-full bg-[#e8a87c]" aria-hidden="true" />
 			</header>
 
 			<form class="mt-10 flex flex-1 flex-col gap-6" @submit.prevent="openConfirm" novalidate>
 				<div class="space-y-2">
-					<label for="checkin-name" class="text-sm font-bold text-neutral-600">姓名</label>
+					<label for="checkin-name" class="text-sm font-bold text-neutral-600">{{ t('checkin.form.name') }}</label>
 					<input
 						id="checkin-name"
 						v-model="name"
 						type="text"
 						name="name"
 						autocomplete="name"
-						placeholder="請輸入您的姓名"
+						:placeholder="t('checkin.form.namePlaceholder')"
 						:class="inputClass"
 					/>
 				</div>
 				<div class="space-y-2">
-					<label for="checkin-employee-id" class="text-sm font-bold text-neutral-600">員工編號</label>
+					<label for="checkin-employee-id" class="text-sm font-bold text-neutral-600">{{ t('checkin.form.employeeId') }}</label>
 					<input
 						id="checkin-employee-id"
 						v-model="employeeId"
 						type="text"
 						name="username"
 						autocomplete="username"
-						placeholder="例如：AM12345"
+						:placeholder="t('checkin.form.employeeIdPlaceholder')"
 						:class="inputClass"
 					/>
 				</div>
 				<div class="space-y-2">
-					<label for="checkin-companions" class="text-sm font-bold text-neutral-600">同行人數</label>
+					<label for="checkin-companions" class="text-sm font-bold text-neutral-600">{{ t('checkin.form.companions') }}</label>
 					<div class="relative">
 						<select
 							id="checkin-companions"
@@ -111,7 +117,7 @@ function commitCheckIn() {
 							]"
 						>
 							<option v-for="n in companionOptions" :key="n" :value="n">
-								{{ n }} 位{{ n === 1 ? "（本人）" : "" }}
+								{{ n }} {{ t('checkin.form.companionUnit') }}{{ n === 1 ? t('checkin.form.self') : "" }}
 							</option>
 						</select>
 						<span
@@ -141,7 +147,7 @@ function commitCheckIn() {
 						</svg>
 					</span>
 					<p class="border-l-4 border-[#8b6914]/40 pl-3 text-sm leading-relaxed text-neutral-700">
-						資料將用於家庭日當天<strong class="text-gw-navy">出席紀錄與人數核對</strong>，請確保資訊填寫正確。
+						{{ t('checkin.notice') }}
 					</p>
 				</div>
 
@@ -151,13 +157,15 @@ function commitCheckIn() {
 						:disabled="!formValid()"
 						class="flex w-full items-center justify-center gap-2 rounded-full bg-[#1a5f2a] py-4 text-base font-bold text-white shadow-[0_8px_24px_rgba(26,95,42,0.25)] transition enabled:active:scale-[0.99] enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
 					>
-						確定
+						{{ t('common.submit') }}
 						<span aria-hidden="true">›</span>
 					</button>
 				</div>
 			</form>
 
-			<p class="mt-6 text-center text-xs text-neutral-400">© 2026 AmTRAN Technology Co., Ltd.</p>
+			<p class="mt-6 text-center text-xs text-neutral-400">
+				{{ t("footer.copyright") }}
+			</p>
 		</main>
 
 		<AppFooter class="relative z-[1] border-t-0 bg-transparent" />
@@ -189,21 +197,21 @@ function commitCheckIn() {
 							id="checkin-confirm-title"
 							class="font-display mt-5 text-center text-lg font-bold text-gw-navy"
 						>
-							請確認以下報到資訊正確
+							{{ t('checkin.confirmTitle') }}
 						</h2>
 					</div>
 					<dl class="mt-6 divide-y divide-neutral-100">
 						<div class="flex justify-between gap-3 py-3 text-sm">
-							<dt class="text-neutral-500">姓名</dt>
+							<dt class="text-neutral-500">{{ t('checkin.form.name') }}</dt>
 							<dd class="font-bold text-gw-navy">{{ name.trim() }}</dd>
 						</div>
 						<div class="flex justify-between gap-3 py-3 text-sm">
-							<dt class="text-neutral-500">員工編號</dt>
+							<dt class="text-neutral-500">{{ t('checkin.form.employeeId') }}</dt>
 							<dd class="font-bold text-gw-navy">{{ employeeId.trim() }}</dd>
 						</div>
 						<div class="flex justify-between gap-3 py-3 text-sm">
-							<dt class="text-neutral-500">同行人數</dt>
-							<dd class="font-bold text-gw-navy">{{ companionCount }} 位</dd>
+							<dt class="text-neutral-500">{{ t('checkin.form.companions') }}</dt>
+							<dd class="font-bold text-gw-navy">{{ companionCount }} {{ t('checkin.form.companionUnit') }}</dd>
 						</div>
 					</dl>
 					<div class="mt-6 flex flex-col gap-3">
@@ -212,14 +220,14 @@ function commitCheckIn() {
 							class="w-full rounded-full bg-[#1a5f2a] py-3.5 text-center text-base font-bold text-white shadow-md transition hover:brightness-110 active:scale-[0.99]"
 							@click="commitCheckIn"
 						>
-							確認
+							{{ t('common.confirm') }}
 						</button>
 						<button
 							type="button"
 							class="w-full rounded-full bg-[#e8e4dc] py-3.5 text-center text-base font-semibold text-neutral-800 transition hover:bg-[#ded9cf] active:scale-[0.99]"
 							@click="closeConfirm"
 						>
-							回上頁
+							{{ t('common.back') }}
 						</button>
 					</div>
 				</div>

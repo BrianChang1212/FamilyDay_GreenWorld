@@ -8,8 +8,10 @@ import {
 	getProfile,
 	isCheckInDone,
 } from "@/lib/demoState";
+import { useI18n } from "@/composables/useI18n";
 
 const router = useRouter();
+const { t } = useI18n();
 const profile = computed(() => getProfile());
 const companions = computed(() => getCompanionCount());
 
@@ -33,8 +35,12 @@ onMounted(() => {
 				class="overflow-hidden rounded-3xl border border-neutral-200/80 bg-white shadow-md ring-1 ring-black/[0.04]"
 			>
 				<div class="bg-gradient-to-b from-gw-mint/40 to-white px-4 pb-3 pt-6 text-center">
-					<p class="text-xs font-bold tracking-wide text-gw-navy/80">YOU&apos;RE ALL SET!</p>
-					<p class="mt-1 text-[11px] text-neutral-600">Family Day Event Registration Complete!</p>
+					<p class="text-xs font-bold tracking-wide text-gw-navy/80">
+						{{ t("checkinComplete.statusTitle") }}
+					</p>
+					<p class="mt-1 text-[11px] text-neutral-600">
+						{{ t("checkinComplete.statusSubtitle") }}
+					</p>
 				</div>
 				<div class="border-t border-neutral-200/80 bg-gw-mint/10 ring-1 ring-inset ring-neutral-300/50">
 					<div class="relative aspect-[5/4] w-full overflow-hidden">
@@ -42,7 +48,7 @@ onMounted(() => {
 							:src="CHECKIN_COMPLETE_STICKER_SRC"
 							width="1024"
 							height="1024"
-							alt="完成報到：自然慶祝場景（無人物）"
+							:alt="t('checkinComplete.imageAlt')"
 							class="absolute inset-0 h-full w-full object-cover object-center"
 							loading="lazy"
 							decoding="async"
@@ -55,14 +61,16 @@ onMounted(() => {
 						class="rounded-full bg-gw-brand px-4 py-1.5 text-[10px] font-bold uppercase tracking-wide text-white opacity-90"
 						disabled
 					>
-						VIEW DETAILS
+						{{ t("checkinComplete.viewDetails") }}
 					</button>
 				</div>
 			</div>
 
-			<h1 class="font-display mt-8 text-center text-2xl font-bold text-gw-brand">恭喜完成報到</h1>
+			<h1 class="font-display mt-8 text-center text-2xl font-bold text-gw-brand">
+				{{ t("checkinComplete.title") }}
+			</h1>
 			<p class="mt-2 text-center text-sm font-medium text-gw-navy">
-				感謝參加瑞軒科技2026家庭日
+				{{ t("checkinComplete.subtitle") }}
 			</p>
 
 			<div
@@ -71,7 +79,9 @@ onMounted(() => {
 				<div class="flex items-center justify-between border-b border-neutral-200/80 px-4 py-3">
 					<div class="flex items-center gap-2">
 						<span class="flex h-6 w-6 items-center justify-center rounded bg-gw-brand text-xs text-white">✓</span>
-						<span class="text-sm font-bold text-gw-navy">報到資訊</span>
+						<span class="text-sm font-bold text-gw-navy">{{
+							t("checkinComplete.infoTitle")
+						}}</span>
 					</div>
 					<span
 						class="flex h-8 w-8 items-center justify-center rounded-full bg-gw-mint/80 text-sm text-gw-brand"
@@ -87,7 +97,7 @@ onMounted(() => {
 							>👤</span
 						>
 						<div>
-							<p class="text-xs text-neutral-500">姓名</p>
+							<p class="text-xs text-neutral-500">{{ t("checkin.form.name") }}</p>
 							<p class="font-bold text-gw-navy">{{ profile.name }}</p>
 						</div>
 					</li>
@@ -98,7 +108,9 @@ onMounted(() => {
 							>🪪</span
 						>
 						<div>
-							<p class="text-xs text-neutral-500">員工編號</p>
+							<p class="text-xs text-neutral-500">
+								{{ t("checkin.form.employeeId") }}
+							</p>
 							<p class="font-bold text-gw-navy">{{ profile.employeeId }}</p>
 						</div>
 					</li>
@@ -109,8 +121,12 @@ onMounted(() => {
 							>👥</span
 						>
 						<div>
-							<p class="text-xs text-neutral-500">同行人數</p>
-							<p class="font-bold text-gw-navy">{{ companions }} 位</p>
+							<p class="text-xs text-neutral-500">
+								{{ t("checkin.form.companions") }}
+							</p>
+							<p class="font-bold text-gw-navy">
+								{{ companions }} {{ t("checkin.form.companionUnit") }}
+							</p>
 						</div>
 					</li>
 				</ul>
@@ -120,16 +136,24 @@ onMounted(() => {
 				class="mt-8 rounded-2xl border border-amber-200/70 bg-amber-50/90 px-4 py-4 text-left text-sm text-amber-950/90"
 				role="status"
 			>
-				<p class="font-semibold text-gw-navy">領取報到禮</p>
+				<p class="font-semibold text-gw-navy">
+					{{ t("checkinComplete.claimTitle") }}
+				</p>
 				<p class="mt-2 text-neutral-700">
-					請依現場工作人員引導領取<strong class="text-gw-navy">報到禮</strong>。
+					{{ t("checkinComplete.claimHint", { giftLabel: t("checkinComplete.giftLabel") }) }}
 				</p>
 				<p class="mt-3 text-neutral-700">
-					參加闖關請另掃<strong class="text-gw-navy">闖關專用 QR</strong>，本頁不會進入闖關。
+					{{
+						t("checkinComplete.gameHint", {
+							qrLabel: t("checkinComplete.gameQrLabel"),
+						})
+					}}
 				</p>
 			</div>
 
-			<p class="mt-8 text-center text-xs text-neutral-400">© 2026 AmTRAN Technology Co., Ltd.</p>
+			<p class="mt-8 text-center text-xs text-neutral-400">
+				{{ t("footer.copyright") }}
+			</p>
 		</main>
 
 		<AppFooter class="relative z-[1] border-t-0 bg-transparent" />

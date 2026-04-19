@@ -4,9 +4,12 @@ import { useRoute, useRouter } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 import { advanceStage, getStage } from "@/lib/demoState";
+import { useI18n } from "@/composables/useI18n";
+import { GAME_CONFIG } from "@/constants";
 
 const route = useRoute();
 const router = useRouter();
+const { t } = useI18n();
 const stage = ref(1);
 
 const ok = computed(() => route.query.ok === "1");
@@ -20,7 +23,7 @@ function next() {
 		router.push({ name: "quiz" });
 		return;
 	}
-	if (stage.value >= 6) {
+	if (stage.value >= GAME_CONFIG.TOTAL_STAGES) {
 		router.push({ name: "finish" });
 		return;
 	}
@@ -89,7 +92,7 @@ function next() {
 					ok ? 'text-gw-forest' : 'text-[#b4232c]',
 				]"
 			>
-				{{ ok ? "恭喜答對" : "答錯了" }}
+				{{ ok ? t("result.correctTitle") : t("result.wrongTitle") }}
 			</h1>
 
 			<p
@@ -97,8 +100,8 @@ function next() {
 			>
 				{{
 					ok
-						? "你對大自然的觀察入微，成功解開了這個謎題！"
-						: "別灰心，繼續探索大自然的美好！"
+						? t("result.correctMessage")
+						: t("result.wrongMessage")
 				}}
 			</p>
 
@@ -108,14 +111,14 @@ function next() {
 					class="w-full rounded-full bg-gradient-to-b from-gw-brand to-gw-forest py-4 text-base font-bold text-white shadow-btn transition duration-300 ease-gw-smooth hover:brightness-[1.05] active:scale-[0.99]"
 					@click="next"
 				>
-					{{ ok ? "前往下一站 →" : "再試一次" }}
+					{{ ok ? t("result.nextButton") : t("result.retryButton") }}
 				</button>
 				<button
 					type="button"
 					class="w-full rounded-full border-2 border-gw-forest/85 bg-white py-3.5 text-base font-bold text-gw-forest transition hover:bg-gw-mint/40"
 					@click="router.push({ name: 'stage' })"
 				>
-					返回地圖
+					{{ t("result.backMapButton") }}
 				</button>
 			</div>
 		</main>

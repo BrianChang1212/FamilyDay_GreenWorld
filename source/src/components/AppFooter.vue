@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import { useI18n } from "@/composables/useI18n";
+
+const { t } = useI18n();
+
 const links = [
-	{ label: "安全說明", href: "#" },
-	{ label: "隱私權", href: "#" },
-	{ label: "聯絡資訊", href: "#" },
+	{ label: t("footer.linkSafety"), href: "#" },
+	{ label: t("footer.linkPrivacy"), href: "#" },
+	{ label: t("footer.linkContact"), href: "#" },
 ] as const;
 </script>
 
@@ -17,13 +21,13 @@ const links = [
 					aria-hidden="true"
 					>🧭</span
 				>
-				<span class="leading-snug tracking-wide text-neutral-500"
-					>Powered by AmTRAN Technology Co., Ltd.</span
-				>
+				<span class="leading-snug tracking-wide text-neutral-500">
+					{{ t("footer.poweredBy") }}
+				</span>
 			</div>
 			<nav
 				class="flex flex-wrap justify-end gap-x-4 text-[11px] font-semibold tracking-wide text-neutral-500"
-				aria-label="Footer links"
+				:aria-label="t('footer.linksAriaLabel')"
 			>
 				<a
 					v-for="l in links"

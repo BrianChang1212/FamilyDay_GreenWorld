@@ -5,6 +5,7 @@ import {
 	normalizeQueryEntry,
 	setEntryIntent,
 } from "@/lib/entryIntent";
+import { STORAGE_KEYS } from "@/constants";
 
 describe("entryIntent", () => {
 	beforeEach(() => {
@@ -36,7 +37,7 @@ describe("entryIntent", () => {
 	});
 
 	it("getEntryIntent ignores corrupted storage values", () => {
-		sessionStorage.setItem("fdgw_entry_intent", "other");
+		sessionStorage.setItem(STORAGE_KEYS.entryIntent, "other");
 		expect(getEntryIntent()).toBeNull();
 	});
 });
