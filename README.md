@@ -187,7 +187,7 @@ npm run dev
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
 | 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-20（頁尾 **v2.48**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md)（合併版 **v1.3.25**；`summary-frontend` **v1.24** 補 `constants`／`i18n`／`STORAGE_KEYS`） |
+| 最後更新 README | 2026-04-20（頁尾 **v2.49**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md)（合併版 **v1.3.26**；`summary-frontend` **v1.25**：**`views/`** 分群、`FINISH_REWARD_SLOTS` 併 **`constants`**） |
 
 
 ---
@@ -224,7 +224,7 @@ npm run dev
 | `/checkin` | **報到**單頁（姓名、員編、同行人數）＋確認彈窗；完成後僅 **`/checkin/complete`**。 |
 | `/checkin/complete` | 報到完成頁；參加闖關須**另掃闖關 QR**（如 `/game`）。報到動線見 [`summary-frontend.md`](docs/architecture/summary-frontend.md) **§2.2**（含流程圖）。 |
 | `/finish` | 完成頁保證領獎原型（`FinishView.vue`）：確認領獎彈窗。規格見 [`docs/project/專案文件.md`](docs/project/專案文件.md)、[`summary-frontend.md`](docs/architecture/summary-frontend.md)。 |
-| `/finish/claimed` | 領取成功頁（`ClaimSuccessView.vue`）：已設定 **`VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 呈現三格狀態；**未**設定時（含預覽站）以 **`local-fallback`**／`sessionStorage` 類比；載入邏輯見 **`source/src/composables/useRewardClaimPresentation.ts`**、**`source/src/lib/rewardClaimPresentation.ts`**、**`source/src/api/rewardClaimStatus.ts`**。詳 [`summary-frontend.md`](docs/architecture/summary-frontend.md) §2.1、§2（**v1.24**）。 |
+| `/finish/claimed` | 領取成功頁（`ClaimSuccessView.vue`）：已設定 **`VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 呈現三格狀態；**未**設定時（含預覽站）以 **`local-fallback`**／`sessionStorage` 類比；載入邏輯見 **`source/src/composables/useRewardClaimPresentation.ts`**、**`source/src/lib/rewardClaimPresentation.ts`**、**`source/src/api/rewardClaimStatus.ts`**。詳 [`summary-frontend.md`](docs/architecture/summary-frontend.md) §2.1、§2（**v1.25**）。 |
 
 
 ### 系統架構圖
@@ -464,7 +464,7 @@ sequenceDiagram
 | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `docs/`           | 見 [`docs/README.md`](docs/README.md)（含 `project/`、`specs/`、`architecture/`、`demo/`、**`preview/`** 介面截圖等子目錄說明） |
 | `assets/`         | 設計稿、KV、Logo、CIS（註明版本與來源）                                                                                          |
-| `source/`         | 前端（Vue 3 + Vite + TS + Tailwind + Vue Router）：`npm install` → `npm run dev`（預設 `http://localhost:5173`）；**`npm run test`**（Vitest） |
+| `source/`         | 前端（Vue 3 + Vite + TS + Tailwind + Vue Router）：`npm install` → `npm run dev`（預設 `http://localhost:5173`）；**`npm run test`**（Vitest）。路由頁面於 **`src/views/home`**、**`onboarding`**、**`auth`**、**`checkin`**、**`quest`** |
 | `.cursor/skills/` | Cursor Agent 用技能說明（前端設計、文案／在地化等）；選用，**非**執行期依賴                                                                    |
 | `test/`           | 倉庫根目錄**驗收／測試紀錄**用（**選用**；目前僅 **`.gitkeep`**）。**程式單元測試**在 **`source/src/**/*.test.ts`**（Vitest），非此資料夾 |
 | `tool/`           | 輔助腳本（**選用**）：例如 [`tool/capture-preview-screenshots.ps1`](tool/capture-preview-screenshots.ps1)（重產 [`docs/preview/screenshots/`](docs/preview/screenshots/)，見 [`docs/preview/README.md`](docs/preview/README.md)）；另含 **`.gitkeep`** |
@@ -527,4 +527,4 @@ sequenceDiagram
 
 ---
 
-*README v2.48 · 2026-04-20（`summary-frontend` **v1.24**：前端 `constants`／`i18n`／`STORAGE_KEYS` 集中化描述；`專案文件` **v1.3.25**；v2.47）*
+*README v2.49 · 2026-04-20（`summary-frontend` **v1.25**：**`views/`** 分群與文件對齊；`專案文件` **v1.3.26**；v2.48）*
