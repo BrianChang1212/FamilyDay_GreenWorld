@@ -1,5 +1,8 @@
-import { FINISH_REWARD_SLOTS } from "@/lib/constants/finishReward";
-import { GAME_CONFIG, STORAGE_KEYS } from "@/constants";
+import {
+	FINISH_REWARD_SLOTS,
+	GAME_CONFIG,
+	STORAGE_KEYS,
+} from "@/constants";
 
 export { FINISH_REWARD_SLOTS };
 

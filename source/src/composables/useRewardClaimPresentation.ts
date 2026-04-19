@@ -1,6 +1,6 @@
 import { computed, ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import { FINISH_REWARD_SLOTS } from "@/lib/constants/finishReward";
+import { FINISH_REWARD_SLOTS } from "@/constants";
 import { getFinishClaimedCount } from "@/lib/demoState";
 import {
 	parseMockClaimedQueryParam,

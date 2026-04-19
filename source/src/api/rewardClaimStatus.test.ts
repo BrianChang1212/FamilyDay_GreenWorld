@@ -1,7 +1,7 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { fetchRewardClaimStatus } from "@/api/rewardClaimStatus";
 import * as apiBase from "@/lib/apiBase";
-import { FINISH_REWARD_SLOTS } from "@/lib/constants/finishReward";
+import { FINISH_REWARD_SLOTS } from "@/constants";
 
 vi.mock("@/lib/apiBase");
 

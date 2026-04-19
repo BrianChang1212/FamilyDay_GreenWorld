@@ -1,14 +1,14 @@
 import { createRouter, createWebHistory } from "vue-router";
-import WelcomeView from "@/views/WelcomeView.vue";
-import BriefingView from "@/views/BriefingView.vue";
-import RegisterView from "@/views/RegisterView.vue";
-import CheckInFormView from "@/views/CheckInFormView.vue";
-import CheckInCompleteView from "@/views/CheckInCompleteView.vue";
-import StageView from "@/views/StageView.vue";
-import QuizView from "@/views/QuizView.vue";
-import ResultView from "@/views/ResultView.vue";
-import FinishView from "@/views/FinishView.vue";
-import ClaimSuccessView from "@/views/ClaimSuccessView.vue";
+import WelcomeView from "@/views/home/WelcomeView.vue";
+import BriefingView from "@/views/onboarding/BriefingView.vue";
+import RegisterView from "@/views/auth/RegisterView.vue";
+import CheckInFormView from "@/views/checkin/CheckInFormView.vue";
+import CheckInCompleteView from "@/views/checkin/CheckInCompleteView.vue";
+import StageView from "@/views/quest/StageView.vue";
+import QuizView from "@/views/quest/QuizView.vue";
+import ResultView from "@/views/quest/ResultView.vue";
+import FinishView from "@/views/quest/FinishView.vue";
+import ClaimSuccessView from "@/views/quest/ClaimSuccessView.vue";
 import {
 	setEntryIntent,
 	normalizeQueryEntry,

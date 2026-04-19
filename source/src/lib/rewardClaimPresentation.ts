@@ -1,6 +1,6 @@
 import { fetchRewardClaimStatus } from "@/api/rewardClaimStatus";
 import { getViteApiBase } from "@/lib/apiBase";
-import { FINISH_REWARD_SLOTS } from "@/lib/constants/finishReward";
+import { FINISH_REWARD_SLOTS } from "@/constants";
 
 export type RewardClaimStatusSource = "api" | "mock-query" | "local-fallback";
 
