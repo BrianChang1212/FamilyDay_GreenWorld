@@ -46,7 +46,13 @@ function goHome() {
 
 <template>
 	<div class="relative flex min-h-full flex-col bg-[#f5f6f4]">
-		<AppHeader class="relative z-[2]" :stage="stage" show-progress show-user />
+		<AppHeader
+			class="relative z-[2]"
+			:stage="stage"
+			:completed-override="GAME_CONFIG.TOTAL_STAGES"
+			show-progress
+			show-user
+		/>
 
 		<main class="relative z-[2] flex flex-1 flex-col px-4 pb-6 pt-4 sm:mx-auto sm:max-w-md sm:w-full">
 			<div class="rounded-2xl bg-gw-brand px-4 py-4 text-center shadow-md">

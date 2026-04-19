@@ -18,7 +18,6 @@ const {
 	statusSource,
 	statusLoadState,
 	statusError,
-	isMockPreview,
 	loadClaimPresentation,
 } = useRewardClaimPresentation();
 
@@ -109,20 +108,6 @@ onMounted(() => {
 			</p>
 
 			<section class="mt-10">
-				<p
-					v-if="isMockPreview"
-					class="mb-3 rounded-xl border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-center text-[11px] text-amber-900/90"
-					role="note"
-				>
-					{{ t("claimSuccess.mockPreviewNote") }}
-				</p>
-				<p
-					v-if="statusSource === 'local-fallback'"
-					class="mb-3 rounded-xl border border-amber-200/80 bg-amber-50/90 px-3 py-2 text-center text-[11px] text-amber-900/90"
-					role="note"
-				>
-					{{ t("claimSuccess.localFallbackNote") }}
-				</p>
 				<h2 class="text-center text-base font-bold text-[#b45309]">
 					{{ t("claimSuccess.statusTitle") }}
 				</h2>
