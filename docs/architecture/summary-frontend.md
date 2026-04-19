@@ -36,9 +36,11 @@
 - `features/map` 或 `zones` — 關卡瀏覽／地圖  
 - `components` — 共用元件（例：全站裝飾 **`components/doodles/PageCritters.vue`**）  
 - **`api/`** — **僅** HTTP 與回應正規化（例：**`rewardClaimStatus.ts`** → `GET /api/v1/me/dashboard`；**不**依賴 Vue／`demoState`）  
-- **`lib/constants/`** — 與後端／UI 共用之常數（例：**`finishReward.ts`** 之 **`FINISH_REWARD_SLOTS`**）  
+- **`constants/`** — 全域執行期常數（例：**`APP_CONFIG`**、**`GAME_CONFIG`**、**`STORAGE_KEYS`**；供 i18n／狀態邏輯／測試共用）  
+- **`lib/constants/`** — 與後端／UI 共用之領獎相關常數（例：**`finishReward.ts`** 之 **`FINISH_REWARD_SLOTS`**）  
 - **`lib/`** — 工具與原型狀態（例：**`apiBase.ts`**、**`demoState.ts`**、**`entryIntent.ts`**）；**應用編排**（無 Vue）：**`rewardClaimPresentation.ts`**（領取成功頁：mock／API／`local-fallback` 決策）、**`provisionalFinishClaim.ts`**（完成頁：無 API 時遞增本機次數）  
-- **`composables/`** — Vue 黏著層（例：**`useRewardClaimPresentation.ts`** 綁 `useRoute`、loading、`watch`）  
+- **`composables/`** — Vue 黏著層（例：**`useRewardClaimPresentation.ts`** 綁 `useRoute`、loading、`watch`；**`useI18n.ts`** 集中 UI 字串與參數替換）  
+- **`i18n/`** — 介面文案字典（例：**`zh-TW.ts`**；頁面文案改由 key 管理，降低硬編碼重複）  
 - `styles` / design tokens — 色票、間距、字級（主視覺／CIS 定案後統一）
 
 ### 2.1 呈現架構：路由與 QR 進入點（`source/` 實作 · 2026-04-18 · 對齊 §2.2–§2.3）
@@ -56,7 +58,7 @@
 | `/stage`、`/quiz`、`/result`、`/finish` | 闖關流程（既有） |
 | `/finish/claimed` | **領取成功**（`ClaimSuccessView`）：闖關禮三格狀態之**呈現**（見下段「領取狀態資料來源」） |
 
-**狀態鍵（原型，`sessionStorage`）：** **意圖** `fdgw_entry_intent`（`entryIntent.ts`）；**profile** `fdgw_name`、`fdgw_employeeId`；**闖關** `fdgw_stage`、`fdgw_inZone`；**報到** `fdgw_companionCount`、`fdgw_checkin_done`。  
+**狀態鍵（原型，`sessionStorage`）：** 由 **`constants/index.ts`** 之 **`STORAGE_KEYS`** 集中管理（`entryIntent.ts`／`demoState.ts` 共用）；值域包含 **意圖**、**profile**、**闖關進度**、**報到狀態**、**領獎次數**。  
 
 **領取狀態資料來源（與程式對齊 · `ClaimSuccessView`）：** 畫面僅透過 **`composables/useRewardClaimPresentation.ts`** 載入；**決策與呼叫 API** 在 **`lib/rewardClaimPresentation.ts`**（無 Vue 依賴）。已設定 **`VITE_API_BASE`** 時，**`/finish/claimed`** 以 **`GET /api/v1/me/dashboard`** 回傳之 `progress` 映射次數（優先 **`rewardRedeemCount`**；暫可 **`fullClearCount`**），實作見 **`source/src/api/rewardClaimStatus.ts`**（預設欄位上限與 **`lib/constants/finishReward.ts`** 對齊）。**未**設定 **`VITE_API_BASE`** 時（含預覽站），該頁以 **`local-fallback`** 後備讀取 **`fdgw_finishClaimed`**（`demoState.ts`），並標示**非伺服器紀錄**。**`?mock_claimed=`** 僅供離線 UI 覆寫。**`/finish`** 確認領獎後，若無 API 底網址則由 **`lib/provisionalFinishClaim.ts`** 遞增 **`fdgw_finishClaimed`**；有 API 時不寫入該鍵。
 
@@ -217,3 +219,4 @@ flowchart TD
 | 1.21 | 2026-04-18 | **§4**：「靜態預覽」條目之根 **`README`** 改為可點連結 [`README.md#preview-netlify-test-ui`](../../README.md#preview-netlify-test-ui) |
 | 1.22 | 2026-04-19 | **§2** 目錄：**`api/`**／**`lib/constants/`**／**`rewardClaimPresentation`**／**`provisionalFinishClaim`**／**`composables/`** 與程式分層一致；**§2.1**「領取狀態」、**§3** 完成頁列、**§4** dashboard 條目同步 |
 | 1.23 | 2026-04-19 | **§1.1**：**Vitest** 單元測試（`source/src/**/*.test.ts`）、指令與 **`.github/workflows/ci.yml`**（`npm run test` → build） |
+| 1.24 | 2026-04-20 | **§2／§2.1**：補 `source/src/constants/index.ts`（`APP_CONFIG`／`GAME_CONFIG`／`STORAGE_KEYS`）與 `useI18n.ts`、`i18n/zh-TW.ts` 之集中化描述；狀態鍵改述為 `STORAGE_KEYS` 單一來源 |
