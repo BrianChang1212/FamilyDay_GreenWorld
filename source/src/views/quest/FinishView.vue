@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
@@ -7,23 +7,82 @@ import {
 	LEVEL_COMPLETE_STICKER_SRC,
 	getProfile,
 	getStage,
+	getFinishClaimedCount,
 } from "@/lib/demoState";
 import { incrementLocalFinishClaimIfNoApiBase } from "@/lib/provisionalFinishClaim";
+import { resolveRewardClaimPresentation } from "@/lib/rewardClaimPresentation";
+import { getViteApiBase } from "@/lib/apiBase";
 import { useI18n } from "@/composables/useI18n";
-import { GAME_CONFIG } from "@/constants";
+import { FINISH_REWARD_SLOTS, GAME_CONFIG } from "@/constants";
 
 const router = useRouter();
 const { t } = useI18n();
 const stage = ref(GAME_CONFIG.TOTAL_STAGES);
 const name = ref("");
+const employeeId = ref("");
 const showClaimModal = ref(false);
+const claimedCount = ref(0);
+const maxSlots = ref(FINISH_REWARD_SLOTS);
+const statusLoadState = ref<"loading" | "ok" | "error">("loading");
+const statusError = ref("");
+
+const userLine = computed(() => {
+	const id = employeeId.value.trim();
+	if (!id || id === "—") return name.value;
+	return `${name.value}（${id}）`;
+});
+
+const isClaimFull = computed(
+	() => claimedCount.value >= maxSlots.value && maxSlots.value > 0,
+);
+
+const nextClaimIndex = computed(() =>
+	Math.min(claimedCount.value + 1, maxSlots.value),
+);
+
+const slotLabels = computed(() => {
+	const c = claimedCount.value;
+	const cap = maxSlots.value;
+	return Array.from({ length: cap }, (_, i) =>
+		c > i ? t("claimSuccess.slotClaimed") : t("claimSuccess.slotPending"),
+	);
+});
+
+function slotActive(index: number): boolean {
+	return claimedCount.value > index;
+}
+
+async function refreshClaimed(): Promise<void> {
+	statusLoadState.value = "loading";
+	statusError.value = "";
+	const r = await resolveRewardClaimPresentation(null, getFinishClaimedCount);
+	if (r.loadState === "error") {
+		statusLoadState.value = "error";
+		statusError.value = r.error;
+		return;
+	}
+	claimedCount.value = r.claimed;
+	maxSlots.value = r.maxSlots;
+	statusLoadState.value = "ok";
+	if (claimedCount.value >= maxSlots.value && maxSlots.value > 0) {
+		await router.replace({ name: "finishClaimSuccess" });
+	}
+}
+
+function retryLoadStatus() {
+	void refreshClaimed();
+}
 
 onMounted(() => {
 	stage.value = getStage();
-	name.value = getProfile().name || t("finish.fallbackName");
+	const p = getProfile();
+	name.value = p.name || t("finish.fallbackName");
+	employeeId.value = p.employeeId || "—";
+	void refreshClaimed();
 });
 
 function openClaimModal() {
+	if (isClaimFull.value || statusLoadState.value !== "ok") return;
 	showClaimModal.value = true;
 }
 
@@ -33,10 +92,16 @@ function closeClaimModal() {
 
 function confirmClaim() {
 	showClaimModal.value = false;
-	/** 領取紀錄以後端為準；僅在未設定 API 的開發原型用 session 類比 */
+	/** 已設定 API 時：原型仍導向成功頁，由 dashboard 反映伺服器狀態（正式上線應改為核銷 API 成功後再導頁或重新整理） */
+	if (getViteApiBase()) {
+		router.push({ name: "finishClaimSuccess" });
+		return;
+	}
 	incrementLocalFinishClaimIfNoApiBase();
-	// 上線後於此呼叫核銷／領獎 API，成功後再導向 finishClaimSuccess
-	router.push({ name: "finishClaimSuccess" });
+	claimedCount.value = getFinishClaimedCount();
+	if (claimedCount.value >= maxSlots.value) {
+		router.push({ name: "finishClaimSuccess" });
+	}
 }
 
 function goHome() {
@@ -79,17 +144,88 @@ function goHome() {
 			</div>
 
 			<p class="mt-8 text-center text-base font-bold leading-relaxed text-gw-navy">
-				{{ t("finish.completeMessage", { name }) }}
+				{{ t("finish.completeMessage") }}
 			</p>
+
+			<p class="mt-4 text-center text-base font-bold text-gw-navy">
+				{{ userLine }}
+			</p>
+
+			<section class="mt-8">
+				<h2 class="text-center text-base font-bold text-[#b45309]">
+					{{ t("finish.statusTitle") }}
+				</h2>
+				<div
+					v-if="statusLoadState === 'loading'"
+					class="mt-6 text-center text-sm text-neutral-500"
+					aria-live="polite"
+				>
+					{{ t("claimSuccess.loadingStatus") }}
+				</div>
+				<div
+					v-else-if="statusLoadState === 'error'"
+					class="mt-6 rounded-xl border border-red-200 bg-red-50/90 px-3 py-3 text-center text-[12px] text-red-900"
+					role="alert"
+				>
+					<p>{{ statusError }}</p>
+					<button
+						type="button"
+						class="mt-2 text-[11px] font-semibold text-gw-brand underline underline-offset-2"
+						@click="retryLoadStatus"
+					>
+						{{ t("claimSuccess.retryButton") }}
+					</button>
+				</div>
+				<div v-else class="mt-6 flex justify-between gap-2 px-1">
+					<div
+						v-for="(label, i) in slotLabels"
+						:key="i"
+						class="flex flex-1 flex-col items-center"
+					>
+						<div
+							:class="[
+								'flex h-14 w-14 items-center justify-center rounded-full text-xl transition',
+								slotActive(i)
+									? 'bg-[#fecaca] text-[#78350f] shadow-sm ring-2 ring-white'
+									: 'bg-neutral-200/90 text-neutral-500',
+							]"
+							aria-hidden="true"
+						>
+							🎁
+						</div>
+						<p class="mt-2 text-center text-[11px] font-semibold text-gw-navy/85">
+							{{ label }}
+						</p>
+					</div>
+				</div>
+				<p
+					v-if="statusLoadState === 'ok' && !isClaimFull && claimedCount > 0"
+					class="mx-auto mt-4 max-w-[22rem] text-center text-[11px] leading-relaxed text-neutral-500"
+				>
+					{{ t("finish.loopHint", { maxSlots }) }}
+				</p>
+			</section>
 
 			<div class="mt-auto flex flex-col gap-3 pt-10">
 				<button
 					type="button"
-					class="w-full rounded-full bg-[#1a5f2a] py-4 text-base font-bold text-white shadow-lg transition hover:brightness-110"
+					class="w-full rounded-full py-4 text-base font-bold shadow-lg transition"
+					:class="
+						isClaimFull || statusLoadState !== 'ok'
+							? 'cursor-not-allowed bg-neutral-300 text-neutral-500'
+							: 'bg-[#1a5f2a] text-white hover:brightness-110'
+					"
+					:disabled="isClaimFull || statusLoadState !== 'ok'"
 					@click="openClaimModal"
 				>
-					{{ t("finish.claimButton") }}
+					{{ isClaimFull ? t("finish.claimButtonDone") : t("finish.claimButton") }}
 				</button>
+				<p
+					v-if="statusLoadState === 'ok' && !isClaimFull"
+					class="text-center text-[11px] leading-relaxed text-neutral-500"
+				>
+					{{ t("finish.staffHint") }}
+				</p>
 				<button
 					type="button"
 					class="w-full rounded-full border-2 border-[#1a5f2a] bg-white py-3.5 text-base font-bold text-[#1a5f2a] transition hover:bg-neutral-50"
@@ -125,7 +261,10 @@ function goHome() {
 						{{ t("finish.modalTitle") }}
 					</h2>
 					<p class="mt-2 text-center text-sm text-neutral-600">
-						{{ t("finish.modalMessage") }}
+						{{ t("finish.modalMessage", { nextClaimIndex }) }}
+					</p>
+					<p class="mt-3 text-center text-[11px] text-neutral-500">
+						{{ t("finish.staffHint") }}
 					</p>
 					<div class="mt-6 flex flex-col gap-2">
 						<button
@@ -133,7 +272,7 @@ function goHome() {
 							class="w-full rounded-full bg-gw-brand py-3.5 text-base font-bold text-white shadow-md transition hover:brightness-110"
 							@click="confirmClaim"
 						>
-							{{ t("common.confirm") }}
+							{{ t("finish.modalConfirmButton") }}
 						</button>
 						<button
 							type="button"

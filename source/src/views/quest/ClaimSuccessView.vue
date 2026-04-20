@@ -41,12 +41,9 @@ function slotActive(index: number): boolean {
 const slotLabels = computed(() => {
 	const c = claimed.value;
 	const cap = maxSlots.value;
-	const third = c >= cap ? t("claimSuccess.slotFullClaimed") : t("claimSuccess.slotFinalPending");
-	return [
-		c >= 1 ? t("claimSuccess.slotClaimed") : t("claimSuccess.slotPending"),
-		c >= 2 ? t("claimSuccess.slotClaimed") : t("claimSuccess.slotPending"),
-		third,
-	] as const;
+	return Array.from({ length: cap }, (_, i) =>
+		c > i ? t("claimSuccess.slotClaimed") : t("claimSuccess.slotPending"),
+	);
 });
 
 onMounted(() => {
