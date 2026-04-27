@@ -1,6 +1,6 @@
 # 架設環境與部署 — 討論總結
 
-> 本文件彙整**雲端／內網、反向代理、PaaS 選型與現場網路**之討論結論，供與 IT／主辦對齊。  
+> 本文件彙整**Firebase 部署、費用告警與現場網路**之討論結論，供與 IT／主辦對齊。  
 > 實際報價與合約以各廠商官網及採購規定為準。
 
 ---
@@ -23,41 +23,33 @@
 
 ---
 
-## 2. 曾討論的架構選項（由複雜到簡化）
+## 2. 後端部署方案（定案）
 
-### 2.1 公司內網 + 對外入口（DMZ + Nginx）
+### 2.1 Firebase（正式主線）
 
-- **內網**：FastAPI + PostgreSQL。  
-- **DMZ**：**Nginx** 終止 **HTTPS**，`proxy_pass` 至內網 API；防火牆僅開 **443** 至 DMZ，DB 不對外。  
-- **適用**：資料須留在公司、由 IT 開 DNAT／DMZ。  
-- **使用者路徑**：手機仍經**網際網路**連到對外 IP，與「純內網不可從園區直連」須區分。
+- 後端資料主線採 **Cloud Firestore**；即時高併發需求可加用 **Realtime Database**。  
+- 費用採 **Blaze 隨用隨付**，並配置 **Budgets & Alerts**（建議 50%/90%/100%）。  
+- 安全以 **Firebase Security Rules** 與身分驗證策略控管。
 
-### 2.2 更簡化變體
+### 2.2 前端預覽與正式環境
 
-- **單台台灣區域 VPS／雲 VM**：Docker Compose（Nginx + API + Postgres）一體，營運較單純（須公司允許資料上雲）。  
-- **DMZ 單機全包**：Nginx + API + DB 同在 DMZ，少跨網段反代，但**安全分段較弱**，需資安同意。
-
-### 2.3 PaaS + 託管資料庫（討論中偏「營運省事」）
-
-- **形態**：託管 **PostgreSQL** + **Web Service** 跑 FastAPI；前端靜態可另託管（CDN）。  
-- **常見組合**：**Render／Railway**（一條龍）；**Neon + Fly.io** 或 **Neon + Cloud Run**（運算與 DB 分開）。  
-- **公司限制**：若僅允許 **AWS／Azure**，則改為該生態之 **Container／Serverless + 託管 Postgres**，並用官方 **Pricing Calculator** 估算。
+- 前端原型仍可用 Netlify / GitHub Pages 做靜態預覽。  
+- 正式資料與身分驗證走 Firebase 專案（建議分 `dev/stage/prod`）。
 
 ---
 
 ## 3. 區域與延遲
 
 - 雲端節點優先選**鄰近台灣**（如**東京、新加坡**等，依平台可用區），降低 RTT。  
-- **Firebase vs PostgreSQL** 之討論結論：本專案關聯資料與規則多，**以 PostgreSQL 為主**較合適（細節見 [`summary-backend.md`](./summary-backend.md)）。
+- **目前定案**：本專案後端以 **Firebase** 為主（細節見 [`summary-backend.md`](./summary-backend.md)）。
 
 ---
 
 ## 4. 付款與採購注意
 
-- **Render**：Workspace 方案 + Web Service / Postgres 規格分開計價（見 [Render Pricing](https://render.com/pricing)）。  
-- **Railway**：月費訂閱 + 依 **CPU／RAM／Volume／Egress** 用量（見 [Railway Docs Pricing](https://docs.railway.app/pricing)）。  
-- **Neon**：Free 或按 **CU-hour、儲存、流量**（見 [Neon Pricing](https://neon.tech/pricing)）。  
-- **Fly.io**、**GCP Cloud Run**：按 **Machine／vCPU-秒／流量** 等（見官方定價頁）。  
+- Firestore 計價核心為讀取/寫入/刪除、儲存與對外流量。  
+- Realtime Database 計價核心為儲存與下載流量（連線上限 Blaze 為 200K / DB）。  
+- 以目前估算量級，單日活動費用可維持低成本；仍建議以壓測與實際流量驗證。
 
 **實際月費**隨規格、是否 24/7、活動尖峰而變，無法在本文給固定數字；需以計算機與壓測後規格代入。
 
@@ -65,10 +57,10 @@
 
 ## 5. 建議決策流程
 
-1. 確認公司是否**限定雲廠商**、資料是否**必須留在內網**。  
-2. 若可上雲且要省事 → **PaaS + 託管 Postgres**；活動日視壓測調整 **實例數／min instances**。  
-3. 若必須公司機房 → **DMZ Nginx + 內網 API + 內網 DB**，由 IT 開防火牆與憑證。  
-4. 正式前：**HTTPS、備份、日誌、還原演練**；綠世界現場做一次**連線抽測**。
+1. 建立 Firebase `dev/stage/prod` 專案與最小權限原則。  
+2. 設定 Blaze 預算與告警門檻，確認通知對象。  
+3. 先以靜態預覽驗證前端流程，再接 Firebase 真實資料流。  
+4. 活動前完成壓測、Rules 審查與現場網路抽測。
 
 ---
 
@@ -81,3 +73,4 @@
 | 1.2 | 2026-04-18 | **§1.1**：補 **測試 Web UI** 標記、Netlify 範例與 QR 分流見根 **`README.md`**（錨點 **`preview-netlify-test-ui`**） |
 | 1.3 | 2026-04-18 | **§1.1**：「測試 Web UI 操作」段 **`README`** 改為可點連結 [`README#preview-netlify-test-ui`](../../README.md#preview-netlify-test-ui) |
 | 1.4 | 2026-04-19 | **§1.1**：補 **`.github/workflows/ci.yml`**（`npm run test` → build）與靜態預覽 workflow 之分流說明 |
+| 1.5 | 2026-04-27 | 後端部署主線改為 **Firebase**，移除舊 PaaS/DMZ 主方案敘事 |

@@ -1,6 +1,6 @@
 # 家庭日綠世界闖關 Web — API 規格（v0.1 草案）
 
-> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.4** 檔首用語與 § 端點表一致；**v0.1.3** 補前端 **Vitest** 對 dashboard 客戶端映射之測試註記；**v0.1.2** 起之前端分層註記仍適用；**不改**端點定義）。
+> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.7** 新增傳輸加密與敏感資料保護要求；**v0.1.6** 新增前後端 API 實際動作流程圖；**v0.1.5** 新增 Firebase 實作對齊註記；**v0.1.4** 檔首用語與 § 端點表一致；**v0.1.3** 補前端 **Vitest** 對 dashboard 客戶端映射之測試註記；**v0.1.2** 起之前端分層註記仍適用；**不改**端點定義）。
 
 ---
 
@@ -11,10 +11,28 @@
 | API Base | `/api/v1` |
 | 格式 | `Content-Type: application/json` |
 | 認證 | 簽到／闖關登入成功後建議使用 **HTTP-only Cookie（session）**；需登入的 API 未帶有效 session 時回 **401** |
+| 傳輸加密 | **正式環境必須使用 HTTPS（TLS 1.2+）**；禁止明文 HTTP 傳輸個資或 token |
+| Cookie 安全 | Session Cookie 應設定 `HttpOnly`、`Secure`、`SameSite=Lax`（跨站需求再評估 `SameSite=None; Secure`） |
+| 敏感資料保護 | 工號、姓名、token、JWT 不可寫入前端可見 URL query；日誌需遮罩（mask）個資與憑證 |
 | 錯誤 | 建議 `{ "code": "STRING", "message": "人可讀說明" }` |
 | 限流 | **每位使用者每分鐘最多 30 次請求**（可再細分 bucket）；`login`、`checkin` 建議獨立或較嚴格 |
 
 完整路徑範例：`GET https://<host>/api/v1/me/dashboard`
+
+---
+
+## Firebase 實作對齊註記
+
+本章僅補充「目前後端定案為 Firebase」之實作對齊邊界；**不重**定義本文件既有 REST 路徑與欄位語意。
+
+| 對齊面向 | 註記 |
+|------|------|
+| 架構定案來源 | 以 `docs/architecture/summary-backend.md`（v1.5）為準：Firebase（Firestore 為主，Realtime Database 視場景啟用） |
+| API 契約定位 | 本文件維持「HTTP API 契約層」；底層可由 Cloud Functions / Cloud Run / Server 介面實作，對前端契約不變 |
+| 資料主來源 | 簽到、闖關進度、作答、領獎等交易資料以 Firestore 為主；Google Sheet 僅作匯入/匯出與報表輔助 |
+| 認證與授權 | `auth/*`、`staff/*` 端點之身份驗證與權限檢查，需對齊 Firebase Authentication 與 Security Rules/後端授權策略 |
+| 站點 QR 安全 | `stations/verify` 仍以 signed JWT 驗簽、`exp`、`jti` 防重播為最低要求；不得僅信任前端傳入站點參數 |
+| 成本與容量 | 用量估算、預算告警與連線策略以 `summary-backend.md`、`summary-traffic.md`、`summary-deployment.md` 為準，本檔不重複維護計價表 |
 
 ---
 
@@ -233,6 +251,68 @@
 
 ---
 
+## 12. 前端與後端 API 實際動作流程圖
+
+以下示意「使用者從進場到領獎」的主要 API 往返路徑，供前後端與測試對齊。
+
+```mermaid
+sequenceDiagram
+  autonumber
+  participant U as 使用者
+  participant FE as Frontend (Vue)
+  participant API as Backend API (/api/v1)
+  participant DB as Firebase (Firestore)
+
+  U->>FE: 掃入口 QR / 開啟連結
+  FE->>API: POST /entry/verify (選用)
+  API-->>FE: 入口驗證結果
+
+  alt 報到路徑
+    U->>FE: 填報到資料
+    FE->>API: POST /checkin
+    API->>DB: 寫入報到資料
+    API-->>FE: 報到成功
+    FE->>API: GET /checkin/status
+    API-->>FE: 已報到狀態
+  else 闖關路徑
+    U->>FE: 填闖關登入
+    FE->>API: POST /auth/login
+    API-->>FE: Session 建立成功
+
+    FE->>API: GET /me/dashboard
+    API->>DB: 讀取關卡與進度
+    API-->>FE: stages + progress
+
+    loop 每關到站與作答
+      U->>FE: 掃關卡 QR
+      FE->>API: POST /stations/verify
+      API-->>FE: challengeId
+      FE->>API: GET /challenges/{challengeId}
+      API-->>FE: 題目內容
+      U->>FE: 送出答案
+      FE->>API: POST /challenges/{challengeId}/attempts
+      API->>DB: 更新作答結果與進度
+      API-->>FE: correct / nextStageId
+    end
+
+    opt 完成後再玩一輪
+      FE->>API: POST /me/playthrough/restart
+      API->>DB: 重置本輪進度
+      API-->>FE: fullClearCount / remainingRounds
+    end
+
+    opt 櫃台領獎
+      FE->>API: POST /staff/redeem/token
+      API-->>FE: 短期 token
+      FE->>API: POST /staff/redeem/confirm
+      API->>DB: 寫入領獎紀錄
+      API-->>FE: redeem confirmed
+    end
+  end
+```
+
+---
+
 ## 修訂紀錄
 
 | 版本 | 日期 | 說明 |
@@ -242,3 +322,6 @@
 | v0.1.2 | 2026-04-19 | §11：補註前端已將 dashboard 讀取與畫面編排分離（`api/rewardClaimStatus.ts`、`lib/rewardClaimPresentation.ts`、`composables/useRewardClaimPresentation.ts`）；**端點與欄位語意**仍以此規格為準 |
 | v0.1.3 | 2026-04-19 | §11：補 **Vitest** 客戶端測試註記（`rewardClaimStatus.test.ts` 等）；**不重**定義 REST 路徑或 `progress` 語意 |
 | v0.1.4 | 2026-04-19 | 檔首：**dashboard** 端點改為 **`GET /api/v1/me/dashboard`**（與本文端點表一致；**無**契約變更） |
+| v0.1.5 | 2026-04-27 | 新增「Firebase 實作對齊註記」：補充 API 契約層與 Firebase 定案（Firestore/Realtime DB/Auth/Security Rules）之連動邊界；**不改**端點 |
+| v0.1.6 | 2026-04-27 | 新增「前端與後端 API 實際動作流程圖」：補充從進場、報到、闖關到領獎的前後端呼叫順序 |
+| v0.1.7 | 2026-04-27 | 全域約定新增「傳輸加密 / Cookie 安全 / 敏感資料保護」：要求 HTTPS（TLS 1.2+）與個資遮罩，降低資料外洩風險 |

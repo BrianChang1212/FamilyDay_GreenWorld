@@ -106,7 +106,7 @@ npm run dev
 
 ### 公開預覽部署 · 測試 Web UI
 
-> 給他人用手機／瀏覽器試操作，可不接後端；與 [`docs/architecture/summary-deployment.md`](docs/architecture/summary-deployment.md) **§1.1**（修訂 **v1.4**）、[`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) **§4** 互相連結。
+> 給他人用手機／瀏覽器試操作，可不接後端；與 [`docs/architecture/summary-deployment.md`](docs/architecture/summary-deployment.md) **§1.1**（修訂 **v1.5**）、[`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) **§4** 互相連結。
 
 靜態檔來自 `source/` 的 `npm run build` 產物（`source/dist`）。**建議優先使用 Netlify**（子路徑與 Vue Router 較省事）；亦可使用本倉庫內建的 GitHub Actions 發布至 GitHub Pages。
 
@@ -153,7 +153,7 @@ npm run dev
 
 ### 介面預覽（截圖）
 
-以下為 **`source/` 生產建置**（`npm run build`）後，以 **390×844**（常見手機寬度）全頁截圖；與 [Netlify 測試站](#preview-netlify-test-ui)／本機 `npm run preview` **同一套輸出**。原始檔置於 [`docs/preview/screenshots/`](docs/preview/screenshots/)（重新產生步驟見 [`docs/preview/README.md`](docs/preview/README.md)）。
+以下為 **`source/` 生產建置**（`npm run build`）後，以 **390×844**（常見手機寬度）全頁截圖；與 [Netlify 測試站](#preview-netlify-test-ui)／本機 `npm run preview` **同一套輸出**。原始檔置於 [`docs/preview/screenshots/`](docs/preview/screenshots/)（重新產生步驟見 [`docs/media/README.md`](docs/media/README.md)）。
 
 | 歡迎 `/` | 報到 `/checkin` |
 | :---: | :---: |
@@ -187,14 +187,14 @@ npm run dev
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
 | 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-20（頁尾 **v2.49**）；細節見 [`docs/demo/README.md`](docs/demo/README.md)、[`docs/preview/`](docs/preview/)、[`docs/project/專案文件.md`](docs/project/專案文件.md)（合併版 **v1.3.26**；`summary-frontend` **v1.25**：**`views/`** 分群、`FINISH_REWARD_SLOTS` 併 **`constants`**） |
+| 最後更新 README | 2026-04-27（頁尾 **v2.51**）；細節見 [`docs/media/README.md`](docs/media/README.md)、[`docs/project/專案文件.md`](docs/project/專案文件.md)（合併版 **v1.3.28**；`summary-frontend` **v1.26**：版本鏈同步） |
 
 
 ---
 
 ## Demo 影片預覽
 
-內嵌播放與檔名、GitHub／本機預覽注意事項見 **[`docs/demo/README.md`](docs/demo/README.md)**。若下列路徑無檔案，請改點後援連結。
+內嵌播放與檔名、GitHub／本機預覽注意事項見 **[`docs/media/README.md`](docs/media/README.md)**。若下列路徑無檔案，請改點後援連結。
 
 <video src="docs/demo/family-day-prototype-demo.mp4" controls playsinline width="100%" style="max-width:720px;border-radius:8px"></video>
 
@@ -204,189 +204,43 @@ npm run dev
 
 ## 技術架構
 
-
-| 層級  | 內容                                                                                                                                                                    |
-| --- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 前端  | Web UI；**已實作原型**：Vue 3 + Vite + TypeScript + Tailwind CSS + Vue Router（`source/`）；字體：Noto Sans TC／Noto Serif TC。**Naive UI** 仍為草案選項，**尚未**安裝；表單與版面以 Tailwind 自製為主；RWD |
-| 後端  | **草案**：**FastAPI** + **PostgreSQL**（即時資料）；**Sheet** 輔助匯入／匯出（見 `docs/architecture/summary-backend.md`）                                                                 |
-| 效能  | 約 1,300 人活動規模；**在線≠固定 RPS**；壓測見 `docs/architecture/summary-traffic.md`                                                                                                |
-
-
-### 前端路由補充（原型）
-
-
-| 路徑 | 說明 |
+| 層級 | 重點 |
 | --- | --- |
-| `/check-in` | **報到 QR**：寫入意圖後導向 **`/checkin`**（單頁三欄＋確認彈窗→完成頁）。 |
-| `/game` | **闖關入口 QR**：寫入意圖後導向 **`/` 歡迎頁**（再依序說明→登入→地圖）。 |
-| `?entry=checkin` / `?entry=game` | 僅寫入 **`sessionStorage` 意圖**（`beforeEach`）；**不**等同開啟 `/check-in`／`/game` 的轉址；見 [`summary-frontend.md`](docs/architecture/summary-frontend.md) §2.1。 |
-| `/register` | **闖關登入**（姓名／員編）；送出後 **`/stage`**。若意圖誤為報到則導向 **`/checkin`**。 |
-| `/checkin` | **報到**單頁（姓名、員編、同行人數）＋確認彈窗；完成後僅 **`/checkin/complete`**。 |
-| `/checkin/complete` | 報到完成頁；參加闖關須**另掃闖關 QR**（如 `/game`）。報到動線見 [`summary-frontend.md`](docs/architecture/summary-frontend.md) **§2.2**（含流程圖）。 |
-| `/finish` | 完成頁保證領獎原型（`FinishView.vue`）：確認領獎彈窗。規格見 [`docs/project/專案文件.md`](docs/project/專案文件.md)、[`summary-frontend.md`](docs/architecture/summary-frontend.md)。 |
-| `/finish/claimed` | 領取成功頁（`ClaimSuccessView.vue`）：已設定 **`VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 呈現三格狀態；**未**設定時（含預覽站）以 **`local-fallback`**／`sessionStorage` 類比；載入邏輯見 **`source/src/composables/useRewardClaimPresentation.ts`**、**`source/src/lib/rewardClaimPresentation.ts`**、**`source/src/api/rewardClaimStatus.ts`**。詳 [`summary-frontend.md`](docs/architecture/summary-frontend.md) §2.1、§2（**v1.25**）。 |
+| 前端 | Vue 3 + Vite + TypeScript + Tailwind + Vue Router（`source/`） |
+| 後端 | Firebase（Firestore 為主，Realtime Database 視場景啟用） |
+| API 契約 | `docs/specs/api-v0.1.md` |
+| 架構摘要 | 前端：`docs/architecture/summary-frontend.md`、後端：`docs/architecture/summary-backend.md`、部署：`docs/architecture/summary-deployment.md`、流量：`docs/architecture/summary-traffic.md` |
 
+### 快速路由（原型）
 
-### 系統架構圖
+- 報到入口：`/check-in` -> `/checkin` -> `/checkin/complete`
+- 闖關入口：`/game` -> `/` -> `/register` -> `/stage`
+- 領獎頁：`/finish`、`/finish/claimed`
 
-以下為**邏輯架構**（實作可為自建 API、Serverless 或 Google Apps Script Web App 等，依 `docs/project/專案文件.md`「技術規格」定案）。**原型與產品準線：** **報到**與**闖關入口**為**不同 QR／URL**（見 [使用者流程](#使用者流程)）；報到完成後**不**自動進入闖關，須**另掃闖關 QR**（與舊版「簽到後直連闖關」示意圖不同）。**各關到站**以**現場關卡 QR code** 掃描由後端驗證（QR 內容須避免可被輕易偽造或重播；細節於技術規格定案）。
-
-```mermaid
-flowchart TB
-  subgraph client["使用者端"]
-    U[瀏覽器<br/>手機／平板／電腦]
-  end
-
-  subgraph entry["進場（兩類入口 · 分流）"]
-    QR1[報到專用 QR／連結<br/>例如 /check-in]
-    QR2[闖關入口 QR／連結<br/>例如 /game]
-  end
-
-  subgraph fe["前端 Web（同一 SPA · 不同路由）"]
-    P1[簽到介面<br/>報到表單／完成頁]
-    P2[闖關介面<br/>歡迎→說明→登入→地圖／答題…]
-  end
-
-  subgraph be["後端應用層"]
-    API[API／應用服務<br/>驗證、業務規則、同步]
-  end
-
-  subgraph data["資料層"]
-    GS[("Google Sheet<br/>名冊／出席／輕量統計")]
-    DB[("Database<br/>闖關進度／兌獎／高併發寫入")]
-  end
-
-  subgraph onsite["現場（園區 · 各關卡）"]
-    SQ[關卡 QR code<br/>立牌／現場布置]
-  end
-
-  U --> QR1
-  U --> QR2
-  QR1 --> P1
-  QR2 --> P2
-  P1 -.->|不自動銜接<br/>須另掃闖關 QR| QR2
-  P1 --> API
-  P2 --> API
-  API --> GS
-  API --> DB
-  P2 -.->|掃描驗證到站| SQ
-  SQ -.->|開啟／帶入關卡資訊| U
-```
-
-
-
-**主要資料流（摘要）**
-
-```mermaid
-sequenceDiagram
-  autonumber
-  participant U as 使用者
-  participant FE as 前端
-  participant API as 後端 API
-  participant GS as Google Sheet
-  participant DB as Database
-
-  U->>FE: 開啟簽到 QR／連結
-  FE->>API: 簽到（工號、姓名、同行人數）
-  API->>GS: 查名冊、寫入出席
-  API-->>FE: 報到結果
-
-  U->>FE: 闖關：掃描該關 QR、作答
-  FE->>API: 關卡／到站驗證（QR）／答案提交
-  API->>DB: 讀寫闖關狀態、嘗試紀錄
-  API->>GS: 選配：統計或稽核寫入
-  API-->>FE: 關卡結果／可否兌獎
-
-  FE->>API: 闖關禮兌換／核銷狀態（櫃檯佐證）
-  API->>DB: 寫入兌獎紀錄
-  API-->>FE: 兌換結果
-```
-
-
+完整流程圖與資料流請看 `docs/project/專案文件.md`（需求與流程、技術規格）及 `docs/architecture/summary-frontend.md`。
 
 ---
 
 ## 規格與活動內容
 
-### 已確認規格（摘要）
+| 項目 | 摘要 |
+| --- | --- |
+| 活動規模 | 約 1,000～1,300 人 |
+| 核心功能 | 現場報到 + 闖關遊戲（同一 Web App、不同路由） |
+| 報名規則 | 1+3 免費，第 5 人起加收 |
+| 闖關規則 | 6 關，答錯可重答，同工號最多 3 次/3 份 |
 
-
-| 項目        | 規格                                                                                                     |
-| --------- | ------------------------------------------------------------------------------------------------------ |
-| 預估人流      | 約 1,000～1,300 人                                                                                        |
-| 範圍        | **本專案核心**：現場簽到 Web + 闖關遊戲 Web；**事前報名**預計用 Google 表單／企業維信表單（產出報名清冊 Excel，詳見 `docs/project/專案文件.md`）     |
-| 平台        | Web UI（手機、平板、電腦瀏覽器）                                                                                    |
-| 後端        | **草案**：**PostgreSQL** 扛即時簽到／闖關；**Google Sheet** 以報名清冊匯入／報表為主（見 `docs/architecture/summary-backend.md`） |
-| 介面        | **簽到頁** + **闖關頁**（兩個獨立頁面／路由；**同一 Web App**；**報到**為 **`/checkin` 單頁**，**闖關**經 **`/register` 登入**；**報到 QR** 與**闖關 QR** 分流入，見 [使用者流程](#使用者流程)）                                                                              |
-| 關卡        | 園內 **6 關**；到站掃**實體 QR**；題型建議**三選一**或圈選題（簡單有趣）                                                          |
-| 名額／費用（報名） | **1+3**（員工 + 3 名眷屬）免費；**第 5 人起**須額外收費（標準見表單規則）                                                         |
-| 闖關／獎項     | 一個工號**最多參加 3 次**，最多領 **3 份闖關紀念品**；完成六關後至**大草皮櫃檯**由工作人員驗證畫面領獎；**獎品限量、先到先選**                             |
-
-
-### 六大闖關地點（主題區）
-
-會議舉例：**水鳥區、天鵝湖**等六大主題區（與園區實地 QR 布點以**5 月下旬場勘**後定案）。先前提案亦曾列：大探奇區、水生植物公園、鳥園、蝴蝶園、生物多樣性探索區等，**以上併列供對照，以場勘與主辦最終配置為準**。
-
-### 執行階段（摘要）
-
-
-| 階段      | 內容                          | 狀態                             |
-| ------- | --------------------------- | ------------------------------ |
-| 流程與內容規劃 | 流程架構、UX、闖關機制                | 進行中                            |
-| UI 設計   | Wireframe／主視覺（KV、CIS）與設計稿交付 | 待開始（**程式碼級介面**已在 `source/` 迭代） |
-| 開發與測試   | 前後端、多裝置測試、兌獎與驗收             | 前端原型進行中；後端與 E2E 待開始            |
-
-
-### 時程（0410 會議＋提案對照）
-
-- **活動舉辦日**：確認中（偏好**六月底**，或**七月初**）；舊提案曾寫 5 月底前**完成開發**，仍以**活動日前驗收**為準。
-- **主視覺**：目標 **4/17 前**確認，供設計素材。
-- **流程／介面／文案**：**4/24 前**定案；並以**雙週會**追蹤進度。
-- **實地場勘**：預計 **5 月下旬**綠世界場勘（關卡 QR 與動線）。
+完整規格與時程請看 `docs/project/專案文件.md`。
 
 ---
 
 ## 使用者流程
 
-### QR 進入點與登入／表單（2026-04-18）
+- 報到：掃報到 QR -> 報到單頁 -> 完成頁（不自動進闖關）
+- 闖關：掃闖關入口 QR -> 歡迎/說明 -> 登入 -> 地圖/關卡 -> 完成領獎
+- 各關到站：掃現場關卡 QR 驗證
 
-- **同一 Web 應用**內，簽到與闖關為**不同路由／畫面**。**闖關線**經 **`/register`（闖關登入）** 填姓名／員編；**報到線**經 **`/checkin` 單頁** 一次填姓名／員編／同行人數（**不**先走闖關登入頁）。  
-- **掃報到用 QR**（或報到連結）→ **`/checkin`**（單頁＋確認彈窗）→ **報到完成頁**；**不**自動進入闖關。  
-- **掃闖關入口 QR**（或遊戲連結）→ **`/` 歡迎** → 遊戲說明 → **`/register`** → **`/stage`**（細節見 [`summary-frontend.md`](docs/architecture/summary-frontend.md) §2.1）。  
-- 各關**到站**仍掃**該關實體 QR** 進入題目；URL 應保留進入意圖與站點參數（登入流程不應遺失）。詳見 [`docs/project/專案文件.md`](docs/project/專案文件.md) §2.4、§4.1。  
-- **待產品定案**：未完成報到者是否允許開始闖關（建議由路由或後端強制）。
-
-### 事前報名（表單；非本 Web 專案本體）
-
-- 平台：Google 表單或企業維信表單；產出報名清冊（如 Excel）。  
-- 收集：工號、姓名、參加人數、**每位參加者**身分證字號與出生年月日（**保險**所需）、交通（是否搭遊覽車）、午餐桌次等。  
-- 名額：**1+3** 免費；**第 5 人起**加收（表單須載明規則與收費標準）。
-
-### 現場簽到
-
-**流程圖（與線框步驟）：** [`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) **§2.2**。
-
-1. 掃描**報到專用 QR code**（或報到連結）進入應用程式（原型：`/check-in` → `/checkin`）  
-2. 於**同一頁**填寫**姓名、員編、同行人數** → **確認彈窗** → 送出後僅 **`/checkin/complete`**，**不**連到闖關（**不**先經闖關用之 `/register`）  
-3. **目的**：作為**補休假**核發憑證之一；並與**餐飲／門票**等預約數據核對  
-4. 依**報名人數**領取第一份**報到禮**（現場動線）  
-5. **闖關**：須**另掃闖關專用 QR**（如 `/game` 連結）才可進入闖關流程（與報到畫面分離）
-
-### 闖關
-
-**啟動**：掃描**闖關入口 QR**（或連結）進入；**與報到分開**（報到另掃報到 QR）。詳見 [`docs/project/專案文件.md`](docs/project/專案文件.md) **§3.1.1**、[`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) **§2.3**（流程圖同節）。**報到**流程圖見同檔 **§2.2**。
-
-**掃完闖關入口後 — 畫面順序（線框）**
-
-1. **歡迎頁** → 2. **遊戲說明** → 3. **闖關登入頁**（**全屏表單**，非彈窗；標題常為「請輸入您的基本資料」）：僅 **姓名**、**員工編號**（**不含**報到之同行人數）→ **確定**後 **開始闖關**  
-4. **每一關**：到站頁 → 掃**該關站點 QR** → **題目**（未選答案前不可確定）→ 答錯可**重答**／答對**下一關** → 至 6／6  
-5. **完成闖關** → **領取闖關禮**（含確認彈窗、成功狀態；**工作人員**核銷）→ 與會議「大草皮櫃檯驗畫面」一致
-
-**規則（0410 會議）**
-
-- 題型：建議**三選一**或圈選題；**答錯可立即重答，直到答對為止**（鼓勵參與）。  
-- 同一**工號**最多參加 **3 次**（眷屬分頭闖關或同人重複玩皆可），最多領 **3 份**闖關紀念品。  
-- **獎項**：種類**限量**，採**先到先選**制。
+完整分流與畫面順序請看 `docs/project/專案文件.md` 與 `docs/architecture/summary-frontend.md`。
 
 ---
 
@@ -421,10 +275,10 @@ sequenceDiagram
 細節見 `docs/project/專案文件.md`（開頭補充文件表）及 `docs/architecture/summary-*.md`。
 
 1. **前端（草案簽核中；實作現況見上表）：** Vue 3 + Vite + TypeScript + Tailwind + Vue Router；**Naive UI** 可選、尚未納入 `package.json`
-2. **Database（草案）：** PostgreSQL
+2. **Database（定案）：** Firebase（Firestore 為主，Realtime Database 視場景啟用）
 3. **RWD：** 需要（手機優先）
 4. **Sheet：** 匯入／匯出與同步時機（仍待確認）
-5. **部署：** PaaS／Neon+Cloud Run／公司 DMZ 等（見 `docs/architecture/summary-deployment.md`）
+5. **部署：** Firebase 專案與 Blaze 預算告警（見 `docs/architecture/summary-deployment.md`）
 
 ### 專案進度（概覽）
 
@@ -462,12 +316,12 @@ sequenceDiagram
 
 | 路徑                | 用途                                                                                                                |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `docs/`           | 見 [`docs/README.md`](docs/README.md)（含 `project/`、`specs/`、`architecture/`、`demo/`、**`preview/`** 介面截圖等子目錄說明） |
+| `docs/`           | 見 [`docs/README.md`](docs/README.md)（含 `project/`、`specs/`、`architecture/`、`media/`、`demo/`、`preview/` 等子目錄說明） |
 | `assets/`         | 設計稿、KV、Logo、CIS（註明版本與來源）                                                                                          |
 | `source/`         | 前端（Vue 3 + Vite + TS + Tailwind + Vue Router）：`npm install` → `npm run dev`（預設 `http://localhost:5173`）；**`npm run test`**（Vitest）。路由頁面於 **`src/views/home`**、**`onboarding`**、**`auth`**、**`checkin`**、**`quest`** |
 | `.cursor/skills/` | Cursor Agent 用技能說明（前端設計、文案／在地化等）；選用，**非**執行期依賴                                                                    |
 | `test/`           | 倉庫根目錄**驗收／測試紀錄**用（**選用**；目前僅 **`.gitkeep`**）。**程式單元測試**在 **`source/src/**/*.test.ts`**（Vitest），非此資料夾 |
-| `tool/`           | 輔助腳本（**選用**）：例如 [`tool/capture-preview-screenshots.ps1`](tool/capture-preview-screenshots.ps1)（重產 [`docs/preview/screenshots/`](docs/preview/screenshots/)，見 [`docs/preview/README.md`](docs/preview/README.md)）；另含 **`.gitkeep`** |
+| `tool/`           | 輔助腳本（**選用**）：例如 [`tool/capture-preview-screenshots.ps1`](tool/capture-preview-screenshots.ps1)（重產 [`docs/preview/screenshots/`](docs/preview/screenshots/)，見 [`docs/media/README.md`](docs/media/README.md)）；另含 **`.gitkeep`** |
 | `graphify-out/`   | 圖譜／分析工具輸出（HTML／JSON／報告）；**已列於 `.gitignore`**，避免大量快取進版控                                                                 |
 
 
@@ -485,12 +339,12 @@ sequenceDiagram
 | 詳細規格（單檔）     | `docs/project/專案文件.md`（需求、待確認、專案狀態、技術規格、提案來源、維護附錄）               |
 | API 草案（v0.1） | `docs/specs/api-v0.1.md`（REST 端點、範例 JSON、畫面對照；修訂紀錄至 **v0.1.4**） |
 | 前端討論總結       | `docs/architecture/summary-frontend.md`（Vue3／Vite／模組與 UX、API 銜接） |
-| 後端討論總結       | `docs/architecture/summary-backend.md`（FastAPI／PostgreSQL、模型與安全） |
+| 後端討論總結       | `docs/architecture/summary-backend.md`（Firebase、資料模型與安全規則） |
 | 架設環境討論總結     | `docs/architecture/summary-deployment.md`（雲／內網／PaaS、區域與採購注意）     |
 | 流量分析討論總結     | `docs/architecture/summary-traffic.md`（在線與 RPS、尖峰、限流、壓測）         |
 | 提案／線框 PDF   | `docs/proposals/FamilyDayApp_Proposal_v1.pdf`、`FamilyDayApp_wireframe_v2.pdf` |
 | 設計資產說明       | `assets/README.md`                                               |
-| 操作示範錄影       | [`docs/demo/README.md`](docs/demo/README.md)（內嵌播放見本 README [Demo 影片預覽](#demo-影片預覽)） |
+| 操作示範錄影與截圖維護 | [`docs/media/README.md`](docs/media/README.md)（內嵌播放見本 README [Demo 影片預覽](#demo-影片預覽)） |
 
 
 ### 快速查找
@@ -502,7 +356,7 @@ sequenceDiagram
 | 系統架構與資料流圖     | 本 README [技術架構](#技術架構)（在 [Demo 影片預覽](#demo-影片預覽) 之後） |
 | 完整需求、待辦、進度、技術 | `docs/project/專案文件.md`（內有章節目錄）   |
 | 前後端與部署／流量定案摘要 | `docs/architecture/summary-*.md` |
-| 畫面操作 Demo       | 本頁 [Demo 影片預覽](#demo-影片預覽)／[`docs/demo/README.md`](docs/demo/README.md) |
+| 畫面操作 Demo       | 本頁 [Demo 影片預覽](#demo-影片預覽)／[`docs/media/README.md`](docs/media/README.md) |
 
 
 ### 建議閱讀順序（角色）
@@ -527,4 +381,4 @@ sequenceDiagram
 
 ---
 
-*README v2.49 · 2026-04-20（`summary-frontend` **v1.25**：**`views/`** 分群與文件對齊；`專案文件` **v1.3.26**；v2.48）*
+*README v2.51 · 2026-04-27（版本鏈同步：`summary-frontend` **v1.26**、`summary-backend` **v1.5**、`summary-deployment` **v1.5**、`summary-traffic` **v1.2**；前版 v2.50）*

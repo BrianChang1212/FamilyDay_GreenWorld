@@ -165,7 +165,7 @@ flowchart TD
 
 - 開發期：可於 **`vite.config`** 設定 **proxy** 指向本機或測試 API（`source/vite.config.ts` **目前未**預設 proxy，由專案依環境補上）。  
 - 正式／測試建置：於 **`source/`** 設定 **`VITE_API_BASE`** = API **主機根**（**無**尾隨 `/`），例如 `https://api.example.com` 或同源 `https://event.example.com`；程式會請求 **`{VITE_API_BASE}/api/v1/...`**（見 **`source/src/lib/apiBase.ts`**）。**舊稿若寫 `VITE_API_BASE_URL` 應改為此名稱。**  
-- **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`source/vite.config.ts`** 與根 [`README.md`](../../README.md#preview-netlify-test-ui)「**公開預覽部署 · 測試 Web UI**」（錨點 **`preview-netlify-test-ui`**；含 **Netlify 範例網址**、**`/check-in`**／**`/game`** QR 分流、與 **`main` 連動**；[`summary-deployment.md`](./summary-deployment.md) **§1.1** **v1.4** 摘要連動）。  
+- **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`source/vite.config.ts`** 與根 [`README.md`](../../README.md#preview-netlify-test-ui)「**公開預覽部署 · 測試 Web UI**」（錨點 **`preview-netlify-test-ui`**；含 **Netlify 範例網址**、**`/check-in`**／**`/game`** QR 分流、與 **`main` 連動**；[`summary-deployment.md`](./summary-deployment.md) **§1.1** **v1.5** 摘要連動）。  
 - **關卡瀏覽與領取狀態呈現**：可共用 **`GET /api/v1/me/dashboard`**（合併 API）；HTTP 與 JSON 映射見 **`source/src/api/rewardClaimStatus.ts`**；領取成功頁之 mock／API／fallback 編排見 **`lib/rewardClaimPresentation.ts`** 與 **`composables/useRewardClaimPresentation.ts`**。  
 - 完整端點列表見 [`api-v0.1.md`](../specs/api-v0.1.md)。
 
@@ -220,3 +220,4 @@ flowchart TD
 | 1.23 | 2026-04-19 | **§1.1**：**Vitest** 單元測試（`source/src/**/*.test.ts`）、指令與 **`.github/workflows/ci.yml`**（`npm run test` → build） |
 | 1.24 | 2026-04-20 | **§2／§2.1**：補 `source/src/constants/index.ts`（`APP_CONFIG`／`GAME_CONFIG`／`STORAGE_KEYS`）與 `useI18n.ts`、`i18n/zh-TW.ts` 之集中化描述；狀態鍵改述為 `STORAGE_KEYS` 單一來源 |
 | 1.25 | 2026-04-20 | **§2**：`views/` 依路由分群（**`home/`**、**`onboarding/`**、**`auth/`**、**`checkin/`**、**`quest/`**）；**`FINISH_REWARD_SLOTS`** 併入 **`constants/index.ts`** 敘述；**§2.1**、**§3** 領獎槽位說明改與程式一致（移除已刪之 **`lib/constants/finishReward.ts`** 路徑） |
+| 1.26 | 2026-04-27 | 版本鏈同步：部署摘要引用更新為 `summary-deployment` **v1.5** |
