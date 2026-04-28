@@ -187,7 +187,7 @@ npm run dev
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
 | 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-27（頁尾 **v2.51**）；細節見 [`docs/media/README.md`](docs/media/README.md)、[`docs/project/專案文件.md`](docs/project/專案文件.md)（合併版 **v1.3.28**；`summary-frontend` **v1.26**：版本鏈同步） |
+| 最後更新 README | 2026-04-28（頁尾 **v2.52**）；細節見 [`docs/media/README.md`](docs/media/README.md)、[`docs/project/專案文件.md`](docs/project/專案文件.md)（合併版 **v1.3.29**；`summary-frontend` **v1.26**：版本鏈同步） |
 
 
 ---
@@ -381,4 +381,4 @@ npm run dev
 
 ---
 
-*README v2.51 · 2026-04-27（版本鏈同步：`summary-frontend` **v1.26**、`summary-backend` **v1.5**、`summary-deployment` **v1.5**、`summary-traffic` **v1.2**；前版 v2.50）*
+*README v2.52 · 2026-04-28（版本鏈同步：`summary-frontend` **v1.26**、`summary-backend` **v1.5**、`summary-deployment` **v1.5**、`summary-traffic` **v1.2**；前版 v2.51）*
