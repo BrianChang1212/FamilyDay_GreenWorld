@@ -17,6 +17,7 @@ npm run mock:api
 
 預設埠號：`8787`  
 可透過環境變數調整：`MOCK_API_PORT=9000 npm run mock:api`
+PowerShell 寫法：`$env:MOCK_API_PORT=9000; npm run mock:api`
 
 ### 1.2 設定前端 API Base
 
@@ -77,6 +78,11 @@ curl "http://localhost:8787/api/v1/me/dashboard?scenario=error"
 - 在設定 `VITE_API_BASE` 後，`/finish/claimed` 可讀取 Mock API 並正常呈現
 - 針對錯誤與非法資料，畫面不崩潰且有可理解狀態
 - `npm run test:api:all` 全部 PASS（全站 API smoke test）
+
+## 4.1) 報到身分配對（Mock DB）
+
+- `POST /api/v1/checkin` 需符合 `source/mock/db.json` 的 `employees` 配對。
+- 若姓名與員工編號不一致，預期回 `401`，`code=CHECKIN_IDENTITY_MISMATCH`。
 
 ---
 

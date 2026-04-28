@@ -41,12 +41,5 @@
       "name": "Ivy"
     }
   ],
-  "checkins": [
-    {
-      "employeeId": "1141041",
-      "name": "Brian",
-      "partySize": 16,
-      "checkinAt": "2026-04-28T09:45:17.794Z"
-    }
-  ]
+  "checkins": []
 }

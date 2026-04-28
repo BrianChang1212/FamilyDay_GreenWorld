@@ -63,7 +63,7 @@ npm -v
 **3. 安裝專案相依套件（在 `source/`）**
 
 ```powershell
-cd D:\Brian\dev\FamilyDay_GreenWorld\source
+cd source
 npm install
 ```
 
@@ -337,7 +337,7 @@ npm run dev
 | 總覽           | `README.md`（本文件）                                                 |
 | 文件索引         | `docs/README.md`（`docs/` 分類導覽）                                   |
 | 詳細規格（單檔）     | `docs/project/專案文件.md`（需求、待確認、專案狀態、技術規格、提案來源、維護附錄）               |
-| API 草案（v0.1） | `docs/specs/api-v0.1.md`（REST 端點、範例 JSON、畫面對照；修訂紀錄至 **v0.1.4**） |
+| API 草案（v0.1） | `docs/specs/api-v0.1.md`（REST 端點、範例 JSON、畫面對照；修訂紀錄見檔尾） |
 | 前端討論總結       | `docs/architecture/summary-frontend.md`（Vue3／Vite／模組與 UX、API 銜接） |
 | 後端討論總結       | `docs/architecture/summary-backend.md`（Firebase、資料模型與安全規則） |
 | 架設環境討論總結     | `docs/architecture/summary-deployment.md`（雲／內網／PaaS、區域與採購注意）     |

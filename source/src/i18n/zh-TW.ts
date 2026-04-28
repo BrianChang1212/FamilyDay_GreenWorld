@@ -26,7 +26,7 @@ export const zhTW = {
       name: '姓名',
       namePlaceholder: '請輸入您的姓名',
       employeeId: '員工編號',
-      employeeIdPlaceholder: '例如：AM12345',
+      employeeIdPlaceholder: '例如：1141041',
       companions: '同行人數',
       companionUnit: '位',
       self: '（本人）',

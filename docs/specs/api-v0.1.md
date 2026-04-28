@@ -1,6 +1,6 @@
 # 家庭日綠世界闖關 Web — API 規格（v0.1 草案）
 
-> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.7** 新增傳輸加密與敏感資料保護要求；**v0.1.6** 新增前後端 API 實際動作流程圖；**v0.1.5** 新增 Firebase 實作對齊註記；**v0.1.4** 檔首用語與 § 端點表一致；**v0.1.3** 補前端 **Vitest** 對 dashboard 客戶端映射之測試註記；**v0.1.2** 起之前端分層註記仍適用；**不改**端點定義）。
+> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.8** 新增 mock 行為差異註記；**v0.1.7** 新增傳輸加密與敏感資料保護要求；**v0.1.6** 新增前後端 API 實際動作流程圖；**v0.1.5** 新增 Firebase 實作對齊註記；**v0.1.4** 檔首用語與 § 端點表一致；**v0.1.3** 補前端 **Vitest** 對 dashboard 客戶端映射之測試註記；**v0.1.2** 起之前端分層註記仍適用；**不改**端點定義）。
 
 ---
 
@@ -33,6 +33,20 @@
 | 認證與授權 | `auth/*`、`staff/*` 端點之身份驗證與權限檢查，需對齊 Firebase Authentication 與 Security Rules/後端授權策略 |
 | 站點 QR 安全 | `stations/verify` 仍以 signed JWT 驗簽、`exp`、`jti` 防重播為最低要求；不得僅信任前端傳入站點參數 |
 | 成本與容量 | 用量估算、預算告警與連線策略以 `summary-backend.md`、`summary-traffic.md`、`summary-deployment.md` 為準，本檔不重複維護計價表 |
+
+---
+
+## Mock 驗證差異註記（`source/mock/server.js`）
+
+此章節僅描述目前 mock server 之簡化行為，避免與正式 API 契約混淆：
+
+| 項目 | 目前 Mock 行為 | 正式契約定位 |
+|------|------|------|
+| `POST /api/v1/checkin` | 需符合 `source/mock/db.json` 的 `employees` 對照；不符回 `401 CHECKIN_IDENTITY_MISMATCH` | 正式版應依名冊/身份服務驗證 |
+| `GET /api/v1/events/{eventId}` | 僅實作固定路徑 `/api/v1/events/familyday-2026` | 正式版維持 `{eventId}` 動態路由 |
+| `POST /api/v1/stations/verify` | 僅 smoke 回應，未實作 JWT 驗簽/exp/jti | 正式版需完整 JWT 安全檢查 |
+| `GET /api/v1/me/dashboard` | 回應為前端驗證所需最小欄位集 | 正式版回應以本文件示例為準 |
+| `POST /api/v1/challenges/{challengeId}/attempts` | request 用 `answer`，response 用 `nextChallengeId` | 正式版欄位仍以 `choiceId` / `nextStageId` 為目標 |
 
 ---
 
@@ -73,11 +87,13 @@
 
 ```json
 {
-  "employeeId": "E12345",
-  "name": "王小明",
+  "employeeId": "1141041",
+  "name": "Brian",
   "partySize": 3
 }
 ```
+
+> Mock 測試資料請以 `source/mock/db.json` 的 `employees` 為準；例如 `1141041 / Brian`。
 
 ---
 
@@ -325,3 +341,4 @@ sequenceDiagram
 | v0.1.5 | 2026-04-27 | 新增「Firebase 實作對齊註記」：補充 API 契約層與 Firebase 定案（Firestore/Realtime DB/Auth/Security Rules）之連動邊界；**不改**端點 |
 | v0.1.6 | 2026-04-27 | 新增「前端與後端 API 實際動作流程圖」：補充從進場、報到、闖關到領獎的前後端呼叫順序 |
 | v0.1.7 | 2026-04-27 | 全域約定新增「傳輸加密 / Cookie 安全 / 敏感資料保護」：要求 HTTPS（TLS 1.2+）與個資遮罩，降低資料外洩風險 |
+| v0.1.8 | 2026-04-28 | 新增 mock 驗證差異註記：補 `checkin` 身分對照、`events` 固定路徑、`stations/verify` 安全檢查範圍與 `attempts` mock 欄位差異 |
