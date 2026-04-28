@@ -35,6 +35,7 @@ Windows 安裝、`npm run dev`、`npm run test`、CI 流程）。
 |--------|------|
 | 需求與專案狀態 | [`project/project-master.md`](./project/project-master.md) |
 | API v0.1 草案 | [`specs/api-v0.1.md`](./specs/api-v0.1.md) |
+| Firestore Schema（v1 草案） | [`architecture/firestore-schema-v1.md`](./architecture/firestore-schema-v1.md) |
 | API 整合與 Mock 驗證清單 | [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md) |
 | 前端／後端／部署／流量摘要 | [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) 等 |
 | 測試 Web UI（Netlify、QR） | 根 [`README.md`](../README.md#preview-netlify-test-ui)（錨點 **`preview-netlify-test-ui`**）；部署摘要 [`architecture/summary-deployment.md`](./architecture/summary-deployment.md) **§1.1**（**v1.5**） |

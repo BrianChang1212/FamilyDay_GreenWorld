@@ -120,6 +120,12 @@ Firebase/Google Cloud 可設定 **Budgets & Alerts** 做費用通知，建議：
 - 端點清單、請求／回應範例、畫面對照：**[`api-v0.1.md`](../specs/api-v0.1.md)**。  
 - 後續可由此產生 **OpenAPI** 供前端型別與測試工具使用。
 
+### DB 設計參考入口
+
+- Firestore collections、欄位型別、索引建議、Security Rules 草稿請見：
+  **[`firestore-schema-v1.md`](./firestore-schema-v1.md)**。
+- 本檔維持架構與策略層摘要；`firestore-schema-v1.md` 為資料模型落地草案。
+
 ---
 
 ## 6. 效能實作要點（與流量文件呼應）

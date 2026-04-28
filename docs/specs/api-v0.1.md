@@ -267,7 +267,57 @@
 
 ---
 
-## 12. 前端與後端 API 實際動作流程圖
+## 12. 端點觸發時機圖（Player / Staff / Admin / System）
+
+以下將端點依「觸發角色／時機」分群，避免把營運後台端點誤判為玩家主流程必要呼叫。
+
+```mermaid
+flowchart LR
+  subgraph P[Player Web Flow]
+    P1[掃入口 QR] --> P2[POST /api/v1/entry/verify]
+    P3[報到送出] --> P4[POST /api/v1/checkin]
+    P5[報到頁查狀態] --> P6[GET /api/v1/checkin/status]
+    P7[闖關登入] --> P8[POST /api/v1/auth/login]
+    P9[頁面初始化/刷新] --> P10[GET /api/v1/auth/me]
+    P11[關卡總覽/領取狀態] --> P12[GET /api/v1/me/dashboard]
+    P13[掃站點 QR] --> P14[POST /api/v1/stations/verify]
+    P15[題目頁載入] --> P16[GET /api/v1/challenges/{challengeId}]
+    P17[送答案] --> P18[POST /api/v1/challenges/{challengeId}/attempts]
+    P19[再玩一輪] --> P20[POST /api/v1/me/playthrough/restart]
+  end
+
+  subgraph S[Staff Counter Flow]
+    S1[櫃台人員登入後開啟核銷] --> S2[POST /api/v1/staff/redeem/token]
+    S2 --> S3[POST /api/v1/staff/redeem/confirm]
+  end
+
+  subgraph A[Admin Ops Flow]
+    A1[活動前/中名冊更新] --> A2[POST /api/v1/admin/roster/import]
+    A3[營運看報到] --> A4[GET /api/v1/admin/reports/attendance]
+    A5[營運看闖關進度] --> A6[GET /api/v1/admin/reports/progress]
+  end
+
+  subgraph H[System Health]
+    H1[監控/部署 smoke check] --> H2[GET /api/v1/health]
+    H1 --> H3[GET /api/v1/health/ready]
+  end
+```
+
+| 分群 | 端點 | 典型觸發時機 |
+|------|------|--------------|
+| Player | `/entry/verify` | 入口 QR 驗證（選用） |
+| Player | `/checkin`、`/checkin/status` | 報到送出與報到狀態回查 |
+| Player | `/auth/login`、`/auth/me` | 闖關登入、頁面重整後 session 恢復 |
+| Player | `/me/dashboard` | 關卡總覽、進度刷新、領取成功頁狀態顯示 |
+| Player | `/stations/verify`、`/challenges/*` | 到站驗證與作答循環 |
+| Player | `/me/playthrough/restart` | 完成一輪後重啟下一輪 |
+| Staff | `/staff/redeem/*` | 櫃台核銷與領獎確認 |
+| Admin | `/admin/roster/import`、`/admin/reports/*` | 名冊匯入與營運報表 |
+| System | `/health`、`/health/ready` | 監控、部署後健康檢查 |
+
+---
+
+## 13. 前端與後端 API 實際動作流程圖
 
 以下示意「使用者從進場到領獎」的主要 API 往返路徑，供前後端與測試對齊。
 
@@ -342,3 +392,4 @@ sequenceDiagram
 | v0.1.6 | 2026-04-27 | 新增「前端與後端 API 實際動作流程圖」：補充從進場、報到、闖關到領獎的前後端呼叫順序 |
 | v0.1.7 | 2026-04-27 | 全域約定新增「傳輸加密 / Cookie 安全 / 敏感資料保護」：要求 HTTPS（TLS 1.2+）與個資遮罩，降低資料外洩風險 |
 | v0.1.8 | 2026-04-28 | 新增 mock 驗證差異註記：補 `checkin` 身分對照、`events` 固定路徑、`stations/verify` 安全檢查範圍與 `attempts` mock 欄位差異 |
+| v0.1.9 | 2026-04-28 | 新增「端點觸發時機圖」：依 Player / Staff / Admin / System 分群標示 API 呼叫時機，並將原流程圖章節調整為 §13 |

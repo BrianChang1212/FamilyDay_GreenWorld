@@ -211,6 +211,22 @@ npm run dev
 | API 契約 | `docs/specs/api-v0.1.md` |
 | 架構摘要 | 前端：`docs/architecture/summary-frontend.md`、後端：`docs/architecture/summary-backend.md`、部署：`docs/architecture/summary-deployment.md`、流量：`docs/architecture/summary-traffic.md` |
 
+### API 觸發時機（簡短版）
+
+```mermaid
+flowchart LR
+  P[Player] --> PAPI["entry/checkin/auth/me/dashboard/stations/challenges/restart"]
+  S[Staff] --> SAPI["staff/redeem/token + staff/redeem/confirm"]
+  A[Admin] --> AAPI["admin/roster/import + admin/reports/*"]
+  H[System] --> HAPI["health + health/ready"]
+```
+
+- Player：使用者在報到、闖關、作答、再玩一輪時觸發。
+- Staff：櫃台核銷與領獎確認時觸發。
+- Admin：名冊匯入與營運報表查詢時觸發。
+- System：監控與部署健康檢查時觸發。
+- 完整版（含分群詳圖與端點表）：`docs/specs/api-v0.1.md` §12。
+
 ### 快速路由（原型）
 
 - 報到入口：`/check-in` -> `/checkin` -> `/checkin/complete`
