@@ -1,35 +1,77 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
+import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
+import { fetchChallenge, submitChallengeAttempt } from "@/api/gameFlow";
 import { getStage, stageStickerSrc, stageTitle } from "@/lib/demoState";
-import { getStageQuiz } from "@/lib/stageQuestions";
 import { useI18n } from "@/composables/useI18n";
 import { GAME_CONFIG } from "@/constants";
 
+const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const stage = ref(1);
-
-const quiz = computed(() => getStageQuiz(stage.value));
-const options = computed(() => [...quiz.value.options]);
-const correct = computed(() => quiz.value.correct);
+const challengeId = ref("c1");
+const question = ref("");
+const options = ref<string[]>([]);
 const selected = ref<string | null>(null);
+const loadState = ref<"loading" | "ok" | "error">("loading");
+const submitLoading = ref(false);
+const errorText = ref("");
 
 onMounted(() => {
 	stage.value = getStage();
+	const q = route.query.challengeId;
+	if (typeof q === "string" && q.trim()) {
+		challengeId.value = q.trim();
+	}
 	selected.value = null;
+	loadChallenge();
 });
 
 const progressPct = computed(
 	() => (stage.value / GAME_CONFIG.TOTAL_STAGES) * 100,
 );
 
+function loadChallenge() {
+	loadState.value = "loading";
+	errorText.value = "";
+	fetchChallenge(challengeId.value)
+		.then((data) => {
+			challengeId.value = data.challengeId;
+			question.value = data.title || stageTitle(stage.value);
+			options.value = data.options;
+			loadState.value = "ok";
+		})
+		.catch(() => {
+			loadState.value = "error";
+			errorText.value = "題目載入失敗，請重試。";
+		});
+}
+
 function confirm() {
 	if (!selected.value) return;
-	const ok = selected.value === correct.value;
-	router.push({ name: "result", query: { ok: ok ? "1" : "0" } });
+	submitLoading.value = true;
+	errorText.value = "";
+	submitChallengeAttempt(challengeId.value, selected.value)
+		.then((r) => {
+			router.push({
+				name: "result",
+				query: {
+					ok: r.correct ? "1" : "0",
+					challengeId: challengeId.value,
+					nextChallengeId: r.nextChallengeId || "",
+				},
+			});
+		})
+		.catch(() => {
+			errorText.value = "送出答案失敗，請稍後再試。";
+		})
+		.finally(() => {
+			submitLoading.value = false;
+		});
 }
 </script>
 
@@ -74,11 +116,17 @@ function confirm() {
 				<p
 					class="mt-4 text-base font-bold leading-relaxed text-gw-navy sm:text-lg"
 				>
-					{{ quiz.question }}
+					{{
+						loadState === "loading"
+							? "題目載入中..."
+							: loadState === "error"
+								? errorText
+								: question
+					}}
 				</p>
 			</div>
 
-			<div class="mt-5 flex flex-col gap-3">
+			<div v-if="loadState === 'ok'" class="mt-5 flex flex-col gap-3">
 				<button
 					v-for="opt in options"
 					:key="opt"
@@ -106,7 +154,7 @@ function confirm() {
 			<div class="mt-8">
 				<button
 					type="button"
-					:disabled="!selected"
+					:disabled="!selected || submitLoading || loadState !== 'ok'"
 					class="w-full rounded-full py-4 text-base font-bold transition"
 					:class="
 						selected
@@ -115,7 +163,7 @@ function confirm() {
 					"
 					@click="confirm"
 				>
-					{{ t("common.confirm") }}
+					{{ submitLoading ? "Submitting..." : t("common.confirm") }}
 				</button>
 			</div>
 		</main>

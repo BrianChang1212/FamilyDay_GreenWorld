@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
+import { verifyStation } from "@/api/gameFlow";
 import {
 	QR_SCAN_STICKER_SRC,
 	getInZone,
@@ -18,6 +19,9 @@ const router = useRouter();
 const { t } = useI18n();
 const stage = ref(1);
 const inZone = ref(false);
+const challengeId = ref("");
+const scanError = ref("");
+const scanLoading = ref(false);
 
 /** 到站畫面 vs 模擬掃碼全屏 */
 const viewPhase = ref<"arrival" | "scanning">("arrival");
@@ -30,13 +34,13 @@ onMounted(() => {
 const stationName = computed(() => stageTitle(stage.value));
 const stationSticker = computed(() => stageStickerSrc(stage.value));
 
-function simulateScan() {
-	inZone.value = true;
-	setInZone(true);
-}
-
 function startQuiz() {
-	router.push({ name: "quiz" });
+	router.push({
+		name: "quiz",
+		query: challengeId.value
+			? { challengeId: challengeId.value }
+			: undefined,
+	});
 }
 
 function openScanUi() {
@@ -48,8 +52,24 @@ function closeScanUi() {
 }
 
 function finishScanDemo() {
-	simulateScan();
-	viewPhase.value = "arrival";
+	scanLoading.value = true;
+	scanError.value = "";
+	verifyStation(`stage-${stage.value}-token`)
+		.then((cid) => {
+			challengeId.value = cid;
+			inZone.value = true;
+			setInZone(true);
+			viewPhase.value = "arrival";
+		})
+		.catch((err) => {
+			scanError.value =
+				err instanceof Error && err.message
+					? "站點驗證失敗，請重新掃描。"
+					: "站點驗證失敗，請稍後再試。";
+		})
+		.finally(() => {
+			scanLoading.value = false;
+		});
 }
 
 function rowState(id: number): "done" | "current" | "locked" {
@@ -98,9 +118,10 @@ function rowState(id: number): "done" | "current" | "locked" {
 				<button
 					type="button"
 					class="w-full rounded-full bg-gw-brand py-3.5 text-base font-bold text-white shadow-lg transition hover:brightness-110"
+					:disabled="scanLoading"
 					@click="finishScanDemo"
 				>
-					{{ t("stage.scanSuccessButton") }}
+					{{ scanLoading ? "Verifying..." : t("stage.scanSuccessButton") }}
 				</button>
 				<button
 					type="button"
@@ -111,6 +132,13 @@ function rowState(id: number): "done" | "current" | "locked" {
 					{{ t("stage.scanBackButton") }}
 				</button>
 			</div>
+			<p
+				v-if="scanError"
+				class="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-800"
+				role="alert"
+			>
+				{{ scanError }}
+			</p>
 			<p class="mt-6 text-center font-serif text-[10px] uppercase tracking-[0.2em] text-neutral-400">
 				{{ t("stage.prototypeLabel") }}
 			</p>

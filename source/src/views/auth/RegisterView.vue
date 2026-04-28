@@ -4,12 +4,15 @@ import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import { resetScavengerRun, setProfile } from "@/lib/demoState";
 import { getEntryIntent } from "@/lib/entryIntent";
+import { getViteApiBase } from "@/lib/apiBase";
 import { useI18n } from "@/composables/useI18n";
 
 const router = useRouter();
 const { t } = useI18n();
 const name = ref("");
 const employeeId = ref("");
+const isSubmitting = ref(false);
+const submitError = ref("");
 
 const isGame = computed(() => getEntryIntent() === "game");
 
@@ -22,11 +25,65 @@ onMounted(() => {
 const inputClass =
 	"w-full rounded-2xl border-0 bg-[#eef0ed] px-4 py-3.5 text-base text-gw-navy shadow-inner outline-none ring-1 ring-black/[0.04] transition focus:ring-2 focus:ring-gw-brand/35 placeholder:text-neutral-400";
 
-function submit() {
-	if (!name.value.trim() || !employeeId.value.trim()) return;
-	setProfile(name.value, employeeId.value);
-	resetScavengerRun();
-	router.push({ name: "stage" });
+function friendlyAuthError(err: unknown): string {
+	if (!(err instanceof Error)) {
+		return "登入失敗，請稍後再試。";
+	}
+	if (err.message.includes("AUTH_IDENTITY_MISMATCH")) {
+		return "姓名與員工編號不一致，請確認後再試。";
+	}
+	if (err.message.includes("INVALID_AUTH_PAYLOAD")) {
+		return "登入資料不完整，請確認姓名與員工編號。";
+	}
+	if (err.message.includes("Failed to fetch")) {
+		return "無法連線到伺服器，請確認網路與 API 服務狀態。";
+	}
+	return "登入失敗，請稍後再試。";
+}
+
+async function submitAuthApi(nameValue: string, employeeIdValue: string) {
+	const base = getViteApiBase();
+	if (!base) {
+		throw new Error("VITE_API_BASE is not configured");
+	}
+
+	const res = await fetch(`${base}/api/v1/auth/login`, {
+		method: "POST",
+		credentials: "include",
+		headers: {
+			Accept: "application/json",
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			name: nameValue,
+			employeeId: employeeIdValue,
+		}),
+	});
+
+	if (!res.ok) {
+		const text = await res.text().catch(() => "");
+		throw new Error(`auth/login ${res.status}: ${text.slice(0, 200)}`);
+	}
+}
+
+async function submit() {
+	if (isSubmitting.value) return;
+	const nameValue = name.value.trim();
+	const employeeIdValue = employeeId.value.trim();
+	if (!nameValue || !employeeIdValue) return;
+
+	isSubmitting.value = true;
+	submitError.value = "";
+	try {
+		await submitAuthApi(nameValue, employeeIdValue);
+		setProfile(nameValue, employeeIdValue);
+		resetScavengerRun();
+		router.push({ name: "stage" });
+	} catch (err) {
+		submitError.value = friendlyAuthError(err);
+	} finally {
+		isSubmitting.value = false;
+	}
 }
 </script>
 
@@ -107,12 +164,19 @@ function submit() {
 				<div class="mt-auto pt-4">
 					<button
 						type="submit"
-						:disabled="!name.trim() || !employeeId.trim()"
+						:disabled="isSubmitting || !name.trim() || !employeeId.trim()"
 						class="flex w-full items-center justify-center gap-2 rounded-full bg-[#1a5f2a] py-4 text-base font-bold text-white shadow-[0_8px_24px_rgba(26,95,42,0.25)] transition enabled:active:scale-[0.99] enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
 					>
-						{{ t("register.submitButton") }}
+						{{ isSubmitting ? "Signing in..." : t("register.submitButton") }}
 						<span aria-hidden="true">›</span>
 					</button>
+					<p
+						v-if="submitError"
+						class="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-800"
+						role="alert"
+					>
+						{{ submitError }}
+					</p>
 				</div>
 			</form>
 

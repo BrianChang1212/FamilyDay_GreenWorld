@@ -120,3 +120,27 @@ npm run test:api:all
 
 - Mock Server：`source/mock/server.js`
 - API 測試腳本：`source/mock/test-all-api.js`
+
+---
+
+## 6) 闖關遊戲 API 專項測試
+
+在 `source/` 執行：
+
+```bash
+npm run test:api:game
+```
+
+此指令專注驗證闖關流程：
+
+- `POST /api/v1/entry/verify`
+- `POST /api/v1/auth/login`
+- `GET /api/v1/auth/me`
+- `GET /api/v1/me/dashboard`
+- `POST /api/v1/stations/verify`
+- `GET /api/v1/challenges/{challengeId}`
+- `POST /api/v1/challenges/{challengeId}/attempts`（錯誤與正確答案）
+- `POST /api/v1/me/playthrough/restart`
+- `POST /api/v1/auth/logout`
+
+對應腳本：`source/mock/test-game-api.js`

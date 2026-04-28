@@ -3,11 +3,13 @@ import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
+import { logoutGame, restartPlaythrough } from "@/api/gameFlow";
 import {
 	LEVEL_COMPLETE_STICKER_SRC,
 	getProfile,
 	getStage,
 	getFinishClaimedCount,
+	resetScavengerRun,
 } from "@/lib/demoState";
 import { incrementLocalFinishClaimIfNoApiBase } from "@/lib/provisionalFinishClaim";
 import { resolveRewardClaimPresentation } from "@/lib/rewardClaimPresentation";
@@ -25,6 +27,8 @@ const claimedCount = ref(0);
 const maxSlots = ref(FINISH_REWARD_SLOTS);
 const statusLoadState = ref<"loading" | "ok" | "error">("loading");
 const statusError = ref("");
+const actionLoading = ref(false);
+const actionError = ref("");
 
 const userLine = computed(() => {
 	const id = employeeId.value.trim();
@@ -105,7 +109,32 @@ function confirmClaim() {
 }
 
 function goHome() {
-	router.push({ name: "welcome" });
+	actionLoading.value = true;
+	actionError.value = "";
+	logoutGame()
+		.catch(() => {
+			actionError.value = "登出 API 失敗，已改用前端返回首頁。";
+		})
+		.finally(() => {
+			actionLoading.value = false;
+			router.push({ name: "welcome" });
+		});
+}
+
+function restartGame() {
+	actionLoading.value = true;
+	actionError.value = "";
+	restartPlaythrough()
+		.then(() => {
+			resetScavengerRun();
+			router.push({ name: "stage" });
+		})
+		.catch(() => {
+			actionError.value = "再玩一輪啟動失敗，請稍後再試。";
+		})
+		.finally(() => {
+			actionLoading.value = false;
+		});
 }
 </script>
 
@@ -228,11 +257,27 @@ function goHome() {
 				</p>
 				<button
 					type="button"
+					:disabled="actionLoading"
+					class="w-full rounded-full border-2 border-gw-brand/35 bg-white py-3.5 text-base font-bold text-gw-brand transition enabled:hover:bg-gw-mint/30 disabled:cursor-not-allowed disabled:opacity-60"
+					@click="restartGame"
+				>
+					{{ actionLoading ? "Processing..." : "再玩一輪" }}
+				</button>
+				<button
+					type="button"
 					class="w-full rounded-full border-2 border-[#1a5f2a] bg-white py-3.5 text-base font-bold text-[#1a5f2a] transition hover:bg-neutral-50"
+					:disabled="actionLoading"
 					@click="goHome"
 				>
 					{{ t("finish.backHomeButton") }}
 				</button>
+				<p
+					v-if="actionError"
+					class="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-800"
+					role="alert"
+				>
+					{{ actionError }}
+				</p>
 			</div>
 		</main>
 

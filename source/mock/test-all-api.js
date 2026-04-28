@@ -41,8 +41,8 @@ async function main() {
 	});
 	await req("checkin status", "GET", "/api/v1/checkin/status");
 	await req("auth login", "POST", "/api/v1/auth/login", {
-		employeeId: "E12345",
-		name: "Mock User",
+		employeeId: "1141041",
+		name: "Brian",
 	});
 	await req("auth me", "GET", "/api/v1/auth/me");
 	await req("auth logout", "POST", "/api/v1/auth/logout");

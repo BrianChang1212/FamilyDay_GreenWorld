@@ -9,8 +9,42 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const dbPath = path.join(__dirname, "db.json");
 const challenges = [
-	{ id: "c1", title: "Challenge 1", options: ["A", "B", "C"] },
-	{ id: "c2", title: "Challenge 2", options: ["A", "B", "C"] },
+	{
+		id: "c1",
+		title: "請問天鵝湖裡有幾種品種的天鵝？",
+		options: ["5種", "10種", "30種", "42種"],
+		correct: "10種",
+	},
+	{
+		id: "c2",
+		title: "開闊草原最能支持下列哪一種生態角色？",
+		options: ["深海魚類", "草食動物與昆蟲棲地", "珊瑚蟲", "企鵝繁殖"],
+		correct: "草食動物與昆蟲棲地",
+	},
+	{
+		id: "c3",
+		title: "在森林步道行走時，較恰當的作法是？",
+		options: ["離開步道抄近路", "依告示與動線前進", "大聲播放音樂驅蟲", "隨意摘取植物帶回"],
+		correct: "依告示與動線前進",
+	},
+	{
+		id: "c4",
+		title: "松鼠常把食物藏起來，主要是為了？",
+		options: ["當作玩具", "度過食物較少的時段", "吸引遊客拍照", "築巢防水"],
+		correct: "度過食物較少的時段",
+	},
+	{
+		id: "c5",
+		title: "「昆蟲飯店」這類設施主要目的接近？",
+		options: ["飼養寵物昆蟲販售", "提供授粉與益蟲棲息空間", "防治所有蚊蟲", "收集垃圾"],
+		correct: "提供授粉與益蟲棲息空間",
+	},
+	{
+		id: "c6",
+		title: "完成所有站點後，下列何者最合適？",
+		options: ["隨意丟棄垃圾", "將野生動物帶回家", "回顧所學並支持保育", "破壞告示設施"],
+		correct: "回顧所學並支持保育",
+	},
 ];
 
 const defaultDb = {
@@ -139,6 +173,26 @@ function toPositiveInt(raw, fallback = 1) {
 
 function normalizeStr(v) {
 	return String(v || "").trim();
+}
+
+function challengeIdByStageToken(token) {
+	const m = String(token || "").match(/^stage-(\d+)-token$/);
+	if (!m) {
+		return "c1";
+	}
+	const n = Number(m[1]);
+	if (!Number.isFinite(n) || n < 1 || n > 6) {
+		return "c1";
+	}
+	return `c${n}`;
+}
+
+function nextChallengeIdByCurrent(currentId) {
+	const idx = challenges.findIndex((c) => c.id === currentId);
+	if (idx < 0 || idx + 1 >= challenges.length) {
+		return "";
+	}
+	return challenges[idx + 1].id;
 }
 
 const server = http.createServer((req, res) => {
@@ -290,13 +344,46 @@ const server = http.createServer((req, res) => {
 	}
 
 	if (req.method === "POST" && urlObj.pathname === "/api/v1/auth/login") {
-		return writeJson(res, 200, {
-			ok: true,
-			user: {
-				employeeId: "E12345",
-				name: "Mock User",
-			},
-		});
+		return readJsonBody(req)
+			.then(async (body) => {
+				const employeeId = normalizeStr(body.employeeId);
+				const name = normalizeStr(body.name);
+				if (!employeeId || !name) {
+					writeJson(res, 400, {
+						code: "INVALID_AUTH_PAYLOAD",
+						message: "employeeId and name are required",
+					});
+					return;
+				}
+
+				const db = await readDb();
+				const matchedEmployee = db.employees.find(
+					(v) =>
+						normalizeStr(v.employeeId) === employeeId &&
+						normalizeStr(v.name) === name,
+				);
+				if (!matchedEmployee) {
+					writeJson(res, 401, {
+						code: "AUTH_IDENTITY_MISMATCH",
+						message: "name and employeeId do not match mock db",
+					});
+					return;
+				}
+
+				writeJson(res, 200, {
+					ok: true,
+					user: {
+						employeeId,
+						name,
+					},
+				});
+			})
+			.catch(() =>
+				writeJson(res, 400, {
+					code: "INVALID_JSON",
+					message: "invalid json body",
+				}),
+			);
 	}
 
 	if (req.method === "POST" && urlObj.pathname === "/api/v1/auth/logout") {
@@ -329,11 +416,21 @@ const server = http.createServer((req, res) => {
 	}
 
 	if (req.method === "POST" && urlObj.pathname === "/api/v1/stations/verify") {
-		return writeJson(res, 200, {
-			ok: true,
-			challengeId: "c1",
-			stationId: "station-a",
-		});
+		return readJsonBody(req)
+			.then((body) => {
+				const challengeId = challengeIdByStageToken(body.token);
+				writeJson(res, 200, {
+					ok: true,
+					challengeId,
+					stationId: "station-a",
+				});
+			})
+			.catch(() =>
+				writeJson(res, 400, {
+					code: "INVALID_JSON",
+					message: "invalid json body",
+				}),
+			);
 	}
 
 	if (req.method === "GET" && /^\/api\/v1\/challenges\/[^/]+$/.test(urlObj.pathname)) {
@@ -352,11 +449,18 @@ const server = http.createServer((req, res) => {
 	) {
 		return readJsonBody(req)
 			.then((body) => {
-				const answer = String(body.answer || "").toUpperCase();
-				const correct = answer === "A";
+				const challengeId = firstMatch(
+					urlObj.pathname,
+					/^\/api\/v1\/challenges\/([^/]+)\/attempts$/,
+				);
+				const found = challenges.find((c) => c.id === challengeId) || challenges[0];
+				const answer = normalizeStr(body.answer);
+				const correct = answer === normalizeStr(found.correct);
 				writeJson(res, 200, {
 					correct,
-					nextChallengeId: correct ? "c2" : "c1",
+					nextChallengeId: correct
+						? nextChallengeIdByCurrent(found.id)
+						: found.id,
 				});
 			})
 			.catch(() =>

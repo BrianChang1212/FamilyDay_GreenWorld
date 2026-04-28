@@ -11,6 +11,14 @@ const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
 const stage = ref(1);
+const currentChallengeId = computed(() => {
+	const v = route.query.challengeId;
+	return typeof v === "string" ? v : "";
+});
+const nextChallengeId = computed(() => {
+	const v = route.query.nextChallengeId;
+	return typeof v === "string" ? v : "";
+});
 
 const ok = computed(() => route.query.ok === "1");
 
@@ -20,7 +28,12 @@ onMounted(() => {
 
 function next() {
 	if (!ok.value) {
-		router.push({ name: "quiz" });
+		router.push({
+			name: "quiz",
+			query: currentChallengeId.value
+				? { challengeId: currentChallengeId.value }
+				: undefined,
+		});
 		return;
 	}
 	if (stage.value >= GAME_CONFIG.TOTAL_STAGES) {
@@ -28,7 +41,12 @@ function next() {
 		return;
 	}
 	advanceStage();
-	router.push({ name: "stage" });
+	router.push({
+		name: "stage",
+		query: nextChallengeId.value
+			? { challengeId: nextChallengeId.value }
+			: undefined,
+	});
 }
 </script>
 
