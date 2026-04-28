@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed, onMounted } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
+import { fetchCheckinStatus } from "@/api/checkinStatus";
 import {
 	CHECKIN_COMPLETE_STICKER_SRC,
 	getCompanionCount,
@@ -14,6 +15,27 @@ const router = useRouter();
 const { t } = useI18n();
 const profile = computed(() => getProfile());
 const companions = computed(() => getCompanionCount());
+const statusLoadState = ref<"idle" | "loading" | "ok" | "error">("idle");
+const statusCheckedIn = ref(false);
+const statusCheckinAt = ref("");
+const statusError = ref("");
+
+async function loadCheckinStatus() {
+	statusLoadState.value = "loading";
+	statusError.value = "";
+	try {
+		const status = await fetchCheckinStatus(profile.value.employeeId);
+		statusCheckedIn.value = status.checkedIn;
+		statusCheckinAt.value = status.checkinAt ?? "";
+		statusLoadState.value = "ok";
+	} catch (err) {
+		statusLoadState.value = "error";
+		statusError.value =
+			err instanceof Error && err.message
+				? err.message
+				: "Failed to load check-in status";
+	}
+}
 
 onMounted(() => {
 	const { name, employeeId } = profile.value;
@@ -24,6 +46,7 @@ onMounted(() => {
 	if (!isCheckInDone()) {
 		router.replace({ name: "checkin" });
 	}
+	void loadCheckinStatus();
 });
 </script>
 
@@ -136,6 +159,27 @@ onMounted(() => {
 				class="mt-8 rounded-2xl border border-amber-200/70 bg-amber-50/90 px-4 py-4 text-left text-sm text-amber-950/90"
 				role="status"
 			>
+				<p
+					v-if="statusLoadState === 'loading'"
+					class="text-xs text-neutral-600"
+				>
+					{{ t("checkinComplete.apiLoading") }}
+				</p>
+				<p
+					v-else-if="statusLoadState === 'error'"
+					class="text-xs text-red-700"
+				>
+					{{ t("checkinComplete.apiError", { error: statusError }) }}
+				</p>
+				<p
+					v-else-if="statusLoadState === 'ok'"
+					class="text-xs text-neutral-600"
+				>
+					{{ t("checkinComplete.apiStatus", {
+						checkedIn: statusCheckedIn ? t("checkinComplete.apiCheckedIn") : t("checkinComplete.apiNotCheckedIn"),
+						checkinAt: statusCheckinAt || "N/A",
+					}) }}
+				</p>
 				<p class="font-semibold text-gw-navy">
 					{{ t("checkinComplete.claimTitle") }}
 				</p>

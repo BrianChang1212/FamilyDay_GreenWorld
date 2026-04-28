@@ -36,6 +36,7 @@
 | 需求與專案狀態 | [`project/專案文件.md`](./project/專案文件.md) |
 | API v0.1 草案 | [`specs/api-v0.1.md`](./specs/api-v0.1.md) |
 | API 整合驗證清單 | [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md) |
+| Mock API 驗證流程 | [`testing/mock-api-test-plan.md`](./testing/mock-api-test-plan.md) |
 | 前端／後端／部署／流量摘要 | [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) 等 |
 | 測試 Web UI（Netlify、QR） | 根 [`README.md`](../README.md#preview-netlify-test-ui)（錨點 **`preview-netlify-test-ui`**）；部署摘要 [`architecture/summary-deployment.md`](./architecture/summary-deployment.md) **§1.1**（**v1.5**） |
 | 前端單元測試（Vitest） | `source/`：`npm run test`；規格見 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) **§1.1**（**v1.26**）；CI 見 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) |

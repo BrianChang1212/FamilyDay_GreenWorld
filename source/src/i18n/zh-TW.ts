@@ -47,6 +47,11 @@ export const zhTW = {
     giftLabel: "報到禮",
     gameQrLabel: "闖關專用 QR",
     imageAlt: "完成報到：自然慶祝場景（無人物）",
+    apiLoading: "正在載入報到狀態…",
+    apiError: "報到狀態讀取失敗：{error}",
+    apiStatus: "後端狀態：{checkedIn}（checkinAt: {checkinAt}）",
+    apiCheckedIn: "已報到",
+    apiNotCheckedIn: "未報到",
   },
   briefing: {
     title: "遊戲說明",

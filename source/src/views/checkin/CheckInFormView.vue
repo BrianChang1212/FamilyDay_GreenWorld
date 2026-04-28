@@ -10,6 +10,7 @@ import {
 	setProfile,
 } from "@/lib/demoState";
 import { clearEntryIntent } from "@/lib/entryIntent";
+import { getViteApiBase } from "@/lib/apiBase";
 import { useI18n } from "@/composables/useI18n";
 import { APP_CONFIG } from "@/constants";
 
@@ -21,6 +22,8 @@ const name = ref(p0.name);
 const employeeId = ref(p0.employeeId);
 const companionCount = ref(getCompanionCount());
 const showConfirm = ref(false);
+const isSubmitting = ref(false);
+const submitError = ref("");
 
 const companionOptions = Array.from(
 	{ length: APP_CONFIG.MAX_COMPANIONS },
@@ -29,6 +32,22 @@ const companionOptions = Array.from(
 
 const inputClass =
 	"w-full rounded-2xl border-0 bg-[#eef0ed] px-4 py-3.5 text-base text-gw-navy shadow-inner outline-none ring-1 ring-black/[0.04] transition focus:ring-2 focus:ring-gw-brand/35 placeholder:text-neutral-400";
+
+function friendlyCheckinError(err: unknown): string {
+	if (!(err instanceof Error)) {
+		return "報到失敗，請稍後再試。";
+	}
+	if (err.message.includes("CHECKIN_IDENTITY_MISMATCH")) {
+		return "姓名與員工編號不一致，請確認後再試。";
+	}
+	if (err.message.includes("INVALID_CHECKIN_PAYLOAD")) {
+		return "報到資料不完整，請確認姓名、員工編號與同行人數。";
+	}
+	if (err.message.includes("Failed to fetch")) {
+		return "無法連線到伺服器，請確認網路與 API 服務狀態。";
+	}
+	return "報到失敗，請稍後再試。";
+}
 
 function formValid(): boolean {
 	return (
@@ -41,23 +60,69 @@ function formValid(): boolean {
 
 function openConfirm() {
 	if (!formValid()) return;
+	submitError.value = "";
 	showConfirm.value = true;
 }
 
 function closeConfirm() {
+	if (isSubmitting.value) return;
 	showConfirm.value = false;
 }
 
-function commitCheckIn() {
+async function submitCheckInApi(
+	nameValue: string,
+	employeeIdValue: string,
+	partySizeValue: number,
+) {
+	const base = getViteApiBase();
+	if (!base) {
+		return;
+	}
+
+	const res = await fetch(`${base}/api/v1/checkin`, {
+		method: "POST",
+		credentials: "include",
+		headers: {
+			Accept: "application/json",
+			"Content-Type": "application/json",
+		},
+		body: JSON.stringify({
+			name: nameValue,
+			employeeId: employeeIdValue,
+			partySize: partySizeValue,
+		}),
+	});
+
+	if (!res.ok) {
+		const text = await res.text().catch(() => "");
+		throw new Error(`checkin ${res.status}: ${text.slice(0, 200)}`);
+	}
+}
+
+async function commitCheckIn() {
+	if (isSubmitting.value) return;
 	let n = companionCount.value;
 	if (!Number.isFinite(n) || n < 1) n = 1;
 	companionCount.value = n;
-	setProfile(name.value, employeeId.value);
-	setCompanionCount(n);
-	setCheckInDone(true);
-	clearEntryIntent();
-	showConfirm.value = false;
-	router.push({ name: "checkinComplete" });
+	isSubmitting.value = true;
+	submitError.value = "";
+	try {
+		await submitCheckInApi(
+			name.value.trim(),
+			employeeId.value.trim(),
+			n,
+		);
+		setProfile(name.value, employeeId.value);
+		setCompanionCount(n);
+		setCheckInDone(true);
+		clearEntryIntent();
+		showConfirm.value = false;
+		router.push({ name: "checkinComplete" });
+	} catch (err) {
+		submitError.value = friendlyCheckinError(err);
+	} finally {
+		isSubmitting.value = false;
+	}
 }
 </script>
 
@@ -217,18 +282,27 @@ function commitCheckIn() {
 					<div class="mt-6 flex flex-col gap-3">
 						<button
 							type="button"
-							class="w-full rounded-full bg-[#1a5f2a] py-3.5 text-center text-base font-bold text-white shadow-md transition hover:brightness-110 active:scale-[0.99]"
+							:disabled="isSubmitting"
+							class="w-full rounded-full bg-[#1a5f2a] py-3.5 text-center text-base font-bold text-white shadow-md transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
 							@click="commitCheckIn"
 						>
-							{{ t('common.confirm') }}
+							{{ isSubmitting ? "Submitting..." : t('common.confirm') }}
 						</button>
 						<button
 							type="button"
-							class="w-full rounded-full bg-[#e8e4dc] py-3.5 text-center text-base font-semibold text-neutral-800 transition hover:bg-[#ded9cf] active:scale-[0.99]"
+							:disabled="isSubmitting"
+							class="w-full rounded-full bg-[#e8e4dc] py-3.5 text-center text-base font-semibold text-neutral-800 transition enabled:hover:bg-[#ded9cf] enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
 							@click="closeConfirm"
 						>
 							{{ t('common.back') }}
 						</button>
+						<p
+							v-if="submitError"
+							class="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-800"
+							role="alert"
+						>
+							{{ submitError }}
+						</p>
 					</div>
 				</div>
 			</div>
