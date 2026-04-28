@@ -1,6 +1,7 @@
 # `docs/` 文件索引
 
-本目錄依**用途分類**；維護主文件仍為 [`project/專案文件.md`](./project/專案文件.md)。
+本目錄依**用途分類**；維護主文件仍為
+[`project/project-master.md`](./project/project-master.md)。
 
 ---
 
@@ -23,9 +24,8 @@
 
 ## 開發環境（Windows／Node）
 
-1. **安裝 Node.js 與 npm**、**PATH 更新**、**`npm install`**：見倉庫根目錄 [`README.md`「快速開始」](../README.md#快速開始) 內 **Windows：安裝 Node.js 與 npm（winget）** 小節（含 Error 1925、`--scope user`、同一終端機刷新 PATH 等）。  
-2. **啟動前端**：於 `source/` 執行 `npm run dev`（細節同上節與根 README）。  
-3. **前端單元測試**：於 `source/` 執行 `npm run test`（Vitest；檔案 **`source/src/**/*.test.ts`**）；CI 見根目錄 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml)。
+開發指令與環境設定以根目錄 [`README.md`](../README.md#快速開始) 為單一來源（含
+Windows 安裝、`npm run dev`、`npm run test`、CI 流程）。
 
 ---
 
@@ -33,10 +33,9 @@
 
 | 想找… | 檔案 |
 |--------|------|
-| 需求與專案狀態 | [`project/專案文件.md`](./project/專案文件.md) |
+| 需求與專案狀態 | [`project/project-master.md`](./project/project-master.md) |
 | API v0.1 草案 | [`specs/api-v0.1.md`](./specs/api-v0.1.md) |
-| API 整合驗證清單 | [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md) |
-| Mock API 驗證流程 | [`testing/mock-api-test-plan.md`](./testing/mock-api-test-plan.md) |
+| API 整合與 Mock 驗證清單 | [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md) |
 | 前端／後端／部署／流量摘要 | [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) 等 |
 | 測試 Web UI（Netlify、QR） | 根 [`README.md`](../README.md#preview-netlify-test-ui)（錨點 **`preview-netlify-test-ui`**）；部署摘要 [`architecture/summary-deployment.md`](./architecture/summary-deployment.md) **§1.1**（**v1.5**） |
 | 前端單元測試（Vitest） | `source/`：`npm run test`；規格見 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) **§1.1**（**v1.26**）；CI 見 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) |
@@ -52,4 +51,13 @@
 
 ---
 
-**最後整理：** 2026-04-28。歷史變更與實作細節請以**各檔案標頭**、根目錄 **`README.md`** 頁尾版本列、以及 **`project/專案文件.md`**（合併版 **v1.3.28**）為準；**測試 Web UI** 見根 [`README.md`](../README.md#preview-netlify-test-ui)；**Vitest** 單元測試見上表與 `summary-frontend.md` **§1.1**（**v1.26**）；前端路由、`VITE_API_BASE`、`local-fallback`、`constants`／`i18n` 集中化、**`views/`** 分群與 **`api/`／`composables` 分層**見 `architecture/summary-frontend.md`（§2.1、§2，**v1.26**）；後端／流量摘要見 `architecture/summary-backend.md`（**v1.5**）、`architecture/summary-traffic.md`（**v1.2**）；部署摘要見 `architecture/summary-deployment.md` §1.1（修訂至 **v1.5**）；`specs/api-v0.1.md` 修訂至 **v0.1.8**；API 整合驗證清單見 [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md)。
+**最後整理：** 2026-04-28。版本與修訂歷史以各檔案檔頭及
+[`project/project-master.md`](./project/project-master.md) 頁尾版本列為準。
+技術細節請直接查閱對應單一來源文件：前端
+[`architecture/summary-frontend.md`](./architecture/summary-frontend.md)、後端
+[`architecture/summary-backend.md`](./architecture/summary-backend.md)、部署
+[`architecture/summary-deployment.md`](./architecture/summary-deployment.md)、流量
+[`architecture/summary-traffic.md`](./architecture/summary-traffic.md)、API
+[`specs/api-v0.1.md`](./specs/api-v0.1.md)、整合驗證
+[`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md)；
+測試 Web UI 見根 [`README.md`](../README.md#preview-netlify-test-ui)。

@@ -35,7 +35,7 @@ cd FamilyDay_GreenWorld
 ### 只讀文件／規格
 
 1. 開啟 `[docs/README.md](docs/README.md)` 了解 `docs/` 分類。
-2. 完整需求與會議基線：`[docs/project/專案文件.md](docs/project/專案文件.md)`。
+2. 完整需求與會議基線：`[docs/project/project-master.md](docs/project/project-master.md)`。
 3. API 與架構摘要：`docs/specs/`、`docs/architecture/`（見上列索引）。
 
 ### Windows：安裝 Node.js 與 npm（winget）
@@ -175,7 +175,7 @@ npm run dev
 | 活動     | 新竹北埔**綠世界生態農場**；對象為**台北辦公室同仁及眷屬**（預估約 **1,000～1,300** 人）；活動日**確認中**（偏好**六月底**，或七月初）                       |
 | 產品     | 解謎 Web 應用；同仁與家人體驗生態探索，完成關卡可至指定地點領取紀念品                                                                     |
 | 提案／線框 PDF | `docs/proposals/FamilyDayApp_Proposal_v1.pdf`（v1，2026.04.10）、[`FamilyDayApp_wireframe_v2.pdf`](docs/proposals/FamilyDayApp_wireframe_v2.pdf)（線框 v2）；靜態圖另見 [`docs/design/wireframe/`](docs/design/wireframe/) |
-| 需求主文件  | `docs/project/專案文件.md`（合併版：需求、待確認、狀態、技術）；索引見 `docs/README.md`                                             |
+| 需求主文件  | `docs/project/project-master.md`（合併版：需求、待確認、狀態、技術）；索引見 `docs/README.md`                                             |
 | 資訊開發人員 | Ken、Brian                                                                                                 |
 | GitHub | [BrianChang1212/FamilyDay_GreenWorld](https://github.com/BrianChang1212/FamilyDay_GreenWorld)             |
 
@@ -186,8 +186,8 @@ npm run dev
 | 項目          | 內容                                                                                                                    |
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
-| 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/專案文件.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-28（頁尾 **v2.52**）；細節見 [`docs/media/README.md`](docs/media/README.md)、[`docs/project/專案文件.md`](docs/project/專案文件.md)（合併版 **v1.3.29**；`summary-frontend` **v1.26**：版本鏈同步） |
+| 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/project-master.md`；`docs/proposals/`、`docs/design/` 等                                  |
+| 最後更新 README | 2026-04-28（頁尾 **v2.52**）；細節見 [`docs/media/README.md`](docs/media/README.md)、[`docs/project/project-master.md`](docs/project/project-master.md)（合併版 **v1.3.29**；`summary-frontend` **v1.26**：版本鏈同步） |
 
 
 ---
@@ -217,7 +217,7 @@ npm run dev
 - 闖關入口：`/game` -> `/` -> `/register` -> `/stage`
 - 領獎頁：`/finish`、`/finish/claimed`
 
-完整流程圖與資料流請看 `docs/project/專案文件.md`（需求與流程、技術規格）及 `docs/architecture/summary-frontend.md`。
+完整流程圖與資料流請看 `docs/project/project-master.md`（需求與流程、技術規格）及 `docs/architecture/summary-frontend.md`。
 
 ---
 
@@ -230,7 +230,7 @@ npm run dev
 | 報名規則 | 1+3 免費，第 5 人起加收 |
 | 闖關規則 | 6 關，答錯可重答，同工號最多 3 次/3 份 |
 
-完整規格與時程請看 `docs/project/專案文件.md`。
+完整規格與時程請看 `docs/project/project-master.md`。
 
 ---
 
@@ -240,7 +240,7 @@ npm run dev
 - 闖關：掃闖關入口 QR -> 歡迎/說明 -> 登入 -> 地圖/關卡 -> 完成領獎
 - 各關到站：掃現場關卡 QR 驗證
 
-完整分流與畫面順序請看 `docs/project/專案文件.md` 與 `docs/architecture/summary-frontend.md`。
+完整分流與畫面順序請看 `docs/project/project-master.md` 與 `docs/architecture/summary-frontend.md`。
 
 ---
 
@@ -263,7 +263,7 @@ npm run dev
 
 ### 待確認（高優先級節錄）
 
-完整清單見 `docs/project/專案文件.md`。會議後仍待主辦／表單補齊者例如：
+完整清單見 `docs/project/project-master.md`。會議後仍待主辦／表單補齊者例如：
 
 1. 活動**確切日期**（六月底 vs 七月初）
 2. 事前報名**表單欄位明細**、收費規則說明、保險文案
@@ -272,7 +272,7 @@ npm run dev
 
 ### 技術選型（草案已完成，待會議簽核）
 
-細節見 `docs/project/專案文件.md`（開頭補充文件表）及 `docs/architecture/summary-*.md`。
+細節見 `docs/project/project-master.md`（開頭補充文件表）及 `docs/architecture/summary-*.md`。
 
 1. **前端（草案簽核中；實作現況見上表）：** Vue 3 + Vite + TypeScript + Tailwind + Vue Router；**Naive UI** 可選、尚未納入 `package.json`
 2. **Database（定案）：** Firebase（Firestore 為主，Realtime Database 視場景啟用）
@@ -282,7 +282,7 @@ npm run dev
 
 ### 專案進度（概覽）
 
-整體約 **24%**（文件＋前端可跑原型＋**前端 Vitest 單元測試與 CI**；後端、整合／E2E／壓測仍待）。細項見 `docs/project/專案文件.md`「專案狀態」。
+整體約 **24%**（文件＋前端可跑原型＋**前端 Vitest 單元測試與 CI**；後端、整合／E2E／壓測仍待）。細項見 `docs/project/project-master.md`「專案狀態」。
 
 
 | 項目               | 狀態                                      |
@@ -336,7 +336,7 @@ npm run dev
 | ------------ | ---------------------------------------------------------------- |
 | 總覽           | `README.md`（本文件）                                                 |
 | 文件索引         | `docs/README.md`（`docs/` 分類導覽）                                   |
-| 詳細規格（單檔）     | `docs/project/專案文件.md`（需求、待確認、專案狀態、技術規格、提案來源、維護附錄）               |
+| 詳細規格（單檔）     | `docs/project/project-master.md`（需求、待確認、專案狀態、技術規格、提案來源、維護附錄）               |
 | API 草案（v0.1） | `docs/specs/api-v0.1.md`（REST 端點、範例 JSON、畫面對照；修訂紀錄見檔尾） |
 | 前端討論總結       | `docs/architecture/summary-frontend.md`（Vue3／Vite／模組與 UX、API 銜接） |
 | 後端討論總結       | `docs/architecture/summary-backend.md`（Firebase、資料模型與安全規則） |
@@ -354,7 +354,7 @@ npm run dev
 | ------------- | -------------------------------- |
 | 5 分鐘掌握專案      | 本 README                         |
 | 系統架構與資料流圖     | 本 README [技術架構](#技術架構)（在 [Demo 影片預覽](#demo-影片預覽) 之後） |
-| 完整需求、待辦、進度、技術 | `docs/project/專案文件.md`（內有章節目錄）   |
+| 完整需求、待辦、進度、技術 | `docs/project/project-master.md`（內有章節目錄）   |
 | 前後端與部署／流量定案摘要 | `docs/architecture/summary-*.md` |
 | 畫面操作 Demo       | 本頁 [Demo 影片預覽](#demo-影片預覽)／[`docs/media/README.md`](docs/media/README.md) |
 
@@ -364,10 +364,10 @@ npm run dev
 
 | 角色    | 順序                                                 |
 | ----- | -------------------------------------------------- |
-| PM    | README → `docs/project/專案文件.md`（先「專案狀態」「待確認」再「需求」） |
-| 開發    | README → `docs/project/專案文件.md`（先「技術規格」再「需求」）      |
-| UI/UX | README → `docs/project/專案文件.md`（「需求與流程」「待確認」）      |
-| 測試    | README → `docs/project/專案文件.md`（「需求」「技術規格」）        |
+| PM    | README → `docs/project/project-master.md`（先「專案狀態」「待確認」再「需求」） |
+| 開發    | README → `docs/project/project-master.md`（先「技術規格」再「需求」）      |
+| UI/UX | README → `docs/project/project-master.md`（「需求與流程」「待確認」）      |
+| 測試    | README → `docs/project/project-master.md`（「需求」「技術規格」）        |
 
 
 ### 文件更新頻率（建議）
@@ -376,7 +376,7 @@ npm run dev
 | 文件                     | 時機                                             |
 | ---------------------- | ---------------------------------------------- |
 | `README.md`            | 重大變更、里程碑                                       |
-| `docs/project/專案文件.md` | 需求／技術／會議／進度任一變更時（更新對應章節）；新路徑見 `docs/README.md` |
+| `docs/project/project-master.md` | 需求／技術／會議／進度任一變更時（更新對應章節）；新路徑見 `docs/README.md` |
 
 
 ---
