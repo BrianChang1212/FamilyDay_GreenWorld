@@ -1,6 +1,6 @@
 # 家庭日綠世界闖關 Web — API 規格（v0.1 草案）
 
-> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.8** 新增 mock 行為差異註記；**v0.1.7** 新增傳輸加密與敏感資料保護要求；**v0.1.6** 新增前後端 API 實際動作流程圖；**v0.1.5** 新增 Firebase 實作對齊註記；**v0.1.4** 檔首用語與 § 端點表一致；**v0.1.3** 補前端 **Vitest** 對 dashboard 客戶端映射之測試註記；**v0.1.2** 起之前端分層註記仍適用；**不改**端點定義）。
+> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.11** 更新第二階段 Cloud Functions 落地端點狀態；**v0.1.10** 新增 Cloud Functions MVP 已落地端點清單；**v0.1.9** 新增端點觸發時機圖；**不改**端點定義）。
 
 ---
 
@@ -47,6 +47,32 @@
 | `POST /api/v1/stations/verify` | 僅 smoke 回應，未實作 JWT 驗簽/exp/jti | 正式版需完整 JWT 安全檢查 |
 | `GET /api/v1/me/dashboard` | 回應為前端驗證所需最小欄位集 | 正式版回應以本文件示例為準 |
 | `POST /api/v1/challenges/{challengeId}/attempts` | request 用 `answer`，response 用 `nextChallengeId` | 正式版欄位仍以 `choiceId` / `nextStageId` 為目標 |
+
+---
+
+## Cloud Functions MVP 落地狀態（2026-04-30）
+
+以下為 `functions/` 目前已落地的最小端點（Firebase Functions emulator 已驗證）：
+
+| 端點 | 狀態 | 備註 |
+|------|------|------|
+| `GET /api/v1/health` | 已落地 | 存活檢查 |
+| `GET /api/v1/health/ready` | 已落地 | 就緒檢查 |
+| `POST /api/v1/auth/login` | 已落地 | 以員編+姓名比對名冊，回傳 HTTP-only cookie session |
+| `GET /api/v1/auth/me` | 已落地 | 需帶有效 session；否則 401 |
+| `POST /api/v1/auth/logout` | 已落地 | 清除 session cookie |
+| `POST /api/v1/checkin` | 已落地 | 名冊比對通過後寫入記憶體 checkin state |
+| `GET /api/v1/checkin/status` | 已落地 | 回傳最新或指定員編報到狀態 |
+| `GET /api/v1/me/dashboard` | 已落地 | 回傳 stages + progress 最小欄位集 |
+| `POST /api/v1/stations/verify` | 已落地 | 第二階段先提供最小驗證邏輯（JWT 驗簽仍待下一階段） |
+| `GET /api/v1/challenges/{challengeId}` | 已落地 | 回傳題目與選項（不回正解） |
+| `POST /api/v1/challenges/{challengeId}/attempts` | 已落地 | 支援 `choiceId`（並相容 `answer`） |
+| `POST /api/v1/me/playthrough/restart` | 已落地 | 未滿足條件回 409 |
+| `POST /api/v1/staff/redeem/token` | 已落地 | 回傳短期 token（in-memory） |
+| `POST /api/v1/staff/redeem/confirm` | 已落地 | 重複核銷回 409 |
+| `POST /api/v1/admin/roster/import` | 已落地 | 第二階段先回最小匯入結果 |
+| `GET /api/v1/admin/reports/attendance` | 已落地 | 第二階段先回最小統計欄位 |
+| `GET /api/v1/admin/reports/progress` | 已落地 | 第二階段先回最小統計欄位 |
 
 ---
 
@@ -393,3 +419,5 @@ sequenceDiagram
 | v0.1.7 | 2026-04-27 | 全域約定新增「傳輸加密 / Cookie 安全 / 敏感資料保護」：要求 HTTPS（TLS 1.2+）與個資遮罩，降低資料外洩風險 |
 | v0.1.8 | 2026-04-28 | 新增 mock 驗證差異註記：補 `checkin` 身分對照、`events` 固定路徑、`stations/verify` 安全檢查範圍與 `attempts` mock 欄位差異 |
 | v0.1.9 | 2026-04-28 | 新增「端點觸發時機圖」：依 Player / Staff / Admin / System 分群標示 API 呼叫時機，並將原流程圖章節調整為 §13 |
+| v0.1.10 | 2026-04-30 | 新增「Cloud Functions MVP 落地狀態」：標示已落地與未落地端點（`functions/` 第一階段） |
+| v0.1.11 | 2026-04-30 | 更新第二階段落地狀態：新增 game/staff/admin 端點已落地註記（仍採 in-memory） |

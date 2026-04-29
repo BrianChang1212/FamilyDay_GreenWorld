@@ -24,6 +24,17 @@ vi.mock("@/lib/entryIntent", () => ({
 	normalizeQueryEntry: normalizeQueryEntryMock,
 }));
 
+vi.mock("@/views/home/WelcomeView.vue", () => ({ default: {} }));
+vi.mock("@/views/onboarding/BriefingView.vue", () => ({ default: {} }));
+vi.mock("@/views/auth/RegisterView.vue", () => ({ default: {} }));
+vi.mock("@/views/checkin/CheckInFormView.vue", () => ({ default: {} }));
+vi.mock("@/views/checkin/CheckInCompleteView.vue", () => ({ default: {} }));
+vi.mock("@/views/quest/StageView.vue", () => ({ default: {} }));
+vi.mock("@/views/quest/QuizView.vue", () => ({ default: {} }));
+vi.mock("@/views/quest/ResultView.vue", () => ({ default: {} }));
+vi.mock("@/views/quest/FinishView.vue", () => ({ default: {} }));
+vi.mock("@/views/quest/ClaimSuccessView.vue", () => ({ default: {} }));
+
 describe("router config and guard", () => {
 	function getRouterConfig(): RouterConfig {
 		const firstCall = createRouterMock.mock.calls[0];

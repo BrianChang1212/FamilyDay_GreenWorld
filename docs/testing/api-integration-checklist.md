@@ -1,6 +1,6 @@
 # 前後端 API 整合驗證清單（Checklist）
 
-> 適用範圍：`docs/specs/api-v0.1.md`（目前修訂至 v0.1.8）  
+> 適用範圍：`docs/specs/api-v0.1.md`（目前修訂至 v0.1.10）  
 > 目的：用「前端實際操作」驗證 API 契約、錯誤處理與資料一致性。
 
 ---
@@ -125,6 +125,8 @@
 
 | 執行日期 | 環境 | Seed 版本 | 範圍（章節） | Pass | Fail | Blocked | 證據連結 | 執行者 | 備註 |
 |----------|------|-----------|--------------|------|------|---------|----------|--------|------|
+| 2026-04-30 | dev (Functions Emulator) | in-memory roster (`functions/src/data/employees.ts`) | 1, 2.2, 3, 6(401 基本驗證) | 8 | 0 | 0 | CLI 驗證：`health/ready/login/me/checkin/status/dashboard` 皆 200，未登入 `auth/me` 為 401 | Codex | 第一階段僅驗 MVP 端點；stations/challenges/restart/staff/admin 待下一階段 |
+| 2026-04-30 | dev (Functions Emulator, port 5003) | in-memory (`functions/src/state/*.ts`) | 1, 3, 4, 5, 6 | 13 | 0 | 0 | CLI 驗證：`stations/verify`、`challenges/*`、`restart(409)`、`staff/redeem/*`、`admin/reports/*` 皆符合預期 | Codex | 第二階段端點已落地（in-memory）；JWT 驗簽/Firestore 仍待下一階段 |
 | <!-- YYYY-MM-DD --> | <!-- dev/stage --> | <!-- seed tag --> | <!-- 1~6 / 全部 --> | <!-- n --> | <!-- n --> | <!-- n --> | <!-- link/path --> | <!-- owner --> | <!-- note --> |
 
 ---
