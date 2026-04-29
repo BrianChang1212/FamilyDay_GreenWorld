@@ -1,9 +1,14 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+type RouterConfig = {
+	routes: Array<Record<string, unknown>>;
+};
+
 const createWebHistoryMock = vi.fn();
 const beforeEachMock = vi.fn();
-const createRouterMock = vi.fn(() => ({
+const createRouterMock = vi.fn((config: RouterConfig) => ({
 	beforeEach: beforeEachMock,
+	__config: config,
 }));
 
 const setEntryIntentMock = vi.fn();
@@ -20,6 +25,22 @@ vi.mock("@/lib/entryIntent", () => ({
 }));
 
 describe("router config and guard", () => {
+	function getRouterConfig(): RouterConfig {
+		const firstCall = createRouterMock.mock.calls[0];
+		if (!firstCall) {
+			throw new Error("createRouter was not called");
+		}
+		return firstCall[0] as RouterConfig;
+	}
+
+	function getGuard(): (to: { query: { entry?: unknown } }) => void {
+		const firstCall = beforeEachMock.mock.calls[0];
+		if (!firstCall) {
+			throw new Error("router.beforeEach was not registered");
+		}
+		return firstCall[0] as (to: { query: { entry?: unknown } }) => void;
+	}
+
 	beforeEach(() => {
 		vi.resetModules();
 		createRouterMock.mockClear();
@@ -31,7 +52,7 @@ describe("router config and guard", () => {
 
 	it("registers check-in and game entry redirects", async () => {
 		await import("@/router");
-		const config = createRouterMock.mock.calls[0][0];
+		const config = getRouterConfig();
 		const routes = config.routes as Array<Record<string, unknown>>;
 		const checkinEntry = routes.find((r) => r.name === "checkinEntry");
 		const gameEntry = routes.find((r) => r.name === "gameEntry");
@@ -51,9 +72,7 @@ describe("router config and guard", () => {
 
 	it("beforeEach guard sets intent only for normalized values", async () => {
 		await import("@/router");
-		const guard = beforeEachMock.mock.calls[0][0] as (to: {
-			query: { entry?: unknown };
-		}) => void;
+		const guard = getGuard();
 
 		normalizeQueryEntryMock.mockReturnValueOnce("checkin");
 		guard({ query: { entry: "checkin" } });
