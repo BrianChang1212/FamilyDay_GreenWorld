@@ -7,6 +7,12 @@
 ## 目錄
 
 - [快速開始](#快速開始)
+  - [新手快速導覽（3 分鐘）](#新手快速導覽3-分鐘)
+  - [最快啟動（本機前端原型）](#最快啟動本機前端原型)
+  - [上線包含／不包含（避免混淆）](#上線包含不包含避免混淆)
+  - [目前實際進度（即時狀態）](#目前實際進度即時狀態)
+  - [進階疑難排解（Windows 安裝 Node.js 與 npm）](#進階疑難排解windows-安裝-nodejs-與-npm)
+  - [公開預覽部署（測試 Web UI）](#公開預覽部署測試-web-ui)
   - [介面預覽（截圖）](#ui-preview-screenshots)
 - [專案概覽](#專案概覽)
 - [Demo 影片預覽](#demo-影片預覽)
@@ -23,22 +29,61 @@
 
 ## 快速開始
 
-### 取得程式庫
+### 新手快速導覽（3 分鐘）
+
+- 這是家庭日活動用的前端 Web 原型，主流程為「報到」與「闖關」兩條路由。
+- 前端已可本機啟動與建置；API 目前以契約文件 + mock 驗證為主。
+- 若你是第一次接手，建議先看：
+  1. 本節「最快啟動（本機前端原型）」
+  2. `docs/project/project-master.md`（需求與待辦）
+  3. `docs/specs/api-v0.1.md`（API 契約）
+
+### 最快啟動（本機前端原型）
+
+**需求：** [Node.js](https://nodejs.org/) 20 LTS 以上，且可執行 `node`、`npm`。
 
 ```bash
 git clone https://github.com/BrianChang1212/FamilyDay_GreenWorld.git
-cd FamilyDay_GreenWorld
+cd FamilyDay_GreenWorld/source
+npm install
+npm run dev
 ```
 
-（若本機路徑為 `20260410_FamilyDay_GreenWorld_App`，與上列為同一專案內容時，可略過 clone，直接在該資料夾操作。）
+若你已在專案目錄，直接執行：
 
-### 只讀文件／規格
+```bash
+npm install
+npm run dev
+```
 
-1. 開啟 `[docs/README.md](docs/README.md)` 了解 `docs/` 分類。
-2. 完整需求與會議基線：`[docs/project/project-master.md](docs/project/project-master.md)`。
-3. API 與架構摘要：`docs/specs/`、`docs/architecture/`（見上列索引）。
+瀏覽器開啟終端機顯示網址（常見為 [http://localhost:5173](http://localhost:5173)）。  
+建置預覽可用：`npm run build` 後 `npm run preview`。
 
-### Windows：安裝 Node.js 與 npm（winget）
+**單元測試（Vitest）：** 於 `source/` 執行 `npm run test`；開發監看可用 `npm run test:watch`；覆蓋率報告可用 `npm run test:coverage`。測試檔與程式並列（`source/src/**/*.test.ts`）。GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) 在 `npm run build` **之前**會先跑 `npm run test`。
+
+**說明：** 後端 API 尚未串接時，多數畫面仍以 mock／靜態流程為主。**未設定 `VITE_API_BASE` 時**，完成頁領獎次數會以瀏覽器 `sessionStorage` 類比（僅供預覽）；若要以**真實後端**顯示次數，請於 `source/` 建立 `.env.local`（或建置環境變數）設定 **`VITE_API_BASE`**（API 主機根、無尾隨 `/`），詳見 `docs/architecture/summary-frontend.md` §4。定案見 `docs/specs/api-v0.1.md` 與 `docs/architecture/summary-backend.md`。
+
+### 上線包含／不包含（避免混淆）
+
+| 類別 | 路徑／檔案 | 是否進正式上線執行 | 說明 |
+|------|------------|--------------------|------|
+| 前端執行碼 | `source/src/**`、`source/public/**` | 會（經 build 後） | 由 `npm run build` 打包成 `source/dist`，提供正式站點執行 |
+| 部署產物 | `source/dist/**` | 會（部署時使用） | 最終上線的靜態資源輸出 |
+| 單元測試 | `source/src/**/*.test.ts` | 不會 | 僅供本機與 CI 驗證行為；不打包進 production |
+| Mock API | `source/mock/**` | 不會（正式環境） | 僅開發／驗證用；正式環境應改接實際後端 |
+| CI 設定 | `.github/workflows/*.yml` | 不會（runtime） | 只在 GitHub Actions 執行測試、建置與部署流程 |
+| 開發依賴 | `source/node_modules/**` | 不會（runtime） | 建置與開發工具依賴，非部署產物 |
+
+### 目前實際進度（即時狀態）
+
+| 面向 | 現況 |
+|------|------|
+| 前端 | `source/` 可本機啟動、建置與預覽；主要路由流程可操作 |
+| API | 前端已依 `docs/specs/api-v0.1.md` 串接呼叫介面；目前以 `source/mock/` 驗證為主，正式後端待接入 |
+| 測試 | Vitest 單元測試已納入 CI，作為上線前品質把關 |
+| 部署 | Netlify / GitHub Pages 目前定位為測試預覽；正式環境待公司核可網域與後端資安配置 |
+
+### 進階疑難排解（Windows 安裝 Node.js 與 npm）
 
 若 PowerShell 出現 **npm** 無法辨識，代表尚未安裝 Node.js，或 PATH 尚未載入。
 
@@ -60,20 +105,11 @@ node -v
 npm -v
 ```
 
-**3. 安裝專案相依套件（在 `source/`）**
-
-```powershell
-cd source
-npm install
-```
-
-（若上一步已執行過 `npm install`，可略過。本機曾驗證：**Node v24.14.1**、**npm 11.x**。）
-
-**4. 全系統安裝（選用）**
+**3. 全系統安裝（選用）**
 
 若要以**系統管理員**安裝給所有使用者：以系統管理員開啟 PowerShell，執行 `winget install OpenJS.NodeJS.LTS ...`（**不要**加 `--scope user`），並依 UAC 提示同意。
 
-**5. 安裝失敗時的記錄檔（winget／MSI）**
+**4. 安裝失敗時的記錄檔（winget／MSI）**
 
 路徑範例（實際檔名含時間戳記）：
 
@@ -81,30 +117,9 @@ npm install
 
 內可搜尋 **Error 1925**、**1603** 對照權限或舊版衝突。
 
----
-
-### 本機執行前端原型（`source/`）
-
-**需求：** [Node.js](https://nodejs.org/) **20 LTS 或以上**皆可；本倉庫曾以 **winget LTS 套件（例如 v24.x）** 驗證。須能執行 `node`、`npm`。
-
-```bash
-cd source
-npm install
-npm run dev
-```
-
-（`npm install` 與上一節 Windows 步驟重複時，擇一執行即可。）
-
-瀏覽器開啟終端機顯示之本機網址（Vite 預設多為 **[http://localhost:5173](http://localhost:5173)**）。  
-建置預覽：`npm run build` 後 `npm run preview`。
-
-**單元測試（Vitest）：** 於 `source/` 執行 `npm run test`；開發監看可用 `npm run test:watch`；覆蓋率報告可用 `npm run test:coverage`。測試檔與程式並列（`source/src/**/*.test.ts`）。GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) 在 `npm run build` **之前**會先跑 `npm run test`。
-
-**說明：** 後端 API 尚未串接時，多數畫面仍以 mock／靜態流程為主。**未設定 `VITE_API_BASE` 時**，完成頁領獎次數會以瀏覽器 `sessionStorage` 類比（僅供預覽）；若要以**真實後端**顯示次數，請於 `source/` 建立 `.env.local`（或建置環境變數）設定 **`VITE_API_BASE`**（API 主機根、無尾隨 `/`），詳見 `docs/architecture/summary-frontend.md` §4。定案見 `docs/specs/api-v0.1.md` 與 `docs/architecture/summary-backend.md`。
-
 <a id="preview-netlify-test-ui"></a>
 
-### 公開預覽部署 · 測試 Web UI
+### 公開預覽部署（測試 Web UI）
 
 > 給他人用手機／瀏覽器試操作，可不接後端；與 [`docs/architecture/summary-deployment.md`](docs/architecture/summary-deployment.md) **§1.1**（修訂 **v1.5**）、[`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) **§4** 互相連結。
 
