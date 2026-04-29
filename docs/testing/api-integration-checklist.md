@@ -1,6 +1,6 @@
 # 前後端 API 整合驗證清單（Checklist）
 
-> 適用範圍：`docs/specs/api-v0.1.md`（目前修訂至 v0.1.10）  
+> 適用範圍：`docs/specs/api-v0.1.md`（目前修訂至 v0.1.13）  
 > 目的：用「前端實際操作」驗證 API 契約、錯誤處理與資料一致性。
 
 ---
@@ -125,13 +125,22 @@
 
 | 執行日期 | 環境 | Seed 版本 | 範圍（章節） | Pass | Fail | Blocked | 證據連結 | 執行者 | 備註 |
 |----------|------|-----------|--------------|------|------|---------|----------|--------|------|
-| 2026-04-30 | dev (Functions + Firestore verification script) | ADC (`application_default_credentials.json`) | 0, 3, 5（Firestore 真切換驗證） | 0 | 0 | 1 | `npm run verify:firestore`：先缺 Project ID，補 `GOOGLE_CLOUD_PROJECT` 後回 `PERMISSION_DENIED` | Codex | 憑證已建立但帳號尚無 `familyday-greenworld-dev` 專案 Firestore 權限（需 IAM 授權） |
-| 2026-04-30 | dev (Functions + Firestore verification script) | `functions/scripts/verify-firestore-flow.mjs` | 0, 3, 5（Firestore 真切換驗證） | 0 | 0 | 1 | `npm run verify:firestore` -> 缺 `FDGW_USE_FIRESTORE`；啟用後缺 `GOOGLE_APPLICATION_CREDENTIALS` | Codex | 一鍵流程已建置完成；待提供 service account 後可直接重跑 |
+| 2026-04-30 | dev (Functions + Firestore verification script) | ADC (`application_default_credentials.json`) | 0, 3, 5（Firestore 真切換驗證） | 0 | 0 | 1 | `npm run verify:firestore`：先缺 Project ID，補 `GOOGLE_CLOUD_PROJECT` 後回 `PERMISSION_DENIED` | Codex | Blocked: Firestore IAM permission pending（已建憑證，待專案授權） |
+| 2026-04-30 | dev (Functions + Firestore verification script) | `functions/scripts/verify-firestore-flow.mjs` | 0, 3, 5（Firestore 真切換驗證） | 0 | 0 | 1 | `npm run verify:firestore` -> 缺 `FDGW_USE_FIRESTORE`；啟用後缺 `GOOGLE_APPLICATION_CREDENTIALS` | Codex | Blocked: Firestore IAM permission pending（流程已建置，可直接重跑） |
 | 2026-04-30 | dev (Functions Emulator, port 5003) | in-memory (`functions/src/state/*.ts`) | 1, 6(CORS allowlist) | 3 | 0 | 0 | CORS 驗證：allowlist `netlify` 回 `200 + ACAO`；非白名單 `evil.example.com` 回 `500` 且無 ACAO | Codex | CORS allowlist 已收斂；白名單含 localhost:5173/4173、Netlify、GitHub Pages |
 | 2026-04-30 | dev (Functions Emulator, port 5003) | in-memory (`functions/src/state/*.ts`) | 1~5 + 6(401/409/CORS) | 17 | 0 | 1 | CLI：`health/ready/login/me/checkin/status/stations/challenges/attempts/dashboard/staff/admin` + 回歸 `source test/build`、`functions build` | Codex | 核心流程可用；**CORS allowlist 未收斂**（`Origin: https://evil.example.com` 仍回 `Access-Control-Allow-Origin`） |
 | 2026-04-30 | dev (Functions Emulator) | in-memory roster (`functions/src/data/employees.ts`) | 1, 2.2, 3, 6(401 基本驗證) | 8 | 0 | 0 | CLI 驗證：`health/ready/login/me/checkin/status/dashboard` 皆 200，未登入 `auth/me` 為 401 | Codex | 第一階段僅驗 MVP 端點；stations/challenges/restart/staff/admin 待下一階段 |
 | 2026-04-30 | dev (Functions Emulator, port 5003) | in-memory (`functions/src/state/*.ts`) | 1, 3, 4, 5, 6 | 13 | 0 | 0 | CLI 驗證：`stations/verify`、`challenges/*`、`restart(409)`、`staff/redeem/*`、`admin/reports/*` 皆符合預期 | Codex | 第二階段端點已落地（in-memory）；JWT 驗簽/Firestore 仍待下一階段 |
 | <!-- YYYY-MM-DD --> | <!-- dev/stage --> | <!-- seed tag --> | <!-- 1~6 / 全部 --> | <!-- n --> | <!-- n --> | <!-- n --> | <!-- link/path --> | <!-- owner --> | <!-- note --> |
+
+---
+
+## 7.2) 當前結論（Go/No-Go）
+
+- **Go（dev/stage）**：前端 + API + 後端（in-memory）整合流程可運作，核心路徑與 401/409/CORS 邊界已驗證。
+- **Conditional Go（Firestore）**：Firestore 模式程式路徑與驗證腳本已就緒，但 IAM 未授權前不可視為 fully verified。
+- **No-Go（正式對外）**：若 Firestore IAM 與最小安全基線（憑證、權限、環境變數）未完成，不可進入正式上架。
+- **Blocked 標準用語**：`Firestore IAM permission pending`。
 
 ---
 

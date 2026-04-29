@@ -1,7 +1,7 @@
 # 家庭日闖關系統 — 專案主文件（合併版）
 
 > **專案：** 瑞軒 2026 家庭日闖關系統  
-> **最後更新：** 2026-04-28（0410 會議／API 草案為基線；QR 分流見 §2.4）。
+> **最後更新：** 2026-04-30（同步 Cloud Functions、CORS allowlist 與 Firestore 驗證阻塞現況）。
 > 前端流程與路由見 [`summary-frontend.md`](../architecture/summary-frontend.md)
 > §2.1–§2.3；測試 Web UI／Netlify 預覽見根
 > [`README.md`](../../README.md#preview-netlify-test-ui)；部署摘要見
@@ -482,25 +482,25 @@
 
 ## 專案狀態
 
-> **最後更新：** 2026-04-29（同步單元測試與覆蓋率驗證結果；百分比仍為粗估）  
-> **專案階段：** 開發準備與原型驗證  
-> **整體進度：** 24%（API／架構草案＋可建置前端原型＋**前端 Vitest 單元測試與 CI**；最新驗證為 **11 檔 / 72 tests 全通過、coverage Statements/Lines 91.84%**；前端含完成領獎流程，見「技術規格 → 前端」）
+> **最後更新：** 2026-04-30（同步 Functions 聯調、CORS 收斂與 Firestore 驗證紀錄）  
+> **專案階段：** 開發驗證與阻塞解除  
+> **整體進度：** 62%（前端可操作 + Functions API 已落地 + 4/30 聯調驗證完成；目前主要阻塞為 Firestore IAM 權限未完成）
 
 ---
 
 ### 里程碑進度
 
 ```
-[█████░░░░░░░░░░░░░░░] 24%
+[████████████░░░░░░░░] 62%
 
 ✓ 需求收集與整理      [████████████] 100%
-→ 技術選型            [█████░░░░░░░]  45%
-  UI/UX 設計          [██░░░░░░░░░░]  15%（程式碼級介面迭代；正式稿／KV 仍待）
-  前端開發            [███░░░░░░░░░]  28%（路由與畫面原型；**Vitest** 單元測試（11 檔 / 72 tests、coverage Statements/Lines 91.84%）；**未**接後端 API）
-  後端開發            [░░░░░░░░░░░░]   0%
-  整合測試            [░░░░░░░░░░░░]   0%（前端／後端聯調仍待）
+→ 技術選型            [█████████░░░]  78%
+  UI/UX 設計          [███░░░░░░░░░]  22%（流程稿先行；正式視覺資產持續補齊）
+  前端開發            [███████░░░░░]  65%（主要流程可操作，已接 `VITE_API_BASE`）
+  後端開發            [███████░░░░░]  60%（Functions 端點已落地；Firestore 卡 IAM）
+  整合測試            [██████░░░░░░]  50%（4/30 已完成核心流程與邊界驗證）
   壓力測試            [░░░░░░░░░░░░]   0%
-  部署上線            [░░░░░░░░░░░░]   0%（**正式場域**；**不含** Netlify／GitHub Pages 等預覽，見根 `README`「公開預覽部署」）
+  部署上線            [██░░░░░░░░░░]  15%（dev/stage 可驗證；正式場域待 IAM 與安全基線）
 ```
 
 ---
@@ -522,13 +522,18 @@
 
 3. **前端原型（補充）**
    - [x] 完成頁 **`/finish`** 領獎互動與 **`/finish/claimed`** 領取成功頁（原型；後者可接 **`VITE_API_BASE` + dashboard**，無 API 時 **`local-fallback`**）：詳見 [技術規格 → 技術架構 → 前端](#技術架構) 與 [`summary-frontend.md`](../architecture/summary-frontend.md) **v1.26**
+4. **後端與聯調（4/30）**
+   - [x] Firebase Cloud Functions 已落地 `health/auth/checkin/dashboard/stations/challenges/restart/staff/admin` 路由
+   - [x] CORS allowlist 已收斂並完成白名單/非白名單驗證
+   - [x] `FDGW_USE_FIRESTORE` 切換與 `verify:firestore` 驗證流程已建立
 
 #### 進行中 →
 
-1. **技術選型**（約 45%；草案已完成，待簽核）
+1. **技術與環境收斂**（約 78%；阻塞解除中）
    - [x] 架構與 API **草案**（[`api-v0.1.md`](../specs/api-v0.1.md)、[`summary-*.md`](../architecture/summary-frontend.md)）
    - [ ] 前端／Database／部署之**正式簽核**
    - [x] 開發工具鏈與 **Repo／`source/` 初始化**（Vue + Vite + TS + Tailwind；可 `npm run build`）
+   - [ ] Firestore IAM 權限補齊並完成最終實證
 
 2. **需求釐清**
    - [ ] 高優先級 H1～H5 與表單／清冊規格收斂
@@ -544,15 +549,15 @@
 
 2. **開發**
    - [x] 前端開發環境建置（`source/`；本機 `npm run dev`／`build`）
-   - [ ] 後端開發環境建置
-   - [ ] 報到系統開發（**正式** API／簽到流程；現有畫面為原型）
-   - [ ] 闖關系統開發（**正式** QR／進度 API；現有畫面為原型＋示範資料）
-   - [ ] 獎品兌換系統開發
+   - [x] 後端開發環境建置（`functions/` TypeScript + Firebase Functions）
+   - [x] 報到系統開發（Cloud Functions `checkin` + `checkin/status`）
+   - [x] 闖關系統開發（`stations/challenges/restart/dashboard`）
+   - [x] 獎品兌換系統開發（`staff/redeem/token` + `staff/redeem/confirm`）
 
 3. **測試**
    - [x] **前端**單元測試（**Vitest**；`source/src/**/*.test.ts`；**CI** 見 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)；最新驗證：**11 檔 / 72 tests 全通過，coverage Statements/Lines 91.84%**；細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) **§1.1** **v1.23**）
-   - [ ] 後端單元測試
-   - [ ] 整合測試
+   - [ ] 後端單元測試（待補齊）
+   - [x] 整合測試（4/30 已完成核心流程、401/409、CORS 邊界）
    - [ ] 壓力測試（1,300 人併發）
    - [ ] 使用者驗收測試
 
@@ -571,6 +576,9 @@
 | 2026-04-27 | **後端架構定案**（Vue+Vite+Firebase、API v0.1、流量與部署摘要） | 與會議成本估算及維運策略對齊，降低後端維運負擔 | 見本檔開頭補充文件表；後端以 Firebase 為準 |
 | 2026-04-15 | **`source/` 前端可建置原型**（Vue Router、Tailwind、示範流程） | 驗證技術鏈與 UX 假設；與後端解耦 | Naive UI 未裝；見 `summary-frontend.md` v1.1 |
 | 2026-04-16 | **完成頁 `/finish` 領獎流程（原型）** | 對齊主規則表之次數／份數上限與櫃台驗證情境；先以瀏覽器暫存類比領取次數 | 見 `summary-frontend.md` v1.2（**現況**見 **v1.26**、`api-v0.1` **v0.1.8**）；正式上線需接 `api-v0.1.md` 櫃台／核銷端點或等價流程 |
+| 2026-04-30 | Cloud Functions 作為首階段後端執行層 | 可快速承接既有 REST 契約並以最小變更完成前後端聯調 | 核心與 Phase 2 端點已落地，前端可直接驗證 |
+| 2026-04-30 | CORS 採固定 allowlist 白名單策略 | 先堵住任意 Origin 風險，符合活動前最小安全基線 | 白名單來源可通過，非白名單不回傳 ACAO |
+| 2026-04-30 | Firestore 採環境旗標切換（`FDGW_USE_FIRESTORE`） | 允許 in-memory 與 Firestore 並行驗證，降低切換風險 | 目前阻塞點聚焦為 IAM 權限，便於分工追蹤 |
 
 ---
 
@@ -582,6 +590,7 @@
 |------|------|----------|--------|:----:|
 | 1,300 人併發可能超出系統負載 | 系統崩潰，活動無法進行 | 提前壓力測試、準備擴展方案 | | 監控中 |
 | 活動日前驗收窗口緊（目標六月底／七月初） | 功能不完整或品質不佳 | MVP、倒排驗收；5 月下旬場勘後凍結動線相關需求 | | 監控中 |
+| Firestore IAM 未完成導致最終實證未閉環 | 正式資料層無法完成 Go 証明，影響正式上線判定 | 立即補齊專案 IAM（Cloud Datastore User+）並重跑 `npm run verify:firestore` | Brian / 專案 Owner | 阻塞中 |
 
 #### 中風險 🟡
 
@@ -601,17 +610,18 @@
 ### 待辦事項（本週）
 
 #### 高優先級
-- [ ] 例行會議（每週五 10:00、A1）
-- [ ] 活動日拍板（H1）；表單／清冊格式（H2）
-- [ ] 簽到與闖關資料切分與同步（H3）；簽到→闖關導覽（H4）；專屬 QR 資安（H5）
+- [ ] 補齊 `familyday-greenworld-dev` Firestore IAM（Cloud Datastore User 或等價權限）
+- [ ] 重跑 `functions/`：`npm run verify:firestore` 並確認 Firestore 寫入/讀取成功
+- [ ] 將 Firestore 驗證證據回填 `docs/testing/api-integration-checklist.md`，解除 Blocked
+- [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、Cookie）
 
 #### 中優先級
-- [ ] **會議簽核**技術草案（[`api-v0.1.md`](../specs/api-v0.1.md)、[`summary-frontend.md`](../architecture/summary-frontend.md)、[`summary-backend.md`](../architecture/summary-backend.md)、部署見 [`summary-deployment.md`](../architecture/summary-deployment.md)）
-- [ ] 聯繫 Fendy Wei：KV（4/17）、識別元素（Logo／印花／CIS）
+- [ ] 完成 dev/stage 驗證 runbook（含 `VITE_API_BASE`、`FDGW_USE_FIRESTORE`、憑證設定）
+- [ ] 補齊後端單元測試與關鍵路徑自動化（auth/checkin/game/redeem）
 
 #### 低優先級
-- [x] 建立前端開發環境並初始化 `source/`（後端改採 Firebase，待建立正式專案與環境設定）
-- [ ] 依 [`api-v0.1.md`](../specs/api-v0.1.md) 設計 Firebase 資料結構與 Security Rules 草稿
+- [ ] 盤點壓測腳本（k6）與活動日前演練節點
+- [ ] 補齊設計資產到位後的 UI 文案與視覺一致性檢查
 
 ---
 
@@ -729,4 +739,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.29 · 2026-04-28（版本鏈同步：`summary-frontend` **v1.26**、`summary-backend` **v1.5**、`summary-deployment` **v1.5**、`summary-traffic` **v1.2**；前版 **v1.3.28**）
+**文件版本：** 合併版 v1.3.30 · 2026-04-30（版本鏈同步：`api-v0.1` **v0.1.13**、`summary-frontend` **v1.26**、`summary-backend` **v1.5**、`summary-deployment` **v1.5**、`summary-traffic` **v1.2**；前版 **v1.3.29**）

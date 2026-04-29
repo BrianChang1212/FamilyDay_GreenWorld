@@ -78,10 +78,11 @@ npm run dev
 
 | 面向 | 現況 |
 |------|------|
-| 前端 | `source/` 可本機啟動、建置與預覽；主要路由流程可操作 |
-| API | 前端已依 `docs/specs/api-v0.1.md` 串接呼叫介面；目前以 `source/mock/` 驗證為主，正式後端待接入 |
-| 測試 | Vitest 單元測試已納入 CI，作為上線前品質把關 |
-| 部署 | Netlify / GitHub Pages 目前定位為測試預覽；正式環境待公司核可網域與後端資安配置 |
+| 前端 | `source/` 可本機啟動、建置與預覽；已可透過 `VITE_API_BASE` 串接 Firebase Functions |
+| API | Cloud Functions 已落地核心與 Phase 2 端點（`health/auth/checkin/dashboard/stations/challenges/restart/staff/admin`） |
+| 後端資料層 | 已完成 in-memory + Firestore toggle（`FDGW_USE_FIRESTORE`）；Firestore 最終實證目前卡在 IAM 權限 |
+| 測試 | Vitest 單元測試與 CI 持續通過；4/30 已完成 Functions 聯調與 CORS allowlist 驗證 |
+| 部署 | 可進行 dev/stage 驗證上架；正式對外上線仍需先完成 IAM 與最小安全基線 |
 
 ### 進階疑難排解（Windows 安裝 Node.js 與 npm）
 
@@ -313,32 +314,32 @@ flowchart LR
 
 ### 專案進度（概覽）
 
-整體約 **24%**（文件＋前端可跑原型＋**前端 Vitest 單元測試與 CI 已驗證：11 檔 / 72 tests 全通過、coverage Statements/Lines 91.84%**；後端、整合／E2E／壓測仍待）。細項見 `docs/project/project-master.md`「專案狀態」。
+整體約 **62%**（前端可操作 + Functions API 已落地 + 4/30 聯調驗證 + CORS allowlist 收斂；阻塞點為 Firestore IAM 權限，尚未完成最終實證與正式上線安全項）。細項見 `docs/project/project-master.md`「專案狀態」。
 
 
-| 項目               | 狀態                                      |
+| 項目 | 狀態 |
 | ---------------- | --------------------------------------- |
-| 需求收集與整理          | 完成                                      |
-| 技術選型             | 草案完成，待簽核                                |
-| UI/UX 設計（設計稿／KV） | 未開始                                     |
-| 開發               | **前端** `source/` 可建置與預覽（示範流程）；後端 API 未接 |
-| 測試               | **前端** Vitest 單元測試已納入 CI（`source/src/**/*.test.ts`）；最新驗證：**11 檔 / 72 tests 全通過，coverage Statements/Lines 91.84%**；整合／E2E／壓測仍待 |
-| 部署               | **正式／公司核可場域**尚未定案與上線；**靜態預覽**（Netlify／GitHub Pages 等）見 [公開預覽部署 · 測試 Web UI](#preview-netlify-test-ui) 與 **CI**（[`.github/workflows/ci.yml`](.github/workflows/ci.yml)） |
+| 需求收集與整理 | 完成 |
+| 技術選型 | Cloud Functions + Firestore 路線已落地實作；正式維運參數待簽核 |
+| UI/UX 設計（設計稿／KV） | 進行中（功能流程先行，正式視覺資產持續補齊） |
+| 開發 | **前端 + API + 後端（in-memory）** 已完成主要流程；Firestore 模式程式路徑已打通，待 IAM 權限完成最終驗證 |
+| 測試 | **前端** Vitest + CI 持續通過；**後端聯調**已完成健康檢查、登入、報到、闖關、staff/admin、401/409 與 CORS 驗證 |
+| 部署 | **dev/stage 可驗證上架**；正式上線需先完成 Firestore IAM、憑證與安全基線（HTTPS/Cookie/權限） |
 
 
 ### 下一步（本週）
 
 **高優先級**
 
-- 需求確認會議（每週五 10:00、A1）  
-- 收斂上述高優先級待確認事項  
-- 請 Fendy（魏淑芬）提供識別元素（Logo、印花、CIS）；**KV 目標 4/17 前**  
-- **4/24 前**收斂流程、App 介面與提示文案（搭配雙週會）
+- 完成 `familyday-greenworld-dev` 的 Firestore IAM 授權（至少 Cloud Datastore User）  
+- 重跑 `functions/` 的 `npm run verify:firestore` 並保存證據（CLI 輸出 + Firestore 查驗）  
+- 將 Firestore 驗證結果回填 `docs/testing/api-integration-checklist.md`（解除 Blocked）  
+- 確認 `VITE_API_BASE`、CORS allowlist 與目標驗證網域一致  
 
 **中優先級**
 
-- 會議**簽核**技術草案（`docs/specs/api-v0.1.md`、`docs/architecture/summary-*.md`）  
-- 前端：`source/` 已初始化並可 `npm run dev`／`npm run build`（後端環境仍待簽核後建立）
+- 補齊 Firestore Security Rules 檢核與最小監控告警清單  
+- 將 dev/stage 驗證流程整理為可重跑的 runbook（含憑證與環境變數）  
 
 ---
 
@@ -411,4 +412,4 @@ flowchart LR
 
 ---
 
-*README v2.52 · 2026-04-28（版本鏈同步：`summary-frontend` **v1.26**、`summary-backend` **v1.5**、`summary-deployment` **v1.5**、`summary-traffic` **v1.2**；前版 v2.51）*
+*README v2.53 · 2026-04-30（版本鏈同步：`api-v0.1` **v0.1.13**、`summary-frontend` **v1.26**、`summary-backend` **v1.5**、`summary-deployment` **v1.5**、`summary-traffic` **v1.2**；前版 v2.52）*
