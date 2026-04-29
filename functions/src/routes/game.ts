@@ -61,7 +61,7 @@ gameRouter.get("/challenges/:challengeId", (req, res) => {
 	});
 });
 
-gameRouter.post("/challenges/:challengeId/attempts", (req, res) => {
+gameRouter.post("/challenges/:challengeId/attempts", async (req, res) => {
 	const session = getSessionUser(req);
 	if (!session) {
 		res.status(401).json(badRequest("UNAUTHORIZED", "missing or invalid session"));
@@ -82,21 +82,25 @@ gameRouter.post("/challenges/:challengeId/attempts", (req, res) => {
 		return;
 	}
 
-	const result = applyAttemptResult(session.employeeId, challengeId, choiceId);
+	const result = await applyAttemptResult(
+		session.employeeId,
+		challengeId,
+		choiceId,
+	);
 	res.status(200).json({
 		correct: result.correct,
 		nextStageId: result.nextStageId,
 	});
 });
 
-gameRouter.post("/me/playthrough/restart", (req, res) => {
+gameRouter.post("/me/playthrough/restart", async (req, res) => {
 	const session = getSessionUser(req);
 	if (!session) {
 		res.status(401).json(badRequest("UNAUTHORIZED", "missing or invalid session"));
 		return;
 	}
 
-	const restarted = restartPlaythrough(session.employeeId);
+	const restarted = await restartPlaythrough(session.employeeId);
 	if (!restarted) {
 		res.status(409).json(
 			badRequest(
@@ -109,11 +113,11 @@ gameRouter.post("/me/playthrough/restart", (req, res) => {
 	res.status(200).json(restarted);
 });
 
-gameRouter.get("/me/progress", (req, res) => {
+gameRouter.get("/me/progress", async (req, res) => {
 	const session = getSessionUser(req);
 	if (!session) {
 		res.status(401).json(badRequest("UNAUTHORIZED", "missing or invalid session"));
 		return;
 	}
-	res.status(200).json(getOrInitProgress(session.employeeId));
+	res.status(200).json(await getOrInitProgress(session.employeeId));
 });

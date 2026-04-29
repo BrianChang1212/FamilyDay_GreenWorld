@@ -1,3 +1,5 @@
+import { getDb, useFirestoreStore } from "../utils/store";
+
 export type CheckinRecord = {
 	employeeId: string;
 	name: string;
@@ -7,11 +9,32 @@ export type CheckinRecord = {
 
 const checkins = new Map<string, CheckinRecord>();
 
-export function upsertCheckin(record: CheckinRecord): void {
+export async function upsertCheckin(record: CheckinRecord): Promise<void> {
+	if (useFirestoreStore()) {
+		const db = getDb();
+		await db.collection("checkins").doc(record.employeeId).set(record, { merge: true });
+		return;
+	}
 	checkins.set(record.employeeId, record);
 }
 
-export function getCheckin(employeeId?: string): CheckinRecord | null {
+export async function getCheckin(employeeId?: string): Promise<CheckinRecord | null> {
+	if (useFirestoreStore()) {
+		const db = getDb();
+		if (employeeId) {
+			const snap = await db.collection("checkins").doc(employeeId).get();
+			return snap.exists ? (snap.data() as CheckinRecord) : null;
+		}
+		const q = await db
+			.collection("checkins")
+			.orderBy("checkinAt", "desc")
+			.limit(1)
+			.get();
+		if (q.empty) {
+			return null;
+		}
+		return q.docs[0].data() as CheckinRecord;
+	}
 	if (employeeId) {
 		return checkins.get(employeeId) ?? null;
 	}

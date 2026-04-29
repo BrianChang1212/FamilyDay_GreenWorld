@@ -49,7 +49,7 @@ exports.gameRouter.get("/challenges/:challengeId", (req, res) => {
         options: challenge.options,
     });
 });
-exports.gameRouter.post("/challenges/:challengeId/attempts", (req, res) => {
+exports.gameRouter.post("/challenges/:challengeId/attempts", async (req, res) => {
     const session = (0, authGuard_1.getSessionUser)(req);
     if (!session) {
         res.status(401).json((0, http_1.badRequest)("UNAUTHORIZED", "missing or invalid session"));
@@ -67,30 +67,30 @@ exports.gameRouter.post("/challenges/:challengeId/attempts", (req, res) => {
             .json((0, http_1.badRequest)("INVALID_ATTEMPT_PAYLOAD", "choiceId is required"));
         return;
     }
-    const result = (0, game_1.applyAttemptResult)(session.employeeId, challengeId, choiceId);
+    const result = await (0, game_1.applyAttemptResult)(session.employeeId, challengeId, choiceId);
     res.status(200).json({
         correct: result.correct,
         nextStageId: result.nextStageId,
     });
 });
-exports.gameRouter.post("/me/playthrough/restart", (req, res) => {
+exports.gameRouter.post("/me/playthrough/restart", async (req, res) => {
     const session = (0, authGuard_1.getSessionUser)(req);
     if (!session) {
         res.status(401).json((0, http_1.badRequest)("UNAUTHORIZED", "missing or invalid session"));
         return;
     }
-    const restarted = (0, game_1.restartPlaythrough)(session.employeeId);
+    const restarted = await (0, game_1.restartPlaythrough)(session.employeeId);
     if (!restarted) {
         res.status(409).json((0, http_1.badRequest)("RESTART_NOT_ALLOWED", "restart requires a full clear and remaining rounds"));
         return;
     }
     res.status(200).json(restarted);
 });
-exports.gameRouter.get("/me/progress", (req, res) => {
+exports.gameRouter.get("/me/progress", async (req, res) => {
     const session = (0, authGuard_1.getSessionUser)(req);
     if (!session) {
         res.status(401).json((0, http_1.badRequest)("UNAUTHORIZED", "missing or invalid session"));
         return;
     }
-    res.status(200).json((0, game_1.getOrInitProgress)(session.employeeId));
+    res.status(200).json(await (0, game_1.getOrInitProgress)(session.employeeId));
 });

@@ -6,14 +6,14 @@ const http_1 = require("../utils/http");
 const session_1 = require("../utils/session");
 const game_1 = require("../state/game");
 exports.dashboardRouter = (0, express_1.Router)();
-exports.dashboardRouter.get("/me/dashboard", (req, res) => {
+exports.dashboardRouter.get("/me/dashboard", async (req, res) => {
     const raw = (0, http_1.getCookie)(req, (0, session_1.getSessionCookieName)());
     const session = raw ? (0, session_1.verifySessionToken)(raw) : null;
     if (!session) {
         res.status(401).json((0, http_1.badRequest)("UNAUTHORIZED", "missing or invalid session"));
         return;
     }
-    const progress = (0, game_1.getOrInitProgress)(session.employeeId);
+    const progress = await (0, game_1.getOrInitProgress)(session.employeeId);
     res.status(200).json({
         event: {
             id: "greenworld-2026",

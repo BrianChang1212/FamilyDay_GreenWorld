@@ -6,7 +6,7 @@ const employees_1 = require("../data/employees");
 const checkins_1 = require("../state/checkins");
 const http_1 = require("../utils/http");
 exports.checkinRouter = (0, express_1.Router)();
-exports.checkinRouter.post("/checkin", (req, res) => {
+exports.checkinRouter.post("/checkin", async (req, res) => {
     const employeeId = (0, http_1.normalizeText)(req.body?.employeeId);
     const name = (0, http_1.normalizeText)(req.body?.name);
     const partySize = (0, http_1.toPositiveInt)(req.body?.partySize);
@@ -20,7 +20,7 @@ exports.checkinRouter.post("/checkin", (req, res) => {
         return;
     }
     const now = new Date().toISOString();
-    (0, checkins_1.upsertCheckin)({
+    await (0, checkins_1.upsertCheckin)({
         employeeId: employee.employeeId,
         name: employee.name,
         partySize,
@@ -32,9 +32,9 @@ exports.checkinRouter.post("/checkin", (req, res) => {
         checkinAt: now,
     });
 });
-exports.checkinRouter.get("/checkin/status", (req, res) => {
+exports.checkinRouter.get("/checkin/status", async (req, res) => {
     const employeeId = (0, http_1.normalizeText)(req.query.employeeId);
-    const found = (0, checkins_1.getCheckin)(employeeId || undefined);
+    const found = await (0, checkins_1.getCheckin)(employeeId || undefined);
     if (!found) {
         res.status(200).json({
             checkedIn: false,

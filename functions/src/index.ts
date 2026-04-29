@@ -10,10 +10,22 @@ import { healthRouter } from "./routes/health";
 import { staffRouter } from "./routes/staff";
 
 const app = express();
+const corsAllowlist = new Set([
+	"http://localhost:5173",
+	"http://localhost:4173",
+	"https://familyday-greenworld.netlify.app",
+	"https://brianchang1212.github.io",
+]);
 
 app.use(
 	cors({
-		origin: true,
+		origin: (origin, callback) => {
+			if (!origin || corsAllowlist.has(origin)) {
+				callback(null, true);
+				return;
+			}
+			callback(new Error("CORS origin is not allowed"));
+		},
 		credentials: true,
 	}),
 );
@@ -37,7 +49,7 @@ app.use("/api/v1", (_req, res) => {
 export const api = onRequest(
 	{
 		region: "us-central1",
-		cors: true,
+		cors: false,
 	},
 	app,
 );

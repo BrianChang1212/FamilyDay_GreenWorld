@@ -3,6 +3,7 @@ node_modules/
 dist/
 build/
 out/
+functions/lib/
 .venv/
 __pycache__/
 *.pyc

@@ -1,3 +1,5 @@
+import { getDb, useFirestoreStore } from "../utils/store";
+
 export type ChallengeRecord = {
 	id: string;
 	title: string;
@@ -79,7 +81,19 @@ export function stageIdToChallengeId(stageId: number): string {
 	return CHALLENGES[stageId - 1].id;
 }
 
-export function getOrInitProgress(employeeId: string): PlayerProgress {
+export async function getOrInitProgress(employeeId: string): Promise<PlayerProgress> {
+	if (useFirestoreStore()) {
+		const db = getDb();
+		const ref = db.collection("player_progress").doc(employeeId);
+		const snap = await ref.get();
+		if (snap.exists) {
+			return snap.data() as PlayerProgress;
+		}
+		const init = defaultProgress();
+		await ref.set(init, { merge: true });
+		return init;
+	}
+
 	const found = playerProgress.get(employeeId);
 	if (found) {
 		return found;
@@ -89,16 +103,16 @@ export function getOrInitProgress(employeeId: string): PlayerProgress {
 	return init;
 }
 
-export function applyAttemptResult(
+export async function applyAttemptResult(
 	employeeId: string,
 	challengeId: string,
 	choiceId: string,
-): { correct: boolean; nextStageId: number | null } {
+): Promise<{ correct: boolean; nextStageId: number | null }> {
 	const challenge = getChallenge(challengeId);
 	if (!challenge) {
 		return { correct: false, nextStageId: null };
 	}
-	const progress = getOrInitProgress(employeeId);
+	const progress = await getOrInitProgress(employeeId);
 	const correct = challenge.correctChoiceId === choiceId;
 	if (!correct) {
 		return {
@@ -115,19 +129,27 @@ export function applyAttemptResult(
 
 	if (progress.completedStageIds.length >= CHALLENGES.length) {
 		progress.currentStageId = CHALLENGES.length;
+		if (useFirestoreStore()) {
+			const db = getDb();
+			await db.collection("player_progress").doc(employeeId).set(progress, { merge: true });
+		}
 		return { correct: true, nextStageId: null };
 	}
 
 	progress.currentStageId = Math.min(stageId + 1, CHALLENGES.length);
+	if (useFirestoreStore()) {
+		const db = getDb();
+		await db.collection("player_progress").doc(employeeId).set(progress, { merge: true });
+	}
 	return { correct: true, nextStageId: progress.currentStageId };
 }
 
-export function restartPlaythrough(employeeId: string): {
+export async function restartPlaythrough(employeeId: string): Promise<{
 	ok: boolean;
 	fullClearCount: number;
 	remainingRounds: number;
-} | null {
-	const progress = getOrInitProgress(employeeId);
+} | null> {
+	const progress = await getOrInitProgress(employeeId);
 	if (progress.completedStageIds.length < CHALLENGES.length) {
 		return null;
 	}
@@ -138,6 +160,10 @@ export function restartPlaythrough(employeeId: string): {
 	progress.fullClearCount += 1;
 	progress.completedStageIds = [];
 	progress.currentStageId = 1;
+	if (useFirestoreStore()) {
+		const db = getDb();
+		await db.collection("player_progress").doc(employeeId).set(progress, { merge: true });
+	}
 	return {
 		ok: true,
 		fullClearCount: progress.fullClearCount,

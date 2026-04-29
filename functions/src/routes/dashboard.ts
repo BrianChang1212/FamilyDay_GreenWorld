@@ -5,14 +5,14 @@ import { getOrInitProgress } from "../state/game";
 
 export const dashboardRouter = Router();
 
-dashboardRouter.get("/me/dashboard", (req, res) => {
+dashboardRouter.get("/me/dashboard", async (req, res) => {
 	const raw = getCookie(req, getSessionCookieName());
 	const session = raw ? verifySessionToken(raw) : null;
 	if (!session) {
 		res.status(401).json(badRequest("UNAUTHORIZED", "missing or invalid session"));
 		return;
 	}
-	const progress = getOrInitProgress(session.employeeId);
+	const progress = await getOrInitProgress(session.employeeId);
 
 	res.status(200).json({
 		event: {

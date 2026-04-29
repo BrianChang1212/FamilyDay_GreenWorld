@@ -1,6 +1,6 @@
 # 家庭日綠世界闖關 Web — API 規格（v0.1 草案）
 
-> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.11** 更新第二階段 Cloud Functions 落地端點狀態；**v0.1.10** 新增 Cloud Functions MVP 已落地端點清單；**v0.1.9** 新增端點觸發時機圖；**不改**端點定義）。
+> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.13** 完成 CORS allowlist 收斂驗證；**v0.1.12** 補 2 小時聯調驗證註記與 CORS 觀察；**v0.1.11** 更新第二階段 Cloud Functions 落地端點狀態；**不改**端點定義）。
 
 ---
 
@@ -73,6 +73,17 @@
 | `POST /api/v1/admin/roster/import` | 已落地 | 第二階段先回最小匯入結果 |
 | `GET /api/v1/admin/reports/attendance` | 已落地 | 第二階段先回最小統計欄位 |
 | `GET /api/v1/admin/reports/progress` | 已落地 | 第二階段先回最小統計欄位 |
+
+---
+
+### 聯調驗證註記（2 小時清單，2026-04-30）
+
+- 核心流程（登入、報到、闖關、dashboard）可由 Functions emulator 端到端打通。
+- `401/409` 邊界行為已驗證：
+  - 未登入呼叫 `GET /api/v1/auth/me` 回 `401`
+  - 未滿足條件呼叫 `POST /api/v1/me/playthrough/restart` 回 `409`
+- CORS allowlist 已收斂：僅允許 `http://localhost:5173`、`http://localhost:4173`、`https://familyday-greenworld.netlify.app`、`https://brianchang1212.github.io`。
+- 非白名單來源（例：`https://evil.example.com`）驗證結果為無 ACAO 回應，符合阻擋預期。
 
 ---
 
@@ -421,3 +432,5 @@ sequenceDiagram
 | v0.1.9 | 2026-04-28 | 新增「端點觸發時機圖」：依 Player / Staff / Admin / System 分群標示 API 呼叫時機，並將原流程圖章節調整為 §13 |
 | v0.1.10 | 2026-04-30 | 新增「Cloud Functions MVP 落地狀態」：標示已落地與未落地端點（`functions/` 第一階段） |
 | v0.1.11 | 2026-04-30 | 更新第二階段落地狀態：新增 game/staff/admin 端點已落地註記（仍採 in-memory） |
+| v0.1.12 | 2026-04-30 | 新增 2 小時聯調驗證註記：確認核心流程與 401/409 邊界行為，並記錄 CORS allowlist 仍待收斂 |
+| v0.1.13 | 2026-04-30 | CORS allowlist 收斂完成並驗證：白名單來源可用，非白名單來源不回傳 ACAO |

@@ -5,7 +5,7 @@ import { badRequest, normalizeText, toPositiveInt } from "../utils/http";
 
 export const checkinRouter = Router();
 
-checkinRouter.post("/checkin", (req, res) => {
+checkinRouter.post("/checkin", async (req, res) => {
 	const employeeId = normalizeText(req.body?.employeeId);
 	const name = normalizeText(req.body?.name);
 	const partySize = toPositiveInt(req.body?.partySize);
@@ -31,7 +31,7 @@ checkinRouter.post("/checkin", (req, res) => {
 	}
 
 	const now = new Date().toISOString();
-	upsertCheckin({
+	await upsertCheckin({
 		employeeId: employee.employeeId,
 		name: employee.name,
 		partySize,
@@ -44,9 +44,9 @@ checkinRouter.post("/checkin", (req, res) => {
 	});
 });
 
-checkinRouter.get("/checkin/status", (req, res) => {
+checkinRouter.get("/checkin/status", async (req, res) => {
 	const employeeId = normalizeText(req.query.employeeId);
-	const found = getCheckin(employeeId || undefined);
+	const found = await getCheckin(employeeId || undefined);
 	if (!found) {
 		res.status(200).json({
 			checkedIn: false,

@@ -15,8 +15,20 @@ const game_1 = require("./routes/game");
 const health_1 = require("./routes/health");
 const staff_1 = require("./routes/staff");
 const app = (0, express_1.default)();
+const corsAllowlist = new Set([
+    "http://localhost:5173",
+    "http://localhost:4173",
+    "https://familyday-greenworld.netlify.app",
+    "https://brianchang1212.github.io",
+]);
 app.use((0, cors_1.default)({
-    origin: true,
+    origin: (origin, callback) => {
+        if (!origin || corsAllowlist.has(origin)) {
+            callback(null, true);
+            return;
+        }
+        callback(new Error("CORS origin is not allowed"));
+    },
     credentials: true,
 }));
 app.use(express_1.default.json());
@@ -35,5 +47,5 @@ app.use("/api/v1", (_req, res) => {
 });
 exports.api = (0, https_1.onRequest)({
     region: "us-central1",
-    cors: true,
+    cors: false,
 }, app);

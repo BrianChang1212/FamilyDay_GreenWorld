@@ -11,15 +11,15 @@ exports.adminRouter.post("/admin/roster/import", (_req, res) => {
         importedCount: 10,
     });
 });
-exports.adminRouter.get("/admin/reports/attendance", (_req, res) => {
-    const anyCheckin = (0, checkins_1.getCheckin)();
+exports.adminRouter.get("/admin/reports/attendance", async (_req, res) => {
+    const anyCheckin = await (0, checkins_1.getCheckin)();
     res.status(200).json({
         total: 1000,
         checkedIn: anyCheckin ? 1 : 0,
     });
 });
-exports.adminRouter.get("/admin/reports/progress", (_req, res) => {
-    const redeem = (0, redeem_1.getRedeemSummary)();
+exports.adminRouter.get("/admin/reports/progress", async (_req, res) => {
+    const redeem = await (0, redeem_1.getRedeemSummary)();
     res.status(200).json({
         players: 1,
         fullClear: 0,
