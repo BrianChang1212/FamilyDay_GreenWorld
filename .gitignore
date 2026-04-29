@@ -25,6 +25,3 @@ Thumbs.db
 *.log
 npm-debug.log*
 
-# Local graph / analysis tool output (large JSON cache; optional)
-graphify-out/
-source/graphify-out/

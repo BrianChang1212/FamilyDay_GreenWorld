@@ -298,7 +298,7 @@ flowchart LR
 
 ### 專案進度（概覽）
 
-整體約 **24%**（文件＋前端可跑原型＋**前端 Vitest 單元測試與 CI**；後端、整合／E2E／壓測仍待）。細項見 `docs/project/project-master.md`「專案狀態」。
+整體約 **24%**（文件＋前端可跑原型＋**前端 Vitest 單元測試與 CI 已驗證：11 檔 / 72 tests 全通過、coverage Statements/Lines 91.84%**；後端、整合／E2E／壓測仍待）。細項見 `docs/project/project-master.md`「專案狀態」。
 
 
 | 項目               | 狀態                                      |
@@ -307,7 +307,7 @@ flowchart LR
 | 技術選型             | 草案完成，待簽核                                |
 | UI/UX 設計（設計稿／KV） | 未開始                                     |
 | 開發               | **前端** `source/` 可建置與預覽（示範流程）；後端 API 未接 |
-| 測試               | **前端** Vitest 單元測試已納入 CI（`source/src/**/*.test.ts`）；整合／E2E／壓測仍待 |
+| 測試               | **前端** Vitest 單元測試已納入 CI（`source/src/**/*.test.ts`）；最新驗證：**11 檔 / 72 tests 全通過，coverage Statements/Lines 91.84%**；整合／E2E／壓測仍待 |
 | 部署               | **正式／公司核可場域**尚未定案與上線；**靜態預覽**（Netlify／GitHub Pages 等）見 [公開預覽部署 · 測試 Web UI](#preview-netlify-test-ui) 與 **CI**（[`.github/workflows/ci.yml`](.github/workflows/ci.yml)） |
 
 
@@ -338,7 +338,6 @@ flowchart LR
 | `.cursor/skills/` | Cursor Agent 用技能說明（前端設計、文案／在地化等）；選用，**非**執行期依賴                                                                    |
 | `test/`           | 倉庫根目錄**驗收／測試紀錄**用（**選用**；目前僅 **`.gitkeep`**）。**程式單元測試**在 **`source/src/**/*.test.ts`**（Vitest），非此資料夾 |
 | `tool/`           | 輔助腳本（**選用**）：例如 [`tool/capture-preview-screenshots.ps1`](tool/capture-preview-screenshots.ps1)（重產 [`docs/preview/screenshots/`](docs/preview/screenshots/)，見 [`docs/media/README.md`](docs/media/README.md)）；另含 **`.gitkeep`** |
-| `graphify-out/`   | 圖譜／分析工具輸出（HTML／JSON／報告）；**已列於 `.gitignore`**，避免大量快取進版控                                                                 |
 
 
 ---
