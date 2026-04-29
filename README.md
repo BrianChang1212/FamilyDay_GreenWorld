@@ -332,6 +332,7 @@ flowchart LR
 **高優先級**
 
 - 完成 `familyday-greenworld-dev` 的 Firestore IAM 授權（至少 Cloud Datastore User）  
+- 確認本機驗證身分已對齊目標專案（`firebase login:list` 需有授權帳號；`GOOGLE_CLOUD_PROJECT=familyday-greenworld-dev`）  
 - 重跑 `functions/` 的 `npm run verify:firestore` 並保存證據（CLI 輸出 + Firestore 查驗）  
 - 將 Firestore 驗證結果回填 `docs/testing/api-integration-checklist.md`（解除 Blocked）  
 - 確認 `VITE_API_BASE`、CORS allowlist 與目標驗證網域一致  
