@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
-import { logoutGame, restartPlaythrough } from "@/api/gameFlow";
+import { claimFinishReward, logoutGame, restartPlaythrough } from "@/api/gameFlow";
 import {
 	LEVEL_COMPLETE_STICKER_SRC,
 	getProfile,
@@ -29,6 +29,8 @@ const statusLoadState = ref<"loading" | "ok" | "error">("loading");
 const statusError = ref("");
 const actionLoading = ref(false);
 const actionError = ref("");
+const claimSubmitting = ref(false);
+const claimError = ref("");
 
 const userLine = computed(() => {
 	const id = employeeId.value.trim();
@@ -68,9 +70,6 @@ async function refreshClaimed(): Promise<void> {
 	claimedCount.value = r.claimed;
 	maxSlots.value = r.maxSlots;
 	statusLoadState.value = "ok";
-	if (claimedCount.value >= maxSlots.value && maxSlots.value > 0) {
-		await router.replace({ name: "finishClaimSuccess" });
-	}
 }
 
 function retryLoadStatus() {
@@ -91,20 +90,39 @@ function openClaimModal() {
 }
 
 function closeClaimModal() {
+	if (claimSubmitting.value) return;
 	showClaimModal.value = false;
+	claimError.value = "";
 }
 
-function confirmClaim() {
-	showClaimModal.value = false;
-	/** 已設定 API 時：原型仍導向成功頁，由 dashboard 反映伺服器狀態（正式上線應改為核銷 API 成功後再導頁或重新整理） */
+async function confirmClaim() {
+	claimError.value = "";
 	if (getViteApiBase()) {
-		router.push({ name: "finishClaimSuccess" });
+		claimSubmitting.value = true;
+		try {
+			await claimFinishReward();
+			showClaimModal.value = false;
+			await router.push({ name: "finishClaimSuccess" });
+		} catch (err) {
+			const msg = err instanceof Error ? err.message : String(err);
+			if (/REWARD_CLAIM_LIMIT_REACHED|409/.test(msg)) {
+				claimError.value = t("finish.rewardLimitReached", {
+					maxSlots: maxSlots.value,
+				});
+			} else {
+				claimError.value =
+					msg.length > 180 ? `${msg.slice(0, 180)}…` : msg;
+			}
+		} finally {
+			claimSubmitting.value = false;
+		}
 		return;
 	}
+	showClaimModal.value = false;
 	incrementLocalFinishClaimIfNoApiBase();
 	claimedCount.value = getFinishClaimedCount();
 	if (claimedCount.value >= maxSlots.value) {
-		router.push({ name: "finishClaimSuccess" });
+		await router.push({ name: "finishClaimSuccess" });
 	}
 }
 
@@ -205,7 +223,17 @@ function restartGame() {
 						{{ t("claimSuccess.retryButton") }}
 					</button>
 				</div>
-				<div v-else class="mt-6 flex justify-between gap-2 px-1">
+				<p
+					v-if="statusLoadState === 'ok' && isClaimFull"
+					class="mx-auto mt-4 max-w-[22rem] rounded-xl border border-amber-200/90 bg-amber-50/95 px-3 py-3 text-center text-[12px] font-semibold leading-relaxed text-amber-950"
+					role="status"
+				>
+					{{ t("finish.rewardLimitReached", { maxSlots }) }}
+				</p>
+				<div
+					v-if="statusLoadState === 'ok'"
+					class="mt-6 flex justify-between gap-2 px-1"
+				>
 					<div
 						v-for="(label, i) in slotLabels"
 						:key="i"
@@ -311,17 +339,26 @@ function restartGame() {
 					<p class="mt-3 text-center text-[11px] text-neutral-500">
 						{{ t("finish.staffHint") }}
 					</p>
+					<p
+						v-if="claimError"
+						class="mt-3 rounded-lg border border-red-200 bg-red-50 px-2 py-2 text-center text-[11px] text-red-900"
+						role="alert"
+					>
+						{{ claimError }}
+					</p>
 					<div class="mt-6 flex flex-col gap-2">
 						<button
 							type="button"
-							class="w-full rounded-full bg-gw-brand py-3.5 text-base font-bold text-white shadow-md transition hover:brightness-110"
+							class="w-full rounded-full bg-gw-brand py-3.5 text-base font-bold text-white shadow-md transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+							:disabled="claimSubmitting"
 							@click="confirmClaim"
 						>
-							{{ t("finish.modalConfirmButton") }}
+							{{ claimSubmitting ? t("common.loading") : t("finish.modalConfirmButton") }}
 						</button>
 						<button
 							type="button"
-							class="w-full rounded-full border-2 border-neutral-200 bg-white py-3 text-sm font-semibold text-neutral-700 transition hover:bg-neutral-50"
+							class="w-full rounded-full border-2 border-neutral-200 bg-white py-3 text-sm font-semibold text-neutral-700 transition enabled:hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+							:disabled="claimSubmitting"
 							@click="closeClaimModal"
 						>
 							{{ t("common.cancel") }}

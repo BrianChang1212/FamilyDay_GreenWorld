@@ -60,6 +60,13 @@ async function main() {
 	await req("dashboard full", "GET", "/api/v1/me/dashboard?scenario=full");
 	await req("dashboard empty", "GET", "/api/v1/me/dashboard?scenario=empty");
 	await req("dashboard error", "GET", "/api/v1/me/dashboard?scenario=error", null, 500);
+	await req("me progress", "GET", "/api/v1/me/progress");
+	await req(
+		"me progress full",
+		"GET",
+		"/api/v1/me/progress?scenario=full",
+	);
+	await req("me progress error", "GET", "/api/v1/me/progress?scenario=error", null, 500);
 	await req("station verify", "POST", "/api/v1/stations/verify", {
 		token: "station-token",
 	});
@@ -68,6 +75,7 @@ async function main() {
 		answer: "A",
 	});
 	await req("playthrough restart", "POST", "/api/v1/me/playthrough/restart");
+	await req("reward claim", "POST", "/api/v1/me/reward/claim", {});
 	await req("staff redeem token", "POST", "/api/v1/staff/redeem/token");
 	await req("staff redeem confirm", "POST", "/api/v1/staff/redeem/confirm", {
 		token: "mock-redeem-token",

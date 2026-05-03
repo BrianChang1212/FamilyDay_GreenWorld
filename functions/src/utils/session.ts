@@ -51,12 +51,20 @@ export function verifySessionToken(token: string): SessionPayload | null {
 	}
 }
 
+function sessionCookieAttrs(): string {
+	const mode = (process.env.FDGW_SESSION_COOKIE_SAMESITE || "lax").toLowerCase();
+	if (mode === "none") {
+		return "Path=/; HttpOnly; SameSite=None; Secure";
+	}
+	return "Path=/; HttpOnly; SameSite=Lax";
+}
+
 export function buildSessionCookie(token: string): string {
-	return `${COOKIE_NAME}=${encodeURIComponent(token)}; Path=/; HttpOnly; SameSite=Lax`;
+	return `${COOKIE_NAME}=${encodeURIComponent(token)}; ${sessionCookieAttrs()}`;
 }
 
 export function buildClearSessionCookie(): string {
-	return `${COOKIE_NAME}=; Path=/; HttpOnly; SameSite=Lax; Max-Age=0`;
+	return `${COOKIE_NAME}=; Max-Age=0; ${sessionCookieAttrs()}`;
 }
 
 export function getSessionCookieName(): string {

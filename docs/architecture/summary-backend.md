@@ -28,6 +28,22 @@
 
 ---
 
+## 2.0 本機服務帳戶與環境變數（Firestore 驗證）
+
+**目的：** 在本機執行 `functions` 的 `npm run verify:firestore`，或讓 Functions／Admin SDK 寫入 **Cloud Firestore**（含名冊 `roster` 等一律走 Firestore 的路徑）時，需要具備專案 IAM 的**服務帳戶 JSON 金鑰**。
+
+| 項目 | 說明 |
+|------|------|
+| **金鑰存放** | **不要**把 JSON 提交進 Git。可放在倉庫外；本工作區慣例範例為 `D:\Brian\secrets\firebase\familyday-greenworld-dev-sa.json`（檔名／路徑依環境自訂）。 |
+| **`GOOGLE_APPLICATION_CREDENTIALS`** | 設為金鑰檔的**絕對路徑**。未設定時，`verify-firestore-flow.mjs` 會直接失敗。 |
+| **`GOOGLE_CLOUD_PROJECT`** | 目標 GCP／Firebase 專案 ID（例如 `familyday-greenworld-dev`）。 |
+| **`FDGW_USE_FIRESTORE`** | 設為 `true` 時，簽到／遊戲進度等可切換為 Firestore 持久層（見 `functions/src/utils/store.ts`）。 |
+| **輔助腳本** | `functions/scripts/cloud-firestore-dev.ps1` 可帶 `-CredentialPath`、` -ProjectId`、`-DatabaseId` 並執行 `verify`／`serve`；根目錄 [`README.md`](../../README.md)「GCP 服務帳戶」有 PowerShell 範例。 |
+
+**與 ADC 的差異：** 僅依賴 `gcloud` 的 **Application Default Credentials**（使用者登入）時，行為與權限範圍可能與服務帳戶不同；整合驗證清單中的紀錄以「明確指定金鑰路徑」較易重現與除錯。
+
+---
+
 ## 2.1 Firebase 方案補充（提案口徑與估算）
 
 以下為「若改採 Firebase」的成本與限制補充，供會議比較使用。
@@ -109,7 +125,7 @@ Firebase/Google Cloud 可設定 **Budgets & Alerts** 做費用通知，建議：
 | 項目 | 結論 |
 |------|------|
 | 簽到 vs 闖關登入 | **分開**：獨立 API 與流程（見 `api-v0.1.md` 之 `checkin` 與 `auth/login`）。 |
-| 進度模型 | **作法 A**：**無獨立 `runId`／runs 表**；以單一使用者進度 + **`fullClearCount`／輪次** 等欄位表達「最多玩 3 輪」；再開一輪用 **`POST /api/v1/me/playthrough/restart`**。 |
+| 進度模型 | **作法 A**：**無獨立 `runId`／runs 表**；以單一使用者進度表達；**闖關可無限再玩**（`POST /api/v1/me/playthrough/restart` 僅要求當下已全通關）；**闖關禮最多領 3 次**（`maxRounds` + `rewardRedeemCount` + `bankedFullClears` 與 **`POST /api/v1/me/reward/claim`**）。 |
 | 關卡瀏覽資料 | **合併 API**：**`GET /api/v1/me/dashboard`** 一次回傳 stages + progress。 |
 | 限流 | 伺服器端實作 **每使用者每分鐘 30 次**（可細分 bucket）；登入／簽到可更嚴。 |
 

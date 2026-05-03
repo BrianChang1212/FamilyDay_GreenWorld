@@ -13,11 +13,15 @@ export function useFirestoreStore(): boolean {
 	return toBool(process.env.FDGW_USE_FIRESTORE);
 }
 
+function firestoreDatabaseId(): string {
+	return process.env.FDGW_FIRESTORE_DATABASE_ID || "default";
+}
+
 export function getDb() {
 	if (getApps().length === 0) {
 		initializeApp({
 			credential: applicationDefault(),
 		});
 	}
-	return getFirestore();
+	return getFirestore(firestoreDatabaseId());
 }

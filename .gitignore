@@ -12,6 +12,9 @@ __pycache__/
 .env
 .env.*
 !.env.example
+# Never commit Firebase/GCP service account JSON (use repo-external path or team secret store)
+secrets/
+**/*-sa.json
 
 # OS / editor
 .DS_Store

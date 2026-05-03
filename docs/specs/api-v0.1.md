@@ -1,6 +1,6 @@
 # 家庭日綠世界闖關 Web — API 規格（v0.1 草案）
 
-> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.13** 完成 CORS allowlist 收斂驗證；**v0.1.12** 補 2 小時聯調驗證註記與 CORS 觀察；**v0.1.11** 更新第二階段 Cloud Functions 落地端點狀態；**不改**端點定義）。
+> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.18** 聯調註記 CORS 白名單與 **`functions/src/index.ts`** 對齊；**v0.1.17** Mock／整合清單與 **`me/progress`** 對齊；**v0.1.16** 補列 **`GET /api/v1/me/progress`** 落地狀態；**v0.1.15** 文件與 §13 流程圖路徑對齊；**v0.1.14** 同步 Cloud Functions：`auth/checkin` 改走 Firestore roster 驗證，`admin/roster/import` 實作 Firestore 寫入；**v0.1.13** 完成 CORS allowlist 收斂驗證；**不改**端點定義）。
 
 ---
 
@@ -58,19 +58,21 @@
 |------|------|------|
 | `GET /api/v1/health` | 已落地 | 存活檢查 |
 | `GET /api/v1/health/ready` | 已落地 | 就緒檢查 |
-| `POST /api/v1/auth/login` | 已落地 | 以員編+姓名比對名冊，回傳 HTTP-only cookie session |
+| `POST /api/v1/auth/login` | 已落地 | 以員編+姓名比對 **Firestore `roster`**，回傳 HTTP-only cookie session |
 | `GET /api/v1/auth/me` | 已落地 | 需帶有效 session；否則 401 |
 | `POST /api/v1/auth/logout` | 已落地 | 清除 session cookie |
-| `POST /api/v1/checkin` | 已落地 | 名冊比對通過後寫入記憶體 checkin state |
+| `POST /api/v1/checkin` | 已落地 | 名冊比對通過後寫入 `checkins`（`FDGW_USE_FIRESTORE=true` 時落地 Firestore） |
 | `GET /api/v1/checkin/status` | 已落地 | 回傳最新或指定員編報到狀態 |
 | `GET /api/v1/me/dashboard` | 已落地 | 回傳 stages + progress 最小欄位集 |
+| `GET /api/v1/me/progress` | 已落地 | 僅回傳 **`player_progress`** 文件內容（除錯／聯調）；**主流程**仍以 **`GET /api/v1/me/dashboard`** 為準；前端 **SPA 目前未**呼叫此端點 |
 | `POST /api/v1/stations/verify` | 已落地 | 第二階段先提供最小驗證邏輯（JWT 驗簽仍待下一階段） |
-| `GET /api/v1/challenges/{challengeId}` | 已落地 | 回傳題目與選項（不回正解） |
+| `GET /api/v1/challenges/{challengeId}` | 已落地 | 僅回傳 `challengeId`；題幹／選項文案由前端題庫負責；後端只驗證作答並更新過關進度 |
 | `POST /api/v1/challenges/{challengeId}/attempts` | 已落地 | 支援 `choiceId`（並相容 `answer`） |
 | `POST /api/v1/me/playthrough/restart` | 已落地 | 未滿足條件回 409 |
-| `POST /api/v1/staff/redeem/token` | 已落地 | 回傳短期 token（in-memory） |
-| `POST /api/v1/staff/redeem/confirm` | 已落地 | 重複核銷回 409 |
-| `POST /api/v1/admin/roster/import` | 已落地 | 第二階段先回最小匯入結果 |
+| `POST /api/v1/me/reward/claim` | 已落地 | Finish 頁玩家確認領獎時遞增 `rewardRedeemCount`（須已全通關且符合輪次規則；否則 409） |
+| `POST /api/v1/staff/redeem/token` | 已落地 | 回傳短期 token（`FDGW_USE_FIRESTORE=true` 時落地 Firestore） |
+| `POST /api/v1/staff/redeem/confirm` | 已落地 | 成功時遞增 `progress.rewardRedeemCount` 並寫入核銷紀錄；失敗回 409（`code` 如 `REDEEM_LIMIT_REACHED`、`INVALID_REDEEM_TOKEN` 等） |
+| `POST /api/v1/admin/roster/import` | 已落地 | 寫入 Firestore `roster`（`items[]` 匯入） |
 | `GET /api/v1/admin/reports/attendance` | 已落地 | 第二階段先回最小統計欄位 |
 | `GET /api/v1/admin/reports/progress` | 已落地 | 第二階段先回最小統計欄位 |
 
@@ -82,7 +84,7 @@
 - `401/409` 邊界行為已驗證：
   - 未登入呼叫 `GET /api/v1/auth/me` 回 `401`
   - 未滿足條件呼叫 `POST /api/v1/me/playthrough/restart` 回 `409`
-- CORS allowlist 已收斂：僅允許 `http://localhost:5173`、`http://localhost:4173`、`https://familyday-greenworld.netlify.app`、`https://brianchang1212.github.io`。
+- CORS allowlist 已收斂（與 **`functions/src/index.ts`** 一致）：`http://localhost:5173`、`http://localhost:4173`、`http://127.0.0.1:5173`、`http://127.0.0.1:4173`、`https://familyday-greenworld.netlify.app`、`https://brianchang1212.github.io`。
 - 非白名單來源（例：`https://evil.example.com`）驗證結果為無 ACAO 回應，符合阻擋預期。
 
 ---
@@ -130,7 +132,7 @@
 }
 ```
 
-> Mock 測試資料請以 `source/mock/db.json` 的 `employees` 為準；例如 `1141041 / Brian`。
+> Cloud Functions 實測以 Firestore `roster` 為準；mock server 測試才使用 `source/mock/db.json` 的 `employees`。
 
 ---
 
@@ -187,7 +189,7 @@
 }
 ```
 
-**作法 A（無獨立 runId）**：進度以單一使用者狀態表示；`fullClearCount`、`canStartNewRound` 等欄位名稱可依實作調整。**選用：** `rewardRedeemCount`（櫃台核銷／領獎次數）供前端「領取成功」三格狀態呈現；未實作時前端可暫以 `fullClearCount` 映射（以前後端定案為準）。
+**作法 A（無獨立 runId）**：進度以單一使用者狀態表示；`fullClearCount` 僅統計「再玩一輪」次數（**不**限制闖關重玩）；**`maxRounds` 表示闖關禮最多可領次數**（預設 3）。`canStartNewRound` 等由 API 組裝。**選用：** `rewardRedeemCount` 供「領取成功」三格狀態；未實作時前端可暫以 `fullClearCount` 映射（以前後端定案為準）。
 
 ---
 
@@ -222,8 +224,16 @@
 
 | 方法 | 路徑 | 說明 |
 |------|------|------|
-| GET | `/api/v1/challenges/{challengeId}` | 取得題目與選項（**不回傳正解**） |
-| POST | `/api/v1/challenges/{challengeId}/attempts` | 送答案；錯誤可再送，直到答對（與活動規則一致） |
+| GET | `/api/v1/challenges/{challengeId}` | 確認題目代號存在；**回應僅含 `challengeId`**（題幹／選項顯示由前端） |
+| POST | `/api/v1/challenges/{challengeId}/attempts` | 送作答代號（`A`–`D`）；錯誤可再送；後端更新是否過關與進度 |
+
+**`GET /api/v1/challenges/{challengeId}` 回應（示例）**
+
+```json
+{
+  "challengeId": "c1"
+}
+```
 
 **`POST /api/v1/challenges/{challengeId}/attempts` 請求體（示例）**
 
@@ -233,6 +243,8 @@
 }
 ```
 
+`choiceId`（或相容欄位 `answer`）須為 **`A`–`D`** 之一，並與後端該題之正解代號比對；後端**不**下發題幹或選項文字。**選項顯示與題幹**由前端依 `challengeId`（如 `c1`…`c6`）對照本地題庫／i18n。
+
 **回應（示例）**
 
 ```json
@@ -241,13 +253,15 @@
 
 答錯時可回 `{ "correct": false }`；仍受每分鐘請求上限約束。
 
+**與前端本地重置對齊：** 若使用者已全通關且 **`rewardRedeemCount >= bankedFullClears`**（上一輪獎勵已領），但前端未呼叫 **`POST /api/v1/me/playthrough/restart`**（例如從首頁重置本地關卡後再玩），則在 **第 1 關（`c1`）答對**時，後端會自動清空本輪 `completedStageIds` 並 **`fullClearCount` +1**，等同補做 restart，以便 **`bankedFullClears`** 能在新一輪通關時再次遞增。
+
 ---
 
 ## 8. 再玩一輪（作法 A）
 
 | 方法 | 路徑 | 說明 |
 |------|------|------|
-| POST | `/api/v1/me/playthrough/restart` | 在 **`fullClearCount < maxRounds`** 且商業規則允許時，**重置本輪進度**（例如 `currentStageId`、已完成關卡），開始下一輪 |
+| POST | `/api/v1/me/playthrough/restart` | 已全通關時**重置本輪進度**（可無限次再玩）；`fullClearCount` 僅遞增統計；**`remainingRounds` 為 `null`**（不再代表剩餘可玩輪數） |
 
 **回應（示例）**
 
@@ -255,11 +269,28 @@
 {
   "ok": true,
   "fullClearCount": 1,
-  "remainingRounds": 2
+  "remainingRounds": null
 }
 ```
 
-若規則不允許（例如未通關不可重開），回 **409** 並附 `code`。
+`remainingRounds`：**`null`** 表示闖關重玩**不**受輪數上限約束（領獎上限仍見 `progress.maxRounds` 與 `rewardRedeemCount`）。若未通關即重開，回 **409** 並附 `code`。
+
+### 8.1 Finish 頁領獎計次（玩家）
+
+| 方法 | 路徑 | 說明 |
+|------|------|------|
+| POST | `/api/v1/me/reward/claim` | 使用者在 **完成頁（Finish）** 按「確認領獎」時呼叫；成功則 **`rewardRedeemCount` 加 1**。**須**已通關、**且** `rewardRedeemCount < maxRounds`（領獎最多 3 次）、**且** `bankedFullClears > rewardRedeemCount`（每次「整輪六關全通關」累計於 `bankedFullClears`，未領過的通關才可領一次）。 |
+
+**回應（示例）**
+
+```json
+{
+  "ok": true,
+  "rewardRedeemCount": 1
+}
+```
+
+不符合條件時回 **409**，`code` 例如：`FINISH_CLAIM_NOT_READY`、`REWARD_CLAIM_LIMIT_REACHED`、`REWARD_CLAIM_NOT_ELIGIBLE`（尚無可領的通關額度，例如已領滿本輪或尚未累計 `bankedFullClears`）。
 
 ---
 
@@ -297,8 +328,9 @@
 | 掃站點 QR | `POST /api/v1/stations/verify` |
 | 載入題目／作答 | `GET /api/v1/challenges/{challengeId}`、`POST /api/v1/challenges/{challengeId}/attempts` |
 | 再玩一輪 | `POST /api/v1/me/playthrough/restart` |
+| Finish 頁 Modal「確認領獎」 | **`POST /api/v1/me/reward/claim`**（成功後再導 **`/finish/claimed`**；**已領滿**時前端可停留 **`/finish`** 顯示上限提醒，不強制導向 claimed） |
 | 領取成功頁（闖關禮狀態呈現） | 與關卡瀏覽共用 **`GET /api/v1/me/dashboard`**；讀取 `progress.rewardRedeemCount`（選用）或暫用 `fullClearCount`（見 §5 示例） |
-| 領獎（若有） | `POST /api/v1/staff/redeem/token`、`POST /api/v1/staff/redeem/confirm` |
+| 櫃台掃碼核銷（若有） | `POST /api/v1/staff/redeem/token`、`POST /api/v1/staff/redeem/confirm` |
 
 **實作測試（前端 · 不變更上表契約）：** `source/src/api/rewardClaimStatus.test.ts`（**Vitest**）等，驗證客戶端對 **`dashboard.progress`** 之映射與錯誤處理；**後端**仍須依本規格實作與回傳 JSON。
 
@@ -344,10 +376,12 @@ flowchart LR
 |------|------|--------------|
 | Player | `/entry/verify` | 入口 QR 驗證（選用） |
 | Player | `/checkin`、`/checkin/status` | 報到送出與報到狀態回查 |
-| Player | `/auth/login`、`/auth/me` | 闖關登入、頁面重整後 session 恢復 |
+| Player | `/auth/login`、`/auth/logout`、`/auth/me` | 闖關登入、登出、頁面重整後 session 恢復 |
 | Player | `/me/dashboard` | 關卡總覽、進度刷新、領取成功頁狀態顯示 |
+| Player | `/me/progress` | 除錯／聯調讀取 raw **`player_progress`**（主流程仍以 **`/me/dashboard`** 為準） |
 | Player | `/stations/verify`、`/challenges/*` | 到站驗證與作答循環 |
 | Player | `/me/playthrough/restart` | 完成一輪後重啟下一輪 |
+| Player | `/me/reward/claim` | 完成頁闖關禮「確認領獎」 |
 | Staff | `/staff/redeem/*` | 櫃台核銷與領獎確認 |
 | Admin | `/admin/roster/import`、`/admin/reports/*` | 名冊匯入與營運報表 |
 | System | `/health`、`/health/ready` | 監控、部署後健康檢查 |
@@ -367,47 +401,53 @@ sequenceDiagram
   participant DB as Firebase (Firestore)
 
   U->>FE: 掃入口 QR / 開啟連結
-  FE->>API: POST /entry/verify (選用)
+  FE->>API: POST /api/v1/entry/verify (選用)
   API-->>FE: 入口驗證結果
 
   alt 報到路徑
     U->>FE: 填報到資料
-    FE->>API: POST /checkin
+    FE->>API: POST /api/v1/checkin
     API->>DB: 寫入報到資料
     API-->>FE: 報到成功
-    FE->>API: GET /checkin/status
+    FE->>API: GET /api/v1/checkin/status
     API-->>FE: 已報到狀態
   else 闖關路徑
     U->>FE: 填闖關登入
-    FE->>API: POST /auth/login
+    FE->>API: POST /api/v1/auth/login
     API-->>FE: Session 建立成功
 
-    FE->>API: GET /me/dashboard
+    FE->>API: GET /api/v1/me/dashboard
     API->>DB: 讀取關卡與進度
     API-->>FE: stages + progress
 
     loop 每關到站與作答
       U->>FE: 掃關卡 QR
-      FE->>API: POST /stations/verify
+      FE->>API: POST /api/v1/stations/verify
       API-->>FE: challengeId
-      FE->>API: GET /challenges/{challengeId}
+      FE->>API: GET /api/v1/challenges/{challengeId}
       API-->>FE: 題目內容
       U->>FE: 送出答案
-      FE->>API: POST /challenges/{challengeId}/attempts
+      FE->>API: POST /api/v1/challenges/{challengeId}/attempts
       API->>DB: 更新作答結果與進度
       API-->>FE: correct / nextStageId
     end
 
     opt 完成後再玩一輪
-      FE->>API: POST /me/playthrough/restart
+      FE->>API: POST /api/v1/me/playthrough/restart
       API->>DB: 重置本輪進度
       API-->>FE: fullClearCount / remainingRounds
     end
 
+    opt 完成頁闖關禮（非櫃台）
+      FE->>API: POST /api/v1/me/reward/claim
+      API->>DB: 遞增 rewardRedeemCount（上限 maxRounds）
+      API-->>FE: ok / 409
+    end
+
     opt 櫃台領獎
-      FE->>API: POST /staff/redeem/token
+      FE->>API: POST /api/v1/staff/redeem/token
       API-->>FE: 短期 token
-      FE->>API: POST /staff/redeem/confirm
+      FE->>API: POST /api/v1/staff/redeem/confirm
       API->>DB: 寫入領獎紀錄
       API-->>FE: redeem confirmed
     end
@@ -434,3 +474,8 @@ sequenceDiagram
 | v0.1.11 | 2026-04-30 | 更新第二階段落地狀態：新增 game/staff/admin 端點已落地註記（仍採 in-memory） |
 | v0.1.12 | 2026-04-30 | 新增 2 小時聯調驗證註記：確認核心流程與 401/409 邊界行為，並記錄 CORS allowlist 仍待收斂 |
 | v0.1.13 | 2026-04-30 | CORS allowlist 收斂完成並驗證：白名單來源可用，非白名單來源不回傳 ACAO |
+| v0.1.14 | 2026-05-01 | 同步 Cloud Functions 最新實作：`auth/login`、`checkin` 改為 Firestore `roster` 身分比對；`admin/roster/import` 改為實際寫入 Firestore；MVP 落地表與測試註記同步更新 |
+| v0.1.15 | 2026-05-03 | §11 Finish 列：補**已領滿**可停留 **`/finish`**。§13 流程圖：序列圖內路徑統一 **`/api/v1`** 前綴；補 **`POST /api/v1/me/reward/claim`** 選用區塊。根 `README`、`firestore-schema-v1`、`summary-frontend`、`project-master` 與領滿完成頁行為敘述同步 |
+| v0.1.16 | 2026-05-03 | Firebase 實作對齊註記之 MVP 落地表：補 **`GET /api/v1/me/progress`**（`functions/src/routes/game.ts`；主流程仍以 dashboard 為準） |
+| v0.1.17 | 2026-05-03 | **`source/mock/server.js`** 補 **`GET /api/v1/me/progress`**（`scenario` 與 dashboard 一致）；**`test-all-api.js`** 補 **`me/progress`**／**`reward/claim`**；**`test-game-api.js`** 驗證 **`me/progress`** 欄位；**`api-integration-checklist.md`** §9.5／§9.6 與根 **`README`** API 字串同步；§12 觸發表補 **`/auth/logout`**、**`/me/progress`**、**`/me/reward/claim`** |
+| v0.1.18 | 2026-05-03 | 聯調驗證註記：CORS allowlist 補列 **`127.0.0.1:5173`／`4173`**（與 **`functions/src/index.ts`** 一致） |

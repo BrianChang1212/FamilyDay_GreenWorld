@@ -1,7 +1,7 @@
 # 前端技術與設計 — 討論總結
 
 > 本文件彙整專案關於**前端架構、介面方向、與 API 銜接**之討論結論，作為後續實作與評審依據。  
-> 相關 API 細節見 [`api-v0.1.md`](../specs/api-v0.1.md)（修訂 **v0.1.8**；§11 **Vitest** 客戶端測試註記，**不重**定義 REST）。
+> 相關 API 細節見 [`api-v0.1.md`](../specs/api-v0.1.md)（修訂紀錄見該檔文末；§11 **Vitest** 客戶端測試註記，**不重**定義 REST）。
 
 ---
 
@@ -59,7 +59,7 @@
 
 **狀態鍵（原型，`sessionStorage`）：** 由 **`constants/index.ts`** 之 **`STORAGE_KEYS`** 集中管理（`entryIntent.ts`／`demoState.ts` 共用）；值域包含 **意圖**、**profile**、**闖關進度**、**報到狀態**、**領獎次數**。  
 
-**領取狀態資料來源（與程式對齊 · `ClaimSuccessView`）：** 畫面僅透過 **`composables/useRewardClaimPresentation.ts`** 載入；**決策與呼叫 API** 在 **`lib/rewardClaimPresentation.ts`**（無 Vue 依賴）。已設定 **`VITE_API_BASE`** 時，**`/finish/claimed`** 以 **`GET /api/v1/me/dashboard`** 回傳之 `progress` 映射次數（優先 **`rewardRedeemCount`**；暫可 **`fullClearCount`**），實作見 **`source/src/api/rewardClaimStatus.ts`**（預設欄位上限與 **`constants/index.ts`** 之 **`FINISH_REWARD_SLOTS`** 對齊）。**未**設定 **`VITE_API_BASE`** 時（含預覽站），該頁以 **`local-fallback`** 後備讀取 **`fdgw_finishClaimed`**（`demoState.ts`），並標示**非伺服器紀錄**。**`?mock_claimed=`** 僅供離線 UI 覆寫。**`/finish`** 確認領獎後，若無 API 底網址則由 **`lib/provisionalFinishClaim.ts`** 遞增 **`fdgw_finishClaimed`**；有 API 時不寫入該鍵。
+**領取狀態資料來源（與程式對齊 · `ClaimSuccessView`／`FinishView`）：** 畫面僅透過 **`composables/useRewardClaimPresentation.ts`** 載入；**決策與呼叫 API** 在 **`lib/rewardClaimPresentation.ts`**（無 Vue 依賴）。已設定 **`VITE_API_BASE`** 時，**`/finish`** 與 **`/finish/claimed`** 皆以 **`GET /api/v1/me/dashboard`** 回傳之 `progress` 映射次數（優先 **`rewardRedeemCount`**；暫可 **`fullClearCount`**），實作見 **`source/src/api/rewardClaimStatus.ts`**（預設欄位上限與 **`constants/index.ts`** 之 **`FINISH_REWARD_SLOTS`** 對齊）。**未**設定 **`VITE_API_BASE`** 時（含預覽站），該頁以 **`local-fallback`** 後備讀取 **`fdgw_finishClaimed`**（`demoState.ts`），並標示**非伺服器紀錄**。**`?mock_claimed=`** 僅供離線 UI 覆寫。**`/finish`** 確認領獎後，若無 API 底網址則由 **`lib/provisionalFinishClaim.ts`** 遞增 **`fdgw_finishClaimed`**；**有 API 時**改為呼叫 **`POST /api/v1/me/reward/claim`** 由後端遞增 **`rewardRedeemCount`**（成功後再導向 **`/finish/claimed`**）。**若已領滿**（`rewardRedeemCount` 達 `maxRounds`），**不再**自動導向 **`/finish/claimed`**，使用者留在 **`/finish`**，並顯示「已達領獎上限」提醒（三格狀態仍由 **`dashboard`** 映射）。
 
 ### 2.2 報到 UI 流程（掃描**報到** QR／連結 · 線框對齊 · 2026-04-18）
 
@@ -118,7 +118,7 @@ flowchart TD
 
 1. **完成闖關** — 恭喜文案、姓名／員編、領獎地點說明；獎項／點數圖示（狀態依是否已領）；「領取闖關禮」；**工作人員**核銷提示。  
 2. **確認領取（Modal）** — 第 n 次領取、不可復原提示；確認／取消。  
-3. **領取成功**（**`/finish/claimed`**）— 感謝文案；三格領獎狀態由**後端** `dashboard.progress` 供數、前端映射（`FINISH_REWARD_SLOTS` 與 **`maxRounds`** 對齊）；**未接 API** 時見上表「領取狀態資料來源」（**`local-fallback`**、`sessionStorage` 類比，畫面有預覽提示）。
+3. **領取成功**（**`/finish/claimed`**）— 感謝文案；三格領獎狀態由**後端** `dashboard.progress` 供數、前端映射（`FINISH_REWARD_SLOTS` 與 **`maxRounds`** 對齊）。**已接 API** 時，Modal 內按確認會先呼叫 **`POST /api/v1/me/reward/claim`** 再進入本頁；**未接 API** 時見上表「領取狀態資料來源」（**`local-fallback`**、`sessionStorage` 類比，畫面有預覽提示）。**已領滿**時完成頁 **`/finish`** 顯示上限提醒且不強制導向本頁；進入本頁後若儀表板顯示已滿格，亦顯示上限說明。
 
 #### 闖關流程圖（Mermaid）
 
@@ -156,7 +156,7 @@ flowchart TD
 | 流程 | **簽到頁**與**闖關頁**分開（不同路由），資訊架構清楚。**闖關線：** 歡迎 → 遊戲說明 → **闖關登入頁（全屏，非彈窗）** → 關卡流程；**報到線**見 §2.2。**同一 SPA** 內報到與闖關可共用表單元件，但路由與欄位不同。**報到 QR** 與**闖關入口 QR** 指向不同 URL／query（`entry=checkin`／`entry=game` 等）。各關**到站 QR** 仍為獨立連結（常含站點 JWT，見 [`api-v0.1.md`](../specs/api-v0.1.md)） |
 | 闖關頁 | 以「目前關卡、題目、進度」為主；**不自動輪詢**，使用者操作才打 API |
 | 櫃台驗證 | 完成畫面需**高可讀、少動效**，利於工作人員掃視 |
-| 完成頁／領取成功 | **`/finish`**（`FinishView.vue`）：與「**3 次／3 份**」對齊之確認領獎彈窗；無 API 時遞增本機次數見 **`provisionalFinishClaim.ts`**。**`/finish/claimed`**（`ClaimSuccessView.vue`）：**已設定 `VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 顯示已領進度；**未設定 API** 時以 **`local-fallback`** 顯示 **`fdgw_finishClaimed`**（`demoState.ts`；槽位上限 **`constants/index.ts`** 之 **`FINISH_REWARD_SLOTS`**）。編排邏輯見 **`useRewardClaimPresentation`**／**`rewardClaimPresentation.ts`**。**上線**應設定 **`VITE_API_BASE`**，且完成頁宜於**後端核銷 API 成功**後再導向領取成功頁 |
+| 完成頁／領取成功 | **`/finish`**（`FinishView.vue`）：與「**3 次／3 份**」對齊之確認領獎彈窗；無 API 時遞增本機次數見 **`provisionalFinishClaim.ts`**。**`/finish/claimed`**（`ClaimSuccessView.vue`）：**已設定 `VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 顯示已領進度；**未設定 API** 時以 **`local-fallback`** 顯示 **`fdgw_finishClaimed`**（`demoState.ts`；槽位上限 **`constants/index.ts`** 之 **`FINISH_REWARD_SLOTS`**）。編排邏輯見 **`useRewardClaimPresentation`**／**`rewardClaimPresentation.ts`**。**上線**應設定 **`VITE_API_BASE`**；**`reward/claim` 成功**後再導向領取成功頁；**已領滿**時可停留 **`/finish`** 顯示上限提醒，不強制導向 **`/finish/claimed`** |
 | 視覺 | KV／Logo／CIS 定案後以 **design token** 統一兩路流程，避免兩套風格 |
 
 ---
@@ -221,3 +221,4 @@ flowchart TD
 | 1.24 | 2026-04-20 | **§2／§2.1**：補 `source/src/constants/index.ts`（`APP_CONFIG`／`GAME_CONFIG`／`STORAGE_KEYS`）與 `useI18n.ts`、`i18n/zh-TW.ts` 之集中化描述；狀態鍵改述為 `STORAGE_KEYS` 單一來源 |
 | 1.25 | 2026-04-20 | **§2**：`views/` 依路由分群（**`home/`**、**`onboarding/`**、**`auth/`**、**`checkin/`**、**`quest/`**）；**`FINISH_REWARD_SLOTS`** 併入 **`constants/index.ts`** 敘述；**§2.1**、**§3** 領獎槽位說明改與程式一致（移除已刪之 **`lib/constants/finishReward.ts`** 路徑） |
 | 1.26 | 2026-04-27 | 版本鏈同步：部署摘要引用更新為 `summary-deployment` **v1.5** |
+| 1.27 | 2026-05-03 | 檔首 API 版本改指 `api-v0.1` 修訂紀錄；**§2.1／§2.3／§3**：**已領滿**時完成頁 **`/finish`** 不強制導 **`/finish/claimed`**，與 `FinishView`／`ClaimSuccessView` 現況一致 |

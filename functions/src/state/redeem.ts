@@ -1,4 +1,5 @@
 import { getDb, useFirestoreStore } from "../utils/store";
+import { defaultProgress, getOrInitProgress } from "./game";
 
 type RedeemTokenRecord = {
 	token: string;
@@ -13,11 +14,27 @@ type RedeemConfirmRecord = {
 	confirmedAt: string;
 };
 
+type RedeemFail = { ok: false; code: string; message: string };
+
 const tokenStore = new Map<string, RedeemTokenRecord>();
-const redeemedByEmployee = new Map<string, RedeemConfirmRecord>();
+/** 記憶體模式：每次核銷一筆（文件 ID = redeemId），供報表計數 */
+const redeemHistory: RedeemConfirmRecord[] = [];
 
 function randomToken(): string {
 	return `redeem_${Math.random().toString(36).slice(2, 12)}`;
+}
+
+function throwRedeemFail(f: RedeemFail): never {
+	const err = new Error(f.message) as Error & { redeemFail: RedeemFail };
+	err.redeemFail = f;
+	throw err;
+}
+
+function asRedeemFail(err: unknown): RedeemFail | null {
+	if (err && typeof err === "object" && "redeemFail" in err) {
+		return (err as { redeemFail: RedeemFail }).redeemFail;
+	}
+	return null;
 }
 
 export async function issueRedeemToken(
@@ -44,46 +61,89 @@ export async function issueRedeemToken(
 export async function confirmRedeem(
 	token: string,
 	staffId: string,
-): Promise<{ ok: true; redeemId: string } | { ok: false; code: string; message: string }> {
+): Promise<{ ok: true; redeemId: string } | RedeemFail> {
 	if (useFirestoreStore()) {
-		const db = getDb();
-		const snap = await db.collection("redeem_tokens").doc(token).get();
+		try {
+			const redeemId = await confirmRedeemFirestoreTransaction(token, staffId);
+			return { ok: true, redeemId };
+		} catch (err: unknown) {
+			const f = asRedeemFail(err);
+			if (f) {
+				return f;
+			}
+			throw err;
+		}
+	}
+
+	return confirmRedeemMemory(token, staffId);
+}
+
+async function confirmRedeemFirestoreTransaction(
+	token: string,
+	staffId: string,
+): Promise<string> {
+	const db = getDb();
+	const tokenRef = db.collection("redeem_tokens").doc(token);
+	return db.runTransaction(async (tx) => {
+		const snap = await tx.get(tokenRef);
 		if (!snap.exists) {
-			return {
+			throwRedeemFail({
 				ok: false,
 				code: "INVALID_REDEEM_TOKEN",
 				message: "redeem token not found",
-			};
+			});
 		}
 		const found = snap.data() as RedeemTokenRecord;
 		if (found.expiresAtMs < Date.now()) {
-			await db.collection("redeem_tokens").doc(token).delete();
-			return {
+			tx.delete(tokenRef);
+			throwRedeemFail({
 				ok: false,
 				code: "EXPIRED_REDEEM_TOKEN",
 				message: "redeem token expired",
-			};
+			});
 		}
 
-		const existed = await db.collection("redeem_records").doc(found.employeeId).get();
-		if (existed.exists) {
-			return {
-				ok: false,
-				code: "ALREADY_REDEEMED",
-				message: "reward already redeemed",
-			};
+		const employeeId = found.employeeId;
+		const progRef = db.collection("player_progress").doc(employeeId);
+		const progSnap = await tx.get(progRef);
+		let rewardRedeemCount = 0;
+		let maxRounds = 3;
+		if (progSnap.exists) {
+			const d = progSnap.data() as Record<string, unknown>;
+			rewardRedeemCount = Math.max(0, Math.floor(Number(d.rewardRedeemCount) || 0));
+			maxRounds = Math.max(1, Math.floor(Number(d.maxRounds) || 3));
 		}
-		const redeemId = `redeem_${found.employeeId}_${Date.now()}`;
-		await db.collection("redeem_records").doc(found.employeeId).set({
+		if (rewardRedeemCount >= maxRounds) {
+			throwRedeemFail({
+				ok: false,
+				code: "REDEEM_LIMIT_REACHED",
+				message: "redeem limit reached for this player",
+			});
+		}
+
+		const redeemId = `redeem_${employeeId}_${Date.now()}`;
+		const record: RedeemConfirmRecord = {
 			redeemId,
-			employeeId: found.employeeId,
+			employeeId,
 			staffId,
 			confirmedAt: new Date().toISOString(),
-		});
-		await db.collection("redeem_tokens").doc(token).delete();
-		return { ok: true, redeemId };
-	}
+		};
+		tx.set(db.collection("redeem_records").doc(redeemId), record);
+		const next = rewardRedeemCount + 1;
+		if (!progSnap.exists) {
+			tx.set(progRef, { ...defaultProgress(), rewardRedeemCount: next }, { merge: true });
+		} else {
+			tx.set(progRef, { rewardRedeemCount: next }, { merge: true });
+		}
+		tx.delete(tokenRef);
+		return redeemId;
+	});
+}
 
+async function confirmRedeemMemory(
+	token: string,
+	staffId: string,
+): Promise<{ ok: true; redeemId: string } | RedeemFail> {
 	const found = tokenStore.get(token);
 	if (!found) {
 		return { ok: false, code: "INVALID_REDEEM_TOKEN", message: "redeem token not found" };
@@ -92,12 +152,19 @@ export async function confirmRedeem(
 		tokenStore.delete(token);
 		return { ok: false, code: "EXPIRED_REDEEM_TOKEN", message: "redeem token expired" };
 	}
-	if (redeemedByEmployee.has(found.employeeId)) {
-		return { ok: false, code: "ALREADY_REDEEMED", message: "reward already redeemed" };
+
+	const progress = await getOrInitProgress(found.employeeId);
+	if (progress.rewardRedeemCount >= progress.maxRounds) {
+		return {
+			ok: false,
+			code: "REDEEM_LIMIT_REACHED",
+			message: "redeem limit reached for this player",
+		};
 	}
 
+	progress.rewardRedeemCount += 1;
 	const redeemId = `redeem_${found.employeeId}_${Date.now()}`;
-	redeemedByEmployee.set(found.employeeId, {
+	redeemHistory.push({
 		redeemId,
 		employeeId: found.employeeId,
 		staffId,
@@ -113,5 +180,5 @@ export async function getRedeemSummary(): Promise<{ totalRedeemed: number }> {
 		const v = await db.collection("redeem_records").count().get();
 		return { totalRedeemed: v.data().count };
 	}
-	return { totalRedeemed: redeemedByEmployee.size };
+	return { totalRedeemed: redeemHistory.length };
 }

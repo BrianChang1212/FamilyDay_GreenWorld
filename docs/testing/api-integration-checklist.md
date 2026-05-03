@@ -20,6 +20,7 @@
 - 已載入固定測資（seed）且記錄 seed 版本
 - 已清空上次測試 session / local storage（避免汙染）
 - 測試紀錄模板已建立（案例 ID、預期、實際、截圖、API 回應）
+- **Firestore／Admin 驗證（`functions`）**：金鑰 JSON **勿進版控**；設定 `GOOGLE_APPLICATION_CREDENTIALS` 為金鑰**絕對路徑**，並設 `FDGW_USE_FIRESTORE=true`、`GOOGLE_CLOUD_PROJECT=familyday-greenworld-dev`（或目標專案）。本機慣例範例路徑：`D:\Brian\secrets\firebase\familyday-greenworld-dev-sa.json`。可改用 `functions/scripts/cloud-firestore-dev.ps1 -CredentialPath "..."` 一次帶入；說明見根目錄 [`README.md`](../../README.md)「GCP 服務帳戶」小節與 [`summary-backend.md`](../architecture/summary-backend.md) §「本機服務帳戶」。
 
 ---
 
@@ -55,6 +56,7 @@
 - `POST /api/v1/auth/logout` 後需授權 API 應回 401
 - `GET /api/v1/auth/me` 可回傳登入者摘要
 - `GET /api/v1/me/dashboard` 可回傳 `stages` + `progress`
+- `POST /api/v1/me/reward/claim` 於通關且符合輪次規則時遞增 `rewardRedeemCount`；否則 409
 - `progress.rewardRedeemCount` / `fullClearCount` 在前端呈現符合預期
 
 ---
@@ -82,7 +84,7 @@
 
 - `POST /api/v1/me/playthrough/restart` 在允許條件下成功
 - 不允許條件（例如未通關）回 409
-- `fullClearCount` / `remainingRounds` 更新正確
+- `fullClearCount` 於每次「再玩一輪」遞增；`remainingRounds` 可為 `null`（闖關不限次）
 
 ### 5.2 櫃台領獎（若啟用）
 
@@ -255,10 +257,12 @@ npm run test:api:all
 - `POST /api/v1/auth/logout`
 - `GET /api/v1/auth/me`
 - `GET /api/v1/me/dashboard`（含 `ok/missing/invalid/full/empty/error`）
+- `GET /api/v1/me/progress`（Mock：`scenario` 與 dashboard 對齊；含 `error`）
 - `POST /api/v1/stations/verify`
 - `GET /api/v1/challenges/{challengeId}`
 - `POST /api/v1/challenges/{challengeId}/attempts`
 - `POST /api/v1/me/playthrough/restart`
+- `POST /api/v1/me/reward/claim`
 - `POST /api/v1/staff/redeem/token`
 - `POST /api/v1/staff/redeem/confirm`
 - `POST /api/v1/admin/roster/import`
@@ -287,6 +291,8 @@ npm run test:api:game
 - `POST /api/v1/stations/verify`
 - `GET /api/v1/challenges/{challengeId}`
 - `POST /api/v1/challenges/{challengeId}/attempts`（錯誤與正確答案）
+- `GET /api/v1/me/progress`
+- `POST /api/v1/me/reward/claim`
 - `POST /api/v1/me/playthrough/restart`
 - `POST /api/v1/auth/logout`
 

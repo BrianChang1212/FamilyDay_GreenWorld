@@ -67,6 +67,18 @@ async function main() {
 		"dashboard should return progress object",
 	);
 
+	const rawProgress = await req("me progress", "GET", "/api/v1/me/progress");
+	ensure(
+		typeof rawProgress?.rewardRedeemCount === "number",
+		"me/progress should return rewardRedeemCount",
+	);
+	ensure(
+		typeof rawProgress?.bankedFullClears === "number",
+		"me/progress should return bankedFullClears",
+	);
+
+	await req("reward claim", "POST", "/api/v1/me/reward/claim", {});
+
 	/* 站點驗證與題目流程 */
 	const verify = await req("station verify", "POST", "/api/v1/stations/verify", {
 		token: "station-token",
@@ -82,13 +94,16 @@ async function main() {
 		"GET",
 		`/api/v1/challenges/${challengeId}`,
 	);
-	ensure(Array.isArray(challenge?.options), "challenge get should return options");
+	ensure(
+		challenge?.challengeId === challengeId,
+		"challenge get should return challengeId",
+	);
 
 	const attemptWrong = await req(
 		"challenge attempts wrong",
 		"POST",
 		`/api/v1/challenges/${challengeId}/attempts`,
-		{ answer: "5種" },
+		{ answer: "A" },
 	);
 	ensure(attemptWrong?.correct === false, "wrong attempt should return correct=false");
 
@@ -96,7 +111,7 @@ async function main() {
 		"challenge attempts right",
 		"POST",
 		`/api/v1/challenges/${challengeId}/attempts`,
-		{ answer: "10種" },
+		{ answer: "B" },
 	);
 	ensure(attemptRight?.correct === true, "right attempt should return correct=true");
 

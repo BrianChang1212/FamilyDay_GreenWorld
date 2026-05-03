@@ -13,37 +13,37 @@ const challenges = [
 		id: "c1",
 		title: "請問天鵝湖裡有幾種品種的天鵝？",
 		options: ["5種", "10種", "30種", "42種"],
-		correct: "10種",
+		correctLetter: "B",
 	},
 	{
 		id: "c2",
 		title: "開闊草原最能支持下列哪一種生態角色？",
 		options: ["深海魚類", "草食動物與昆蟲棲地", "珊瑚蟲", "企鵝繁殖"],
-		correct: "草食動物與昆蟲棲地",
+		correctLetter: "B",
 	},
 	{
 		id: "c3",
 		title: "在森林步道行走時，較恰當的作法是？",
 		options: ["離開步道抄近路", "依告示與動線前進", "大聲播放音樂驅蟲", "隨意摘取植物帶回"],
-		correct: "依告示與動線前進",
+		correctLetter: "B",
 	},
 	{
 		id: "c4",
 		title: "松鼠常把食物藏起來，主要是為了？",
 		options: ["當作玩具", "度過食物較少的時段", "吸引遊客拍照", "築巢防水"],
-		correct: "度過食物較少的時段",
+		correctLetter: "B",
 	},
 	{
 		id: "c5",
 		title: "「昆蟲飯店」這類設施主要目的接近？",
 		options: ["飼養寵物昆蟲販售", "提供授粉與益蟲棲息空間", "防治所有蚊蟲", "收集垃圾"],
-		correct: "提供授粉與益蟲棲息空間",
+		correctLetter: "B",
 	},
 	{
 		id: "c6",
-		title: "完成所有站點後，下列何者最合適？",
+		title: "完成所有站點後，關於園區體驗下列何者最合適？",
 		options: ["隨意丟棄垃圾", "將野生動物帶回家", "回顧所學並支持保育", "破壞告示設施"],
-		correct: "回顧所學並支持保育",
+		correctLetter: "C",
 	},
 ];
 
@@ -117,6 +117,28 @@ function buildDashboardProgress(scenario) {
 			fullClearCount: 2,
 		};
 	}
+}
+
+/** Aligns with `functions` `GET /api/v1/me/progress` shape (mock only). */
+function buildMockPlayerProgress(scenario) {
+	const p = buildDashboardProgress(scenario);
+	const fullRaw = p.fullClearCount;
+	const redeemRaw = p.rewardRedeemCount;
+	const maxRaw = p.maxRounds;
+	const fullClear = Number.isFinite(Number(fullRaw)) ? Number(fullRaw) : 0;
+	const redeem = Number.isFinite(Number(redeemRaw)) ? Number(redeemRaw) : 0;
+	const maxRounds =
+		Number.isFinite(Number(maxRaw)) && Number(maxRaw) > 0
+			? Math.floor(Number(maxRaw))
+			: 3;
+	return {
+		currentStageId: 1,
+		completedStageIds: [],
+		fullClearCount: fullClear,
+		bankedFullClears: Math.max(fullClear, redeem),
+		rewardRedeemCount: redeem,
+		maxRounds,
+	};
 }
 
 function readJsonBody(req) {
@@ -415,6 +437,16 @@ const server = http.createServer((req, res) => {
 		});
 	}
 
+	if (req.method === "GET" && urlObj.pathname === "/api/v1/me/progress") {
+		if (scenario === "error") {
+			return writeJson(res, 500, {
+				code: "MOCK_PROGRESS_ERROR",
+				message: "Mock progress internal error",
+			});
+		}
+		return writeJson(res, 200, buildMockPlayerProgress(scenario));
+	}
+
 	if (req.method === "POST" && urlObj.pathname === "/api/v1/stations/verify") {
 		return readJsonBody(req)
 			.then((body) => {
@@ -438,8 +470,6 @@ const server = http.createServer((req, res) => {
 		const found = challenges.find((c) => c.id === challengeId) || challenges[0];
 		return writeJson(res, 200, {
 			challengeId: found.id,
-			title: found.title,
-			options: found.options,
 		});
 	}
 
@@ -454,8 +484,10 @@ const server = http.createServer((req, res) => {
 					/^\/api\/v1\/challenges\/([^/]+)\/attempts$/,
 				);
 				const found = challenges.find((c) => c.id === challengeId) || challenges[0];
-				const answer = normalizeStr(body.answer);
-				const correct = answer === normalizeStr(found.correct);
+				const raw = body.choiceId ?? body.answer;
+				const answer = normalizeStr(raw).toUpperCase();
+				const expected = normalizeStr(found.correctLetter || "").toUpperCase();
+				const correct = answer.length > 0 && answer === expected;
 				writeJson(res, 200, {
 					correct,
 					nextChallengeId: correct
@@ -475,7 +507,14 @@ const server = http.createServer((req, res) => {
 		return writeJson(res, 200, {
 			ok: true,
 			fullClearCount: 1,
-			remainingRounds: 2,
+			remainingRounds: null,
+		});
+	}
+
+	if (req.method === "POST" && urlObj.pathname === "/api/v1/me/reward/claim") {
+		return writeJson(res, 200, {
+			ok: true,
+			rewardRedeemCount: 1,
 		});
 	}
 

@@ -7,7 +7,9 @@ const API_BASE =
 	process.env.VERIFY_API_BASE ||
 	"http://127.0.0.1:5003/familyday-greenworld-dev/us-central1/api/api/v1";
 const EMPLOYEE_ID = process.env.VERIFY_EMPLOYEE_ID || "1141043";
-const EMPLOYEE_NAME = process.env.VERIFY_EMPLOYEE_NAME || "Bob";
+const EMPLOYEE_NAME = process.env.VERIFY_EMPLOYEE_NAME || "Bob-01";
+const FIRESTORE_DATABASE_ID = process.env.FDGW_FIRESTORE_DATABASE_ID || "default";
+const EVENT_ID = process.env.FDGW_EVENT_ID || "familyday-2026";
 
 function assertPreconditions() {
 	if ((process.env.FDGW_USE_FIRESTORE || "").toLowerCase() !== "true") {
@@ -27,7 +29,7 @@ function initDb() {
 	if (getApps().length === 0) {
 		initializeApp({ credential: applicationDefault() });
 	}
-	return getFirestore();
+	return getFirestore(FIRESTORE_DATABASE_ID);
 }
 
 async function api(path, options = {}, cookie = "") {
@@ -49,6 +51,19 @@ async function api(path, options = {}, cookie = "") {
 async function run() {
 	assertPreconditions();
 	const db = initDb();
+	await db
+		.collection("roster")
+		.doc(`${EVENT_ID}_${EMPLOYEE_ID}`)
+		.set(
+			{
+				eventId: EVENT_ID,
+				employeeId: EMPLOYEE_ID,
+				name: EMPLOYEE_NAME,
+				source: "manual",
+				updatedAt: new Date().toISOString(),
+			},
+			{ merge: true },
+		);
 
 	const login = await api("/auth/login", {
 		method: "POST",
@@ -122,14 +137,16 @@ async function run() {
 		},
 		cookie,
 	);
-	if (![200, 409].includes(confirm.status)) {
+	if (confirm.status !== 200 || !confirm.body?.redeemId) {
 		throw new Error(`redeem/confirm unexpected: ${confirm.status} ${JSON.stringify(confirm.body)}`);
 	}
+
+	const redeemId = confirm.body.redeemId;
 
 	const [checkinDoc, progressDoc, redeemDoc] = await Promise.all([
 		db.collection("checkins").doc(EMPLOYEE_ID).get(),
 		db.collection("player_progress").doc(EMPLOYEE_ID).get(),
-		db.collection("redeem_records").doc(EMPLOYEE_ID).get(),
+		db.collection("redeem_records").doc(redeemId).get(),
 	]);
 
 	if (!checkinDoc.exists) {
@@ -139,11 +156,17 @@ async function run() {
 		throw new Error("Firestore check failed: player_progress doc not found.");
 	}
 	if (!redeemDoc.exists) {
-		throw new Error("Firestore check failed: redeem_records doc not found.");
+		throw new Error(`Firestore check failed: redeem_records doc not found for redeemId=${redeemId}.`);
+	}
+	const rc = Number(progressDoc.data()?.rewardRedeemCount);
+	if (!Number.isFinite(rc) || rc < 1) {
+		throw new Error(
+			`Firestore check failed: rewardRedeemCount should be >=1 after redeem confirm, got ${JSON.stringify(progressDoc.data()?.rewardRedeemCount)}`,
+		);
 	}
 
 	console.log(
-		`PASS firestore verification employee=${EMPLOYEE_ID} challenge=${challengeId} confirmStatus=${confirm.status}`,
+		`PASS firestore verification employee=${EMPLOYEE_ID} challenge=${challengeId} rewardRedeemCount=${rc}`,
 	);
 }
 

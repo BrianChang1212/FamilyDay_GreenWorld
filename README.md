@@ -9,6 +9,7 @@
 - [快速開始](#快速開始)
   - [新手快速導覽（3 分鐘）](#新手快速導覽3-分鐘)
   - [最快啟動（本機前端原型）](#最快啟動本機前端原型)
+  - [GCP 服務帳戶（本機 Firestore 驗證／verify:firestore）](#gcp-service-account-local-firestore)
   - [上線包含／不包含（避免混淆）](#上線包含不包含避免混淆)
   - [目前實際進度（即時狀態）](#目前實際進度即時狀態)
   - [進階疑難排解（Windows 安裝 Node.js 與 npm）](#進階疑難排解windows-安裝-nodejs-與-npm)
@@ -63,6 +64,32 @@ npm run dev
 
 **說明：** 後端 API 尚未串接時，多數畫面仍以 mock／靜態流程為主。**未設定 `VITE_API_BASE` 時**，完成頁領獎次數會以瀏覽器 `sessionStorage` 類比（僅供預覽）；若要以**真實後端**顯示次數，請於 `source/` 建立 `.env.local`（或建置環境變數）設定 **`VITE_API_BASE`**（API 主機根、無尾隨 `/`），詳見 `docs/architecture/summary-frontend.md` §4。定案見 `docs/specs/api-v0.1.md` 與 `docs/architecture/summary-backend.md`。
 
+<a id="gcp-service-account-local-firestore"></a>
+
+### GCP 服務帳戶（本機 Firestore 驗證／`verify:firestore`）
+
+**金鑰 JSON 不可提交進 Git。** 請放在倉庫**外**或已列入 `.gitignore` 的目錄（本工作區慣例範例：`D:\Brian\secrets\firebase\familyday-greenworld-dev-sa.json`；路徑依你的機器調整）。
+
+| 變數／參數 | 用途 |
+|------------|------|
+| `GOOGLE_APPLICATION_CREDENTIALS` | 指向上述 JSON 的**絕對路徑**；`firebase-admin` 與 `npm run verify:firestore` 會讀取 |
+| `GOOGLE_CLOUD_PROJECT` | 例如 `familyday-greenworld-dev`（`verify` 腳本與 `cloud-firestore-dev.ps1` 會設定） |
+| `FDGW_USE_FIRESTORE` | 設為 `true` 時走 Firestore 資料層（見 `docs/architecture/summary-backend.md` §「本機服務帳戶」） |
+
+**PowerShell（推薦）：** 於 `functions/` 目錄執行（將路徑改成你的金鑰檔）：
+
+```powershell
+.\scripts\cloud-firestore-dev.ps1 -Mode verify -CredentialPath "D:\Brian\secrets\firebase\familyday-greenworld-dev-sa.json"
+```
+
+`serve`／`all` 模式同樣支援 `-CredentialPath`；細節見 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §0 與 [`docs/architecture/summary-backend.md`](docs/architecture/summary-backend.md)。
+
+**寫入測試名冊（Firestore `roster`）：** 於 `functions/` 設定 `GOOGLE_APPLICATION_CREDENTIALS` 後執行 `npm run seed:roster`。欄位與 Console 測資一致：`eventId`=`familyday-2026`、`source`=`manual`、`updatedAt`=執行當下 ISO 時間、`partySizePlanned`=2；員編預設 **`1141043` 起連號**（預設 10 筆至 `1141052`）。**英文姓名預設不重複**（`1141043` 為 `Bob` 以利 `verify:firestore`，其餘為 Alice、Carol、David… 等內建名單；筆數超過名單長度時改為 `RosterSeed0001` 形式）。可選環境變數：`SEED_COUNT`、`SEED_EMPLOYEE_ID_START`；若需字首員編＋`SeedTester0001` 命名可設 **`SEED_ID_PREFIX`**。實際寫入的 GCP 專案以金鑰 JSON 內 **`project_id`** 為準。
+
+**遠端 Firestore Rules／索引：** 根目錄已納入 `firestore.rules`、`firestore.indexes.json`，並於 `firebase.json` 註冊。在倉庫根目錄、已 `firebase login` 且 `.firebaserc` 指向目標專案後執行 `firebase deploy --only firestore`（或 `:rules` / `:indexes`）。設計說明見 [`docs/architecture/firestore-schema-v1.md`](docs/architecture/firestore-schema-v1.md) **§1.2**。
+
+**清空應用集合後重灌名冊（危險 · 僅限你確認過的 dev 專案）：** 於 `functions/` 設定 `GOOGLE_APPLICATION_CREDENTIALS`，且 **`FDGW_EXPECT_PROJECT_ID` 必須與金鑰 JSON 內 `project_id` 完全一致**（避免誤刪別專案），再設 `FDGW_PURGE_CONFIRM=YES`，執行 `npm run purge:firestore-app`（預設刪除 `redeem_tokens`、`redeem_records`、`player_progress`、`checkins`、`roster` 內全部文件）。完成後再 `npm run seed:roster`；報到／闖關資料請用 API 或測試流程產生。
+
 ### 上線包含／不包含（避免混淆）
 
 | 類別 | 路徑／檔案 | 是否進正式上線執行 | 說明 |
@@ -79,7 +106,7 @@ npm run dev
 | 面向 | 現況 |
 |------|------|
 | 前端 | `source/` 可本機啟動、建置與預覽；已可透過 `VITE_API_BASE` 串接 Firebase Functions |
-| API | Cloud Functions 已落地核心與 Phase 2 端點（`health/auth/checkin/dashboard/stations/challenges/restart/staff/admin`） |
+| API | Cloud Functions 已落地核心與 Phase 2 端點（`health/auth/checkin/dashboard/me/progress/stations/challenges/restart/reward/claim/staff/admin`） |
 | 後端資料層 | 已完成 in-memory + Firestore toggle（`FDGW_USE_FIRESTORE`）；Firestore 最終實證目前卡在 IAM 權限 |
 | 測試 | Vitest 單元測試與 CI 持續通過；4/30 已完成 Functions 聯調與 CORS allowlist 驗證 |
 | 部署 | 可進行 dev/stage 驗證上架；正式對外上線仍需先完成 IAM 與最小安全基線 |
@@ -231,7 +258,7 @@ npm -v
 
 ```mermaid
 flowchart LR
-  P[Player] --> PAPI["entry/checkin/auth/me/dashboard/stations/challenges/restart"]
+  P[Player] --> PAPI["entry/checkin/auth/me/dashboard/me/progress/stations/challenges/restart/reward/claim"]
   S[Staff] --> SAPI["staff/redeem/token + staff/redeem/confirm"]
   A[Admin] --> AAPI["admin/roster/import + admin/reports/*"]
   H[System] --> HAPI["health + health/ready"]

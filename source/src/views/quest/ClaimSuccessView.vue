@@ -15,7 +15,6 @@ const { t } = useI18n();
 const {
 	claimed,
 	maxSlots,
-	statusSource,
 	statusLoadState,
 	statusError,
 	loadClaimPresentation,
@@ -45,6 +44,10 @@ const slotLabels = computed(() => {
 		c > i ? t("claimSuccess.slotClaimed") : t("claimSuccess.slotPending"),
 	);
 });
+
+const isRewardFullyClaimed = computed(
+	() => maxSlots.value > 0 && claimed.value >= maxSlots.value,
+);
 
 onMounted(() => {
 	const p = getProfile();
@@ -108,12 +111,6 @@ onMounted(() => {
 				<h2 class="text-center text-base font-bold text-[#b45309]">
 					{{ t("claimSuccess.statusTitle") }}
 				</h2>
-				<p
-					v-if="statusSource === 'api' && statusLoadState === 'ok'"
-					class="mx-auto mt-2 max-w-[22rem] text-center text-[11px] leading-relaxed text-neutral-500"
-				>
-					{{ t("claimSuccess.apiStatusHint", { claimed, maxSlots }) }}
-				</p>
 				<div
 					v-if="statusLoadState === 'loading'"
 					class="mt-6 text-center text-sm text-neutral-500"
@@ -160,6 +157,18 @@ onMounted(() => {
 						</p>
 					</div>
 				</div>
+				<p
+					v-if="statusLoadState === 'ok' && isRewardFullyClaimed"
+					class="mx-auto mt-4 max-w-[22rem] rounded-xl border border-amber-200/90 bg-amber-50/95 px-3 py-3 text-center text-[12px] font-semibold leading-relaxed text-amber-950"
+					role="status"
+				>
+					{{
+						t("claimSuccess.rewardLimitReached", {
+							claimed: claimed,
+							maxSlots,
+						})
+					}}
+				</p>
 			</section>
 		</main>
 

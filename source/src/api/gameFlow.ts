@@ -9,6 +9,7 @@ type ChallengeJson = {
 type AttemptJson = {
 	correct?: boolean;
 	nextChallengeId?: string;
+	nextStageId?: number;
 };
 
 type VerifyJson = {
@@ -19,6 +20,11 @@ type RestartJson = {
 	ok?: boolean;
 };
 
+type RewardClaimJson = {
+	ok?: boolean;
+	rewardRedeemCount?: number;
+};
+
 function getBaseOrThrow(): string {
 	const base = getViteApiBase();
 	if (!base) {
@@ -27,7 +33,7 @@ function getBaseOrThrow(): string {
 	return base;
 }
 
-export async function verifyStation(token: string): Promise<string> {
+export async function verifyStation(stageId: number, qrJwt: string): Promise<string> {
 	const base = getBaseOrThrow();
 	const res = await fetch(`${base}/api/v1/stations/verify`, {
 		method: "POST",
@@ -36,7 +42,7 @@ export async function verifyStation(token: string): Promise<string> {
 			Accept: "application/json",
 			"Content-Type": "application/json",
 		},
-		body: JSON.stringify({ token }),
+		body: JSON.stringify({ stageId, qrJwt }),
 	});
 
 	if (!res.ok) {
@@ -100,12 +106,15 @@ export async function submitChallengeAttempt(
 	}
 
 	const data = (await res.json()) as AttemptJson;
+	const nextChallengeId =
+		typeof data.nextChallengeId === "string"
+			? data.nextChallengeId
+			: Number.isFinite(data.nextStageId)
+				? `c${data.nextStageId}`
+				: null;
 	return {
 		correct: data.correct === true,
-		nextChallengeId:
-			typeof data.nextChallengeId === "string"
-				? data.nextChallengeId
-				: null,
+		nextChallengeId,
 	};
 }
 
@@ -124,6 +133,29 @@ export async function restartPlaythrough(): Promise<void> {
 	if (!data.ok) {
 		throw new Error("playthrough/restart failed");
 	}
+}
+
+/** Finish 頁確認領獎：後端遞增 `rewardRedeemCount`（須符合通關與輪次規則）。 */
+export async function claimFinishReward(): Promise<{ rewardRedeemCount: number }> {
+	const base = getBaseOrThrow();
+	const res = await fetch(`${base}/api/v1/me/reward/claim`, {
+		method: "POST",
+		credentials: "include",
+		headers: {
+			Accept: "application/json",
+			"Content-Type": "application/json",
+		},
+		body: "{}",
+	});
+	if (!res.ok) {
+		const text = await res.text().catch(() => "");
+		throw new Error(`me/reward/claim ${res.status}: ${text.slice(0, 200)}`);
+	}
+	const data = (await res.json()) as RewardClaimJson;
+	if (data.ok !== true || typeof data.rewardRedeemCount !== "number") {
+		throw new Error("me/reward/claim invalid response");
+	}
+	return { rewardRedeemCount: data.rewardRedeemCount };
 }
 
 export async function logoutGame(): Promise<void> {

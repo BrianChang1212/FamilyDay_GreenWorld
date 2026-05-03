@@ -10,7 +10,13 @@
     "build": "tsc",
     "clean": "rimraf lib",
     "serve": "firebase emulators:start --only functions,hosting",
+    "cloud:serve": "powershell -ExecutionPolicy Bypass -File ./scripts/cloud-firestore-dev.ps1 serve",
+    "cloud:verify": "powershell -ExecutionPolicy Bypass -File ./scripts/cloud-firestore-dev.ps1 verify",
+    "cloud:all": "powershell -ExecutionPolicy Bypass -File ./scripts/cloud-firestore-dev.ps1 all",
     "verify:firestore": "node ./scripts/verify-firestore-flow.mjs",
+    "smoke:api": "node ./scripts/smoke-api.mjs",
+    "seed:roster": "node ./scripts/seed-roster-test-rows.mjs",
+    "purge:firestore-app": "node ./scripts/purge-firestore-app-data.mjs",
     "shell": "firebase functions:shell",
     "deploy": "firebase deploy --only functions:api",
     "lint": "echo \"No lint configured\""

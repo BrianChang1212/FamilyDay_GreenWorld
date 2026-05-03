@@ -88,6 +88,8 @@ export const zhTW = {
     loopHint: "點擊可再次領取，最多 {maxSlots} 份。",
     claimButton: "領取闖關禮 →",
     claimButtonDone: "已領取完畢",
+    rewardLimitReached:
+      "您已達本活動闖關禮領取上限（共 {maxSlots} 次）。仍可繼續體驗闖關或返回首頁。",
     staffHint: "請由現場工作人員協助點擊「確認領取」。",
     backHomeButton: "返回首頁",
     modalTitle: "確認領取？",
@@ -106,8 +108,8 @@ export const zhTW = {
     localFallbackNote:
       "未設定 VITE_API_BASE：暫以瀏覽器 sessionStorage 類比領獎次數（僅供預覽／原型），上線請改由後端提供。",
     statusTitle: "闖關禮領取狀態",
-    apiStatusHint:
-      "以下狀態由伺服器回傳資料呈現（已領 {claimed}／{maxSlots} 次）。三格圖示僅為 UI 映射。",
+    rewardLimitReached:
+      "您已達本活動闖關禮領取上限（{claimed}／{maxSlots} 次），感謝您的參與。",
     loadingStatus: "載入領獎狀態…",
     retryButton: "重試",
     slotClaimed: "已領取",

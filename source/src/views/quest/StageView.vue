@@ -54,7 +54,7 @@ function closeScanUi() {
 function finishScanDemo() {
 	scanLoading.value = true;
 	scanError.value = "";
-	verifyStation(`stage-${stage.value}-token`)
+	verifyStation(stage.value, `stage-${stage.value}-token`)
 		.then((cid) => {
 			challengeId.value = cid;
 			inZone.value = true;

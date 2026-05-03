@@ -230,7 +230,7 @@
 |:----:|------|------|
 | 1 | **完成闖關** | 如「恭喜完成闖關」、顯示姓名／員編；引導至**統籌站／指定處**領取闖關禮；可含獎項／點數圖示（未領前為未啟用狀態）；主按鈕「領取闖關禮」等；附註請**工作人員**協助核銷。 |
 | 2 | **確認領取（彈窗）** | 如「確認領取？」、第幾次領取、確認後無法取消；**確認領取**／**取消**。 |
-| 3 | **領取成功** | 成功文案與感謝；獎項圖示狀態更新（已領項目視覺區隔）；領取次數與份數上限依 [一、人數與身分規則](#一人數與身分規則) 準線，並與櫃檯驗證並列考量（詳 [`api-v0.1.md`](../specs/api-v0.1.md)；前端 **`/finish`** → **`/finish/claimed`**，`ClaimSuccessView` 以 **`GET /api/v1/me/dashboard`** 之 `progress` 呈現次數，無 API 時 **`local-fallback`**，見 [`summary-frontend.md`](../architecture/summary-frontend.md) §2.1、§2 目錄 **v1.26**）。 |
+| 3 | **領取成功** | 成功文案與感謝；獎項圖示狀態更新（已領項目視覺區隔）；領取次數與份數上限依 [一、人數與身分規則](#一人數與身分規則) 準線，並與櫃檯驗證並列考量（詳 [`api-v0.1.md`](../specs/api-v0.1.md)；前端 **`/finish`** 確認領獎成功後導 **`/finish/claimed`**；**已領滿**時可停留 **`/finish`** 顯示上限提醒。`ClaimSuccessView` 以 **`GET /api/v1/me/dashboard`** 之 `progress` 呈現次數，無 API 時 **`local-fallback`**，見 [`summary-frontend.md`](../architecture/summary-frontend.md) §2.1、§2 目錄 **v1.26**）。 |
 
 **實作對照：** [`summary-frontend.md`](../architecture/summary-frontend.md) **§2.1**（路由）、**§2.2**（報到）、**§2.3**（闖關流程圖）。`source/` 已對齊：`/game`→歡迎、報到單頁+確認彈窗、闖關登入後→地圖；細節仍以本節為產品敘述準線。
 

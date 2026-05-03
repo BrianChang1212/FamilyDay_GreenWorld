@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import { resetScavengerRun, setProfile } from "@/lib/demoState";
 import { getEntryIntent } from "@/lib/entryIntent";
-import { getViteApiBase } from "@/lib/apiBase";
+import { loginGame } from "@/api/authLogin";
 import { useI18n } from "@/composables/useI18n";
 
 const router = useRouter();
@@ -42,28 +42,7 @@ function friendlyAuthError(err: unknown): string {
 }
 
 async function submitAuthApi(nameValue: string, employeeIdValue: string) {
-	const base = getViteApiBase();
-	if (!base) {
-		throw new Error("VITE_API_BASE is not configured");
-	}
-
-	const res = await fetch(`${base}/api/v1/auth/login`, {
-		method: "POST",
-		credentials: "include",
-		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-			name: nameValue,
-			employeeId: employeeIdValue,
-		}),
-	});
-
-	if (!res.ok) {
-		const text = await res.text().catch(() => "");
-		throw new Error(`auth/login ${res.status}: ${text.slice(0, 200)}`);
-	}
+	await loginGame(nameValue, employeeIdValue);
 }
 
 async function submit() {

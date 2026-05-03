@@ -5,6 +5,10 @@ import { useRouter } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
 import { fetchChallenge, submitChallengeAttempt } from "@/api/gameFlow";
+import {
+	choiceRowsForChallenge,
+	questionForChallenge,
+} from "@/lib/challengeOptionLabels";
 import { getStage, stageStickerSrc, stageTitle } from "@/lib/demoState";
 import { useI18n } from "@/composables/useI18n";
 import { GAME_CONFIG } from "@/constants";
@@ -15,7 +19,7 @@ const { t } = useI18n();
 const stage = ref(1);
 const challengeId = ref("c1");
 const question = ref("");
-const options = ref<string[]>([]);
+const optionRows = ref<{ key: string; label: string }[]>([]);
 const selected = ref<string | null>(null);
 const loadState = ref<"loading" | "ok" | "error">("loading");
 const submitLoading = ref(false);
@@ -41,8 +45,14 @@ function loadChallenge() {
 	fetchChallenge(challengeId.value)
 		.then((data) => {
 			challengeId.value = data.challengeId;
-			question.value = data.title || stageTitle(stage.value);
-			options.value = data.options;
+			question.value = questionForChallenge(
+				data.challengeId,
+				data.title || stageTitle(stage.value),
+			);
+			optionRows.value = choiceRowsForChallenge(
+				data.challengeId,
+				data.options,
+			);
 			loadState.value = "ok";
 		})
 		.catch(() => {
@@ -128,25 +138,25 @@ function confirm() {
 
 			<div v-if="loadState === 'ok'" class="mt-5 flex flex-col gap-3">
 				<button
-					v-for="opt in options"
-					:key="opt"
+					v-for="row in optionRows"
+					:key="row.key"
 					type="button"
 					:class="[
 						'flex min-h-[3.25rem] w-full items-center justify-between gap-3 rounded-2xl border px-4 py-3.5 text-left text-base font-semibold transition',
-						selected === opt
+						selected === row.key
 							? 'border-gw-brand bg-[#1a5f2a] text-white shadow-md'
 							: 'border-neutral-200/90 bg-[#eef0ed] text-gw-navy hover:border-gw-brand/30',
 					]"
-					@click="selected = opt"
+					@click="selected = row.key"
 				>
-					<span>{{ opt }}</span>
+					<span>{{ row.label }}</span>
 					<span
 						:class="[
 							'flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2',
-							selected === opt ? 'border-white/80 bg-white/20' : 'border-neutral-300 bg-white',
+							selected === row.key ? 'border-white/80 bg-white/20' : 'border-neutral-300 bg-white',
 						]"
 					>
-						<span v-if="selected === opt" class="text-sm text-white">✓</span>
+						<span v-if="selected === row.key" class="text-sm text-white">✓</span>
 					</span>
 				</button>
 			</div>

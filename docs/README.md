@@ -37,6 +37,7 @@ Windows 安裝、`npm run dev`、`npm run test`、CI 流程）。
 | API v0.1 草案 | [`specs/api-v0.1.md`](./specs/api-v0.1.md) |
 | Firestore Schema（v1 草案） | [`architecture/firestore-schema-v1.md`](./architecture/firestore-schema-v1.md) |
 | API 整合與 Mock 驗證清單 | [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md) |
+| 本機 GCP 服務帳戶（Firestore／verify） | 根 [`README.md`](../README.md)「GCP 服務帳戶」；[`architecture/summary-backend.md`](./architecture/summary-backend.md) **§2.0** |
 | 前端／後端／部署／流量摘要 | [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) 等 |
 | 測試 Web UI（Netlify、QR） | 根 [`README.md`](../README.md#preview-netlify-test-ui)（錨點 **`preview-netlify-test-ui`**）；部署摘要 [`architecture/summary-deployment.md`](./architecture/summary-deployment.md) **§1.1**（**v1.5**） |
 | 前端單元測試（Vitest） | `source/`：`npm run test`；規格見 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) **§1.1**（**v1.26**）；CI 見 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) |
@@ -52,7 +53,7 @@ Windows 安裝、`npm run dev`、`npm run test`、CI 流程）。
 
 ---
 
-**最後整理：** 2026-04-28。版本與修訂歷史以各檔案檔頭及
+**最後整理：** 2026-05-03（Mock／測試清單與 **`me/progress`** 對齊）。版本與修訂歷史以各檔案檔頭及
 [`project/project-master.md`](./project/project-master.md) 頁尾版本列為準。
 技術細節請直接查閱對應單一來源文件：前端
 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md)、後端

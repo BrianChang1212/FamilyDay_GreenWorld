@@ -10,7 +10,7 @@ import {
 	setProfile,
 } from "@/lib/demoState";
 import { clearEntryIntent } from "@/lib/entryIntent";
-import { getViteApiBase } from "@/lib/apiBase";
+import { submitCheckin } from "@/api/submitCheckin";
 import { useI18n } from "@/composables/useI18n";
 import { APP_CONFIG } from "@/constants";
 
@@ -74,29 +74,11 @@ async function submitCheckInApi(
 	employeeIdValue: string,
 	partySizeValue: number,
 ) {
-	const base = getViteApiBase();
-	if (!base) {
-		return;
-	}
-
-	const res = await fetch(`${base}/api/v1/checkin`, {
-		method: "POST",
-		credentials: "include",
-		headers: {
-			Accept: "application/json",
-			"Content-Type": "application/json",
-		},
-		body: JSON.stringify({
-			name: nameValue,
-			employeeId: employeeIdValue,
-			partySize: partySizeValue,
-		}),
+	await submitCheckin({
+		name: nameValue,
+		employeeId: employeeIdValue,
+		partySize: partySizeValue,
 	});
-
-	if (!res.ok) {
-		const text = await res.text().catch(() => "");
-		throw new Error(`checkin ${res.status}: ${text.slice(0, 200)}`);
-	}
 }
 
 async function commitCheckIn() {
