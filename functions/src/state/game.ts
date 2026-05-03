@@ -130,31 +130,46 @@ export async function getOrInitProgress(employeeId: string): Promise<PlayerProgr
 	return init;
 }
 
+export type AttemptApplyResult = {
+	correct: boolean;
+	nextStageId: number | null;
+	completedStageIds: number[];
+	allStagesCompleted: boolean;
+};
+
+function attemptSnapshot(
+	progress: PlayerProgress,
+	correct: boolean,
+	nextStageId: number | null,
+): AttemptApplyResult {
+	return {
+		correct,
+		nextStageId,
+		completedStageIds: [...progress.completedStageIds],
+		allStagesCompleted: progress.completedStageIds.length >= CHALLENGES.length,
+	};
+}
+
 export async function applyAttemptResult(
 	employeeId: string,
 	challengeId: string,
 	choiceId: string,
-): Promise<{ correct: boolean; nextStageId: number | null }> {
+): Promise<AttemptApplyResult> {
 	const spec = getChallenge(challengeId);
 	if (!spec) {
-		return { correct: false, nextStageId: null };
+		const p = await getOrInitProgress(employeeId);
+		return attemptSnapshot(p, false, null);
 	}
 	const progress = await getOrInitProgress(employeeId);
 	const correct = spec.correctChoiceId === choiceId;
 	if (!correct) {
-		return {
-			correct: false,
-			nextStageId: progress.currentStageId,
-		};
+		return attemptSnapshot(progress, false, progress.currentStageId);
 	}
 
 	const stageIdx = CHALLENGES.findIndex((v) => v.id === challengeId);
 	const stageId = stageIdx + 1;
 	if (stageId <= 0) {
-		return {
-			correct: false,
-			nextStageId: progress.currentStageId,
-		};
+		return attemptSnapshot(progress, false, progress.currentStageId);
 	}
 
 	/*
@@ -193,17 +208,18 @@ export async function applyAttemptResult(
 		} else {
 			playerProgress.set(employeeId, progress);
 		}
-		return { correct: true, nextStageId: null };
+		return attemptSnapshot(progress, true, null);
 	}
 
-	progress.currentStageId = Math.min(stageId + 1, CHALLENGES.length);
+	/* 任意順序通關：`currentStageId` 僅記錄「最後答對的站」，不表示下一必玩站 */
+	progress.currentStageId = stageId;
 	if (useFirestoreStore()) {
 		const db = getDb();
 		await db.collection("player_progress").doc(employeeId).set(progress, { merge: true });
 	} else {
 		playerProgress.set(employeeId, progress);
 	}
-	return { correct: true, nextStageId: progress.currentStageId };
+	return attemptSnapshot(progress, true, progress.currentStageId);
 }
 
 /**

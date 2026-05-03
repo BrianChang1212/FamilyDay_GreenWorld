@@ -57,7 +57,9 @@
 | `/stage`、`/quiz`、`/result`、`/finish` | 闖關流程（既有） |
 | `/finish/claimed` | **領取成功**（`ClaimSuccessView`）：闖關禮三格狀態之**呈現**（見下段「領取狀態資料來源」） |
 
-**狀態鍵（原型，`sessionStorage`）：** 由 **`constants/index.ts`** 之 **`STORAGE_KEYS`** 集中管理（`entryIntent.ts`／`demoState.ts` 共用）；值域包含 **意圖**、**profile**、**闖關進度**、**報到狀態**、**領獎次數**。  
+**狀態鍵（原型，`sessionStorage`）：** 由 **`constants/index.ts`** 之 **`STORAGE_KEYS`** 集中管理（`entryIntent.ts`／`demoState.ts` 共用）；值域包含 **意圖**、**profile**、**目前選擇之站**（`fdgw_stage`）、**已答對站列表**（**`fdgw_completed_stage_ids`**，JSON 陣列，與後端 **`completedStageIds`** 同步）、**報到狀態**、**領獎次數**。  
+
+**到站掃碼與題組（`StageView.vue`／`demoState.ts` · 2026-05）：** **`POST /api/v1/stations/verify`** 成功後，以 **`fdgw_pending_station_challenge`**（**`STORAGE_KEYS.pendingStationChallenge`**）儲存 **`{ stage, challengeId }`**，與 **`fdgw_stage`** 對齊；改選列表站點或答對返回地圖時清除。**`getInZone()`** 僅在 **`fdgw_inZone === "1"`** 時為 true（未寫入視為未掃碼），避免誤顯「已解鎖」卻無 **`challengeId`**。**`/quiz`** 一律以 **`?challengeId=`** 導頁（來自掃碼結果）；無效時不可導航（避免落回 **`QuizView` 預設 `c1`**）。**`ResultView.vue`** 於答對且返回地圖前執行 **`setInZone(false)`** 並 **`clearPendingStationVerification()`**，與任意順序下一站一致。
 
 **領取狀態資料來源（與程式對齊 · `ClaimSuccessView`／`FinishView`）：** 畫面僅透過 **`composables/useRewardClaimPresentation.ts`** 載入；**決策與呼叫 API** 在 **`lib/rewardClaimPresentation.ts`**（無 Vue 依賴）。已設定 **`VITE_API_BASE`** 時，**`/finish`** 與 **`/finish/claimed`** 皆以 **`GET /api/v1/me/dashboard`** 回傳之 `progress` 映射次數（優先 **`rewardRedeemCount`**；暫可 **`fullClearCount`**），實作見 **`source/src/api/rewardClaimStatus.ts`**（預設欄位上限與 **`constants/index.ts`** 之 **`FINISH_REWARD_SLOTS`** 對齊）。**未**設定 **`VITE_API_BASE`** 時（含預覽站），該頁以 **`local-fallback`** 後備讀取 **`fdgw_finishClaimed`**（`demoState.ts`），並標示**非伺服器紀錄**。**`?mock_claimed=`** 僅供離線 UI 覆寫。**`/finish`** 確認領獎後，若無 API 底網址則由 **`lib/provisionalFinishClaim.ts`** 遞增 **`fdgw_finishClaimed`**；**有 API 時**改為呼叫 **`POST /api/v1/me/reward/claim`** 由後端遞增 **`rewardRedeemCount`**（成功後再導向 **`/finish/claimed`**）。**若已領滿**（`rewardRedeemCount` 達 `maxRounds`），**不再**自動導向 **`/finish/claimed`**，使用者留在 **`/finish`**，並顯示「已達領獎上限」提醒（三格狀態仍由 **`dashboard`** 映射）。
 
@@ -103,16 +105,16 @@ flowchart TD
 **A. 進入遊戲後 → 開始闖關前**
 
 1. **歡迎頁** — 主視覺、活動標題、副文案；「開始探索」→  
-2. **遊戲說明** — 6 關與闖關禮說明、關卡地點順序（線框示例見 §3.1.1）、注意事項（3 裝置／3 份獎等）；「開始探索」→ **下一屏即為登入頁**（不先進地圖或題目）。  
-3. **闖關登入頁（全屏表單，非彈窗）** — 線框標題常為「請輸入您的基本資料」；與流程圖上「**登入**」為同一步。使用者於**整頁**填 **姓名**、**員工編號**（**無**報到用之同行人數），按 **「確定」** 後送 API／綁定身分，再進入關卡流程（**開始闖關**：到站／地圖／第一站等，依實作）。頁內或旁註提醒：資料與兌換闖關禮、裝置／獎品上限有關。
+2. **遊戲說明** — 6 關與闖關禮說明、**地點列表**（線框示例見 §3.1.1；**順序不拘**，僅導覽）；注意事項（3 裝置／3 份獎等）；「開始探索」→ **下一屏即為登入頁**（不先進地圖或題目）。  
+3. **闖關登入頁（全屏表單，非彈窗）** — 線框標題常為「請輸入您的基本資料」；與流程圖上「**登入**」為同一步。使用者於**整頁**填 **姓名**、**員工編號**（**無**報到用之同行人數），按 **「確定」** 後送 API／綁定身分；若有 **`VITE_API_BASE`** 則 **`syncLocalProgressFromDashboard()`** 同步 **`completedStageIds`**，再進入 **`/stage`** 地圖。頁內或旁註提醒：資料與兌換闖關禮、裝置／獎品上限有關。
 
-**B. 每一關（重複至 6／6）**
+**B. 每一站（六站可任選，重複至 6／6 站完成）**
 
-1. **到站頁** — 關卡名稱、引導掃描站點 QR；相機開啟掃描 UI。  
-2. **掃描** — 掃描成功 → **直接**進**題目頁**。  
-3. **題目** — 進度（如 01/06）、選項；未選答案前主按鈕**不可送出**。  
+1. **地圖／到站頁** — 列表可**點選未完成之站**；該站名稱、引導掃描站點 QR；相機開啟掃描 UI。  
+2. **掃描** — 驗證成功後回到到站卡（**已解鎖**）；使用者按 **「開始作答」** → **`/quiz?challengeId=…`**（與線框「進題目」同一步，原型拆成兩次點擊以利狀態綁定）。  
+3. **題目** — 進度為**已完成站數／6**（非線性「第幾站」）；選項；未選答案前主按鈕**不可送出**。  
 4. **答錯** → 「重新回答」回同一題。  
-5. **答對** → 「前往下一關」→ 回到到站類畫面（下一關）。
+5. **答對** → 「繼續探索」→ 回**地圖**另選未完成之站；集滿 6 站後進入完成頁。
 
 **C. 六關完成後**
 
@@ -131,7 +133,7 @@ flowchart TD
     Brief --> Login["闖關登入頁·全屏表單\n姓名／員編·確定"]
   end
 
-  Login --> Station["到站頁：本關名稱·引導掃碼"]
+  Login --> Station["地圖／到站：可選站·本關名稱·引導掃碼"]
   Station --> Scan["掃站點 QR"]
   Scan --> Quiz["題目頁（未選不可確定）"]
   Quiz -->|答錯| Quiz
@@ -154,7 +156,7 @@ flowchart TD
 | 裝置 | **手機優先**；支援平板、桌機（RWD） |
 | 現場 | 戶外強光、單手操作；按鈕與選項（三選一）**夠大、對比夠** |
 | 流程 | **簽到頁**與**闖關頁**分開（不同路由），資訊架構清楚。**闖關線：** 歡迎 → 遊戲說明 → **闖關登入頁（全屏，非彈窗）** → 關卡流程；**報到線**見 §2.2。**同一 SPA** 內報到與闖關可共用表單元件，但路由與欄位不同。**報到 QR** 與**闖關入口 QR** 指向不同 URL／query（`entry=checkin`／`entry=game` 等）。各關**到站 QR** 仍為獨立連結（常含站點 JWT，見 [`api-v0.1.md`](../specs/api-v0.1.md)） |
-| 闖關頁 | 以「目前關卡、題目、進度」為主；**不自動輪詢**，使用者操作才打 API |
+| 闖關頁 | 以「**目前選擇之站**、題目、**已完成站數／6**」為主；地圖可切換未完成之站；**不自動輪詢**，使用者操作才打 API |
 | 櫃台驗證 | 完成畫面需**高可讀、少動效**，利於工作人員掃視 |
 | 完成頁／領取成功 | **`/finish`**（`FinishView.vue`）：與「**3 次／3 份**」對齊之確認領獎彈窗；無 API 時遞增本機次數見 **`provisionalFinishClaim.ts`**。**`/finish/claimed`**（`ClaimSuccessView.vue`）：**已設定 `VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 顯示已領進度；**未設定 API** 時以 **`local-fallback`** 顯示 **`fdgw_finishClaimed`**（`demoState.ts`；槽位上限 **`constants/index.ts`** 之 **`FINISH_REWARD_SLOTS`**）。編排邏輯見 **`useRewardClaimPresentation`**／**`rewardClaimPresentation.ts`**。**上線**應設定 **`VITE_API_BASE`**；**`reward/claim` 成功**後再導向領取成功頁；**已領滿**時可停留 **`/finish`** 顯示上限提醒，不強制導向 **`/finish/claimed`** |
 | 視覺 | KV／Logo／CIS 定案後以 **design token** 統一兩路流程，避免兩套風格 |
@@ -222,3 +224,5 @@ flowchart TD
 | 1.25 | 2026-04-20 | **§2**：`views/` 依路由分群（**`home/`**、**`onboarding/`**、**`auth/`**、**`checkin/`**、**`quest/`**）；**`FINISH_REWARD_SLOTS`** 併入 **`constants/index.ts`** 敘述；**§2.1**、**§3** 領獎槽位說明改與程式一致（移除已刪之 **`lib/constants/finishReward.ts`** 路徑） |
 | 1.26 | 2026-04-27 | 版本鏈同步：部署摘要引用更新為 `summary-deployment` **v1.5** |
 | 1.27 | 2026-05-03 | 檔首 API 版本改指 `api-v0.1` 修訂紀錄；**§2.1／§2.3／§3**：**已領滿**時完成頁 **`/finish`** 不強制導 **`/finish/claimed`**，與 `FinishView`／`ClaimSuccessView` 現況一致 |
+| 1.28 | 2026-05-03 | **§2.1** 補 **`fdgw_completed_stage_ids`** 與登入後 **`syncLocalProgressFromDashboard`**；**§2.3**／流程圖／**§3**：六站**任意順序**、地圖選站與進度語意；對齊 `api-v0.1` **v0.1.19** |
+| 1.29 | 2026-05-03 | **§2.1** 補 **`fdgw_pending_station_challenge`**、**`getInZone()`** 語意、**`/quiz`** 與 **`challengeId` query** 綁定、**`ResultView`** 清除到站狀態；**§2.3 B** 掃碼→作答步驟與 `StageView` 原型一致；對齊 `api-v0.1` **v0.1.20** |

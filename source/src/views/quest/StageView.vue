@@ -6,9 +6,15 @@ import AppFooter from "@/components/AppFooter.vue";
 import { verifyStation } from "@/api/gameFlow";
 import {
 	QR_SCAN_STICKER_SRC,
+	clearPendingStationVerification,
+	getCompletedStageIds,
 	getInZone,
+	getPendingStationVerification,
 	getStage,
+	isStageCompleted,
 	setInZone,
+	setPendingStationVerification,
+	setStage,
 	stageIds,
 	stageStickerSrc,
 	stageTitle,
@@ -26,20 +32,35 @@ const scanLoading = ref(false);
 /** 到站畫面 vs 模擬掃碼全屏 */
 const viewPhase = ref<"arrival" | "scanning">("arrival");
 
+const doneStationCount = computed(() => getCompletedStageIds().length);
+
 onMounted(() => {
 	stage.value = getStage();
-	inZone.value = getInZone();
+	const pending = getPendingStationVerification();
+	if (pending && pending.stage === stage.value) {
+		challengeId.value = pending.challengeId;
+		setInZone(true);
+		inZone.value = true;
+	} else {
+		if (pending) clearPendingStationVerification();
+		if (getInZone()) setInZone(false);
+		inZone.value = false;
+		challengeId.value = "";
+	}
 });
 
 const stationName = computed(() => stageTitle(stage.value));
 const stationSticker = computed(() => stageStickerSrc(stage.value));
 
 function startQuiz() {
+	const cid = challengeId.value.trim();
+	if (!cid) {
+		scanError.value = "請先完成掃碼驗證，再開始作答。";
+		return;
+	}
 	router.push({
 		name: "quiz",
-		query: challengeId.value
-			? { challengeId: challengeId.value }
-			: undefined,
+		query: { challengeId: cid },
 	});
 }
 
@@ -56,7 +77,9 @@ function finishScanDemo() {
 	scanError.value = "";
 	verifyStation(stage.value, `stage-${stage.value}-token`)
 		.then((cid) => {
+			scanError.value = "";
 			challengeId.value = cid;
+			setPendingStationVerification(stage.value, cid);
 			inZone.value = true;
 			setInZone(true);
 			viewPhase.value = "arrival";
@@ -72,16 +95,32 @@ function finishScanDemo() {
 		});
 }
 
-function rowState(id: number): "done" | "current" | "locked" {
-	if (id < stage.value) return "done";
+function rowState(id: number): "done" | "current" | "open" {
+	if (isStageCompleted(id)) return "done";
 	if (id === stage.value) return "current";
-	return "locked";
+	return "open";
+}
+
+function selectStage(id: number) {
+	if (isStageCompleted(id)) return;
+	setStage(id);
+	stage.value = id;
+	setInZone(false);
+	clearPendingStationVerification();
+	challengeId.value = "";
+	scanError.value = "";
 }
 </script>
 
 <template>
 	<div class="gw-page-fill relative flex min-h-full flex-col bg-[#f5f6f4]">
-		<AppHeader class="relative z-[2]" :stage="stage" show-progress show-user />
+		<AppHeader
+			class="relative z-[2]"
+			:stage="stage"
+			:completed-stages-count="doneStationCount"
+			show-progress
+			show-user
+		/>
 
 		<!-- —— 模擬掃碼全屏 —— -->
 		<div
@@ -226,6 +265,13 @@ function rowState(id: number): "done" | "current" | "locked" {
 					>
 						{{ t("stage.startQuizButton") }}
 					</button>
+					<p
+						v-if="scanError"
+						class="mt-3 rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-800"
+						role="alert"
+					>
+						{{ scanError }}
+					</p>
 				</div>
 			</div>
 
@@ -235,14 +281,19 @@ function rowState(id: number): "done" | "current" | "locked" {
 					<li
 						v-for="id in stageIds()"
 						:key="id"
+						role="button"
+						:tabindex="isStageCompleted(id) ? -1 : 0"
 						:class="[
-							'flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm',
+							'flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm transition',
 							rowState(id) === 'current'
 								? 'border-gw-brand/40 bg-gw-mint/30'
 								: rowState(id) === 'done'
-									? 'border-neutral-200 bg-neutral-50'
-									: 'border-neutral-100 bg-white/80 opacity-70',
+									? 'cursor-default border-neutral-200 bg-neutral-50'
+									: 'cursor-pointer border-neutral-100 bg-white/80 hover:border-gw-brand/35 hover:bg-gw-mint/20',
 						]"
+						@click="selectStage(id)"
+						@keydown.enter.prevent="selectStage(id)"
+						@keydown.space.prevent="selectStage(id)"
 					>
 						<span
 							:class="[

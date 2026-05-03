@@ -8,8 +8,16 @@ import { fetchChallenge, submitChallengeAttempt } from "@/api/gameFlow";
 import {
 	choiceRowsForChallenge,
 	questionForChallenge,
+	stageIndexFromChallengeId,
 } from "@/lib/challengeOptionLabels";
-import { getStage, stageStickerSrc, stageTitle } from "@/lib/demoState";
+import {
+	addCompletedStageId,
+	getCompletedStageIds,
+	getStage,
+	setCompletedStageIdsFromApi,
+	stageStickerSrc,
+	stageTitle,
+} from "@/lib/demoState";
 import { useI18n } from "@/composables/useI18n";
 import { GAME_CONFIG } from "@/constants";
 
@@ -32,11 +40,19 @@ onMounted(() => {
 		challengeId.value = q.trim();
 	}
 	selected.value = null;
+	const fromChallenge = stageIndexFromChallengeId(challengeId.value);
+	stage.value = fromChallenge ?? getStage();
 	loadChallenge();
 });
 
+const displayStage = computed(
+	() => stageIndexFromChallengeId(challengeId.value) ?? stage.value,
+);
+
+const doneStationCount = computed(() => getCompletedStageIds().length);
+
 const progressPct = computed(
-	() => (stage.value / GAME_CONFIG.TOTAL_STAGES) * 100,
+	() => (doneStationCount.value / GAME_CONFIG.TOTAL_STAGES) * 100,
 );
 
 function loadChallenge() {
@@ -47,7 +63,7 @@ function loadChallenge() {
 			challengeId.value = data.challengeId;
 			question.value = questionForChallenge(
 				data.challengeId,
-				data.title || stageTitle(stage.value),
+				data.title || stageTitle(displayStage.value),
 			);
 			optionRows.value = choiceRowsForChallenge(
 				data.challengeId,
@@ -67,6 +83,16 @@ function confirm() {
 	errorText.value = "";
 	submitChallengeAttempt(challengeId.value, selected.value)
 		.then((r) => {
+			if (r.correct) {
+				if (r.completedStageIds.length > 0) {
+					setCompletedStageIdsFromApi(r.completedStageIds);
+				} else {
+					const sid = stageIndexFromChallengeId(challengeId.value);
+					if (sid != null) {
+						addCompletedStageId(sid);
+					}
+				}
+			}
 			router.push({
 				name: "result",
 				query: {
@@ -87,26 +113,32 @@ function confirm() {
 
 <template>
 	<div class="relative flex min-h-full flex-col bg-[#f5f6f4]">
-		<AppHeader class="relative z-[2]" :stage="stage" show-progress show-user />
+		<AppHeader
+			class="relative z-[2]"
+			:stage="stage"
+			:completed-stages-count="doneStationCount"
+			show-progress
+			show-user
+		/>
 
 		<main class="relative z-[2] flex flex-1 flex-col px-4 pb-6 pt-4 sm:mx-auto sm:max-w-md sm:w-full">
 			<div class="flex items-end justify-between gap-3">
 				<div class="flex min-w-0 flex-1 items-end gap-3">
 					<img
-						:src="stageStickerSrc(stage)"
+						:src="stageStickerSrc(displayStage)"
 						width="112"
 						height="112"
-						:alt="t('quiz.stageAlt', { stationName: stageTitle(stage) })"
+						:alt="t('quiz.stageAlt', { stationName: stageTitle(displayStage) })"
 						class="h-14 w-14 shrink-0 rounded-2xl border border-neutral-200/90 bg-neutral-50 object-contain object-center shadow-sm"
 						loading="lazy"
 					/>
 					<div class="min-w-0">
 						<p class="text-sm font-bold text-gw-navy">{{ t("quiz.progressTitle") }}</p>
-						<p class="mt-0.5 truncate text-xs text-neutral-500">{{ stageTitle(stage) }}</p>
+						<p class="mt-0.5 truncate text-xs text-neutral-500">{{ stageTitle(displayStage) }}</p>
 					</div>
 				</div>
 				<p class="text-sm font-bold tabular-nums">
-					<span class="text-gw-brand">{{ String(stage).padStart(2, "0") }}</span>
+					<span class="text-gw-brand">{{ String(doneStationCount).padStart(2, "0") }}</span>
 					<span class="text-neutral-400">
 						/ {{ String(GAME_CONFIG.TOTAL_STAGES).padStart(2, "0") }}
 					</span>

@@ -9,6 +9,8 @@ const props = withDefaults(
 	defineProps<{
 		/** 目前要挑戰的站點 1–6（用於推算已完成站數） */
 		stage?: number;
+		/** 已答對站數（任意順序）；若設定則優先於 `stage-1` 線性推算 */
+		completedStagesCount?: number | null;
 		/** 若設定則覆寫進度數字（例如完成頁固定顯示 6/6） */
 		completedOverride?: number | null;
 		showProgress?: boolean;
@@ -16,6 +18,7 @@ const props = withDefaults(
 	}>(),
 	{
 		stage: 1,
+		completedStagesCount: null,
 		completedOverride: null,
 		showProgress: false,
 		showUser: true,
@@ -33,6 +36,12 @@ const completed = computed(() => {
 		return Math.max(
 			0,
 			Math.min(GAME_CONFIG.TOTAL_STAGES, props.completedOverride),
+		);
+	}
+	if (props.completedStagesCount != null) {
+		return Math.max(
+			0,
+			Math.min(GAME_CONFIG.TOTAL_STAGES, props.completedStagesCount),
 		);
 	}
 	return Math.max(

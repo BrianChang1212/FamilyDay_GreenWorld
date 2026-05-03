@@ -3,7 +3,12 @@ import { computed, onMounted, ref } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
-import { advanceStage, getStage } from "@/lib/demoState";
+import {
+	clearPendingStationVerification,
+	getCompletedStageIds,
+	getStage,
+	setInZone,
+} from "@/lib/demoState";
 import { useI18n } from "@/composables/useI18n";
 import { GAME_CONFIG } from "@/constants";
 
@@ -15,12 +20,8 @@ const currentChallengeId = computed(() => {
 	const v = route.query.challengeId;
 	return typeof v === "string" ? v : "";
 });
-const nextChallengeId = computed(() => {
-	const v = route.query.nextChallengeId;
-	return typeof v === "string" ? v : "";
-});
-
 const ok = computed(() => route.query.ok === "1");
+const doneStationCount = computed(() => getCompletedStageIds().length);
 
 onMounted(() => {
 	stage.value = getStage();
@@ -36,17 +37,13 @@ function next() {
 		});
 		return;
 	}
-	if (stage.value >= GAME_CONFIG.TOTAL_STAGES) {
+	if (getCompletedStageIds().length >= GAME_CONFIG.TOTAL_STAGES) {
 		router.push({ name: "finish" });
 		return;
 	}
-	advanceStage();
-	router.push({
-		name: "stage",
-		query: nextChallengeId.value
-			? { challengeId: nextChallengeId.value }
-			: undefined,
-	});
+	setInZone(false);
+	clearPendingStationVerification();
+	router.push({ name: "stage" });
 }
 </script>
 
@@ -54,7 +51,13 @@ function next() {
 	<div
 		class="relative flex min-h-full flex-col bg-gw-cream bg-[radial-gradient(ellipse_120%_80%_at_50%_-30%,rgba(26,157,74,0.06),transparent_50%)]"
 	>
-		<AppHeader class="relative z-[2]" :stage="stage" show-progress show-user />
+		<AppHeader
+			class="relative z-[2]"
+			:stage="stage"
+			:completed-stages-count="doneStationCount"
+			show-progress
+			show-user
+		/>
 
 		<main
 			class="relative z-[2] flex flex-1 flex-col items-center px-5 pb-8 pt-6 sm:mx-auto sm:max-w-md sm:w-full"

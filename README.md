@@ -230,7 +230,7 @@ npm -v
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
 | 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/project-master.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-04-28（頁尾 **v2.52**）；細節見 [`docs/media/README.md`](docs/media/README.md)、[`docs/project/project-master.md`](docs/project/project-master.md)（合併版 **v1.3.29**；`summary-frontend` **v1.26**：版本鏈同步） |
+| 最後更新 README | 2026-05-03（頁尾 **v2.54**）；細節見 [`docs/media/README.md`](docs/media/README.md)、[`docs/project/project-master.md`](docs/project/project-master.md)（合併版 **v1.3.31**；`summary-frontend` **v1.29**、`api-v0.1` **v0.1.20**） |
 
 
 ---
@@ -296,7 +296,7 @@ flowchart LR
 ## 使用者流程
 
 - 報到：掃報到 QR -> 報到單頁 -> 完成頁（不自動進闖關）
-- 闖關：掃闖關入口 QR -> 歡迎/說明 -> 登入 -> 地圖/關卡 -> 完成領獎
+- 闖關：掃闖關入口 QR -> 歡迎/說明 -> 登入 -> 地圖/關卡（**六站完成順序不拘**）-> 完成領獎
 - 各關到站：掃現場關卡 QR 驗證
 
 完整分流與畫面順序請看 `docs/project/project-master.md` 與 `docs/architecture/summary-frontend.md`。
@@ -440,4 +440,4 @@ flowchart LR
 
 ---
 
-*README v2.53 · 2026-04-30（版本鏈同步：`api-v0.1` **v0.1.13**、`summary-frontend` **v1.26**、`summary-backend` **v1.5**、`summary-deployment` **v1.5**、`summary-traffic` **v1.2**；前版 v2.52）*
+*README v2.54 · 2026-05-03（版本鏈同步：`api-v0.1` **v0.1.20**、`summary-frontend` **v1.29**、`summary-backend` **v1.5**、`summary-deployment` **v1.5**、`summary-traffic` **v1.2**；前版 v2.53）*

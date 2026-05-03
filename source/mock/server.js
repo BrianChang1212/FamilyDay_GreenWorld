@@ -47,6 +47,9 @@ const challenges = [
 	},
 ];
 
+/** Mock 累計答對的站（無 session；登入成功時清空） */
+const mockCompletedStages = new Set();
+
 const defaultDb = {
 	employees: [
 		{ employeeId: "1141041", name: "Brian" },
@@ -207,14 +210,6 @@ function challengeIdByStageToken(token) {
 		return "c1";
 	}
 	return `c${n}`;
-}
-
-function nextChallengeIdByCurrent(currentId) {
-	const idx = challenges.findIndex((c) => c.id === currentId);
-	if (idx < 0 || idx + 1 >= challenges.length) {
-		return "";
-	}
-	return challenges[idx + 1].id;
 }
 
 const server = http.createServer((req, res) => {
@@ -392,6 +387,7 @@ const server = http.createServer((req, res) => {
 					return;
 				}
 
+				mockCompletedStages.clear();
 				writeJson(res, 200, {
 					ok: true,
 					user: {
@@ -488,11 +484,18 @@ const server = http.createServer((req, res) => {
 				const answer = normalizeStr(raw).toUpperCase();
 				const expected = normalizeStr(found.correctLetter || "").toUpperCase();
 				const correct = answer.length > 0 && answer === expected;
+				const stageNum = parseInt(String(found.id).replace(/^c/i, ""), 10);
+				if (correct && Number.isFinite(stageNum) && stageNum >= 1 && stageNum <= 6) {
+					mockCompletedStages.add(stageNum);
+				}
+				const completedStageIds = [...mockCompletedStages].sort((a, b) => a - b);
+				const allStagesCompleted = completedStageIds.length >= 6;
 				writeJson(res, 200, {
 					correct,
-					nextChallengeId: correct
-						? nextChallengeIdByCurrent(found.id)
-						: found.id,
+					nextChallengeId: found.id,
+					nextStageId: correct ? (allStagesCompleted ? null : stageNum) : null,
+					completedStageIds,
+					allStagesCompleted,
 				});
 			})
 			.catch(() =>
@@ -504,6 +507,7 @@ const server = http.createServer((req, res) => {
 	}
 
 	if (req.method === "POST" && urlObj.pathname === "/api/v1/me/playthrough/restart") {
+		mockCompletedStages.clear();
 		return writeJson(res, 200, {
 			ok: true,
 			fullClearCount: 1,

@@ -23,9 +23,13 @@ export const GAME_CONFIG = {
 
 export const STORAGE_KEYS = {
   stage: "fdgw_stage",
+  /** JSON number[]：已答對的站點 id（1–6），任意順序通關 */
+  completedStageIds: "fdgw_completed_stage_ids",
   name: "fdgw_name",
   employeeId: "fdgw_employeeId",
   inZone: "fdgw_inZone",
+  /** 本站掃碼驗證後暫存的 challengeId（與 stage 綁定，避免 inZone 與題組不一致） */
+  pendingStationChallenge: "fdgw_pending_station_challenge",
   finishClaimed: "fdgw_finishClaimed",
   companionCount: "fdgw_companionCount",
   checkinDone: "fdgw_checkin_done",

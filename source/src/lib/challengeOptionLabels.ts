@@ -9,7 +9,7 @@ export function apiOptionsAreAbcdKeys(options: string[]): boolean {
 	);
 }
 
-function stageIndexFromChallengeId(challengeId: string): number | null {
+export function stageIndexFromChallengeId(challengeId: string): number | null {
 	const m = /^c(\d+)$/i.exec(challengeId.trim());
 	if (!m) {
 		return null;

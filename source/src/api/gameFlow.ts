@@ -1,4 +1,5 @@
 import { getViteApiBase } from "@/lib/apiBase";
+import { setCompletedStageIdsFromApi } from "@/lib/demoState";
 
 type ChallengeJson = {
 	challengeId?: string;
@@ -10,6 +11,8 @@ type AttemptJson = {
 	correct?: boolean;
 	nextChallengeId?: string;
 	nextStageId?: number;
+	completedStageIds?: number[];
+	allStagesCompleted?: boolean;
 };
 
 type VerifyJson = {
@@ -85,7 +88,12 @@ export async function fetchChallenge(
 export async function submitChallengeAttempt(
 	challengeId: string,
 	answer: string,
-): Promise<{ correct: boolean; nextChallengeId: string | null }> {
+): Promise<{
+	correct: boolean;
+	nextChallengeId: string | null;
+	completedStageIds: number[];
+	allStagesCompleted: boolean;
+}> {
 	const base = getBaseOrThrow();
 	const res = await fetch(
 		`${base}/api/v1/challenges/${encodeURIComponent(challengeId)}/attempts`,
@@ -112,10 +120,41 @@ export async function submitChallengeAttempt(
 			: Number.isFinite(data.nextStageId)
 				? `c${data.nextStageId}`
 				: null;
+	const completedStageIds = Array.isArray(data.completedStageIds)
+		? data.completedStageIds
+				.map((n) => Math.floor(Number(n)))
+				.filter((n) => Number.isFinite(n) && n >= 1 && n <= 6)
+		: [];
 	return {
 		correct: data.correct === true,
 		nextChallengeId,
+		completedStageIds,
+		allStagesCompleted: data.allStagesCompleted === true,
 	};
+}
+
+type DashboardJson = {
+	progress?: { completedStageIds?: unknown };
+};
+
+/** 登入後同步後端已答對站點，與 `GET /me/dashboard` 一致 */
+export async function syncLocalProgressFromDashboard(): Promise<void> {
+	const base = getBaseOrThrow();
+	const res = await fetch(`${base}/api/v1/me/dashboard`, {
+		credentials: "include",
+		headers: { Accept: "application/json" },
+	});
+	if (!res.ok) {
+		return;
+	}
+	const data = (await res.json()) as DashboardJson;
+	const raw = data.progress?.completedStageIds;
+	if (!Array.isArray(raw)) {
+		return;
+	}
+	setCompletedStageIdsFromApi(
+		raw.map((x) => Math.floor(Number(x))).filter((n) => n >= 1 && n <= 6),
+	);
 }
 
 export async function restartPlaythrough(): Promise<void> {

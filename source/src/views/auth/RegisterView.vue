@@ -5,6 +5,8 @@ import AppFooter from "@/components/AppFooter.vue";
 import { resetScavengerRun, setProfile } from "@/lib/demoState";
 import { getEntryIntent } from "@/lib/entryIntent";
 import { loginGame } from "@/api/authLogin";
+import { syncLocalProgressFromDashboard } from "@/api/gameFlow";
+import { getViteApiBase } from "@/lib/apiBase";
 import { useI18n } from "@/composables/useI18n";
 
 const router = useRouter();
@@ -57,6 +59,13 @@ async function submit() {
 		await submitAuthApi(nameValue, employeeIdValue);
 		setProfile(nameValue, employeeIdValue);
 		resetScavengerRun();
+		if (getViteApiBase()) {
+			try {
+				await syncLocalProgressFromDashboard();
+			} catch {
+				/* ignore when dashboard is unreachable */
+			}
+		}
 		router.push({ name: "stage" });
 	} catch (err) {
 		submitError.value = friendlyAuthError(err);

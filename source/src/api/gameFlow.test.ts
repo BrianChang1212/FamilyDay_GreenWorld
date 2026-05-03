@@ -69,7 +69,12 @@ describe("gameFlow api", () => {
 		}) as typeof fetch;
 
 		const r = await submitChallengeAttempt("stage-1", "A");
-		expect(r).toEqual({ correct: true, nextChallengeId: "c3" });
+		expect(r).toEqual({
+			correct: true,
+			nextChallengeId: "c3",
+			completedStageIds: [],
+			allStagesCompleted: false,
+		});
 	});
 
 	it("restartPlaythrough resolves when API returns ok=true", async () => {

@@ -90,6 +90,8 @@ gameRouter.post("/challenges/:challengeId/attempts", async (req, res) => {
 	res.status(200).json({
 		correct: result.correct,
 		nextStageId: result.nextStageId,
+		completedStageIds: result.completedStageIds,
+		allStagesCompleted: result.allStagesCompleted,
 	});
 });
 

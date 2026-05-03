@@ -1,6 +1,6 @@
 # 家庭日綠世界闖關 Web — API 規格（v0.1 草案）
 
-> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.18** 聯調註記 CORS 白名單與 **`functions/src/index.ts`** 對齊；**v0.1.17** Mock／整合清單與 **`me/progress`** 對齊；**v0.1.16** 補列 **`GET /api/v1/me/progress`** 落地狀態；**v0.1.15** 文件與 §13 流程圖路徑對齊；**v0.1.14** 同步 Cloud Functions：`auth/checkin` 改走 Firestore roster 驗證，`admin/roster/import` 實作 Firestore 寫入；**v0.1.13** 完成 CORS allowlist 收斂驗證；**不改**端點定義）。
+> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.20** 補前端原型：`inZone`／**`pendingStationChallenge`** 與 **`challengeId` query** 綁定註記，避免未掃碼卻進預設題組；**無** REST 契約變更；**v0.1.19** 任意順序通關：`dashboard.stages[].locked` 語意、`attempts` 回應補 **`completedStageIds`**／**`allStagesCompleted`**；**v0.1.18** 聯調註記 CORS 白名單與 **`functions/src/index.ts`** 對齊；**v0.1.17** Mock／整合清單與 **`me/progress`** 對齊；**v0.1.16** 補列 **`GET /api/v1/me/progress`** 落地狀態；**v0.1.15** 文件與 §13 流程圖路徑對齊；**v0.1.14** 同步 Cloud Functions：`auth/checkin` 改走 Firestore roster 驗證，`admin/roster/import` 實作 Firestore 寫入；**v0.1.13** 完成 CORS allowlist 收斂驗證；**不改**端點定義）。
 
 ---
 
@@ -44,9 +44,9 @@
 |------|------|------|
 | `POST /api/v1/checkin` | 需符合 `source/mock/db.json` 的 `employees` 對照；不符回 `401 CHECKIN_IDENTITY_MISMATCH` | 正式版應依名冊/身份服務驗證 |
 | `GET /api/v1/events/{eventId}` | 僅實作固定路徑 `/api/v1/events/familyday-2026` | 正式版維持 `{eventId}` 動態路由 |
-| `POST /api/v1/stations/verify` | 僅 smoke 回應，未實作 JWT 驗簽/exp/jti | 正式版需完整 JWT 安全檢查 |
+| `POST /api/v1/stations/verify` | 僅 smoke 回應，未實作 JWT 驗簽/exp/jti；回傳之 **`challengeId`** 須與請求 **`stageId`** 對應（原型與 `functions` 一致） | 正式版需完整 JWT 安全檢查 |
 | `GET /api/v1/me/dashboard` | 回應為前端驗證所需最小欄位集 | 正式版回應以本文件示例為準 |
-| `POST /api/v1/challenges/{challengeId}/attempts` | request 用 `answer`，response 用 `nextChallengeId` | 正式版欄位仍以 `choiceId` / `nextStageId` 為目標 |
+| `POST /api/v1/challenges/{challengeId}/attempts` | request 用 `answer`，response 含 **`correct`**、**`nextStageId`**、**`completedStageIds`**、**`allStagesCompleted`**（與 `functions` 一致） | 正式版請求仍以 **`choiceId`**（相容 `answer`）為準 |
 
 ---
 
@@ -170,26 +170,25 @@
     "name": "瑞軒家庭日"
   },
   "stages": [
-    {
-      "id": 1,
-      "title": "水鳥區",
-      "order": 1,
-      "locked": false
-    }
+    { "id": 1, "title": "水鳥區", "order": 1, "locked": true },
+    { "id": 2, "title": "大探奇區", "order": 2, "locked": true },
+    { "id": 3, "title": "水生植物公園", "order": 3, "locked": false }
   ],
   "progress": {
-    "currentStageId": 3,
+    "currentStageId": 2,
     "completedStageIds": [1, 2],
     "allCompleted": false,
     "fullClearCount": 0,
     "rewardRedeemCount": 0,
-    "canStartNewRound": true,
+    "canStartNewRound": false,
     "maxRounds": 3
   }
 }
 ```
 
-**作法 A（無獨立 runId）**：進度以單一使用者狀態表示；`fullClearCount` 僅統計「再玩一輪」次數（**不**限制闖關重玩）；**`maxRounds` 表示闖關禮最多可領次數**（預設 3）。`canStartNewRound` 等由 API 組裝。**選用：** `rewardRedeemCount` 供「領取成功」三格狀態；未實作時前端可暫以 `fullClearCount` 映射（以前後端定案為準）。
+> **`stages[].locked`（2026-05 實作）：** **`true`** = 該站**已答對**（進度已記入 `completedStageIds`，不需再佔名額）；**`false`** = **尚未完成**，玩家可任選順序到站作答。**`order`／`title`** 僅供地圖／導覽顯示，**不**代表必須依序遊玩。
+
+**作法 A（無獨立 runId）**：進度以單一使用者狀態表示；**六關可任意順序完成**，`completedStageIds` 集滿 6 個相異站別即視為一輪全通（與陣列排序無關）；`fullClearCount` 僅統計「再玩一輪」次數（**不**限制闖關重玩）；**`maxRounds` 表示闖關禮最多可領次數**（預設 3）。`currentStageId` 為**最後答對之站**（除錯／顯示用），**不**表示「下一必玩站」。`canStartNewRound` 等由 API 組裝。**選用：** `rewardRedeemCount` 供「領取成功」三格狀態；未實作時前端可暫以 `fullClearCount` 映射（以前後端定案為準）。
 
 ---
 
@@ -248,10 +247,19 @@
 **回應（示例）**
 
 ```json
-{ "correct": true, "nextStageId": 4 }
+{
+  "correct": true,
+  "nextStageId": 3,
+  "completedStageIds": [1, 2, 3],
+  "allStagesCompleted": false
+}
 ```
 
-答錯時可回 `{ "correct": false }`；仍受每分鐘請求上限約束。
+- **`completedStageIds`**：答對後**當輪**已通關之站別（1–6，遞增排序）。  
+- **`allStagesCompleted`**：本輪是否已集滿 6 站（`true` 時 **`nextStageId`** 可為 **`null`**）。  
+- **`nextStageId`**：與 **`currentStageId`** 對齊之提示欄位（**非**強制下一線性關）；答錯時可省略或沿用請求前之進度。
+
+答錯時可回 `{ "correct": false, "nextStageId": <unchanged>, "completedStageIds": [...] }`；仍受每分鐘請求上限約束。
 
 **與前端本地重置對齊：** 若使用者已全通關且 **`rewardRedeemCount >= bankedFullClears`**（上一輪獎勵已領），但前端未呼叫 **`POST /api/v1/me/playthrough/restart`**（例如從首頁重置本地關卡後再玩），則在 **第 1 關（`c1`）答對**時，後端會自動清空本輪 `completedStageIds` 並 **`fullClearCount` +1**，等同補做 restart，以便 **`bankedFullClears`** 能在新一輪通關時再次遞增。
 
@@ -372,6 +380,8 @@ flowchart LR
   end
 ```
 
+**表（§12）：** 下列「端點」欄為 **`/api/v1` 之後的路徑片段**（與 §1 **API Base** 約定一致；完整範例 **`GET /api/v1/me/dashboard`**）。
+
 | 分群 | 端點 | 典型觸發時機 |
 |------|------|--------------|
 | Player | `/entry/verify` | 入口 QR 驗證（選用） |
@@ -429,7 +439,7 @@ sequenceDiagram
       U->>FE: 送出答案
       FE->>API: POST /api/v1/challenges/{challengeId}/attempts
       API->>DB: 更新作答結果與進度
-      API-->>FE: correct / nextStageId
+      API-->>FE: correct, nextStageId, completedStageIds, allStagesCompleted
     end
 
     opt 完成後再玩一輪
@@ -479,3 +489,5 @@ sequenceDiagram
 | v0.1.16 | 2026-05-03 | Firebase 實作對齊註記之 MVP 落地表：補 **`GET /api/v1/me/progress`**（`functions/src/routes/game.ts`；主流程仍以 dashboard 為準） |
 | v0.1.17 | 2026-05-03 | **`source/mock/server.js`** 補 **`GET /api/v1/me/progress`**（`scenario` 與 dashboard 一致）；**`test-all-api.js`** 補 **`me/progress`**／**`reward/claim`**；**`test-game-api.js`** 驗證 **`me/progress`** 欄位；**`api-integration-checklist.md`** §9.5／§9.6 與根 **`README`** API 字串同步；§12 觸發表補 **`/auth/logout`**、**`/me/progress`**、**`/me/reward/claim`** |
 | v0.1.18 | 2026-05-03 | 聯調驗證註記：CORS allowlist 補列 **`127.0.0.1:5173`／`4173`**（與 **`functions/src/index.ts`** 一致） |
+| v0.1.19 | 2026-05-03 | §5：`stages[].locked` 改為「**已通關**為 **`true`**」；補**任意順序**六關與 **`currentStageId`** 說明。§7：`attempts` 回應補 **`completedStageIds`**、**`allStagesCompleted`** 與範例 JSON；§13 流程圖註記同步；Mock 差異表 §「Firebase 實作對齊註記」更新 |
+| v0.1.20 | 2026-05-03 | Mock 差異表：`stations/verify` 補「**`challengeId` 與 `stageId` 對應**」。**`summary-frontend` v1.29**：前端以 **`fdgw_pending_station_challenge`** 綁定選站與驗證回傳之 **`challengeId`**，**`getInZone()`** 僅 **`fdgw_inZone === "1"`** 為 true；**`/quiz`** 必帶 **`challengeId` query**（見 `StageView.vue`／`QuizView.vue`／`ResultView.vue`）。**無**端點或 JSON 契約變更 |

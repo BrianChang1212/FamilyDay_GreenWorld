@@ -1,6 +1,6 @@
 # 前後端 API 整合驗證清單（Checklist）
 
-> 適用範圍：`docs/specs/api-v0.1.md`（目前修訂至 v0.1.13）  
+> 適用範圍：`docs/specs/api-v0.1.md`（目前修訂至 **v0.1.20**）  
 > 目的：用「前端實際操作」驗證 API 契約、錯誤處理與資料一致性。
 
 ---
@@ -66,6 +66,7 @@
 ### 4.1 站點 QR 驗證
 
 - `POST /api/v1/stations/verify` 正常 QR JWT 可通過
+- 回應之 **`challengeId`** 與請求 **`stageId`** 對應一致（例：`stageId: 5` → `c5`；mock／`functions` 皆應滿足，避免前端題組錯站）
 - 過期 JWT（`exp`）被拒絕
 - 重播 JWT（`jti`）被拒絕
 

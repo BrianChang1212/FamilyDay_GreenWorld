@@ -1,14 +1,17 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+	addCompletedStageId,
 	advanceStage,
 	FINISH_REWARD_SLOTS,
 	getCompanionCount,
+	getCompletedStageIds,
 	getFinishClaimedCount,
 	getInZone,
 	getProfile,
 	getStage,
 	incrementFinishClaimed,
 	isCheckInDone,
+	isStageCompleted,
 	resetScavengerRun,
 	setCheckInDone,
 	setCompanionCount,
@@ -80,7 +83,7 @@ describe("demoState", () => {
 			expect(getStage()).toBe(GAME_CONFIG.TOTAL_STAGES);
 		});
 
-		it("advanceStage at last station does not clear in-zone", () => {
+		it("advanceStage at last station keeps stage and in-zone", () => {
 			setStage(GAME_CONFIG.TOTAL_STAGES);
 			setInZone(true);
 			advanceStage();
@@ -91,9 +94,23 @@ describe("demoState", () => {
 		it("resetScavengerRun sets stage 1 and clears in-zone", () => {
 			setStage(5);
 			setInZone(true);
+			addCompletedStageId(2);
+			addCompletedStageId(4);
 			resetScavengerRun();
 			expect(getStage()).toBe(1);
 			expect(getInZone()).toBe(false);
+			expect(getCompletedStageIds()).toEqual([]);
+		});
+	});
+
+	describe("completedStageIds (any order)", () => {
+		it("addCompletedStageId merges unique sorted ids", () => {
+			addCompletedStageId(3);
+			addCompletedStageId(1);
+			addCompletedStageId(3);
+			expect(getCompletedStageIds()).toEqual([1, 3]);
+			expect(isStageCompleted(1)).toBe(true);
+			expect(isStageCompleted(2)).toBe(false);
 		});
 	});
 
@@ -120,8 +137,8 @@ describe("demoState", () => {
 	});
 
 	describe("inZone default and storage", () => {
-		it("treats missing key as in-zone; explicit 0 as out", () => {
-			expect(getInZone()).toBe(true);
+		it("treats missing key as out-of-zone; explicit 1 as in", () => {
+			expect(getInZone()).toBe(false);
 			setInZone(false);
 			expect(getInZone()).toBe(false);
 			setInZone(true);

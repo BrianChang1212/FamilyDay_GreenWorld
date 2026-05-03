@@ -125,8 +125,8 @@ Firebase/Google Cloud 可設定 **Budgets & Alerts** 做費用通知，建議：
 | 項目 | 結論 |
 |------|------|
 | 簽到 vs 闖關登入 | **分開**：獨立 API 與流程（見 `api-v0.1.md` 之 `checkin` 與 `auth/login`）。 |
-| 進度模型 | **作法 A**：**無獨立 `runId`／runs 表**；以單一使用者進度表達；**闖關可無限再玩**（`POST /api/v1/me/playthrough/restart` 僅要求當下已全通關）；**闖關禮最多領 3 次**（`maxRounds` + `rewardRedeemCount` + `bankedFullClears` 與 **`POST /api/v1/me/reward/claim`**）。 |
-| 關卡瀏覽資料 | **合併 API**：**`GET /api/v1/me/dashboard`** 一次回傳 stages + progress。 |
+| 進度模型 | **作法 A**：**無獨立 `runId`／runs 表**；以單一使用者進度表達；**六關可任意順序完成**（`completedStageIds` 集滿 1–6）；**闖關可無限再玩**（`POST /api/v1/me/playthrough/restart` 僅要求當下已全通關）；**闖關禮最多領 3 次**（`maxRounds` + `rewardRedeemCount` + `bankedFullClears` 與 **`POST /api/v1/me/reward/claim`**）。 |
+| 關卡瀏覽資料 | **合併 API**：**`GET /api/v1/me/dashboard`** 一次回傳 stages + progress；**`stages[].locked`**：**已通關**為 **`true`**（見 **`api-v0.1` §5**）。 |
 | 限流 | 伺服器端實作 **每使用者每分鐘 30 次**（可細分 bucket）；登入／簽到可更嚴。 |
 
 ---
