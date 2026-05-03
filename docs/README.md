@@ -13,6 +13,7 @@
 | [`specs/`](./specs/) | **介面規格**（REST API 草案等） |
 | [`architecture/`](./architecture/) | **架構討論總結**（前後端技術選型、部署、流量） |
 | [`testing/`](./testing/) | **整合驗證清單**（前後端 API 實測流程與驗收 Checklist） |
+| [`setup/`](./setup/) | **本機與預覽**（GCP／Firestore、靜態預覽、Windows Node.js；詳見 [`setup/README.md`](./setup/README.md)） |
 | [`proposals/`](./proposals/) | **外部提案／簡報**（PDF） |
 | [`design/`](./design/) | **設計資產**（線框圖等） |
 | [`media/`](./media/) | **媒體索引**（整合 Demo 錄影與 Preview 截圖維護說明） |
@@ -24,8 +25,8 @@
 
 ## 開發環境（Windows／Node）
 
-開發指令與環境設定以根目錄 [`README.md`](../README.md#快速開始) 為單一來源（含
-Windows 安裝、`npm run dev`、`npm run test`、CI 流程）。
+- **最短路徑：** 根目錄 [`README.md`](../README.md#快速開始)（`npm run dev`、測試、CI）。  
+- **詳細：** [`setup/README.md`](./setup/README.md)（Firestore／GCP、靜態預覽、Windows Node 疑難排解）。
 
 ---
 
@@ -37,10 +38,10 @@ Windows 安裝、`npm run dev`、`npm run test`、CI 流程）。
 | API v0.1 草案 | [`specs/api-v0.1.md`](./specs/api-v0.1.md) |
 | Firestore Schema（v1 草案） | [`architecture/firestore-schema-v1.md`](./architecture/firestore-schema-v1.md) |
 | API 整合與 Mock 驗證清單 | [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md) |
-| 本機 GCP 服務帳戶（Firestore／verify） | 根 [`README.md`](../README.md)「GCP 服務帳戶」；[`architecture/summary-backend.md`](./architecture/summary-backend.md) **§2.0** |
+| 本機 GCP 服務帳戶（Firestore／verify） | [`setup/local-firestore-gcp.md`](./setup/local-firestore-gcp.md)；[`architecture/summary-backend.md`](./architecture/summary-backend.md) **§2.0** |
 | 前端／後端／部署／流量摘要 | [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) 等 |
-| 測試 Web UI（Netlify、QR） | 根 [`README.md`](../README.md#preview-netlify-test-ui)（錨點 **`preview-netlify-test-ui`**）；部署摘要 [`architecture/summary-deployment.md`](./architecture/summary-deployment.md) **§1.1**（**v1.5**） |
-| 前端單元測試（Vitest） | `source/`：`npm run test`；規格見 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) **§1.1**（**v1.29**）；CI 見 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) |
+| 測試 Web UI（Netlify、QR） | [`setup/static-preview-netlify-github.md`](./setup/static-preview-netlify-github.md)；根 [`README`](../README.md#preview-netlify-test-ui) 錨點 **`preview-netlify-test-ui`**；[`summary-deployment.md`](./architecture/summary-deployment.md) **§1.1**（**v1.6**） |
+| 前端單元測試（Vitest） | `source/`：`npm run test`；規格見 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) **§1.1**（**v1.30**）；CI 見 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) |
 | 提案 PDF | [`proposals/FamilyDayApp_Proposal_v1.pdf`](./proposals/FamilyDayApp_Proposal_v1.pdf) |
 | Wireframe PNG | [`design/wireframe/`](./design/wireframe/) |
 | 操作示範錄影與截圖維護 | [`media/README.md`](./media/README.md) |
@@ -53,7 +54,7 @@ Windows 安裝、`npm run dev`、`npm run test`、CI 流程）。
 
 ---
 
-**最後整理：** 2026-05-03（**`api-v0.1` v0.1.20** 前端到站／`challengeId` 綁定註記；**`summary-frontend` v1.29**；整合清單與 **`me/progress`**／任意順序通關敘述對齊）。版本與修訂歷史以各檔案檔頭及
+**最後整理：** 2026-05-03（新增 **`setup/`** 本機與預覽文件；**`summary-deployment` v1.6**；**`api-v0.1` v0.1.20**；**`summary-frontend` v1.30**）。版本與修訂歷史以各檔案檔頭及
 [`project/project-master.md`](./project/project-master.md) 頁尾版本列為準。
 技術細節請直接查閱對應單一來源文件：前端
 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md)、後端
@@ -62,4 +63,4 @@ Windows 安裝、`npm run dev`、`npm run test`、CI 流程）。
 [`architecture/summary-traffic.md`](./architecture/summary-traffic.md)、API
 [`specs/api-v0.1.md`](./specs/api-v0.1.md)、整合驗證
 [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md)；
-測試 Web UI 見根 [`README.md`](../README.md#preview-netlify-test-ui)。
+測試 Web UI 見 [`setup/static-preview-netlify-github.md`](./setup/static-preview-netlify-github.md) 或根 [`README`](../README.md#preview-netlify-test-ui)。

@@ -17,9 +17,9 @@
 
 ### 1.1 前端原型靜態預覽（無後端）
 
-與下方「全端／API 上線」不同：僅將 **Vite 建置產物**（`source/dist`）放於 **Netlify**、**GitHub Pages** 等靜態主機，供手機試操作。倉庫內含 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；**例行 CI** 另見 **`.github/workflows/ci.yml`**（`npm run test` → `npm run build`）。步驟與 **測試 Web UI** 細節見根 [`README.md`](../../README.md#preview-netlify-test-ui)（**公開預覽部署 · 測試 Web UI**，錨點 **`preview-netlify-test-ui`**）。**未接 API** 時，領取成功頁以前端 **`sessionStorage`** 類比並標示預覽用（見 [`summary-frontend.md`](./summary-frontend.md) §2.1 **`local-fallback`**）。
+與下方「全端／API 上線」不同：僅將 **Vite 建置產物**（`source/dist`）放於 **Netlify**、**GitHub Pages** 等靜態主機，供手機試操作。倉庫內含 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；**例行 CI** 另見 **`.github/workflows/ci.yml`**（`npm run test` → `npm run build`）。**測試 Web UI** 完整步驟（Netlify／GitHub Pages、QR、區網試機）見 [`docs/setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；根 [`README.md`](../../README.md#preview-netlify-test-ui) 保留短摘要與錨點 **`preview-netlify-test-ui`**。**未接 API** 時，領取成功頁以前端 **`sessionStorage`** 類比並標示預覽用（見 [`summary-frontend.md`](./summary-frontend.md) §2.1 **`local-fallback`**）。
 
-**測試 Web UI 操作（標記）：** 根 [`README.md`](../../README.md#preview-netlify-test-ui) 同節已註記 **僅供測試介面／流程** 之 **Netlify 預覽網址（範例）**、與 Git **`main` 連動自動部署**、**Base directory = `source`**、以及 **報到／闖關** 用 **QR 網址**（`/check-in`、`/game`）與 **靜態 QR 產生器**參考連結。正式活動網域與 QR **不應**逕用該測試網址，應另定案。
+**測試 Web UI 操作（標記）：** [`static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md) 已註記 **僅供測試介面／流程** 之 **Netlify 預覽網址（範例）**、與 Git **`main` 連動自動部署**、**Base directory = `source`**、以及 **報到／闖關** 用 **QR 網址**（`/check-in`、`/game`）與 **靜態 QR 產生器**參考連結。正式活動網域與 QR **不應**逕用該測試網址，應另定案。
 
 ---
 
@@ -74,3 +74,4 @@
 | 1.3 | 2026-04-18 | **§1.1**：「測試 Web UI 操作」段 **`README`** 改為可點連結 [`README#preview-netlify-test-ui`](../../README.md#preview-netlify-test-ui) |
 | 1.4 | 2026-04-19 | **§1.1**：補 **`.github/workflows/ci.yml`**（`npm run test` → build）與靜態預覽 workflow 之分流說明 |
 | 1.5 | 2026-04-27 | 後端部署主線改為 **Firebase**，移除舊 PaaS/DMZ 主方案敘事 |
+| 1.6 | 2026-05-03 | **§1.1**：測試 Web UI 細節改指向 [`docs/setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；根 **README** 僅保留錨點與摘要 |

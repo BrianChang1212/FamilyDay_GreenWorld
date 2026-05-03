@@ -34,11 +34,11 @@
 
 | 項目 | 說明 |
 |------|------|
-| **金鑰存放** | **不要**把 JSON 提交進 Git。可放在倉庫外；本工作區慣例範例為 `D:\Brian\secrets\firebase\familyday-greenworld-dev-sa.json`（檔名／路徑依環境自訂）。 |
+| **金鑰存放** | **不要**把 JSON 提交進 Git。可放在倉庫外（檔名／路徑依環境自訂；見 [`local-firestore-gcp.md`](../setup/local-firestore-gcp.md)）。 |
 | **`GOOGLE_APPLICATION_CREDENTIALS`** | 設為金鑰檔的**絕對路徑**。未設定時，`verify-firestore-flow.mjs` 會直接失敗。 |
 | **`GOOGLE_CLOUD_PROJECT`** | 目標 GCP／Firebase 專案 ID（例如 `familyday-greenworld-dev`）。 |
 | **`FDGW_USE_FIRESTORE`** | 設為 `true` 時，簽到／遊戲進度等可切換為 Firestore 持久層（見 `functions/src/utils/store.ts`）。 |
-| **輔助腳本** | `functions/scripts/cloud-firestore-dev.ps1` 可帶 `-CredentialPath`、` -ProjectId`、`-DatabaseId` 並執行 `verify`／`serve`；根目錄 [`README.md`](../../README.md)「GCP 服務帳戶」有 PowerShell 範例。 |
+| **輔助腳本** | `functions/scripts/cloud-firestore-dev.ps1` 可帶 `-CredentialPath`、` -ProjectId`、`-DatabaseId` 並執行 `verify`／`serve`；PowerShell 範例與 seed／purge 見 [`local-firestore-gcp.md`](../setup/local-firestore-gcp.md)（根 [`README.md`](../../README.md) 保留短連結）。 |
 
 **與 ADC 的差異：** 僅依賴 `gcloud` 的 **Application Default Credentials**（使用者登入）時，行為與權限範圍可能與服務帳戶不同；整合驗證清單中的紀錄以「明確指定金鑰路徑」較易重現與除錯。
 
@@ -170,3 +170,4 @@ Firebase/Google Cloud 可設定 **Budgets & Alerts** 做費用通知，建議：
 | 1.3 | 2026-04-27 | 新增 **§2.1 Firebase 3000 人規模估算**：Firestore 讀寫粗估、Realtime DB 連線上限（Spark 100 / Blaze 200K）、Blaze 預算通知與限制 |
 | 1.4 | 2026-04-27 | **§2.1** 補提案口徑：2,500 人/25,000 次寫入與 2,000 人次/20,000 次流程估算，供會議擇一作為正式基準 |
 | 1.5 | 2026-04-27 | 後端定案改為 **Firebase**，替換原 FastAPI/PostgreSQL 主方案敘述 |
+| 1.6 | 2026-05-03 | **§2.0**：`cloud-firestore-dev.ps1`／seed／purge 詳述改指向 [`setup/local-firestore-gcp.md`](../setup/local-firestore-gcp.md)；金鑰存放列改為泛化路徑說明 |

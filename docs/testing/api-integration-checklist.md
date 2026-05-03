@@ -20,7 +20,7 @@
 - 已載入固定測資（seed）且記錄 seed 版本
 - 已清空上次測試 session / local storage（避免汙染）
 - 測試紀錄模板已建立（案例 ID、預期、實際、截圖、API 回應）
-- **Firestore／Admin 驗證（`functions`）**：金鑰 JSON **勿進版控**；設定 `GOOGLE_APPLICATION_CREDENTIALS` 為金鑰**絕對路徑**，並設 `FDGW_USE_FIRESTORE=true`、`GOOGLE_CLOUD_PROJECT=familyday-greenworld-dev`（或目標專案）。本機慣例範例路徑：`D:\Brian\secrets\firebase\familyday-greenworld-dev-sa.json`。可改用 `functions/scripts/cloud-firestore-dev.ps1 -CredentialPath "..."` 一次帶入；說明見根目錄 [`README.md`](../../README.md)「GCP 服務帳戶」小節與 [`summary-backend.md`](../architecture/summary-backend.md) §「本機服務帳戶」。
+- **Firestore／Admin 驗證（`functions`）**：金鑰 JSON **勿進版控**；設定 `GOOGLE_APPLICATION_CREDENTIALS` 為金鑰**絕對路徑**，並設 `FDGW_USE_FIRESTORE=true`、`GOOGLE_CLOUD_PROJECT=familyday-greenworld-dev`（或目標專案）。可改用 `functions/scripts/cloud-firestore-dev.ps1 -CredentialPath "..."` 一次帶入；完整說明見 [`docs/setup/local-firestore-gcp.md`](../setup/local-firestore-gcp.md) 與 [`summary-backend.md`](../architecture/summary-backend.md) §「本機服務帳戶」。
 
 ---
 

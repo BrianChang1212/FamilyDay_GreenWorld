@@ -27,7 +27,7 @@
 
 | 對齊面向 | 註記 |
 |------|------|
-| 架構定案來源 | 以 `docs/architecture/summary-backend.md`（v1.5）為準：Firebase（Firestore 為主，Realtime Database 視場景啟用） |
+| 架構定案來源 | 以 `docs/architecture/summary-backend.md`（v1.6）為準：Firebase（Firestore 為主，Realtime Database 視場景啟用） |
 | API 契約定位 | 本文件維持「HTTP API 契約層」；底層可由 Cloud Functions / Cloud Run / Server 介面實作，對前端契約不變 |
 | 資料主來源 | 簽到、闖關進度、作答、領獎等交易資料以 Firestore 為主；Google Sheet 僅作匯入/匯出與報表輔助 |
 | 認證與授權 | `auth/*`、`staff/*` 端點之身份驗證與權限檢查，需對齊 Firebase Authentication 與 Security Rules/後端授權策略 |

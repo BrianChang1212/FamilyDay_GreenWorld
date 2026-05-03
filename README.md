@@ -7,18 +7,9 @@
 ## 目錄
 
 - [快速開始](#快速開始)
-  - [新手快速導覽（3 分鐘）](#新手快速導覽3-分鐘)
-  - [最快啟動（本機前端原型）](#最快啟動本機前端原型)
-  - [GCP 服務帳戶（本機 Firestore 驗證／verify:firestore）](#gcp-service-account-local-firestore)
-  - [上線包含／不包含（避免混淆）](#上線包含不包含避免混淆)
-  - [目前實際進度（即時狀態）](#目前實際進度即時狀態)
-  - [進階疑難排解（Windows 安裝 Node.js 與 npm）](#進階疑難排解windows-安裝-nodejs-與-npm)
-  - [公開預覽部署（測試 Web UI）](#公開預覽部署測試-web-ui)
-  - [介面預覽（截圖）](#ui-preview-screenshots)
 - [專案概覽](#專案概覽)
 - [Demo 影片預覽](#demo-影片預覽)
 - [技術架構](#技術架構)
-  - [系統架構圖](#系統架構圖)
 - [規格與活動內容](#規格與活動內容)
 - [使用者流程](#使用者流程)
 - [設計資產與會議](#設計資產與會議)
@@ -36,8 +27,9 @@
 - 前端已可本機啟動與建置；API 目前以契約文件 + mock 驗證為主。
 - 若你是第一次接手，建議先看：
   1. 本節「最快啟動（本機前端原型）」
-  2. `docs/project/project-master.md`（需求與待辦）
-  3. `docs/specs/api-v0.1.md`（API 契約）
+  2. [`docs/project/project-master.md`](docs/project/project-master.md)（需求與待辦）
+  3. [`docs/specs/api-v0.1.md`](docs/specs/api-v0.1.md)（API 契約）
+- **本機 Firestore／靜態預覽／Windows Node 詳解：** [`docs/setup/README.md`](docs/setup/README.md)
 
 ### 最快啟動（本機前端原型）
 
@@ -62,33 +54,13 @@ npm run dev
 
 **單元測試（Vitest）：** 於 `source/` 執行 `npm run test`；開發監看可用 `npm run test:watch`；覆蓋率報告可用 `npm run test:coverage`。測試檔與程式並列（`source/src/**/*.test.ts`）。GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) 在 `npm run build` **之前**會先跑 `npm run test`。
 
-**說明：** 後端 API 尚未串接時，多數畫面仍以 mock／靜態流程為主。**未設定 `VITE_API_BASE` 時**，完成頁領獎次數會以瀏覽器 `sessionStorage` 類比（僅供預覽）；若要以**真實後端**顯示次數，請於 `source/` 建立 `.env.local`（或建置環境變數）設定 **`VITE_API_BASE`**（API 主機根、無尾隨 `/`），詳見 `docs/architecture/summary-frontend.md` §4。定案見 `docs/specs/api-v0.1.md` 與 `docs/architecture/summary-backend.md`。
+**說明：** 後端 API 尚未串接時，多數畫面仍以 mock／靜態流程為主。**未設定 `VITE_API_BASE` 時**，完成頁領獎次數會以瀏覽器 `sessionStorage` 類比（僅供預覽）；若要以**真實後端**顯示次數，請於 `source/` 建立 `.env.local`（或建置環境變數）設定 **`VITE_API_BASE`**（API 主機根、無尾隨 `/`），詳見 [`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) §4。定案見 [`docs/specs/api-v0.1.md`](docs/specs/api-v0.1.md) 與 [`docs/architecture/summary-backend.md`](docs/architecture/summary-backend.md)。
 
 <a id="gcp-service-account-local-firestore"></a>
 
-### GCP 服務帳戶（本機 Firestore 驗證／`verify:firestore`）
+### GCP 服務帳戶（本機 Firestore 驗證）
 
-**金鑰 JSON 不可提交進 Git。** 請放在倉庫**外**或已列入 `.gitignore` 的目錄（本工作區慣例範例：`D:\Brian\secrets\firebase\familyday-greenworld-dev-sa.json`；路徑依你的機器調整）。
-
-| 變數／參數 | 用途 |
-|------------|------|
-| `GOOGLE_APPLICATION_CREDENTIALS` | 指向上述 JSON 的**絕對路徑**；`firebase-admin` 與 `npm run verify:firestore` 會讀取 |
-| `GOOGLE_CLOUD_PROJECT` | 例如 `familyday-greenworld-dev`（`verify` 腳本與 `cloud-firestore-dev.ps1` 會設定） |
-| `FDGW_USE_FIRESTORE` | 設為 `true` 時走 Firestore 資料層（見 `docs/architecture/summary-backend.md` §「本機服務帳戶」） |
-
-**PowerShell（推薦）：** 於 `functions/` 目錄執行（將路徑改成你的金鑰檔）：
-
-```powershell
-.\scripts\cloud-firestore-dev.ps1 -Mode verify -CredentialPath "D:\Brian\secrets\firebase\familyday-greenworld-dev-sa.json"
-```
-
-`serve`／`all` 模式同樣支援 `-CredentialPath`；細節見 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §0 與 [`docs/architecture/summary-backend.md`](docs/architecture/summary-backend.md)。
-
-**寫入測試名冊（Firestore `roster`）：** 於 `functions/` 設定 `GOOGLE_APPLICATION_CREDENTIALS` 後執行 `npm run seed:roster`。欄位與 Console 測資一致：`eventId`=`familyday-2026`、`source`=`manual`、`updatedAt`=執行當下 ISO 時間、`partySizePlanned`=2；員編預設 **`1141043` 起連號**（預設 10 筆至 `1141052`）。**英文姓名預設不重複**（`1141043` 為 `Bob` 以利 `verify:firestore`，其餘為 Alice、Carol、David… 等內建名單；筆數超過名單長度時改為 `RosterSeed0001` 形式）。可選環境變數：`SEED_COUNT`、`SEED_EMPLOYEE_ID_START`；若需字首員編＋`SeedTester0001` 命名可設 **`SEED_ID_PREFIX`**。實際寫入的 GCP 專案以金鑰 JSON 內 **`project_id`** 為準。
-
-**遠端 Firestore Rules／索引：** 根目錄已納入 `firestore.rules`、`firestore.indexes.json`，並於 `firebase.json` 註冊。在倉庫根目錄、已 `firebase login` 且 `.firebaserc` 指向目標專案後執行 `firebase deploy --only firestore`（或 `:rules` / `:indexes`）。設計說明見 [`docs/architecture/firestore-schema-v1.md`](docs/architecture/firestore-schema-v1.md) **§1.2**。
-
-**清空應用集合後重灌名冊（危險 · 僅限你確認過的 dev 專案）：** 於 `functions/` 設定 `GOOGLE_APPLICATION_CREDENTIALS`，且 **`FDGW_EXPECT_PROJECT_ID` 必須與金鑰 JSON 內 `project_id` 完全一致**（避免誤刪別專案），再設 `FDGW_PURGE_CONFIRM=YES`，執行 `npm run purge:firestore-app`（預設刪除 `redeem_tokens`、`redeem_records`、`player_progress`、`checkins`、`roster` 內全部文件）。完成後再 `npm run seed:roster`；報到／闖關資料請用 API 或測試流程產生。
+**金鑰 JSON 不可提交進 Git。** 環境變數 `GOOGLE_APPLICATION_CREDENTIALS`、`GOOGLE_CLOUD_PROJECT`、`FDGW_USE_FIRESTORE` 與 PowerShell 腳本 `functions/scripts/cloud-firestore-dev.ps1`、**`seed:roster`／`purge:firestore-app`**、Firestore Rules 部署等**完整說明**見 **[`docs/setup/local-firestore-gcp.md`](docs/setup/local-firestore-gcp.md)**（並與 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §0 對齊）。
 
 ### 上線包含／不包含（避免混淆）
 
@@ -111,86 +83,15 @@ npm run dev
 | 測試 | Vitest 單元測試與 CI 持續通過；4/30 已完成 Functions 聯調與 CORS allowlist 驗證 |
 | 部署 | 可進行 dev/stage 驗證上架；正式對外上線仍需先完成 IAM 與最小安全基線 |
 
-### 進階疑難排解（Windows 安裝 Node.js 與 npm）
+### Windows：Node.js／npm 無法使用？
 
-若 PowerShell 出現 **npm** 無法辨識，代表尚未安裝 Node.js，或 PATH 尚未載入。
-
-**1. 以 winget 安裝（建議：無系統管理員權限時用「使用者範圍」）**
-
-全系統安裝（預設）在**非系統管理員**環境可能失敗（MSI **Error 1925**／結束代碼 **1603**：權限不足）。可改為只安裝給目前使用者：
-
-```powershell
-winget install OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agreements --disable-interactivity --scope user
-```
-
-成功時 winget 會提示已新增 `node` 指令，並可能提示**需重新開啟終端機**才會套用 PATH。
-
-**2. 同一個終端機內立即套用 PATH（不必重開 Cursor 時可先執行）**
-
-```powershell
-$env:Path = [System.Environment]::GetEnvironmentVariable("Path","User") + ";" + [System.Environment]::GetEnvironmentVariable("Path","Machine")
-node -v
-npm -v
-```
-
-**3. 全系統安裝（選用）**
-
-若要以**系統管理員**安裝給所有使用者：以系統管理員開啟 PowerShell，執行 `winget install OpenJS.NodeJS.LTS ...`（**不要**加 `--scope user`），並依 UAC 提示同意。
-
-**4. 安裝失敗時的記錄檔（winget／MSI）**
-
-路徑範例（實際檔名含時間戳記）：
-
-`%LOCALAPPDATA%\Packages\Microsoft.DesktopAppInstaller_8wekyb3d8bbwe\LocalState\DiagOutputDir\`
-
-內可搜尋 **Error 1925**、**1603** 對照權限或舊版衝突。
+winget 安裝、PATH、Error 1925／1603 等見 **[`docs/setup/nodejs-windows.md`](docs/setup/nodejs-windows.md)**。
 
 <a id="preview-netlify-test-ui"></a>
 
 ### 公開預覽部署（測試 Web UI）
 
-> 給他人用手機／瀏覽器試操作，可不接後端；與 [`docs/architecture/summary-deployment.md`](docs/architecture/summary-deployment.md) **§1.1**（修訂 **v1.5**）、[`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) **§4** 互相連結。
-
-靜態檔來自 `source/` 的 `npm run build` 產物（`source/dist`）。**建議優先使用 Netlify**（子路徑與 Vue Router 較省事）；亦可使用本倉庫內建的 GitHub Actions 發布至 GitHub Pages。
-
-> **用途標記 · 測試 Web UI 操作**  
-> 下表 **Netlify 網址**與 **QR 用連結**僅供 **測試介面與流程**（內部／利害關係人預覽）。**非**正式活動對外定案之網域或 SLA；正式上線請改用公司核可的網域、後端與資安設定。若於 Netlify **變更站名或自訂網域**，請同步更新本段與實體 QR 內嵌網址。
-
-#### 測試 Web UI：Netlify 預覽站（與 GitHub 連動）
-
-| 項目 | 說明 |
-|------|------|
-| **預覽網址（範例）** | **[https://familyday-greenworld.netlify.app](https://familyday-greenworld.netlify.app)** — 以 Netlify **Domain management** 顯示為準 |
-| **自動更新** | 站台已 **Connect to Git** 時，對 **`main`**（或綁定分支）**push** 且建置成功後，線上 UI 即為新版；失敗時仍為上一版 **Published** |
-| **首次匯入注意** | 設定畫面須填 **Base directory：`source`**（與 [`netlify.toml`](netlify.toml) 一致）；**Publish directory：`dist`**；**勿**設 `VITE_BASE_PATH`（站點在網域根目錄） |
-| **存續** | 站點未刪除、帳號與方案有效時，網址通常**持續可用**；免費方案有建置分鐘／流量等額度，見 [Netlify 方案說明](https://www.netlify.com/pricing/) |
-
-**報到／闖關分流（同一預覽站、不同路徑 — 印靜態 QR 時請含完整 `https`）**
-
-| 用途 | 測試用連結（範例網域同上；若更換請只替換主機名） |
-|------|------|
-| 報到 | `https://familyday-greenworld.netlify.app/check-in` |
-| 闖關 | `https://familyday-greenworld.netlify.app/game` |
-
-**QR 產生器（靜態碼，內容＝上列網址即可）：** 例如 [MakeQRCode](https://makeqrcode.app/)、[The Free QR Code Generator](https://the-free-qrcode-generator.com/)、需 Logo／印刷輸出時 [QRCode Monkey](https://www.qrcode-monkey.com/)。列印建議錯誤修正 **Q 或 H**，印出前務必實掃確認。
-
-**方式 A：Netlify（建議）**
-
-1. 登入 [Netlify](https://www.netlify.com/)，**Add new site → Import an existing project**，授權並選取本 GitHub 儲存庫。  
-2. 建置設定由 [`netlify.toml`](netlify.toml) 帶入；若 UI 未帶出，手動確認 **Base directory = `source`**、`npm run build`、**Publish directory = `dist`**，並已設定 SPA 導向（子路徑重新整理可開）。  
-3. 部署完成後將 **`https://…netlify.app`** 傳給預覽者。**勿設定 `VITE_BASE_PATH`**（`vite.config` 預設 `base: '/'`）。
-
-**方式 B：GitHub Pages**
-
-1. 將變更推上 GitHub 預設分支（如 `main`）。  
-2. 儲存庫 **Settings → Pages**：**Build and deployment** 的 **Source** 選 **GitHub Actions**（首次需儲存設定）。  
-3. 工作流程：[`.github/workflows/deploy-github-pages.yml`](.github/workflows/deploy-github-pages.yml) 會在 `source/` 內建置，並設定 `VITE_BASE_PATH=/<repo名稱>/`，產物並複製 `index.html` 為 `404.html` 以利 SPA。  
-4. 至 **Actions** 手動執行 **Deploy GitHub Pages**（`workflow_dispatch`）；**勿**在未完成 Pages 設定前強求每次 push 自動部署（避免檢查顯示失敗）。例行 push 僅執行建置驗證：[`ci.yml`](.github/workflows/ci.yml)。  
-5. 網址形如：`https://<你的帳號>.github.io/<repo名稱>/`（以實際帳號／倉庫名為準）。
-
-**同區網快速試機（不經 Netlify／GitHub）**
-
-在 `source/` 執行 `npm run dev -- --host`，以手機與電腦連同一 Wi‑Fi，手機瀏覽器開 `http://<電腦區網IP>:5173`（防火牆需允許該連接埠）。
+Netlify／GitHub Pages 建置步驟、範例網址、**報到／闖關 QR 分流**、區網試機等見 **[`docs/setup/static-preview-netlify-github.md`](docs/setup/static-preview-netlify-github.md)**（並與 [`docs/architecture/summary-deployment.md`](docs/architecture/summary-deployment.md) **§1.1**、[`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) **§4** 連動）。
 
 <a id="ui-preview-screenshots"></a>
 
@@ -212,7 +113,6 @@ npm -v
 
 ### 專案簡介
 
-
 | 項目     | 說明                                                                                                        |
 | ------ | --------------------------------------------------------------------------------------------------------- |
 | 活動     | 新竹北埔**綠世界生態農場**；對象為**台北辦公室同仁及眷屬**（預估約 **1,000～1,300** 人）；活動日**確認中**（偏好**六月底**，或七月初）                       |
@@ -222,16 +122,13 @@ npm -v
 | 資訊開發人員 | Ken、Brian                                                                                                 |
 | GitHub | [BrianChang1212/FamilyDay_GreenWorld](https://github.com/BrianChang1212/FamilyDay_GreenWorld)             |
 
-
 ### 文件來源與紀要
-
 
 | 項目          | 內容                                                                                                                    |
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
-| 需求筆記        | `d:\Brian\闖關遊戲,txt.ini`（已結構化寫入 `docs/`）                                                                               |
-| 文件體系        | 詳見 `docs/README.md`（分類索引）→ `docs/project/project-master.md`；`docs/proposals/`、`docs/design/` 等                                  |
-| 最後更新 README | 2026-05-03（頁尾 **v2.54**）；細節見 [`docs/media/README.md`](docs/media/README.md)、[`docs/project/project-master.md`](docs/project/project-master.md)（合併版 **v1.3.31**；`summary-frontend` **v1.29**、`api-v0.1` **v0.1.20**） |
-
+| 需求筆記        | 已結構化寫入 `docs/project/` 等（細節見 `docs/project/project-master.md`）                                                                               |
+| 文件體系        | 詳見 [`docs/README.md`](docs/README.md)（分類索引）→ `docs/project/project-master.md`                                                                  |
+| 最後更新 README | 2026-05-03（頁尾 **v2.55**）；`project-master` **v1.3.32**；細節見 [`docs/media/README.md`](docs/media/README.md)、[`docs/project/project-master.md`](docs/project/project-master.md)、[`docs/setup/README.md`](docs/setup/README.md) |
 
 ---
 
@@ -343,7 +240,6 @@ flowchart LR
 
 整體約 **62%**（前端可操作 + Functions API 已落地 + 4/30 聯調驗證 + CORS allowlist 收斂；阻塞點為 Firestore IAM 權限，尚未完成最終實證與正式上線安全項）。細項見 `docs/project/project-master.md`「專案狀態」。
 
-
 | 項目 | 狀態 |
 | ---------------- | --------------------------------------- |
 | 需求收集與整理 | 完成 |
@@ -352,7 +248,6 @@ flowchart LR
 | 開發 | **前端 + API + 後端（in-memory）** 已完成主要流程；Firestore 模式程式路徑已打通，待 IAM 權限完成最終驗證 |
 | 測試 | **前端** Vitest + CI 持續通過；**後端聯調**已完成健康檢查、登入、報到、闖關、staff/admin、401/409 與 CORS 驗證 |
 | 部署 | **dev/stage 可驗證上架**；正式上線需先完成 Firestore IAM、憑證與安全基線（HTTPS/Cookie/權限） |
-
 
 ### 下一步（本週）
 
@@ -373,71 +268,35 @@ flowchart LR
 
 ## 儲存庫目錄結構
 
-
 | 路徑                | 用途                                                                                                                |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `docs/`           | 見 [`docs/README.md`](docs/README.md)（含 `project/`、`specs/`、`architecture/`、`media/`、`demo/`、`preview/` 等子目錄說明） |
+| `docs/`           | 見 [`docs/README.md`](docs/README.md)（含 **`setup/`** 本機與預覽、`project/`、`specs/`、`architecture/`、`media/` 等） |
 | `assets/`         | 設計稿、KV、Logo、CIS（註明版本與來源）                                                                                          |
 | `source/`         | 前端（Vue 3 + Vite + TS + Tailwind + Vue Router）：`npm install` → `npm run dev`（預設 `http://localhost:5173`）；**`npm run test`**（Vitest）。路由頁面於 **`src/views/home`**、**`onboarding`**、**`auth`**、**`checkin`**、**`quest`** |
 | `.cursor/skills/` | Cursor Agent 用技能說明（前端設計、文案／在地化等）；選用，**非**執行期依賴                                                                    |
 | `test/`           | 倉庫根目錄**驗收／測試紀錄**用（**選用**；目前僅 **`.gitkeep`**）。**程式單元測試**在 **`source/src/**/*.test.ts`**（Vitest），非此資料夾 |
 | `tool/`           | 輔助腳本（**選用**）：例如 [`tool/capture-preview-screenshots.ps1`](tool/capture-preview-screenshots.ps1)（重產 [`docs/preview/screenshots/`](docs/preview/screenshots/)，見 [`docs/media/README.md`](docs/media/README.md)）；另含 **`.gitkeep`** |
 
-
 ---
 
 ## 文件與維護
 
-### 重要文件
+| 你想… | 請開 |
+| ----- | --- |
+| 5 分鐘掌握專案 | 本 README |
+| 本機 GCP／Firestore、靜態預覽、Windows Node | [`docs/setup/README.md`](docs/setup/README.md) |
+| 完整需求、待辦、進度、技術 | [`docs/project/project-master.md`](docs/project/project-master.md) |
+| 文件分類索引 | [`docs/README.md`](docs/README.md) |
+| API 契約（v0.1） | [`docs/specs/api-v0.1.md`](docs/specs/api-v0.1.md) |
+| 前後端／部署／流量摘要 | [`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) 等 |
+| Demo 錄影與截圖維護 | [`docs/media/README.md`](docs/media/README.md) |
 
-
-| 類別           | 檔案                                                               |
-| ------------ | ---------------------------------------------------------------- |
-| 總覽           | `README.md`（本文件）                                                 |
-| 文件索引         | `docs/README.md`（`docs/` 分類導覽）                                   |
-| 詳細規格（單檔）     | `docs/project/project-master.md`（需求、待確認、專案狀態、技術規格、提案來源、維護附錄）               |
-| API 草案（v0.1） | `docs/specs/api-v0.1.md`（REST 端點、範例 JSON、畫面對照；修訂紀錄見檔尾） |
-| 前端討論總結       | `docs/architecture/summary-frontend.md`（Vue3／Vite／模組與 UX、API 銜接） |
-| 後端討論總結       | `docs/architecture/summary-backend.md`（Firebase、資料模型與安全規則） |
-| 架設環境討論總結     | `docs/architecture/summary-deployment.md`（雲／內網／PaaS、區域與採購注意）     |
-| 流量分析討論總結     | `docs/architecture/summary-traffic.md`（在線與 RPS、尖峰、限流、壓測）         |
-| 提案／線框 PDF   | `docs/proposals/FamilyDayApp_Proposal_v1.pdf`、`FamilyDayApp_wireframe_v2.pdf` |
-| 設計資產說明       | `assets/README.md`                                               |
-| 操作示範錄影與截圖維護 | [`docs/media/README.md`](docs/media/README.md)（內嵌播放見本 README [Demo 影片預覽](#demo-影片預覽)） |
-
-
-### 快速查找
-
-
-| 你想…           | 請開                               |
-| ------------- | -------------------------------- |
-| 5 分鐘掌握專案      | 本 README                         |
-| 系統架構與資料流圖     | 本 README [技術架構](#技術架構)（在 [Demo 影片預覽](#demo-影片預覽) 之後） |
-| 完整需求、待辦、進度、技術 | `docs/project/project-master.md`（內有章節目錄）   |
-| 前後端與部署／流量定案摘要 | `docs/architecture/summary-*.md` |
-| 畫面操作 Demo       | 本頁 [Demo 影片預覽](#demo-影片預覽)／[`docs/media/README.md`](docs/media/README.md) |
-
-
-### 建議閱讀順序（角色）
-
-
-| 角色    | 順序                                                 |
-| ----- | -------------------------------------------------- |
-| PM    | README → `docs/project/project-master.md`（先「專案狀態」「待確認」再「需求」） |
-| 開發    | README → `docs/project/project-master.md`（先「技術規格」再「需求」）      |
-| UI/UX | README → `docs/project/project-master.md`（「需求與流程」「待確認」）      |
-| 測試    | README → `docs/project/project-master.md`（「需求」「技術規格」）        |
-
-
-### 文件更新頻率（建議）
-
-
-| 文件                     | 時機                                             |
-| ---------------------- | ---------------------------------------------- |
-| `README.md`            | 重大變更、里程碑                                       |
-| `docs/project/project-master.md` | 需求／技術／會議／進度任一變更時（更新對應章節）；新路徑見 `docs/README.md` |
-
+| 文件 | 建議更新時機 |
+| --- | --- |
+| `README.md` | 重大變更、里程碑 |
+| `docs/project/project-master.md` | 需求／技術／會議／進度任一變更時 |
+| `docs/setup/**` | 本機指令、預覽網址、腳本參數變更時 |
 
 ---
 
-*README v2.54 · 2026-05-03（版本鏈同步：`api-v0.1` **v0.1.20**、`summary-frontend` **v1.29**、`summary-backend` **v1.5**、`summary-deployment` **v1.5**、`summary-traffic` **v1.2**；前版 v2.53）*
+*README v2.55 · 2026-05-03（**`docs/setup/`** 自本版起集中本機／預覽長文；版本鏈：`api-v0.1` **v0.1.20**、`summary-frontend` **v1.30**、`summary-deployment` **v1.6**、`summary-backend` **v1.6**、`summary-traffic` **v1.2**；前版 v2.54）*

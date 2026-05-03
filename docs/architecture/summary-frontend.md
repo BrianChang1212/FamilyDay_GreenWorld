@@ -167,7 +167,7 @@ flowchart TD
 
 - 開發期：可於 **`vite.config`** 設定 **proxy** 指向本機或測試 API（`source/vite.config.ts` **目前未**預設 proxy，由專案依環境補上）。  
 - 正式／測試建置：於 **`source/`** 設定 **`VITE_API_BASE`** = API **主機根**（**無**尾隨 `/`），例如 `https://api.example.com` 或同源 `https://event.example.com`；程式會請求 **`{VITE_API_BASE}/api/v1/...`**（見 **`source/src/lib/apiBase.ts`**）。**舊稿若寫 `VITE_API_BASE_URL` 應改為此名稱。**  
-- **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`source/vite.config.ts`** 與根 [`README.md`](../../README.md#preview-netlify-test-ui)「**公開預覽部署 · 測試 Web UI**」（錨點 **`preview-netlify-test-ui`**；含 **Netlify 範例網址**、**`/check-in`**／**`/game`** QR 分流、與 **`main` 連動**；[`summary-deployment.md`](./summary-deployment.md) **§1.1** **v1.5** 摘要連動）。  
+- **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`source/vite.config.ts`**。步驟與 QR 分流見 [`docs/setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；根 [`README.md`](../../README.md#preview-netlify-test-ui) 保留錨點 **`preview-netlify-test-ui`**；[`summary-deployment.md`](./summary-deployment.md) **§1.1**（**v1.6**）摘要連動。  
 - **關卡瀏覽與領取狀態呈現**：可共用 **`GET /api/v1/me/dashboard`**（合併 API）；HTTP 與 JSON 映射見 **`source/src/api/rewardClaimStatus.ts`**；領取成功頁之 mock／API／fallback 編排見 **`lib/rewardClaimPresentation.ts`** 與 **`composables/useRewardClaimPresentation.ts`**。  
 - 完整端點列表見 [`api-v0.1.md`](../specs/api-v0.1.md)。
 
@@ -226,3 +226,4 @@ flowchart TD
 | 1.27 | 2026-05-03 | 檔首 API 版本改指 `api-v0.1` 修訂紀錄；**§2.1／§2.3／§3**：**已領滿**時完成頁 **`/finish`** 不強制導 **`/finish/claimed`**，與 `FinishView`／`ClaimSuccessView` 現況一致 |
 | 1.28 | 2026-05-03 | **§2.1** 補 **`fdgw_completed_stage_ids`** 與登入後 **`syncLocalProgressFromDashboard`**；**§2.3**／流程圖／**§3**：六站**任意順序**、地圖選站與進度語意；對齊 `api-v0.1` **v0.1.19** |
 | 1.29 | 2026-05-03 | **§2.1** 補 **`fdgw_pending_station_challenge`**、**`getInZone()`** 語意、**`/quiz`** 與 **`challengeId` query** 綁定、**`ResultView`** 清除到站狀態；**§2.3 B** 掃碼→作答步驟與 `StageView` 原型一致；對齊 `api-v0.1` **v0.1.20** |
+| 1.30 | 2026-05-03 | **§4**：靜態預覽長文改指向 [`docs/setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；`summary-deployment` **§1.1** 連動 **v1.6** |
