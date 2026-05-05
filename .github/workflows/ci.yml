@@ -22,10 +22,10 @@ jobs:
         with:
           node-version: lts/*
           cache: npm
-          cache-dependency-path: source/package-lock.json
+          cache-dependency-path: familyday-frontend/package-lock.json
 
       - name: Install, test, and build
-        working-directory: source
+        working-directory: familyday-frontend
         run: |
           npm ci
           npm run test

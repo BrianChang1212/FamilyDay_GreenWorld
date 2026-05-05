@@ -35,10 +35,10 @@ jobs:
         with:
           node-version: lts/*
           cache: npm
-          cache-dependency-path: source/package-lock.json
+          cache-dependency-path: familyday-frontend/package-lock.json
 
       - name: Install & build
-        working-directory: source
+        working-directory: familyday-frontend
         env:
           VITE_BASE_PATH: /${{ github.event.repository.name }}/
         run: |
@@ -52,7 +52,7 @@ jobs:
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4
         with:
-          path: source/dist
+          path: familyday-frontend/dist
 
       - name: Deploy to GitHub Pages
         id: deployment
