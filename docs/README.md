@@ -39,7 +39,9 @@
 | 需求與專案狀態 | [`project/project-master.md`](./project/project-master.md) |
 | API v0.1 草案 | [`specs/api-v0.1.md`](./specs/api-v0.1.md) |
 | Firestore Schema（v1 草案） | [`architecture/firestore-schema-v1.md`](./architecture/firestore-schema-v1.md) |
-| API 整合與 Mock 驗證清單 | [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md) |
+| API 整合清單（精簡） | [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md) |
+| API Mock 測試流程 | [`testing/api-mock-testing.md`](./testing/api-mock-testing.md) |
+| API 歷史驗證紀錄 | [`testing/api-integration-history.md`](./testing/api-integration-history.md) |
 | 本機 GCP 服務帳戶（Firestore／verify） | [`setup/local-firestore-gcp.md`](./setup/local-firestore-gcp.md)；[`architecture/summary-backend.md`](./architecture/summary-backend.md) **§2.0** |
 | Firebase 相關檔案分類（根目錄設定 vs functions／fdgw） | [`firebase/README.md`](./firebase/README.md) |
 | 前端／後端／部署／流量摘要 | [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) 等 |

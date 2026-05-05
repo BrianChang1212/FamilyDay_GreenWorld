@@ -21,62 +21,50 @@
 
 ## 快速開始
 
-### 新手快速導覽（3 分鐘）
+### 30 秒本機啟動（前端）
 
-- 這是家庭日活動用的前端 Web 原型，主流程為「報到」與「闖關」兩條路由。
-- 前端已可本機啟動與建置；API 目前以契約文件 + mock 驗證為主。
-- 若你是第一次接手，建議先看：
-  1. 本節「最快啟動（本機前端原型）」
-  2. [`docs/project/project-master.md`](docs/project/project-master.md)（需求與待辦）
-  3. [`docs/specs/api-v0.1.md`](docs/specs/api-v0.1.md)（API 契約）
-- **本機 Firestore／靜態預覽／Windows Node 詳解：** [`docs/setup/README.md`](docs/setup/README.md)
-
-### 最快啟動（本機前端原型）
-
-**需求：** [Node.js](https://nodejs.org/) 20 LTS 以上，且可執行 `node`、`npm`。
+需求：Node.js 20+。
 
 ```bash
-git clone https://github.com/BrianChang1212/FamilyDay_GreenWorld.git
-cd FamilyDay_GreenWorld/source
+cd source
 npm install
 npm run dev
 ```
 
-若你已在專案目錄，直接執行：
+預設開啟 `http://localhost:5173`（實際埠號以 [`fdgw.project.json`](fdgw.project.json) 為準）。
 
-```bash
-npm install
-npm run dev
-```
-
-瀏覽器開啟終端機顯示網址（預設與 [`fdgw.project.json`](fdgw.project.json) 的 `frontend.viteDevPort` 一致，常見為 [http://localhost:5173](http://localhost:5173)）。  
-建置預覽可用：`npm run build` 後 `npm run preview`（預覽埠見同檔 `frontend.vitePreviewPort`）。
-
-**單元測試（Vitest）：** 於 `source/` 執行 `npm run test`；開發監看可用 `npm run test:watch`；覆蓋率報告可用 `npm run test:coverage`。測試檔與程式並列（`source/src/**/*.test.ts`）。GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) 在 `npm run build` **之前**會先跑 `npm run test`。
-
-**說明：** 後端 API 尚未串接時，多數畫面仍以 mock／靜態流程為主。**未設定 `VITE_API_BASE` 時**，完成頁領獎次數會以瀏覽器 `sessionStorage` 類比（僅供預覽）；若要以**真實後端**顯示次數，請於 `source/` 建立 `.env.local`（或建置環境變數）設定 **`VITE_API_BASE`**（API 主機根、無尾隨 `/`），詳見 [`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) §4。定案見 [`docs/specs/api-v0.1.md`](docs/specs/api-v0.1.md) 與 [`docs/architecture/summary-backend.md`](docs/architecture/summary-backend.md)。
-
-### Windows：一鍵啟動（前端 + Functions emulator + 雲端 Firestore）
-
-**前置：** [`fdgw.project.json`](fdgw.project.json) 與 [`.firebaserc`](.firebaserc) 已對準你的 Firebase 專案；本機備妥 **服務帳戶 JSON**（勿提交 Git）。Node.js 20+。
-
-在倉庫**根目錄**執行：
+### 30 秒 Windows 一鍵啟動（前端 + API + 雲端 Firestore）
 
 ```powershell
 .\scripts\dev-oneclick.ps1 -CredentialPath "D:\path\to\your-sa.json"
 ```
 
-或先設定 `$env:GOOGLE_APPLICATION_CREDENTIALS` 再執行 `.\scripts\dev-oneclick.ps1`（可省略 `-CredentialPath`）。
+### 三個核心入口
 
-腳本會依序：**`npm install`**（`source/` 與 `functions/`）、必要時建立／補上 **`source/.env.local`**（`VITE_API_BASE=/fdgw-emulator-api`）、背景啟動 **`cloud-firestore-dev.ps1 -Mode serve -FunctionsOnly`**（只起 Functions emulator，避免 Hosting 佔用 **5000** 與本機 Vite 衝突）、輪詢 **`/api/v1/health`** 就緒後執行 **`npm run dev`**。在 Vite 終端機 **Ctrl+C** 會結束前端並停止 emulator 背景工作。第二次起可加快：加 **`-SkipInstall`** 略過安裝。`fdgw.project.json` 含中文時，腳本以 **UTF-8** 讀取，避免 `ConvertFrom-Json` 失敗。
+- 專案主文件：[`docs/project/project-master.md`](docs/project/project-master.md)
+- Setup 索引：[`docs/setup/README.md`](docs/setup/README.md)
+- API 契約：[`docs/specs/api-v0.1.md`](docs/specs/api-v0.1.md)
 
-亦可從檔總管雙擊 **[`scripts/dev-oneclick.cmd`](scripts/dev-oneclick.cmd)**；若需帶金鑰路徑，請在 **cmd** 執行：`scripts\dev-oneclick.cmd -CredentialPath "D:\path\to\your-sa.json"`。
+### Windows：30 秒啟動（前端 + API + 雲端 Firestore）
+
+在倉庫根目錄執行：
+
+```powershell
+.\scripts\dev-oneclick.ps1 -CredentialPath "D:\path\to\your-sa.json"
+```
+
+細節（環境變數、`seed/purge`、Rules、故障排除）請看：
+- [`docs/setup/local-firestore-gcp.md`](docs/setup/local-firestore-gcp.md)
+- [`docs/setup/README.md`](docs/setup/README.md)
 
 <a id="gcp-service-account-local-firestore"></a>
 
-### GCP 服務帳戶（本機 Firestore 驗證）
+### 設定單一來源（必對齊）
 
-**金鑰 JSON 不可提交進 Git。** 環境變數 `GOOGLE_APPLICATION_CREDENTIALS`、`GOOGLE_CLOUD_PROJECT`、`FDGW_USE_FIRESTORE` 與 PowerShell 腳本 `functions/scripts/cloud-firestore-dev.ps1`、**`seed:roster`／`purge:firestore-app`**、Firestore Rules 部署等**完整說明**見 **[`docs/setup/local-firestore-gcp.md`](docs/setup/local-firestore-gcp.md)**（並與 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §0 對齊）。**Firebase／產品常數**（專案 ID、區域、emulator 埠、`eventId`、品牌文案、關卡數與領獎上限、`dashboard` 站點標題、CORS、seed／smoke／verify 預設等）集中於 **[`fdgw.project.json`](fdgw.project.json)**；變更 **`game.totalStages` 時須同步 `functions/src/state/game.ts` 的 `CHALLENGES` 陣列長度**。請與 [`.firebaserc`](.firebaserc) 的 `default` 專案保持一致。**Firebase 相關檔案分類與為何 `firebase.json` 等留在根目錄**見 **[`docs/firebase/README.md`](docs/firebase/README.md)**。
+- Firebase 與產品常數：[`fdgw.project.json`](fdgw.project.json)
+- Firebase CLI 目標專案：[`.firebaserc`](.firebaserc)
+- 整合測試主清單：[`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md)
+- 金鑰 JSON **不可提交 Git**
 
 ### 上線包含／不包含（避免混淆）
 
@@ -99,15 +87,15 @@ npm run dev
 | 測試 | Vitest 單元測試與 CI 持續通過；4/30 已完成 Functions 聯調與 CORS allowlist 驗證 |
 | 部署 | 可進行 dev/stage 驗證上架；正式對外上線仍需先完成 IAM 與最小安全基線 |
 
-### Windows：Node.js／npm 無法使用？
+### Windows：Node.js／npm 問題
 
-winget 安裝、PATH、Error 1925／1603 等見 **[`docs/setup/nodejs-windows.md`](docs/setup/nodejs-windows.md)**。
+見 [`docs/setup/nodejs-windows.md`](docs/setup/nodejs-windows.md)。
 
 <a id="preview-netlify-test-ui"></a>
 
 ### 公開預覽部署（測試 Web UI）
 
-Netlify／GitHub Pages 建置步驟、範例網址、**報到／闖關 QR 分流**、區網試機等見 **[`docs/setup/static-preview-netlify-github.md`](docs/setup/static-preview-netlify-github.md)**（並與 [`docs/architecture/summary-deployment.md`](docs/architecture/summary-deployment.md) **§1.1**、[`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) **§4** 連動）。
+見 [`docs/setup/static-preview-netlify-github.md`](docs/setup/static-preview-netlify-github.md)。
 
 <a id="ui-preview-screenshots"></a>
 
@@ -289,7 +277,7 @@ flowchart LR
 | `docs/`           | 見 [`docs/README.md`](docs/README.md)（含 **`setup/`** 本機與預覽、`project/`、`specs/`、`architecture/`、`media/` 等） |
 | `assets/`         | 設計稿、KV、Logo、CIS（註明版本與來源）                                                                                          |
 | `source/`         | 前端（Vue 3 + Vite + TS + Tailwind + Vue Router）：`npm install` → `npm run dev`（預設 `http://localhost:5173`）；**`npm run test`**（Vitest）。路由頁面於 **`src/views/home`**、**`onboarding`**、**`auth`**、**`checkin`**、**`quest`** |
-| `.cursor/skills/` | Cursor Agent 用技能說明（前端設計、文案／在地化等）；選用，**非**執行期依賴                                                                    |
+| `.claude/skills/`（全域） | Agent skills 由全域管理；本專案不需額外內嵌 skills（非執行期依賴） |
 | `test/`           | 倉庫根目錄**驗收／測試紀錄**用（**選用**；目前僅 **`.gitkeep`**）。**程式單元測試**在 **`source/src/**/*.test.ts`**（Vitest），非此資料夾 |
 | `tool/`           | 輔助腳本（**選用**）：例如 [`tool/capture-preview-screenshots.ps1`](tool/capture-preview-screenshots.ps1)（重產 [`docs/preview/screenshots/`](docs/preview/screenshots/)，見 [`docs/media/README.md`](docs/media/README.md)）；另含 **`.gitkeep`** |
 

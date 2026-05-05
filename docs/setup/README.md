@@ -4,7 +4,7 @@
 
 | 文件 | 內容 |
 |------|------|
-| [`local-firestore-gcp.md`](./local-firestore-gcp.md) | GCP 服務帳戶、Firestore 驗證、`seed:roster`／`purge`、Rules／索引部署 |
+| [`local-firestore-gcp.md`](./local-firestore-gcp.md) | **兩層版**：快速版（4 步）＋進階版（環境變數、seed、Rules、purge） |
 | 一鍵本機（Windows） | 倉庫根 [`scripts/dev-oneclick.ps1`](../../scripts/dev-oneclick.ps1)／[`scripts/dev-oneclick.cmd`](../../scripts/dev-oneclick.cmd)；說明見根 [`README.md`](../../README.md)（**Windows：一鍵啟動**） |
 | [`static-preview-netlify-github.md`](./static-preview-netlify-github.md) | Netlify／GitHub Pages 靜態預覽、QR 分流、同網段試機 |
 | [`nodejs-windows.md`](./nodejs-windows.md) | Windows 安裝 Node.js／npm（winget、PATH、常見錯誤） |
