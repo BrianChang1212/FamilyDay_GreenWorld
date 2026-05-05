@@ -4,7 +4,7 @@
 #   # or set GOOGLE_APPLICATION_CREDENTIALS first, then:
 #   .\scripts\dev-oneclick.ps1
 #
-# Prerequisites: Node.js 20+, repo cloned, fdgw.project.json + .firebaserc aligned for your Firebase project.
+# Prerequisites: Node.js 20+, repo cloned, fdgw.project.json + familyday-backend/.firebaserc aligned for your Firebase project.
 Param(
 	[string]$CredentialPath = $env:GOOGLE_APPLICATION_CREDENTIALS,
 	[switch]$SkipInstall
@@ -12,8 +12,8 @@ Param(
 
 $ErrorActionPreference = "Stop"
 $repoRoot = Resolve-Path (Join-Path $PSScriptRoot "..")
-$functionsDir = Join-Path $repoRoot "functions"
-$sourceDir = Join-Path $repoRoot "source"
+$backendDir = Join-Path $repoRoot "familyday-backend"
+$frontendDir = Join-Path $repoRoot "familyday-frontend"
 $fdgwPath = Join-Path $repoRoot "fdgw.project.json"
 
 if (-not (Test-Path $fdgwPath)) {
@@ -43,17 +43,17 @@ Write-Host "Repo: $repoRoot"
 Write-Host "Health probe: $healthUrl"
 
 if (-not $SkipInstall) {
-	Write-Host "npm install (source)..."
-	Push-Location $sourceDir
+	Write-Host "npm install (familyday-frontend)..."
+	Push-Location $frontendDir
 	npm install
 	Pop-Location
-	Write-Host "npm install (functions)..."
-	Push-Location $functionsDir
+	Write-Host "npm install (familyday-backend)..."
+	Push-Location $backendDir
 	npm install
 	Pop-Location
 }
 
-$envLocal = Join-Path $sourceDir ".env.local"
+$envLocal = Join-Path $frontendDir ".env.local"
 $needEnv = $true
 if (Test-Path $envLocal) {
 	$existing = Get-Content $envLocal -Raw
@@ -63,18 +63,18 @@ if ($needEnv) {
 	$line = "VITE_API_BASE=/fdgw-emulator-api"
 	if (Test-Path $envLocal) {
 		Add-Content -Path $envLocal -Value "`n$line"
-		Write-Host "Appended to source/.env.local: $line"
+		Write-Host "Appended to familyday-frontend/.env.local: $line"
 	} else {
 		Set-Content -Path $envLocal -Value "$line`n"
-		Write-Host "Created source/.env.local with $line"
+		Write-Host "Created familyday-frontend/.env.local with $line"
 	}
 }
 
-$ps1 = Join-Path $functionsDir "scripts\cloud-firestore-dev.ps1"
+$ps1 = Join-Path $backendDir "scripts\cloud-firestore-dev.ps1"
 Write-Host "Starting Functions emulator + cloud Firestore (background job)..."
 $job = Start-Job -ScriptBlock {
 	param($Root, $Cred)
-	Set-Location (Join-Path $Root "functions")
+	Set-Location (Join-Path $Root "familyday-backend")
 	& powershell.exe -ExecutionPolicy Bypass -NoProfile -File ".\scripts\cloud-firestore-dev.ps1" `
 		-Mode serve -CredentialPath $Cred -FunctionsOnly
 } -ArgumentList @($repoRoot, $CredentialPath)
@@ -107,7 +107,7 @@ if (-not $ok) {
 
 Write-Host "Emulator OK. Starting Vite (Ctrl+C stops frontend only; run Stop-Job -Id $($job.Id) to stop emulator)."
 try {
-	Push-Location $sourceDir
+	Push-Location $frontendDir
 	npm run dev
 } finally {
 	Stop-Job $job -ErrorAction SilentlyContinue

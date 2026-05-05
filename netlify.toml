@@ -1,8 +1,8 @@
 # Static preview: connect this repo in Netlify → Site settings uses this file automatically.
-# Build runs in source/; Vue Router (history) needs SPA fallback.
+# Build runs in familyday-frontend/; Vue Router (history) needs SPA fallback.
 
 [build]
-base = "source"
+base = "familyday-frontend"
 command = "if [ -z \"$BACKEND_API_ORIGIN\" ]; then echo \"Missing BACKEND_API_ORIGIN\"; exit 1; fi; sed -i \"s|BACKEND_API_ORIGIN_PLACEHOLDER|$BACKEND_API_ORIGIN|g\" ../netlify.toml; npm run build"
 publish = "dist"
 

@@ -8,7 +8,7 @@
 > 填寫規則：每次整合測試新增一列；證據可填 PR、報告、截圖或 HAR。
 
 > 對照說明：歷史列可能含舊 `GOOGLE_CLOUD_PROJECT`。目前預設以
-> [`fdgw.project.json`](../../fdgw.project.json) 與 [`.firebaserc`](../../.firebaserc)
+> [`fdgw.project.json`](../../fdgw.project.json) 與 [`familyday-backend/.firebaserc`](../../familyday-backend/.firebaserc)
 > 為準。
 
 | 執行日期 | 環境 | Seed 版本 | 範圍（章節） | Pass | Fail | Blocked | 證據連結 | 執行者 | 備註 |

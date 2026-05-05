@@ -36,9 +36,9 @@
 |------|------|
 | **金鑰存放** | **不要**把 JSON 提交進 Git。可放在倉庫外（檔名／路徑依環境自訂；見 [`local-firestore-gcp.md`](../setup/local-firestore-gcp.md)）。 |
 | **`GOOGLE_APPLICATION_CREDENTIALS`** | 設為金鑰檔的**絕對路徑**。未設定時，`verify-firestore-flow.mjs` 會直接失敗。 |
-| **`GOOGLE_CLOUD_PROJECT`** | 目標 GCP／Firebase 專案 ID（與 [`fdgw.project.json`](../../fdgw.project.json) 的 `firebaseProjectId`、`.firebaserc` 一致；範例見該檔）。 |
-| **`FDGW_USE_FIRESTORE`** | 設為 `true` 時，簽到／遊戲進度等可切換為 Firestore 持久層（見 `functions/src/utils/store.ts`）。 |
-| **輔助腳本** | `functions/scripts/cloud-firestore-dev.ps1` 可帶 `-CredentialPath`、`-ProjectId`、`-DatabaseId`、**`-FunctionsOnly`**（僅 Functions emulator，對應 `npm run serve:functions`）並執行 `verify`／`serve`／`all`。Windows 一鍵見倉庫根 **`scripts/dev-oneclick.ps1`**。PowerShell 範例與 seed／purge 見 [`local-firestore-gcp.md`](../setup/local-firestore-gcp.md)（根 [`README.md`](../../README.md)）。 |
+| **`GOOGLE_CLOUD_PROJECT`** | 目標 GCP／Firebase 專案 ID（與 [`fdgw.project.json`](../../fdgw.project.json) 的 `firebaseProjectId`、`familyday-backend/.firebaserc` 一致；範例見該檔）。 |
+| **`FDGW_USE_FIRESTORE`** | 設為 `true` 時，簽到／遊戲進度等可切換為 Firestore 持久層（見 `familyday-backend/src/utils/store.ts`）。 |
+| **輔助腳本** | `familyday-backend/scripts/cloud-firestore-dev.ps1` 可帶 `-CredentialPath`、`-ProjectId`、`-DatabaseId`、**`-FunctionsOnly`**（僅 Functions emulator，對應 `npm run serve:functions`）並執行 `verify`／`serve`／`all`。Windows 一鍵見倉庫根 **`scripts/dev-oneclick.ps1`**。PowerShell 範例與 seed／purge 見 [`local-firestore-gcp.md`](../setup/local-firestore-gcp.md)（根 [`README.md`](../../README.md)）。 |
 
 **與 ADC 的差異：** 僅依賴 `gcloud` 的 **Application Default Credentials**（使用者登入）時，行為與權限範圍可能與服務帳戶不同；整合驗證清單中的紀錄以「明確指定金鑰路徑」較易重現與除錯。
 

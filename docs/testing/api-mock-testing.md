@@ -5,7 +5,7 @@
 
 ## 1) 啟動
 
-在 `source/`：
+在 `familyday-frontend/`：
 
 ```bash
 npm run mock:api
@@ -21,7 +21,7 @@ npm run mock:api
 
 ## 2) 前端改接 Mock API
 
-`source/.env.local`：
+`familyday-frontend/.env.local`：
 
 ```env
 VITE_API_BASE=http://localhost:8787
@@ -68,6 +68,6 @@ npm run test:api:game
 ```
 
 對應實作：
-- Mock Server：`source/mock/server.js`
-- 全站測試：`source/mock/test-all-api.js`
-- 闖關測試：`source/mock/test-game-api.js`
+- Mock Server：`familyday-frontend/mock/server.js`
+- 全站測試：`familyday-frontend/mock/test-all-api.js`
+- 闖關測試：`familyday-frontend/mock/test-game-api.js`

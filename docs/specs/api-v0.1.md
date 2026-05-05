@@ -36,13 +36,13 @@
 
 ---
 
-## Mock 驗證差異註記（`source/mock/server.js`）
+## Mock 驗證差異註記（`familyday-frontend/mock/server.js`）
 
 此章節僅描述目前 mock server 之簡化行為，避免與正式 API 契約混淆：
 
 | 項目 | 目前 Mock 行為 | 正式契約定位 |
 |------|------|------|
-| `POST /api/v1/checkin` | 需符合 `source/mock/db.json` 的 `employees` 對照；不符回 `401 CHECKIN_IDENTITY_MISMATCH` | 正式版應依名冊/身份服務驗證 |
+| `POST /api/v1/checkin` | 需符合 `familyday-frontend/mock/db.json` 的 `employees` 對照；不符回 `401 CHECKIN_IDENTITY_MISMATCH` | 正式版應依名冊/身份服務驗證 |
 | `GET /api/v1/events/{eventId}` | 僅實作固定路徑 `/api/v1/events/<eventId>`，`<eventId>` 與 [`fdgw.project.json`](../../fdgw.project.json) 的 `eventId` 一致（目前為 `familyday-2026`） | 正式版維持 `{eventId}` 動態路由 |
 | `POST /api/v1/stations/verify` | 僅 smoke 回應，未實作 JWT 驗簽/exp/jti；回傳之 **`challengeId`** 須與請求 **`stageId`** 對應（原型與 `functions` 一致） | 正式版需完整 JWT 安全檢查 |
 | `GET /api/v1/me/dashboard` | 回應為前端驗證所需最小欄位集 | 正式版回應以本文件示例為準 |
@@ -52,7 +52,7 @@
 
 ## Cloud Functions MVP 落地狀態（2026-04-30）
 
-以下為 `functions/` 目前已落地的最小端點（Firebase Functions emulator 已驗證）：
+以下為 `familyday-backend/` 目前已落地的最小端點（Firebase Functions emulator 已驗證）：
 
 | 端點 | 狀態 | 備註 |
 |------|------|------|
@@ -132,7 +132,7 @@
 }
 ```
 
-> Cloud Functions 實測以 Firestore `roster` 為準；mock server 測試才使用 `source/mock/db.json` 的 `employees`。
+> Cloud Functions 實測以 Firestore `roster` 為準；mock server 測試才使用 `familyday-frontend/mock/db.json` 的 `employees`。
 
 ---
 
@@ -340,7 +340,7 @@
 | 領取成功頁（闖關禮狀態呈現） | 與關卡瀏覽共用 **`GET /api/v1/me/dashboard`**；讀取 `progress.rewardRedeemCount`（選用）或暫用 `fullClearCount`（見 §5 示例） |
 | 櫃台掃碼核銷（若有） | `POST /api/v1/staff/redeem/token`、`POST /api/v1/staff/redeem/confirm` |
 
-**實作測試（前端 · 不變更上表契約）：** `source/src/api/rewardClaimStatus.test.ts`（**Vitest**）等，驗證客戶端對 **`dashboard.progress`** 之映射與錯誤處理；**後端**仍須依本規格實作與回傳 JSON。
+**實作測試（前端 · 不變更上表契約）：** `familyday-frontend/src/api/rewardClaimStatus.test.ts`（**Vitest**）等，驗證客戶端對 **`dashboard.progress`** 之映射與錯誤處理；**後端**仍須依本規格實作與回傳 JSON。
 
 ---
 

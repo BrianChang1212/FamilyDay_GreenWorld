@@ -15,12 +15,12 @@
 ## 介面截圖（Preview）
 
 - 截圖位置：`docs/preview/screenshots/`
-- 來源：`source/` 執行 `npm run build` 後，以 `vite preview` 輸出的畫面
+- 來源：`familyday-frontend/` 執行 `npm run build` 後，以 `vite preview` 輸出的畫面
 - 建議 viewport：`390x844`
 
 ### 重新產生流程
 
-1. 終端機 A：`cd source` -> `npm run build` -> `npm run preview -- --host 127.0.0.1 --port 4173`
+1. 終端機 A：`cd familyday-frontend` -> `npm run build` -> `npm run preview -- --host 127.0.0.1 --port 4173`
 2. 終端機 B（專案根目錄）：`powershell -ExecutionPolicy Bypass -File tool/capture-preview-screenshots.ps1`
 
 ---

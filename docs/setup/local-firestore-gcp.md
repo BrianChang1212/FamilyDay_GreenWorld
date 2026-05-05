@@ -3,7 +3,7 @@
 ## 快速版（先做這 4 步）
 
 1. 準備服務帳戶金鑰 JSON（不可提交 Git）。
-2. 確認 [`fdgw.project.json`](../../fdgw.project.json) 與 [`.firebaserc`](../../.firebaserc) 專案 ID 一致。
+2. 確認 [`fdgw.project.json`](../../fdgw.project.json) 與 [`familyday-backend/.firebaserc`](../../familyday-backend/.firebaserc) 專案 ID 一致。
 3. Windows 一鍵啟動：執行倉庫根 `scripts/dev-oneclick.ps1`（帶 `-CredentialPath` 或先設 `GOOGLE_APPLICATION_CREDENTIALS`）。
 4. 驗證 API 與 UI：依 [`docs/testing/api-integration-checklist.md`](../testing/api-integration-checklist.md) 跑主清單。
 
@@ -11,7 +11,7 @@
 
 ## 快速驗證命令（PowerShell）
 
-在 `functions/`：
+在 `familyday-backend/`：
 
 ```powershell
 .\scripts\cloud-firestore-dev.ps1 -Mode verify -CredentialPath "C:\path\to\your-sa.json"
@@ -37,7 +37,7 @@
 
 ### B) 寫入測試名冊（roster）
 
-在 `functions/` 設定好 `GOOGLE_APPLICATION_CREDENTIALS` 後：
+在 `familyday-backend/` 設定好 `GOOGLE_APPLICATION_CREDENTIALS` 後：
 
 ```bash
 npm run seed:roster
@@ -63,7 +63,7 @@ firebase deploy --only firestore
 - `FDGW_EXPECT_PROJECT_ID` = 金鑰內 `project_id`
 - `FDGW_PURGE_CONFIRM=YES`
 
-再於 `functions/` 執行：
+再於 `familyday-backend/` 執行：
 
 ```bash
 npm run purge:firestore-app

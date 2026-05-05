@@ -13,7 +13,7 @@
 - `VITE_API_BASE` 已指向目標 API（本機常用 `/fdgw-emulator-api`）。
 - 已清除瀏覽器 session / localStorage（避免前次狀態污染）。
 - 若用 Firestore：已設定 `GOOGLE_APPLICATION_CREDENTIALS`、`GOOGLE_CLOUD_PROJECT`、`FDGW_USE_FIRESTORE=true`。
-- `fdgw.project.json` 與 `.firebaserc` 的專案 ID 一致。
+- `fdgw.project.json` 與 `familyday-backend/.firebaserc` 的專案 ID 一致。
 
 參考：
 - [`docs/setup/local-firestore-gcp.md`](../setup/local-firestore-gcp.md)

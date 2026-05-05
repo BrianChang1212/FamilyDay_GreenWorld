@@ -232,7 +232,7 @@
 | 2 | **確認領取（彈窗）** | 如「確認領取？」、第幾次領取、確認後無法取消；**確認領取**／**取消**。 |
 | 3 | **領取成功** | 成功文案與感謝；獎項圖示狀態更新（已領項目視覺區隔）；領取次數與份數上限依 [一、人數與身分規則](#一人數與身分規則) 準線，並與櫃檯驗證並列考量（詳 [`api-v0.1.md`](../specs/api-v0.1.md)；前端 **`/finish`** 確認領獎成功後導 **`/finish/claimed`**；**已領滿**時可停留 **`/finish`** 顯示上限提醒。`ClaimSuccessView` 以 **`GET /api/v1/me/dashboard`** 之 `progress` 呈現次數，無 API 時 **`local-fallback`**，見 [`summary-frontend.md`](../architecture/summary-frontend.md) §2.1、§2 目錄 **v1.31**）。 |
 
-**實作對照：** [`summary-frontend.md`](../architecture/summary-frontend.md) **§2.1**（路由）、**§2.2**（報到）、**§2.3**（闖關流程圖）。`source/` 已對齊：`/game`→歡迎、報到單頁+確認彈窗、闖關登入後→地圖；細節仍以本節為產品敘述準線。
+**實作對照：** [`summary-frontend.md`](../architecture/summary-frontend.md) **§2.1**（路由）、**§2.2**（報到）、**§2.3**（闖關流程圖）。`familyday-frontend/` 已對齊：`/game`→歡迎、報到單頁+確認彈窗、闖關登入後→地圖；細節仍以本節為產品敘述準線。
 
 #### 3.2 獎品兌換
 
@@ -532,7 +532,7 @@
 1. **技術與環境收斂**（約 78%；阻塞解除中）
    - [x] 架構與 API **草案**（[`api-v0.1.md`](../specs/api-v0.1.md)、[`summary-*.md`](../architecture/summary-frontend.md)）
    - [ ] 前端／Database／部署之**正式簽核**
-   - [x] 開發工具鏈與 **Repo／`source/` 初始化**（Vue + Vite + TS + Tailwind；可 `npm run build`）
+   - [x] 開發工具鏈與 **Repo 初始化 → 遷移至 `familyday-frontend/`**（Vue + Vite + TS + Tailwind；可 `npm run build`）
    - [ ] Firestore IAM 權限補齊並完成最終實證
 
 2. **需求釐清**
@@ -548,14 +548,14 @@
    - [ ] 設計規範文件
 
 2. **開發**
-   - [x] 前端開發環境建置（`source/`；本機 `npm run dev`／`build`）
-   - [x] 後端開發環境建置（`functions/` TypeScript + Firebase Functions）
+   - [x] 前端開發環境建置（`familyday-frontend/`；本機 `npm run dev`／`build`）
+   - [x] 後端開發環境建置（`familyday-backend/` TypeScript + Firebase Functions）
    - [x] 報到系統開發（Cloud Functions `checkin` + `checkin/status`）
    - [x] 闖關系統開發（`stations/challenges/restart/dashboard`）
    - [x] 獎品兌換系統開發（`staff/redeem/token` + `staff/redeem/confirm`）
 
 3. **測試**
-   - [x] **前端**單元測試（**Vitest**；`source/src/**/*.test.ts`；**CI** 見 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)；最新驗證：**14 檔 / 87 tests 全通過**；細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) **§1.1** **v1.31**）
+   - [x] **前端**單元測試（**Vitest**；`familyday-frontend/src/**/*.test.ts`；**CI** 見 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)；最新驗證：**14 檔 / 87 tests 全通過**；細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) **§1.1** **v1.31**）
    - [ ] 後端單元測試（待補齊）
    - [x] 整合測試（4/30 已完成核心流程、401/409、CORS 邊界）
    - [ ] 壓力測試（1,300 人併發）
@@ -611,7 +611,7 @@
 
 #### 高優先級
 - [ ] 補齊目標 Firebase 專案（`fdgw.project.json` 之 `firebaseProjectId`）Firestore IAM（Cloud Datastore User 或等價權限）
-- [ ] 重跑 `functions/`：`npm run verify:firestore` 並確認 Firestore 寫入/讀取成功
+- [ ] 重跑 `familyday-backend/`：`npm run verify:firestore` 並確認 Firestore 寫入/讀取成功
 - [ ] 將 Firestore 驗證證據回填 `docs/testing/api-integration-checklist.md`，解除 Blocked
 - [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、Cookie）
 

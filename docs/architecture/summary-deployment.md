@@ -17,7 +17,7 @@
 
 ### 1.1 前端原型靜態預覽（無後端）
 
-與下方「全端／API 上線」不同：僅將 **Vite 建置產物**（`source/dist`）放於 **Netlify**、**GitHub Pages** 等靜態主機，供手機試操作。倉庫內含 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；**例行 CI** 另見 **`.github/workflows/ci.yml`**（`npm run test` → `npm run build`）。**測試 Web UI** 完整步驟（Netlify／GitHub Pages、QR、區網試機）見 [`docs/setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；根 [`README.md`](../../README.md#preview-netlify-test-ui) 保留短摘要與錨點 **`preview-netlify-test-ui`**。**未接 API** 時，領取成功頁以前端 **`sessionStorage`** 類比並標示預覽用（見 [`summary-frontend.md`](./summary-frontend.md) §2.1 **`local-fallback`**）。
+與下方「全端／API 上線」不同：僅將 **Vite 建置產物**（`familyday-frontend/dist`）放於 **Netlify**、**GitHub Pages** 等靜態主機，供手機試操作。倉庫內含 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；**例行 CI** 另見 **`.github/workflows/ci.yml`**（`npm run test` → `npm run build`）。**測試 Web UI** 完整步驟（Netlify／GitHub Pages、QR、區網試機）見 [`docs/setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；根 [`README.md`](../../README.md#preview-netlify-test-ui) 保留短摘要與錨點 **`preview-netlify-test-ui`**。**未接 API** 時，領取成功頁以前端 **`sessionStorage`** 類比並標示預覽用（見 [`summary-frontend.md`](./summary-frontend.md) §2.1 **`local-fallback`**）。
 
 **測試 Web UI 操作（標記）：** [`static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md) 已註記 **僅供測試介面／流程** 之 **Netlify 預覽網址（範例）**、與 Git **`main` 連動自動部署**、**Base directory = `source`**、以及 **報到／闖關** 用 **QR 網址**（`/check-in`、`/game`）與 **靜態 QR 產生器**參考連結。正式活動網域與 QR **不應**逕用該測試網址，應另定案。
 

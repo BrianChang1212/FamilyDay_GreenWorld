@@ -1,7 +1,8 @@
 # `docs/` 文件索引
 
-本目錄依**用途分類**；維護主文件仍為
-[`project/project-master.md`](./project/project-master.md)。
+本目錄依**用途分類**；自 2026-05 起核心程式已拆為三個子 repo：
+`familyday-frontend/`、`familyday-backend/`、`familyday-api-contract/`。
+維護主文件仍為 [`project/project-master.md`](./project/project-master.md)。
 
 ---
 
@@ -10,11 +11,11 @@
 | 資料夾 | 用途 |
 |--------|------|
 | [`project/`](./project/) | **專案主文件**（需求、會議、待確認、狀態、技術規格合併版） |
-| [`specs/`](./specs/) | **介面規格**（REST API 草案等） |
+| [`specs/`](./specs/) | **舊版介面規格快照**（目前正式契約維護於 `familyday-api-contract/`） |
 | [`architecture/`](./architecture/) | **架構討論總結**（前後端技術選型、部署、流量） |
 | [`testing/`](./testing/) | **整合驗證清單**（前後端 API 實測流程與驗收 Checklist） |
 | [`setup/`](./setup/) | **本機與預覽**（GCP／Firestore、靜態預覽、Windows Node.js；詳見 [`setup/README.md`](./setup/README.md)） |
-| [`firebase/`](./firebase/) | **Firebase 檔案分類索引**（`firebase.json`、`.firebaserc`、Rules、Functions、與 `fdgw.project.json` 關係；詳見 [`firebase/README.md`](./firebase/README.md)） |
+| [`firebase/`](./firebase/) | **Firebase 檔案分類索引**（`familyday-backend/firebase.json`、`familyday-backend/.firebaserc`、Rules、Functions、與 `fdgw.project.json` 關係；詳見 [`firebase/README.md`](./firebase/README.md)） |
 | [`proposals/`](./proposals/) | **外部提案／簡報**（PDF） |
 | [`design/`](./design/) | **設計資產**（線框圖等） |
 | [`media/`](./media/) | **媒體索引**（整合 Demo 錄影與 Preview 截圖維護說明） |
@@ -37,16 +38,17 @@
 | 想找… | 檔案 |
 |--------|------|
 | 需求與專案狀態 | [`project/project-master.md`](./project/project-master.md) |
-| API v0.1 草案 | [`specs/api-v0.1.md`](./specs/api-v0.1.md) |
+| API v0.1 草案（現行） | [`../familyday-api-contract/api-v0.1.md`](../familyday-api-contract/api-v0.1.md) |
+| API v0.1 草案（歷史快照） | [`specs/api-v0.1.md`](./specs/api-v0.1.md) |
 | Firestore Schema（v1 草案） | [`architecture/firestore-schema-v1.md`](./architecture/firestore-schema-v1.md) |
 | API 整合清單（精簡） | [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md) |
 | API Mock 測試流程 | [`testing/api-mock-testing.md`](./testing/api-mock-testing.md) |
 | API 歷史驗證紀錄 | [`testing/api-integration-history.md`](./testing/api-integration-history.md) |
 | 本機 GCP 服務帳戶（Firestore／verify） | [`setup/local-firestore-gcp.md`](./setup/local-firestore-gcp.md)；[`architecture/summary-backend.md`](./architecture/summary-backend.md) **§2.0** |
-| Firebase 相關檔案分類（根目錄設定 vs functions／fdgw） | [`firebase/README.md`](./firebase/README.md) |
+| Firebase 相關檔案分類（`familyday-backend/` 設定 vs fdgw） | [`firebase/README.md`](./firebase/README.md) |
 | 前端／後端／部署／流量摘要 | [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) 等 |
 | 測試 Web UI（Netlify、QR） | [`setup/static-preview-netlify-github.md`](./setup/static-preview-netlify-github.md)；根 [`README`](../README.md#preview-netlify-test-ui) 錨點 **`preview-netlify-test-ui`**；[`summary-deployment.md`](./architecture/summary-deployment.md) **§1.1**（**v1.6**） |
-| 前端單元測試（Vitest） | `source/`：`npm run test`；規格見 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) **§1.1**（**v1.31**）；CI 見 [`.github/workflows/ci.yml`](../.github/workflows/ci.yml) |
+| 前端單元測試（Vitest） | `familyday-frontend/`：`npm run test`；規格見 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) **§1.1**（**v1.31**） |
 | 提案 PDF | [`proposals/FamilyDayApp_Proposal_v1.pdf`](./proposals/FamilyDayApp_Proposal_v1.pdf) |
 | Wireframe PNG | [`design/wireframe/`](./design/wireframe/) |
 | 操作示範錄影與截圖維護 | [`media/README.md`](./media/README.md) |

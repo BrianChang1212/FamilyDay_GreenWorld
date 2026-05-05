@@ -1,7 +1,7 @@
 # 瑞軒 2026 家庭日 — 解謎闖關遊戲（綠世界生態農場）
 
 <p align="center">
-  <img src="source/public/images/family-day-forest-walk.png" alt="瑞軒家庭日綠世界主視覺：一家人攜手漫步林間小徑" width="720" />
+  <img src="familyday-frontend/public/images/family-day-forest-walk.png" alt="瑞軒家庭日綠世界主視覺：一家人攜手漫步林間小徑" width="720" />
 </p>
 
 ## 目錄
@@ -26,7 +26,7 @@
 需求：Node.js 20+。
 
 ```bash
-cd source
+cd familyday-frontend
 npm install
 npm run dev
 ```
@@ -43,7 +43,7 @@ npm run dev
 
 - 專案主文件：[`docs/project/project-master.md`](docs/project/project-master.md)
 - Setup 索引：[`docs/setup/README.md`](docs/setup/README.md)
-- API 契約：[`docs/specs/api-v0.1.md`](docs/specs/api-v0.1.md)
+- API 契約：[`familyday-api-contract/api-v0.1.md`](familyday-api-contract/api-v0.1.md)
 
 ### Windows：30 秒啟動（前端 + API + 雲端 Firestore）
 
@@ -61,8 +61,8 @@ npm run dev
 
 ### 設定單一來源（必對齊）
 
-- Firebase 與產品常數：[`fdgw.project.json`](fdgw.project.json)
-- Firebase CLI 目標專案：[`.firebaserc`](.firebaserc)
+- Firebase 與產品常數：[`familyday-backend/fdgw.project.json`](familyday-backend/fdgw.project.json)
+- Firebase CLI 目標專案：[`familyday-backend/.firebaserc`](familyday-backend/.firebaserc)
 - 整合測試主清單：[`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md)
 - 金鑰 JSON **不可提交 Git**
 
@@ -70,19 +70,19 @@ npm run dev
 
 | 類別 | 路徑／檔案 | 是否進正式上線執行 | 說明 |
 |------|------------|--------------------|------|
-| 前端執行碼 | `source/src/**`、`source/public/**` | 會（經 build 後） | 由 `npm run build` 打包成 `source/dist`，提供正式站點執行 |
-| 部署產物 | `source/dist/**` | 會（部署時使用） | 最終上線的靜態資源輸出 |
-| 單元測試 | `source/src/**/*.test.ts` | 不會 | 僅供本機與 CI 驗證行為；不打包進 production |
-| Mock API | `source/mock/**` | 不會（正式環境） | 僅開發／驗證用；正式環境應改接實際後端 |
+| 前端執行碼 | `familyday-frontend/src/**`、`familyday-frontend/public/**` | 會（經 build 後） | 由 `npm run build` 打包成 `familyday-frontend/dist`，提供正式站點執行 |
+| 部署產物 | `familyday-frontend/dist/**` | 會（部署時使用） | 最終上線的靜態資源輸出 |
+| 單元測試 | `familyday-frontend/src/**/*.test.ts` | 不會 | 僅供本機與 CI 驗證行為；不打包進 production |
+| Mock API | `familyday-frontend/mock/**` | 不會（正式環境） | 僅開發／驗證用；正式環境應改接實際後端 |
 | CI 設定 | `.github/workflows/*.yml` | 不會（runtime） | 只在 GitHub Actions 執行測試、建置與部署流程 |
-| 開發依賴 | `source/node_modules/**` | 不會（runtime） | 建置與開發工具依賴，非部署產物 |
+| 開發依賴 | `familyday-frontend/node_modules/**` | 不會（runtime） | 建置與開發工具依賴，非部署產物 |
 
 ### 目前實際進度（即時狀態）
 
 | 面向 | 現況 |
 |------|------|
-| 前端 | `source/` 可本機啟動、建置與預覽；已可透過 `VITE_API_BASE` 串接 Firebase Functions |
-| API | Cloud Functions 已落地核心與 Phase 2 端點（`health/auth/checkin/dashboard/me/progress/stations/challenges/restart/reward/claim/staff/admin`） |
+| 前端 | `familyday-frontend/` 可本機啟動、建置與預覽；已可透過 `VITE_API_BASE` 串接 Firebase Functions |
+| API | `familyday-backend/` Cloud Functions 已落地核心與 Phase 2 端點（`health/auth/checkin/dashboard/me/progress/stations/challenges/restart/reward/claim/staff/admin`） |
 | 後端資料層 | 已完成 in-memory + Firestore toggle（`FDGW_USE_FIRESTORE`）；Firestore 最終實證目前卡在 IAM 權限 |
 | 測試 | Vitest 單元測試與 CI 持續通過；4/30 已完成 Functions 聯調與 CORS allowlist 驗證 |
 | 部署 | 可進行 dev/stage 驗證上架；正式對外上線仍需先完成 IAM 與最小安全基線 |
@@ -101,7 +101,7 @@ npm run dev
 
 ### 介面預覽（截圖）
 
-以下為 **`source/` 生產建置**（`npm run build`）後，以 **390×844**（常見手機寬度）全頁截圖；與 [Netlify 測試站](#preview-netlify-test-ui)／本機 `npm run preview` **同一套輸出**。原始檔置於 [`docs/preview/screenshots/`](docs/preview/screenshots/)（重新產生步驟見 [`docs/media/README.md`](docs/media/README.md)）。
+以下為 **`familyday-frontend/` 生產建置**（`npm run build`）後，以 **390×844**（常見手機寬度）全頁截圖；與 [Netlify 測試站](#preview-netlify-test-ui)／本機 `npm run preview` **同一套輸出**。原始檔置於 [`docs/preview/screenshots/`](docs/preview/screenshots/)（重新產生步驟見 [`docs/media/README.md`](docs/media/README.md)）。
 
 | 歡迎 `/` | 報到 `/checkin` |
 | :---: | :---: |
@@ -150,9 +150,9 @@ npm run dev
 
 | 層級 | 重點 |
 | --- | --- |
-| 前端 | Vue 3 + Vite + TypeScript + Tailwind + Vue Router（`source/`） |
+| 前端 | Vue 3 + Vite + TypeScript + Tailwind + Vue Router（`familyday-frontend/`） |
 | 後端 | Firebase（Firestore 為主，Realtime Database 視場景啟用） |
-| API 契約 | `docs/specs/api-v0.1.md` |
+| API 契約 | `familyday-api-contract/api-v0.1.md` |
 | 架構摘要 | 前端：`docs/architecture/summary-frontend.md`、後端：`docs/architecture/summary-backend.md`、部署：`docs/architecture/summary-deployment.md`、流量：`docs/architecture/summary-traffic.md` |
 
 ### API 觸發時機（簡短版）
@@ -259,7 +259,7 @@ flowchart LR
 
 - 完成**目標 Firebase 專案**（與 [`fdgw.project.json`](fdgw.project.json) 的 `firebaseProjectId`、金鑰 JSON 內 `project_id`、 [`.firebaserc`](.firebaserc) 一致）的 Firestore IAM 授權（至少 Cloud Datastore User）  
 - 確認本機驗證身分已對齊目標專案（`firebase login:list` 需有授權帳號；`GOOGLE_CLOUD_PROJECT=<同上專案 ID>`）  
-- 重跑 `functions/` 的 `npm run verify:firestore` 並保存證據（CLI 輸出 + Firestore 查驗）  
+- 重跑 `familyday-backend/` 的 `npm run verify:firestore` 並保存證據（CLI 輸出 + Firestore 查驗）  
 - 將 Firestore 驗證結果回填 `docs/testing/api-integration-checklist.md`（解除 Blocked）  
 - 確認 `VITE_API_BASE`、CORS allowlist 與目標驗證網域一致  
 
@@ -276,9 +276,13 @@ flowchart LR
 | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
 | `docs/`           | 見 [`docs/README.md`](docs/README.md)（含 **`setup/`** 本機與預覽、`project/`、`specs/`、`architecture/`、`media/` 等） |
 | `assets/`         | 設計稿、KV、Logo、CIS（註明版本與來源）                                                                                          |
-| `source/`         | 前端（Vue 3 + Vite + TS + Tailwind + Vue Router）：`npm install` → `npm run dev`（預設 `http://localhost:5173`）；**`npm run test`**（Vitest）。路由頁面於 **`src/views/home`**、**`onboarding`**、**`auth`**、**`checkin`**、**`quest`** |
+| `familyday-frontend/` | 前端獨立 repo（Vue 3 + Vite + TS + Tailwind + Vue Router）：`npm install` → `npm run dev`；`npm run test`（Vitest） |
+| `familyday-backend/` | 後端獨立 repo（Firebase Functions + Firestore 設定）：`npm install` → `npm run build` / `npm run serve` |
+| `familyday-api-contract/` | API 契約獨立 repo（`api-v0.1.md` + 契約治理檔） |
+| `source/`         | 舊版前端目錄（legacy，僅保留歷史追溯） |
+| `functions/`      | 舊版後端目錄（legacy，僅保留歷史追溯） |
 | `.claude/skills/`（全域） | Agent skills 由全域管理；本專案不需額外內嵌 skills（非執行期依賴） |
-| `test/`           | 倉庫根目錄**驗收／測試紀錄**用（**選用**；目前僅 **`.gitkeep`**）。**程式單元測試**在 **`source/src/**/*.test.ts`**（Vitest），非此資料夾 |
+| `test/`           | 倉庫根目錄**驗收／測試紀錄**用（**選用**；目前僅 **`.gitkeep`**）。**程式單元測試**在 **`familyday-frontend/src/**/*.test.ts`**（Vitest），非此資料夾 |
 | `tool/`           | 輔助腳本（**選用**）：例如 [`tool/capture-preview-screenshots.ps1`](tool/capture-preview-screenshots.ps1)（重產 [`docs/preview/screenshots/`](docs/preview/screenshots/)，見 [`docs/media/README.md`](docs/media/README.md)）；另含 **`.gitkeep`** |
 
 ---
@@ -290,8 +294,9 @@ flowchart LR
 | 5 分鐘掌握專案 | 本 README |
 | 本機 GCP／Firestore、靜態預覽、Windows Node | [`docs/setup/README.md`](docs/setup/README.md) |
 | 完整需求、待辦、進度、技術 | [`docs/project/project-master.md`](docs/project/project-master.md) |
+| Repo 拆分遷移說明 | [`docs/project/repo-split-migration.md`](docs/project/repo-split-migration.md) |
 | 文件分類索引 | [`docs/README.md`](docs/README.md) |
-| API 契約（v0.1） | [`docs/specs/api-v0.1.md`](docs/specs/api-v0.1.md) |
+| API 契約（v0.1） | [`familyday-api-contract/api-v0.1.md`](familyday-api-contract/api-v0.1.md) |
 | 前後端／部署／流量摘要 | [`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) 等 |
 | Demo 錄影與截圖維護 | [`docs/media/README.md`](docs/media/README.md) |
 
