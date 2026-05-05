@@ -1,0 +1,27 @@
+{
+	"firebaseProjectId": "rare-lattice-495009-i9",
+	"functionsRegion": "us-central1",
+	"httpsFunctionName": "api",
+	"functionsEmulatorHost": "127.0.0.1",
+	"functionsEmulatorPort": 5003,
+	"eventId": "familyday-2026",
+	"branding": {
+		"year": "2026",
+		"companyName": "瑞軒科技",
+		"eventTitle": "2026 瑞軒家庭日",
+		"location": "綠世界生態農場",
+		"copyright": "© 2026 AmTRAN Technology Co., Ltd.",
+		"defaultPlayerName": "夥伴",
+		"maxCompanions": 20
+	},
+	"game": {
+		"minStage": 1,
+		"totalStages": 6,
+		"maxRewardRounds": 3,
+		"stationVerifyTtlMinutes": 5
+	},
+	"frontend": {
+		"viteDevPort": 5173,
+		"vitePreviewPort": 4173
+	}
+}

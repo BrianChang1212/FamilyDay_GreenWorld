@@ -1,0 +1,30 @@
+name: Contract CI
+
+on:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
+
+permissions:
+  contents: read
+
+jobs:
+  validate-contract:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required files
+        run: |
+          test -f api-v0.1.md
+          test -f README.md
+          test -f CHANGELOG.md
+
+      - name: Check contract version annotation
+        run: |
+          if ! grep -q "v0.1" api-v0.1.md; then
+            echo "Expected version annotation not found in api-v0.1.md"
+            exit 1
+          fi
