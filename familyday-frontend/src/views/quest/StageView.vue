@@ -106,6 +106,7 @@ function selectStage(id: number) {
 	setStage(id);
 	stage.value = id;
 	setInZone(false);
+	inZone.value = false;
 	clearPendingStationVerification();
 	challengeId.value = "";
 	scanError.value = "";
