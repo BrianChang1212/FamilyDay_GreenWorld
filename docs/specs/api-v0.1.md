@@ -1,6 +1,6 @@
 # 家庭日綠世界闖關 Web — API 規格（v0.1 草案）
 
-> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.20** 補前端原型：`inZone`／**`pendingStationChallenge`** 與 **`challengeId` query** 綁定註記，避免未掃碼卻進預設題組；**無** REST 契約變更；**v0.1.19** 任意順序通關：`dashboard.stages[].locked` 語意、`attempts` 回應補 **`completedStageIds`**／**`allStagesCompleted`**；**v0.1.18** 聯調註記 CORS 白名單與 **`functions/src/index.ts`** 對齊；**v0.1.17** Mock／整合清單與 **`me/progress`** 對齊；**v0.1.16** 補列 **`GET /api/v1/me/progress`** 落地狀態；**v0.1.15** 文件與 §13 流程圖路徑對齊；**v0.1.14** 同步 Cloud Functions：`auth/checkin` 改走 Firestore roster 驗證，`admin/roster/import` 實作 Firestore 寫入；**v0.1.13** 完成 CORS allowlist 收斂驗證；**不改**端點定義）。
+> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.21** 文件維護：`corsOrigins`／mock `eventId` 對齊 **`fdgw.project.json`**；**無** REST 契約變更；**v0.1.20** 補前端原型：`inZone`／**`pendingStationChallenge`** 與 **`challengeId` query** 綁定註記，避免未掃碼卻進預設題組；**v0.1.19** 任意順序通關：`dashboard.stages[].locked` 語意、`attempts` 回應補 **`completedStageIds`**／**`allStagesCompleted`**；**v0.1.18** 聯調註記 CORS 白名單與 **`functions/src/index.ts`** 對齊；**v0.1.17** Mock／整合清單與 **`me/progress`** 對齊；**v0.1.16** 補列 **`GET /api/v1/me/progress`** 落地狀態；**v0.1.15** 文件與 §13 流程圖路徑對齊；**v0.1.14** 同步 Cloud Functions：`auth/checkin` 改走 Firestore roster 驗證，`admin/roster/import` 實作 Firestore 寫入；**v0.1.13** 完成 CORS allowlist 收斂驗證；**不改**端點定義）。
 
 ---
 
@@ -43,7 +43,7 @@
 | 項目 | 目前 Mock 行為 | 正式契約定位 |
 |------|------|------|
 | `POST /api/v1/checkin` | 需符合 `source/mock/db.json` 的 `employees` 對照；不符回 `401 CHECKIN_IDENTITY_MISMATCH` | 正式版應依名冊/身份服務驗證 |
-| `GET /api/v1/events/{eventId}` | 僅實作固定路徑 `/api/v1/events/familyday-2026` | 正式版維持 `{eventId}` 動態路由 |
+| `GET /api/v1/events/{eventId}` | 僅實作固定路徑 `/api/v1/events/<eventId>`，`<eventId>` 與 [`fdgw.project.json`](../../fdgw.project.json) 的 `eventId` 一致（目前為 `familyday-2026`） | 正式版維持 `{eventId}` 動態路由 |
 | `POST /api/v1/stations/verify` | 僅 smoke 回應，未實作 JWT 驗簽/exp/jti；回傳之 **`challengeId`** 須與請求 **`stageId`** 對應（原型與 `functions` 一致） | 正式版需完整 JWT 安全檢查 |
 | `GET /api/v1/me/dashboard` | 回應為前端驗證所需最小欄位集 | 正式版回應以本文件示例為準 |
 | `POST /api/v1/challenges/{challengeId}/attempts` | request 用 `answer`，response 含 **`correct`**、**`nextStageId`**、**`completedStageIds`**、**`allStagesCompleted`**（與 `functions` 一致） | 正式版請求仍以 **`choiceId`**（相容 `answer`）為準 |
@@ -84,7 +84,7 @@
 - `401/409` 邊界行為已驗證：
   - 未登入呼叫 `GET /api/v1/auth/me` 回 `401`
   - 未滿足條件呼叫 `POST /api/v1/me/playthrough/restart` 回 `409`
-- CORS allowlist 已收斂（與 **`functions/src/index.ts`** 一致）：`http://localhost:5173`、`http://localhost:4173`、`http://127.0.0.1:5173`、`http://127.0.0.1:4173`、`https://familyday-greenworld.netlify.app`、`https://brianchang1212.github.io`。
+- CORS allowlist 已收斂：**執行時**以倉庫根 [`fdgw.project.json`](../../fdgw.project.json) 的 **`corsOrigins`** 為準（`functions` 於載入時讀取）；下列為常見值，與該陣列一致：`http://localhost:5173`、`http://localhost:4173`、`http://127.0.0.1:5173`、`http://127.0.0.1:4173`、`https://familyday-greenworld.netlify.app`、`https://brianchang1212.github.io`。
 - 非白名單來源（例：`https://evil.example.com`）驗證結果為無 ACAO 回應，符合阻擋預期。
 
 ---
@@ -491,3 +491,4 @@ sequenceDiagram
 | v0.1.18 | 2026-05-03 | 聯調驗證註記：CORS allowlist 補列 **`127.0.0.1:5173`／`4173`**（與 **`functions/src/index.ts`** 一致） |
 | v0.1.19 | 2026-05-03 | §5：`stages[].locked` 改為「**已通關**為 **`true`**」；補**任意順序**六關與 **`currentStageId`** 說明。§7：`attempts` 回應補 **`completedStageIds`**、**`allStagesCompleted`** 與範例 JSON；§13 流程圖註記同步；Mock 差異表 §「Firebase 實作對齊註記」更新 |
 | v0.1.20 | 2026-05-03 | Mock 差異表：`stations/verify` 補「**`challengeId` 與 `stageId` 對應**」。**`summary-frontend` v1.29**：前端以 **`fdgw_pending_station_challenge`** 綁定選站與驗證回傳之 **`challengeId`**，**`getInZone()`** 僅 **`fdgw_inZone === "1"`** 為 true；**`/quiz`** 必帶 **`challengeId` query**（見 `StageView.vue`／`QuizView.vue`／`ResultView.vue`）。**無**端點或 JSON 契約變更 |
+| v0.1.21 | 2026-05-05 | Mock 差異表：`events` 固定路徑之 `eventId` 改敘為與 [`fdgw.project.json`](../../fdgw.project.json) 一致。聯調 CORS 註記改為以 **`fdgw.corsOrigins`** 為執行時單一來源；**無**端點或 JSON 契約變更。版本鏈：`summary-frontend` **v1.31**、`project-master` **v1.3.33**、根 **`README` v2.56** |

@@ -8,7 +8,8 @@
  * Env (optional):
  *   SEED_COUNT — default 10
  *   SEED_EMPLOYEE_ID_START — default "1141043"
- *   FDGW_EVENT_ID — default "familyday-2026"
+ *   FDGW_EVENT_ID — overrides event id (default: fdgw.project.json)
+ *   Defaults for count / party size / employee start: fdgw.project.json seed.*
  *   FDGW_FIRESTORE_DATABASE_ID — default "default"
  *   SEED_ID_PREFIX — if set (non-empty), legacy mode: PREFIX0001.. + SeedTester0001..
  *
@@ -19,6 +20,7 @@ import process from "node:process";
 import fs from "node:fs";
 import { applicationDefault, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import { getEventId, loadFdgwProject } from "./read-fdgw-project.mjs";
 
 /** Distinct English given names; longer than typical SEED_COUNT; no duplicates. */
 const ENGLISH_FIRST_NAMES = [
@@ -149,11 +151,18 @@ function englishNameAt(slotIndex) {
 
 async function run() {
 	assertCred();
+	const seedCfg = loadFdgwProject().seed;
 	const count = Math.min(
-		500,
-		Math.max(1, parseInt(process.env.SEED_COUNT || "10", 10) || 10),
+		Number(seedCfg.maxCount ?? 500),
+		Math.max(
+			1,
+			parseInt(process.env.SEED_COUNT || String(seedCfg.defaultCount ?? 10), 10) ||
+				seedCfg.defaultCount ||
+				10,
+		),
 	);
-	const eventId = process.env.FDGW_EVENT_ID || "familyday-2026";
+	const eventId = getEventId();
+	const partyPlanned = Number(seedCfg.defaultPartySizePlanned ?? 2);
 	const legacyPrefix = (process.env.SEED_ID_PREFIX || "").trim();
 	const db = initDb();
 	const batch = db.batch();
@@ -173,7 +182,7 @@ async function run() {
 					eventId,
 					employeeId,
 					name,
-					partySizePlanned: 2,
+					partySizePlanned: partyPlanned,
 					source: "manual",
 					updatedAt: now,
 				},
@@ -183,7 +192,10 @@ async function run() {
 			usedNames.add(name);
 		}
 	} else {
-		const startRaw = (process.env.SEED_EMPLOYEE_ID_START || "1141043").trim();
+		const startRaw = (
+			process.env.SEED_EMPLOYEE_ID_START ||
+			String(seedCfg.defaultEmployeeIdStart ?? "1141043")
+		).trim();
 		const startNum = parseInt(startRaw, 10);
 		if (!Number.isFinite(startNum) || startNum < 0) {
 			throw new Error(`Invalid SEED_EMPLOYEE_ID_START: ${startRaw}`);
@@ -202,7 +214,7 @@ async function run() {
 					eventId,
 					employeeId,
 					name,
-					partySizePlanned: 2,
+					partySizePlanned: partyPlanned,
 					source: "manual",
 					updatedAt: now,
 				},

@@ -49,18 +49,34 @@ npm install
 npm run dev
 ```
 
-瀏覽器開啟終端機顯示網址（常見為 [http://localhost:5173](http://localhost:5173)）。  
-建置預覽可用：`npm run build` 後 `npm run preview`。
+瀏覽器開啟終端機顯示網址（預設與 [`fdgw.project.json`](fdgw.project.json) 的 `frontend.viteDevPort` 一致，常見為 [http://localhost:5173](http://localhost:5173)）。  
+建置預覽可用：`npm run build` 後 `npm run preview`（預覽埠見同檔 `frontend.vitePreviewPort`）。
 
 **單元測試（Vitest）：** 於 `source/` 執行 `npm run test`；開發監看可用 `npm run test:watch`；覆蓋率報告可用 `npm run test:coverage`。測試檔與程式並列（`source/src/**/*.test.ts`）。GitHub Actions [`.github/workflows/ci.yml`](.github/workflows/ci.yml) 在 `npm run build` **之前**會先跑 `npm run test`。
 
 **說明：** 後端 API 尚未串接時，多數畫面仍以 mock／靜態流程為主。**未設定 `VITE_API_BASE` 時**，完成頁領獎次數會以瀏覽器 `sessionStorage` 類比（僅供預覽）；若要以**真實後端**顯示次數，請於 `source/` 建立 `.env.local`（或建置環境變數）設定 **`VITE_API_BASE`**（API 主機根、無尾隨 `/`），詳見 [`docs/architecture/summary-frontend.md`](docs/architecture/summary-frontend.md) §4。定案見 [`docs/specs/api-v0.1.md`](docs/specs/api-v0.1.md) 與 [`docs/architecture/summary-backend.md`](docs/architecture/summary-backend.md)。
 
+### Windows：一鍵啟動（前端 + Functions emulator + 雲端 Firestore）
+
+**前置：** [`fdgw.project.json`](fdgw.project.json) 與 [`.firebaserc`](.firebaserc) 已對準你的 Firebase 專案；本機備妥 **服務帳戶 JSON**（勿提交 Git）。Node.js 20+。
+
+在倉庫**根目錄**執行：
+
+```powershell
+.\scripts\dev-oneclick.ps1 -CredentialPath "D:\path\to\your-sa.json"
+```
+
+或先設定 `$env:GOOGLE_APPLICATION_CREDENTIALS` 再執行 `.\scripts\dev-oneclick.ps1`（可省略 `-CredentialPath`）。
+
+腳本會依序：**`npm install`**（`source/` 與 `functions/`）、必要時建立／補上 **`source/.env.local`**（`VITE_API_BASE=/fdgw-emulator-api`）、背景啟動 **`cloud-firestore-dev.ps1 -Mode serve -FunctionsOnly`**（只起 Functions emulator，避免 Hosting 佔用 **5000** 與本機 Vite 衝突）、輪詢 **`/api/v1/health`** 就緒後執行 **`npm run dev`**。在 Vite 終端機 **Ctrl+C** 會結束前端並停止 emulator 背景工作。第二次起可加快：加 **`-SkipInstall`** 略過安裝。`fdgw.project.json` 含中文時，腳本以 **UTF-8** 讀取，避免 `ConvertFrom-Json` 失敗。
+
+亦可從檔總管雙擊 **[`scripts/dev-oneclick.cmd`](scripts/dev-oneclick.cmd)**；若需帶金鑰路徑，請在 **cmd** 執行：`scripts\dev-oneclick.cmd -CredentialPath "D:\path\to\your-sa.json"`。
+
 <a id="gcp-service-account-local-firestore"></a>
 
 ### GCP 服務帳戶（本機 Firestore 驗證）
 
-**金鑰 JSON 不可提交進 Git。** 環境變數 `GOOGLE_APPLICATION_CREDENTIALS`、`GOOGLE_CLOUD_PROJECT`、`FDGW_USE_FIRESTORE` 與 PowerShell 腳本 `functions/scripts/cloud-firestore-dev.ps1`、**`seed:roster`／`purge:firestore-app`**、Firestore Rules 部署等**完整說明**見 **[`docs/setup/local-firestore-gcp.md`](docs/setup/local-firestore-gcp.md)**（並與 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §0 對齊）。
+**金鑰 JSON 不可提交進 Git。** 環境變數 `GOOGLE_APPLICATION_CREDENTIALS`、`GOOGLE_CLOUD_PROJECT`、`FDGW_USE_FIRESTORE` 與 PowerShell 腳本 `functions/scripts/cloud-firestore-dev.ps1`、**`seed:roster`／`purge:firestore-app`**、Firestore Rules 部署等**完整說明**見 **[`docs/setup/local-firestore-gcp.md`](docs/setup/local-firestore-gcp.md)**（並與 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §0 對齊）。**Firebase／產品常數**（專案 ID、區域、emulator 埠、`eventId`、品牌文案、關卡數與領獎上限、`dashboard` 站點標題、CORS、seed／smoke／verify 預設等）集中於 **[`fdgw.project.json`](fdgw.project.json)**；變更 **`game.totalStages` 時須同步 `functions/src/state/game.ts` 的 `CHALLENGES` 陣列長度**。請與 [`.firebaserc`](.firebaserc) 的 `default` 專案保持一致。**Firebase 相關檔案分類與為何 `firebase.json` 等留在根目錄**見 **[`docs/firebase/README.md`](docs/firebase/README.md)**。
 
 ### 上線包含／不包含（避免混淆）
 
@@ -128,7 +144,7 @@ Netlify／GitHub Pages 建置步驟、範例網址、**報到／闖關 QR 分流
 | ----------- | --------------------------------------------------------------------------------------------------------------------- |
 | 需求筆記        | 已結構化寫入 `docs/project/` 等（細節見 `docs/project/project-master.md`）                                                                               |
 | 文件體系        | 詳見 [`docs/README.md`](docs/README.md)（分類索引）→ `docs/project/project-master.md`                                                                  |
-| 最後更新 README | 2026-05-03（頁尾 **v2.55**）；`project-master` **v1.3.32**；細節見 [`docs/media/README.md`](docs/media/README.md)、[`docs/project/project-master.md`](docs/project/project-master.md)、[`docs/setup/README.md`](docs/setup/README.md) |
+| 最後更新 README | 2026-05-05（頁尾 **v2.56**）；`project-master` **v1.3.33**；細節見 [`docs/media/README.md`](docs/media/README.md)、[`docs/project/project-master.md`](docs/project/project-master.md)、[`docs/setup/README.md`](docs/setup/README.md) |
 
 ---
 
@@ -253,8 +269,8 @@ flowchart LR
 
 **高優先級**
 
-- 完成 `familyday-greenworld-dev` 的 Firestore IAM 授權（至少 Cloud Datastore User）  
-- 確認本機驗證身分已對齊目標專案（`firebase login:list` 需有授權帳號；`GOOGLE_CLOUD_PROJECT=familyday-greenworld-dev`）  
+- 完成**目標 Firebase 專案**（與 [`fdgw.project.json`](fdgw.project.json) 的 `firebaseProjectId`、金鑰 JSON 內 `project_id`、 [`.firebaserc`](.firebaserc) 一致）的 Firestore IAM 授權（至少 Cloud Datastore User）  
+- 確認本機驗證身分已對齊目標專案（`firebase login:list` 需有授權帳號；`GOOGLE_CLOUD_PROJECT=<同上專案 ID>`）  
 - 重跑 `functions/` 的 `npm run verify:firestore` 並保存證據（CLI 輸出 + Firestore 查驗）  
 - 將 Firestore 驗證結果回填 `docs/testing/api-integration-checklist.md`（解除 Blocked）  
 - 確認 `VITE_API_BASE`、CORS allowlist 與目標驗證網域一致  
@@ -299,4 +315,4 @@ flowchart LR
 
 ---
 
-*README v2.55 · 2026-05-03（**`docs/setup/`** 自本版起集中本機／預覽長文；版本鏈：`api-v0.1` **v0.1.20**、`summary-frontend` **v1.30**、`summary-deployment` **v1.6**、`summary-backend` **v1.6**、`summary-traffic` **v1.2**；前版 v2.54）*
+*README v2.56 · 2026-05-05（快速開始：`fdgw` 埠號註記；版本鏈：`api-v0.1` **v0.1.21**、`summary-frontend` **v1.31**、`summary-deployment` **v1.6**、`summary-backend` **v1.6**、`summary-traffic` **v1.2**；前版 v2.55）*

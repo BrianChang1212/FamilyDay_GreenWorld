@@ -230,7 +230,7 @@
 |:----:|------|------|
 | 1 | **完成闖關** | 如「恭喜完成闖關」、顯示姓名／員編；引導至**統籌站／指定處**領取闖關禮；可含獎項／點數圖示（未領前為未啟用狀態）；主按鈕「領取闖關禮」等；附註請**工作人員**協助核銷。 |
 | 2 | **確認領取（彈窗）** | 如「確認領取？」、第幾次領取、確認後無法取消；**確認領取**／**取消**。 |
-| 3 | **領取成功** | 成功文案與感謝；獎項圖示狀態更新（已領項目視覺區隔）；領取次數與份數上限依 [一、人數與身分規則](#一人數與身分規則) 準線，並與櫃檯驗證並列考量（詳 [`api-v0.1.md`](../specs/api-v0.1.md)；前端 **`/finish`** 確認領獎成功後導 **`/finish/claimed`**；**已領滿**時可停留 **`/finish`** 顯示上限提醒。`ClaimSuccessView` 以 **`GET /api/v1/me/dashboard`** 之 `progress` 呈現次數，無 API 時 **`local-fallback`**，見 [`summary-frontend.md`](../architecture/summary-frontend.md) §2.1、§2 目錄 **v1.30**）。 |
+| 3 | **領取成功** | 成功文案與感謝；獎項圖示狀態更新（已領項目視覺區隔）；領取次數與份數上限依 [一、人數與身分規則](#一人數與身分規則) 準線，並與櫃檯驗證並列考量（詳 [`api-v0.1.md`](../specs/api-v0.1.md)；前端 **`/finish`** 確認領獎成功後導 **`/finish/claimed`**；**已領滿**時可停留 **`/finish`** 顯示上限提醒。`ClaimSuccessView` 以 **`GET /api/v1/me/dashboard`** 之 `progress` 呈現次數，無 API 時 **`local-fallback`**，見 [`summary-frontend.md`](../architecture/summary-frontend.md) §2.1、§2 目錄 **v1.31**）。 |
 
 **實作對照：** [`summary-frontend.md`](../architecture/summary-frontend.md) **§2.1**（路由）、**§2.2**（報到）、**§2.3**（闖關流程圖）。`source/` 已對齊：`/game`→歡迎、報到單頁+確認彈窗、闖關登入後→地圖；細節仍以本節為產品敘述準線。
 
@@ -521,7 +521,7 @@
    - [x] 專案 README
 
 3. **前端原型（補充）**
-   - [x] 完成頁 **`/finish`** 領獎互動與 **`/finish/claimed`** 領取成功頁（原型；後者可接 **`VITE_API_BASE` + dashboard**，無 API 時 **`local-fallback`**）：詳見 [技術規格 → 技術架構 → 前端](#技術架構) 與 [`summary-frontend.md`](../architecture/summary-frontend.md) **v1.30**
+   - [x] 完成頁 **`/finish`** 領獎互動與 **`/finish/claimed`** 領取成功頁（原型；後者可接 **`VITE_API_BASE` + dashboard**，無 API 時 **`local-fallback`**）：詳見 [技術規格 → 技術架構 → 前端](#技術架構) 與 [`summary-frontend.md`](../architecture/summary-frontend.md) **v1.31**
 4. **後端與聯調（4/30）**
    - [x] Firebase Cloud Functions 已落地 `health/auth/checkin/dashboard/stations/challenges/restart/staff/admin` 路由
    - [x] CORS allowlist 已收斂並完成白名單/非白名單驗證
@@ -555,7 +555,7 @@
    - [x] 獎品兌換系統開發（`staff/redeem/token` + `staff/redeem/confirm`）
 
 3. **測試**
-   - [x] **前端**單元測試（**Vitest**；`source/src/**/*.test.ts`；**CI** 見 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)；最新驗證：**14 檔 / 87 tests 全通過**；細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) **§1.1** **v1.30**）
+   - [x] **前端**單元測試（**Vitest**；`source/src/**/*.test.ts`；**CI** 見 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)；最新驗證：**14 檔 / 87 tests 全通過**；細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) **§1.1** **v1.31**）
    - [ ] 後端單元測試（待補齊）
    - [x] 整合測試（4/30 已完成核心流程、401/409、CORS 邊界）
    - [ ] 壓力測試（1,300 人併發）
@@ -575,7 +575,7 @@
 | 2026-04-10 | 闖關到站以實體 QR 取代 GPS | 減少定位誤差 | 須場勘確認布點與防偽 |
 | 2026-04-27 | **後端架構定案**（Vue+Vite+Firebase、API v0.1、流量與部署摘要） | 與會議成本估算及維運策略對齊，降低後端維運負擔 | 見本檔開頭補充文件表；後端以 Firebase 為準 |
 | 2026-04-15 | **`source/` 前端可建置原型**（Vue Router、Tailwind、示範流程） | 驗證技術鏈與 UX 假設；與後端解耦 | Naive UI 未裝；見 `summary-frontend.md` v1.1 |
-| 2026-04-16 | **完成頁 `/finish` 領獎流程（原型）** | 對齊主規則表之次數／份數上限與櫃台驗證情境；先以瀏覽器暫存類比領取次數 | 見 `summary-frontend.md` v1.2（**現況**見 **v1.30**、`api-v0.1` **v0.1.20**）；正式上線需接 `api-v0.1.md` 櫃台／核銷端點或等價流程 |
+| 2026-04-16 | **完成頁 `/finish` 領獎流程（原型）** | 對齊主規則表之次數／份數上限與櫃台驗證情境；先以瀏覽器暫存類比領取次數 | 見 `summary-frontend.md` v1.2（**現況**見 **v1.31**、`api-v0.1` **v0.1.21**）；正式上線需接 `api-v0.1.md` 櫃台／核銷端點或等價流程 |
 | 2026-04-30 | Cloud Functions 作為首階段後端執行層 | 可快速承接既有 REST 契約並以最小變更完成前後端聯調 | 核心與 Phase 2 端點已落地，前端可直接驗證 |
 | 2026-04-30 | CORS 採固定 allowlist 白名單策略 | 先堵住任意 Origin 風險，符合活動前最小安全基線 | 白名單來源可通過，非白名單不回傳 ACAO |
 | 2026-04-30 | Firestore 採環境旗標切換（`FDGW_USE_FIRESTORE`） | 允許 in-memory 與 Firestore 並行驗證，降低切換風險 | 目前阻塞點聚焦為 IAM 權限，便於分工追蹤 |
@@ -610,7 +610,7 @@
 ### 待辦事項（本週）
 
 #### 高優先級
-- [ ] 補齊 `familyday-greenworld-dev` Firestore IAM（Cloud Datastore User 或等價權限）
+- [ ] 補齊目標 Firebase 專案（`fdgw.project.json` 之 `firebaseProjectId`）Firestore IAM（Cloud Datastore User 或等價權限）
 - [ ] 重跑 `functions/`：`npm run verify:firestore` 並確認 Firestore 寫入/讀取成功
 - [ ] 將 Firestore 驗證證據回填 `docs/testing/api-integration-checklist.md`，解除 Blocked
 - [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、Cookie）
@@ -739,4 +739,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.32 · 2026-05-03（版本鏈同步：`api-v0.1` **v0.1.20**、`summary-frontend` **v1.30**、`summary-backend` **v1.6**、`summary-deployment` **v1.6**、`summary-traffic` **v1.2**；前版 **v1.3.31**）
+**文件版本：** 合併版 v1.3.33 · 2026-05-05（版本鏈同步：`api-v0.1` **v0.1.21**、`summary-frontend` **v1.31**、`summary-backend` **v1.6**、`summary-deployment` **v1.6**、`summary-traffic` **v1.2**；前版 **v1.3.32**）

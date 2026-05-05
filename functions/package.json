@@ -10,6 +10,7 @@
     "build": "tsc",
     "clean": "rimraf lib",
     "serve": "firebase emulators:start --only functions,hosting",
+    "serve:functions": "firebase emulators:start --only functions",
     "cloud:serve": "powershell -ExecutionPolicy Bypass -File ./scripts/cloud-firestore-dev.ps1 serve",
     "cloud:verify": "powershell -ExecutionPolicy Bypass -File ./scripts/cloud-firestore-dev.ps1 verify",
     "cloud:all": "powershell -ExecutionPolicy Bypass -File ./scripts/cloud-firestore-dev.ps1 all",

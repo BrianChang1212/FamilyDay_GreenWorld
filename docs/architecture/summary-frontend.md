@@ -227,3 +227,4 @@ flowchart TD
 | 1.28 | 2026-05-03 | **§2.1** 補 **`fdgw_completed_stage_ids`** 與登入後 **`syncLocalProgressFromDashboard`**；**§2.3**／流程圖／**§3**：六站**任意順序**、地圖選站與進度語意；對齊 `api-v0.1` **v0.1.19** |
 | 1.29 | 2026-05-03 | **§2.1** 補 **`fdgw_pending_station_challenge`**、**`getInZone()`** 語意、**`/quiz`** 與 **`challengeId` query** 綁定、**`ResultView`** 清除到站狀態；**§2.3 B** 掃碼→作答步驟與 `StageView` 原型一致；對齊 `api-v0.1` **v0.1.20** |
 | 1.30 | 2026-05-03 | **§4**：靜態預覽長文改指向 [`docs/setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；`summary-deployment` **§1.1** 連動 **v1.6** |
+| 1.31 | 2026-05-05 | 版本鏈同步：`api-v0.1` **v0.1.21**（規格書 **`fdgw.project.json`**／CORS／mock `eventId` 註記；**無** REST 契約變更）；供 `project-master`／根 **`README`** 頁尾對齊 |

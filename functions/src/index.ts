@@ -1,6 +1,7 @@
 import express from "express";
 import cors from "cors";
 import { onRequest } from "firebase-functions/v2/https";
+import { getCorsAllowlistResolved, getFunctionsRegion } from "./config/fdgwProject";
 import { authRouter } from "./routes/auth";
 import { adminRouter } from "./routes/admin";
 import { checkinRouter } from "./routes/checkin";
@@ -10,14 +11,7 @@ import { healthRouter } from "./routes/health";
 import { staffRouter } from "./routes/staff";
 
 const app = express();
-const corsAllowlist = new Set([
-	"http://localhost:5173",
-	"http://localhost:4173",
-	"http://127.0.0.1:5173",
-	"http://127.0.0.1:4173",
-	"https://familyday-greenworld.netlify.app",
-	"https://brianchang1212.github.io",
-]);
+const corsAllowlist = getCorsAllowlistResolved();
 
 app.use(
 	cors({
@@ -50,7 +44,7 @@ app.use("/api/v1", (_req, res) => {
 
 export const api = onRequest(
 	{
-		region: "us-central1",
+		region: getFunctionsRegion(),
 		cors: false,
 	},
 	app,

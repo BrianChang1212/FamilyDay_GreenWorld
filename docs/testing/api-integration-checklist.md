@@ -1,6 +1,6 @@
 # 前後端 API 整合驗證清單（Checklist）
 
-> 適用範圍：`docs/specs/api-v0.1.md`（目前修訂至 **v0.1.20**）  
+> 適用範圍：`docs/specs/api-v0.1.md`（目前修訂至 **v0.1.21**）  
 > 目的：用「前端實際操作」驗證 API 契約、錯誤處理與資料一致性。
 
 ---
@@ -16,11 +16,11 @@
 ## 0) 測試前準備
 
 - 前端使用測試環境（非正式環境）
-- `VITE_API_BASE` 已指向測試 API（例如 `/api/v1`）
+- `VITE_API_BASE` 已指向測試 API（本機 Vite + Functions emulator 常為 **`/fdgw-emulator-api`**；遠端為 HTTPS Functions 根，無尾隨 `/`）
 - 已載入固定測資（seed）且記錄 seed 版本
 - 已清空上次測試 session / local storage（避免汙染）
 - 測試紀錄模板已建立（案例 ID、預期、實際、截圖、API 回應）
-- **Firestore／Admin 驗證（`functions`）**：金鑰 JSON **勿進版控**；設定 `GOOGLE_APPLICATION_CREDENTIALS` 為金鑰**絕對路徑**，並設 `FDGW_USE_FIRESTORE=true`、`GOOGLE_CLOUD_PROJECT=familyday-greenworld-dev`（或目標專案）。可改用 `functions/scripts/cloud-firestore-dev.ps1 -CredentialPath "..."` 一次帶入；完整說明見 [`docs/setup/local-firestore-gcp.md`](../setup/local-firestore-gcp.md) 與 [`summary-backend.md`](../architecture/summary-backend.md) §「本機服務帳戶」。
+- **Firestore／Admin 驗證（`functions`）**：金鑰 JSON **勿進版控**；設定 `GOOGLE_APPLICATION_CREDENTIALS` 為金鑰**絕對路徑**，並設 `FDGW_USE_FIRESTORE=true`；`GOOGLE_CLOUD_PROJECT` 須與 [`fdgw.project.json`](../../fdgw.project.json) 的 `firebaseProjectId` 及金鑰 JSON 內 `project_id` 一致。可改用 **`functions/scripts/cloud-firestore-dev.ps1 -CredentialPath "..."`** 一次帶入；**Windows** 日常整合可優先使用倉庫根 **`scripts/dev-oneclick.ps1`**（見根 [`README.md`](../../README.md)）。完整說明見 [`docs/setup/local-firestore-gcp.md`](../setup/local-firestore-gcp.md) 與 [`summary-backend.md`](../architecture/summary-backend.md) §「本機服務帳戶」。
 
 ---
 
@@ -126,6 +126,8 @@
 
 > 填寫規則：每次整合測試執行後新增一列；證據可填 PR、測試報告、截圖或 HAR 路徑。
 
+> **對照說明：** 下表為依日期留存之實測紀錄（含當時使用的 `GOOGLE_CLOUD_PROJECT` 字樣）。**目前倉庫預設 Firebase 專案 ID** 以 [`fdgw.project.json`](../../fdgw.project.json) 的 `firebaseProjectId` 與 [`.firebaserc`](../../.firebaserc) 為準，無需與歷史列中的專案代號一致。
+
 | 執行日期 | 環境 | Seed 版本 | 範圍（章節） | Pass | Fail | Blocked | 證據連結 | 執行者 | 備註 |
 |----------|------|-----------|--------------|------|------|---------|----------|--------|------|
 | 2026-04-30 | dev (Functions + Firestore verification script) | ADC (`C:\Users\Brian Chang\AppData\Roaming\gcloud\application_default_credentials.json`) | 0, 3, 5（Firestore 真切換驗證） | 0 | 0 | 1 | `FDGW_USE_FIRESTORE=true` + `GOOGLE_CLOUD_PROJECT=familyday-greenworld-dev` + `GOOGLE_APPLICATION_CREDENTIALS=...` 後執行 `npm run verify:firestore`：`7 PERMISSION_DENIED: Permission denied on resource project familyday-greenworld-dev.`；`npx firebase login:list` 顯示 `No authorized accounts` | Codex | Blocked 仍存在：需先完成目標專案 IAM 授權並完成 Firebase CLI/GCP 身份對齊 |
@@ -214,7 +216,7 @@ npm run dev
 
 目前前端正式呼叫路徑為：
 
-`GET {VITE_API_BASE}/api/v1/me/dashboard`
+`GET {VITE_API_BASE}/api/v1/me/dashboard`（本機 Vite 走 proxy 時 **`VITE_API_BASE=/fdgw-emulator-api`**；mock 伺服器預設埠 **8787**，見 `source/mock/server.js`）
 
 若要快速切換 scenario（不改程式碼）可暫時使用代理或手動測 API：
 

@@ -2,18 +2,32 @@
  * API smoke test: hits implemented /api/v1 routes in order (session cookie flow).
  *
  * Env:
- *   SMOKE_API_BASE — API root including /api suffix (no /api/v1). Default: local emulator.
+ *   SMOKE_API_BASE — full base ending in /api/v1. Default: from fdgw.project.json emulator URL.
  *   SMOKE_EMPLOYEE_ID — default E2E1001
  *   SMOKE_EMPLOYEE_NAME — default FrontendTester
+ *   FDGW_FIREBASE_PROJECT_ID — overrides project id (see read-fdgw-project.mjs)
  */
+
+import {
+	getEmulatorApiV1Base,
+	getFirebaseProjectId,
+	loadFdgwProject,
+} from "./read-fdgw-project.mjs";
+
+const smokeDefaults = loadFdgwProject().smokeTest;
 
 const API_ROOT =
 	process.env.SMOKE_API_BASE ||
 	process.env.VERIFY_API_BASE ||
-	"http://127.0.0.1:5003/familyday-greenworld-dev/us-central1/api/api/v1";
+	getEmulatorApiV1Base();
 
-const EMPLOYEE_ID = process.env.SMOKE_EMPLOYEE_ID || "E2E1001";
-const EMPLOYEE_NAME = process.env.SMOKE_EMPLOYEE_NAME || "FrontendTester";
+const EMPLOYEE_ID = process.env.SMOKE_EMPLOYEE_ID || smokeDefaults.employeeId;
+const EMPLOYEE_NAME = process.env.SMOKE_EMPLOYEE_NAME || smokeDefaults.employeeName;
+const SMOKE_PARTY = smokeDefaults.defaultPartySize;
+const SMOKE_STAGE_ID = smokeDefaults.testStageId;
+const SMOKE_QR_JWT = smokeDefaults.testQrJwt;
+const SMOKE_STAFF_ID = smokeDefaults.staffId;
+const SMOKE_CHOICE_ID = smokeDefaults.testChallengeChoiceId;
 
 const emp = { employeeId: EMPLOYEE_ID, name: EMPLOYEE_NAME };
 
@@ -67,7 +81,13 @@ async function run() {
 		method: "POST",
 		headers: { "content-type": "application/json" },
 		body: JSON.stringify({
-			items: [{ employeeId: emp.employeeId, name: emp.name, partySizePlanned: 2 }],
+			items: [
+				{
+					employeeId: emp.employeeId,
+					name: emp.name,
+					partySizePlanned: SMOKE_PARTY,
+				},
+			],
 		}),
 	});
 	await call("auth_login", "/auth/login", {
@@ -79,7 +99,7 @@ async function run() {
 	await call("checkin", "/checkin", {
 		method: "POST",
 		headers: { "content-type": "application/json" },
-		body: JSON.stringify({ ...emp, partySize: 2 }),
+		body: JSON.stringify({ ...emp, partySize: SMOKE_PARTY }),
 	});
 	await call(
 		"checkin_status",
@@ -88,7 +108,7 @@ async function run() {
 	const v = await call("stations_verify", "/stations/verify", {
 		method: "POST",
 		headers: { "content-type": "application/json" },
-		body: JSON.stringify({ stageId: 1, qrJwt: "stage-1-token" }),
+		body: JSON.stringify({ stageId: SMOKE_STAGE_ID, qrJwt: SMOKE_QR_JWT }),
 	});
 	const challengeId = v.body?.challengeId || "c1";
 	await call("challenge_get", `/challenges/${encodeURIComponent(challengeId)}`);
@@ -98,7 +118,7 @@ async function run() {
 		{
 			method: "POST",
 			headers: { "content-type": "application/json" },
-			body: JSON.stringify({ choiceId: "B" }),
+			body: JSON.stringify({ choiceId: SMOKE_CHOICE_ID }),
 		},
 	);
 	await call("dashboard", "/me/dashboard");
@@ -113,7 +133,7 @@ async function run() {
 		await call("redeem_confirm", "/staff/redeem/confirm", {
 			method: "POST",
 			headers: { "content-type": "application/json" },
-			body: JSON.stringify({ staffId: "staff-smoke", token }),
+			body: JSON.stringify({ staffId: SMOKE_STAFF_ID, token }),
 		});
 	}
 	await call("report_attendance", "/admin/reports/attendance");
@@ -139,7 +159,18 @@ async function run() {
 	expectStatus("report_progress", 200, [200]);
 	expectStatus("auth_logout", 200, [200]);
 
-	console.log(JSON.stringify({ apiRoot: API_ROOT, employeeId: EMPLOYEE_ID, results }, null, 2));
+	console.log(
+		JSON.stringify(
+			{
+				apiRoot: API_ROOT,
+				firebaseProjectId: getFirebaseProjectId(),
+				employeeId: EMPLOYEE_ID,
+				results,
+			},
+			null,
+			2,
+		),
+	);
 	console.log("PASS smoke:api");
 }
 

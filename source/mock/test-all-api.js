@@ -1,4 +1,20 @@
+import { readFileSync } from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+
 const base = process.env.MOCK_API_BASE || "http://localhost:8787";
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+function fdgwEventId() {
+	try {
+		const j = JSON.parse(
+			readFileSync(path.join(__dirname, "..", "..", "fdgw.project.json"), "utf8"),
+		);
+		return typeof j.eventId === "string" ? j.eventId : "familyday-2026";
+	} catch {
+		return "familyday-2026";
+	}
+}
 
 async function req(name, method, path, body, expectStatus = 200) {
 	const res = await fetch(`${base}${path}`, {
@@ -30,7 +46,7 @@ async function req(name, method, path, body, expectStatus = 200) {
 async function main() {
 	await req("health", "GET", "/api/v1/health");
 	await req("health ready", "GET", "/api/v1/health/ready");
-	await req("events", "GET", "/api/v1/events/familyday-2026");
+	await req("events", "GET", `/api/v1/events/${fdgwEventId()}`);
 	await req("entry verify", "POST", "/api/v1/entry/verify", {
 		token: "mock-token",
 	});

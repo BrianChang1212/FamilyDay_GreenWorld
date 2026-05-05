@@ -1,5 +1,5 @@
 import http from "node:http";
-import { promises as fs } from "node:fs";
+import { readFileSync, promises as fs } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { URL } from "node:url";
@@ -8,6 +8,18 @@ const port = Number(process.env.MOCK_API_PORT || 8787);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const dbPath = path.join(__dirname, "db.json");
+
+function loadFdgwEventId() {
+	try {
+		const p = path.join(__dirname, "..", "..", "fdgw.project.json");
+		const j = JSON.parse(readFileSync(p, "utf8"));
+		return typeof j.eventId === "string" ? j.eventId : "familyday-2026";
+	} catch {
+		return "familyday-2026";
+	}
+}
+
+const MOCK_EVENT_ID = loadFdgwEventId();
 const challenges = [
 	{
 		id: "c1",
@@ -232,9 +244,9 @@ const server = http.createServer((req, res) => {
 		return writeJson(res, 200, { ok: true, ready: true, source: "mock-api" });
 	}
 
-	if (req.method === "GET" && urlObj.pathname === "/api/v1/events/familyday-2026") {
+	if (req.method === "GET" && urlObj.pathname === `/api/v1/events/${MOCK_EVENT_ID}`) {
 		return writeJson(res, 200, {
-			eventId: "familyday-2026",
+			eventId: MOCK_EVENT_ID,
 			name: "Family Day GreenWorld",
 			isOpen: true,
 			configVersion: "mock-v1",

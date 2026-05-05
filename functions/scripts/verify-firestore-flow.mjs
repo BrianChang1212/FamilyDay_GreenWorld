@@ -2,14 +2,22 @@ import fs from "node:fs";
 import process from "node:process";
 import { applicationDefault, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
+import {
+	getEmulatorApiV1Base,
+	getEventId,
+	loadFdgwProject,
+} from "./read-fdgw-project.mjs";
 
-const API_BASE =
-	process.env.VERIFY_API_BASE ||
-	"http://127.0.0.1:5003/familyday-greenworld-dev/us-central1/api/api/v1";
-const EMPLOYEE_ID = process.env.VERIFY_EMPLOYEE_ID || "1141043";
-const EMPLOYEE_NAME = process.env.VERIFY_EMPLOYEE_NAME || "Bob-01";
+const verDefaults = loadFdgwProject().verification;
+const API_BASE = process.env.VERIFY_API_BASE || getEmulatorApiV1Base();
+const EMPLOYEE_ID = process.env.VERIFY_EMPLOYEE_ID || verDefaults.defaultEmployeeId;
+const EMPLOYEE_NAME = process.env.VERIFY_EMPLOYEE_NAME || verDefaults.defaultEmployeeName;
 const FIRESTORE_DATABASE_ID = process.env.FDGW_FIRESTORE_DATABASE_ID || "default";
-const EVENT_ID = process.env.FDGW_EVENT_ID || "familyday-2026";
+const EVENT_ID = getEventId();
+const VERIFY_STAGE_ID = verDefaults.testStageId;
+const VERIFY_QR_JWT = verDefaults.testQrJwt;
+const VERIFY_STAFF_ID = verDefaults.staffId;
+const VERIFY_PARTY_SIZE = verDefaults.defaultPartySize;
 
 function assertPreconditions() {
 	if ((process.env.FDGW_USE_FIRESTORE || "").toLowerCase() !== "true") {
@@ -87,7 +95,7 @@ async function run() {
 			body: JSON.stringify({
 				employeeId: EMPLOYEE_ID,
 				name: EMPLOYEE_NAME,
-				partySize: 2,
+				partySize: VERIFY_PARTY_SIZE,
 			}),
 		},
 		cookie,
@@ -101,7 +109,7 @@ async function run() {
 		{
 			method: "POST",
 			headers: { "content-type": "application/json" },
-			body: JSON.stringify({ stageId: 1, qrJwt: "verify-script-token" }),
+			body: JSON.stringify({ stageId: VERIFY_STAGE_ID, qrJwt: VERIFY_QR_JWT }),
 		},
 		cookie,
 	);
@@ -133,7 +141,7 @@ async function run() {
 		{
 			method: "POST",
 			headers: { "content-type": "application/json" },
-			body: JSON.stringify({ staffId: "staff-verify", token: tokenResp.body.token }),
+			body: JSON.stringify({ staffId: VERIFY_STAFF_ID, token: tokenResp.body.token }),
 		},
 		cookie,
 	);

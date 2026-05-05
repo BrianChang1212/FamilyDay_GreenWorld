@@ -1,0 +1,72 @@
+{
+	"_comment": "Single source for tooling + product constants. Keep firebaseProjectId aligned with .firebaserc. functions/src/state/game.ts CHALLENGES.length must equal game.totalStages.",
+	"firebaseProjectId": "rare-lattice-495009-i9",
+	"functionsRegion": "us-central1",
+	"httpsFunctionName": "api",
+	"functionsEmulatorHost": "127.0.0.1",
+	"functionsEmulatorPort": 5003,
+	"hostingEmulatorPort": 5000,
+	"eventId": "familyday-2026",
+	"branding": {
+		"year": "2026",
+		"companyName": "瑞軒科技",
+		"eventTitle": "2026 瑞軒家庭日",
+		"location": "綠世界生態農場",
+		"copyright": "© 2026 AmTRAN Technology Co., Ltd.",
+		"defaultPlayerName": "夥伴",
+		"maxCompanions": 20
+	},
+	"game": {
+		"minStage": 1,
+		"totalStages": 6,
+		"maxRewardRounds": 3,
+		"stationVerifyTtlMinutes": 5
+	},
+	"frontend": {
+		"viteDevPort": 5173,
+		"vitePreviewPort": 4173
+	},
+	"seed": {
+		"defaultEmployeeIdStart": "1141043",
+		"defaultCount": 10,
+		"defaultPartySizePlanned": 2,
+		"maxCount": 500
+	},
+	"verification": {
+		"defaultEmployeeId": "1141043",
+		"defaultEmployeeName": "Bob",
+		"defaultPartySize": 2,
+		"testStageId": 1,
+		"testQrJwt": "verify-script-token",
+		"staffId": "staff-verify"
+	},
+	"smokeTest": {
+		"employeeId": "E2E1001",
+		"employeeName": "FrontendTester",
+		"defaultPartySize": 2,
+		"staffId": "staff-smoke",
+		"testStageId": 1,
+		"testQrJwt": "stage-1-token",
+		"testChallengeChoiceId": "B"
+	},
+	"corsOrigins": [
+		"http://localhost:5173",
+		"http://localhost:4173",
+		"http://127.0.0.1:5173",
+		"http://127.0.0.1:4173",
+		"https://familyday-greenworld.netlify.app",
+		"https://brianchang1212.github.io"
+	],
+	"dashboard": {
+		"eventSlug": "greenworld-2026",
+		"eventDisplayName": "瑞軒家庭日",
+		"stages": [
+			{ "id": 1, "title": "水鳥區" },
+			{ "id": 2, "title": "大探奇區" },
+			{ "id": 3, "title": "水生植物公園" },
+			{ "id": 4, "title": "鳥園" },
+			{ "id": 5, "title": "蝴蝶園" },
+			{ "id": 6, "title": "生物多樣性探索區" }
+		]
+	}
+}

@@ -1,3 +1,4 @@
+import { getMaxRewardRounds, getTotalStages } from "../config/fdgwProject";
 import { getDb, useFirestoreStore } from "../utils/store";
 
 /** 後端只維護「題目代號 + 正解選項」，題幹／選項文案由前端題庫負責 */
@@ -26,6 +27,12 @@ const CHALLENGES: ChallengeSpec[] = [
 	{ id: "c5", correctChoiceId: "B" },
 	{ id: "c6", correctChoiceId: "C" },
 ];
+
+if (CHALLENGES.length !== getTotalStages()) {
+	throw new Error(
+		`CHALLENGES.length (${CHALLENGES.length}) must equal fdgw.game.totalStages (${getTotalStages()})`,
+	);
+}
 
 const playerProgress = new Map<string, PlayerProgress>();
 
@@ -86,7 +93,7 @@ export function defaultProgress(): PlayerProgress {
 		fullClearCount: 0,
 		bankedFullClears: 0,
 		rewardRedeemCount: 0,
-		maxRounds: 3,
+		maxRounds: getMaxRewardRounds(),
 	};
 }
 

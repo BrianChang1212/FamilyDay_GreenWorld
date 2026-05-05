@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { badRequest, normalizeText } from "../utils/http";
 import { getSessionUser } from "../utils/authGuard";
+import { getTotalStages, getStationVerifyTtlMs } from "../config/fdgwProject";
 import {
 	applyAttemptResult,
 	claimFinishRewardProgress,
@@ -19,11 +20,15 @@ gameRouter.post("/stations/verify", (req, res) => {
 		return;
 	}
 
+	const maxStage = getTotalStages();
 	const stageId = Number(req.body?.stageId);
-	if (!Number.isFinite(stageId) || stageId < 1 || stageId > 6) {
-		res
-			.status(400)
-			.json(badRequest("INVALID_STAGE_ID", "stageId must be between 1 and 6"));
+	if (!Number.isFinite(stageId) || stageId < 1 || stageId > maxStage) {
+		res.status(400).json(
+			badRequest(
+				"INVALID_STAGE_ID",
+				`stageId must be between 1 and ${maxStage}`,
+			),
+		);
 		return;
 	}
 
@@ -36,7 +41,7 @@ gameRouter.post("/stations/verify", (req, res) => {
 	res.status(200).json({
 		ok: true,
 		challengeId: stageIdToChallengeId(stageId),
-		expiresAt: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+		expiresAt: new Date(Date.now() + getStationVerifyTtlMs()).toISOString(),
 		playerId: session.employeeId,
 	});
 });

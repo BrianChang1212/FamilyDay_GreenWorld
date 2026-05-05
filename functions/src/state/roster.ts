@@ -1,3 +1,4 @@
+import { getEventId } from "../config/fdgwProject";
 import { getDb } from "../utils/store";
 
 export type RosterRecord = {
@@ -14,10 +15,6 @@ type RosterIdentity = {
 	employeeId: string;
 	name: string;
 };
-
-function getEventId(): string {
-	return process.env.FDGW_EVENT_ID || "familyday-2026";
-}
 
 function rosterDocId(eventId: string, employeeId: string): string {
 	return `${eventId}_${employeeId}`;
