@@ -3,6 +3,7 @@ import WelcomeView from "@/views/home/WelcomeView.vue";
 import BriefingView from "@/views/onboarding/BriefingView.vue";
 import RegisterView from "@/views/auth/RegisterView.vue";
 import CheckInFormView from "@/views/checkin/CheckInFormView.vue";
+import CheckInWelcomeView from "@/views/checkin/CheckInWelcomeView.vue";
 import CheckInCompleteView from "@/views/checkin/CheckInCompleteView.vue";
 import StageView from "@/views/quest/StageView.vue";
 import QuizView from "@/views/quest/QuizView.vue";
@@ -23,7 +24,7 @@ const router = createRouter({
 			name: "checkinEntry",
 			redirect: () => {
 				setEntryIntent("checkin");
-				return { name: "checkin" };
+				return { name: "checkinWelcome" };
 			},
 		},
 		{
@@ -36,6 +37,7 @@ const router = createRouter({
 		},
 		{ path: "/briefing", name: "briefing", component: BriefingView },
 		{ path: "/register", name: "register", component: RegisterView },
+		{ path: "/checkin/welcome", name: "checkinWelcome", component: CheckInWelcomeView },
 		{ path: "/checkin", name: "checkin", component: CheckInFormView },
 		{
 			path: "/checkin/complete",

@@ -74,7 +74,7 @@ describe("router config and guard", () => {
 		const checkinRedirect = checkinEntry?.redirect as () => unknown;
 		const gameRedirect = gameEntry?.redirect as () => unknown;
 
-		expect(checkinRedirect()).toEqual({ name: "checkin" });
+		expect(checkinRedirect()).toEqual({ name: "checkinWelcome" });
 		expect(setEntryIntentMock).toHaveBeenCalledWith("checkin");
 
 		expect(gameRedirect()).toEqual({ name: "welcome" });
