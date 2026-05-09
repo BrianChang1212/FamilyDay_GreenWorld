@@ -1,8 +1,11 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
+	clearCheckinWelcomePassed,
 	clearEntryIntent,
 	getEntryIntent,
+	isCheckinWelcomePassed,
 	normalizeQueryEntry,
+	setCheckinWelcomePassed,
 	setEntryIntent,
 } from "@/lib/entryIntent";
 import { STORAGE_KEYS } from "@/constants";
@@ -39,5 +42,13 @@ describe("entryIntent", () => {
 	it("getEntryIntent ignores corrupted storage values", () => {
 		sessionStorage.setItem(STORAGE_KEYS.entryIntent, "other");
 		expect(getEntryIntent()).toBeNull();
+	});
+
+	it("checkin welcome passed flag round-trip", () => {
+		expect(isCheckinWelcomePassed()).toBe(false);
+		setCheckinWelcomePassed(true);
+		expect(isCheckinWelcomePassed()).toBe(true);
+		clearCheckinWelcomePassed();
+		expect(isCheckinWelcomePassed()).toBe(false);
 	});
 });

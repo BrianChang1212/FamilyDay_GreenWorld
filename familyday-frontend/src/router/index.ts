@@ -1,3 +1,4 @@
+import { nextTick } from "vue";
 import { createRouter, createWebHistory } from "vue-router";
 import WelcomeView from "@/views/home/WelcomeView.vue";
 import BriefingView from "@/views/onboarding/BriefingView.vue";
@@ -11,8 +12,10 @@ import ResultView from "@/views/quest/ResultView.vue";
 import FinishView from "@/views/quest/FinishView.vue";
 import ClaimSuccessView from "@/views/quest/ClaimSuccessView.vue";
 import {
-	setEntryIntent,
+	clearCheckinWelcomePassed,
+	isCheckinWelcomePassed,
 	normalizeQueryEntry,
+	setEntryIntent,
 } from "@/lib/entryIntent";
 
 const router = createRouter({
@@ -24,6 +27,7 @@ const router = createRouter({
 			name: "checkinEntry",
 			redirect: () => {
 				setEntryIntent("checkin");
+				clearCheckinWelcomePassed();
 				return { name: "checkinWelcome" };
 			},
 		},
@@ -37,13 +41,36 @@ const router = createRouter({
 		},
 		{ path: "/briefing", name: "briefing", component: BriefingView },
 		{ path: "/register", name: "register", component: RegisterView },
-		{ path: "/checkin/welcome", name: "checkinWelcome", component: CheckInWelcomeView },
-		{ path: "/checkin", name: "checkin", component: CheckInFormView },
+		/*
+		 * 報到路徑：
+		 *   /checkin          → 歡迎畫面 (checkinWelcome)
+		 *   /checkin/register → 填報到資料表單 (checkin)   ← 需先過歡迎頁才可進入
+		 *   /checkin/complete → 報到完成
+		 * 較長路徑列在 /checkin 之前，避免前綴誤匹配
+		 */
+		{
+			path: "/checkin/register",
+			name: "checkin",
+			component: CheckInFormView,
+			beforeEnter(to, _from, next) {
+				if (isCheckinWelcomePassed()) {
+					next();
+					return;
+				}
+				next({
+					name: "checkinWelcome",
+					replace: true,
+					query: to.query,
+					hash: to.hash,
+				});
+			},
+		},
 		{
 			path: "/checkin/complete",
 			name: "checkinComplete",
 			component: CheckInCompleteView,
 		},
+		{ path: "/checkin", name: "checkinWelcome", component: CheckInWelcomeView },
 		{ path: "/stage", name: "stage", component: StageView },
 		{ path: "/quiz", name: "quiz", component: QuizView },
 		{ path: "/result", name: "result", component: ResultView },
@@ -59,6 +86,14 @@ const router = createRouter({
 router.beforeEach((to) => {
 	const q = normalizeQueryEntry(to.query.entry);
 	if (q) setEntryIntent(q);
+});
+
+/* 換頁後單次 nextTick 歸零捲動；勿加 rAF/setTimeout（易與舊版 Transition 衝突）。 */
+router.afterEach(() => {
+	nextTick(() => {
+		const el = document.querySelector<HTMLElement>(".gw-scroll");
+		if (el) el.scrollTop = 0;
+	});
 });
 
 export default router;

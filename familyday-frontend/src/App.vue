@@ -3,6 +3,11 @@ import { RouterView, useRoute } from "vue-router";
 import PageCritters from "@/components/doodles/PageCritters.vue";
 
 const route = useRoute();
+
+/*
+ * 路由切換不再包 <Transition>：opacity 過場在部分環境會卡死（畫面恒為透明），
+ * 外層白卡片仍在 → 誤判白屏。捲動歸零改由 router/index.ts afterEach + nextTick。
+ */
 </script>
 
 <template>
@@ -26,13 +31,11 @@ const route = useRoute();
 			>
 				<div class="gw-scroll">
 					<RouterView v-slot="{ Component }">
-						<Transition name="gw-route" mode="out-in">
-							<component
-								:is="Component"
-								:key="route.fullPath"
-								class="flex min-h-full min-w-0 w-full shrink-0 flex-col"
-							/>
-						</Transition>
+						<component
+							:is="Component"
+							:key="route.fullPath"
+							class="flex min-h-full min-w-0 w-full shrink-0 flex-col"
+						/>
 					</RouterView>
 				</div>
 			</div>

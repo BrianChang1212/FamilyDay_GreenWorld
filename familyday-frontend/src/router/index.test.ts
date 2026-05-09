@@ -6,13 +6,17 @@ type RouterConfig = {
 
 const createWebHistoryMock = vi.fn();
 const beforeEachMock = vi.fn();
+const afterEachMock = vi.fn();
 const createRouterMock = vi.fn((config: RouterConfig) => ({
 	beforeEach: beforeEachMock,
+	afterEach: afterEachMock,
 	__config: config,
 }));
 
 const setEntryIntentMock = vi.fn();
 const normalizeQueryEntryMock = vi.fn();
+const clearCheckinWelcomePassedMock = vi.fn();
+const isCheckinWelcomePassedMock = vi.fn(() => true);
 
 vi.mock("vue-router", () => ({
 	createRouter: createRouterMock,
@@ -22,12 +26,15 @@ vi.mock("vue-router", () => ({
 vi.mock("@/lib/entryIntent", () => ({
 	setEntryIntent: setEntryIntentMock,
 	normalizeQueryEntry: normalizeQueryEntryMock,
+	clearCheckinWelcomePassed: clearCheckinWelcomePassedMock,
+	isCheckinWelcomePassed: () => isCheckinWelcomePassedMock(),
 }));
 
 vi.mock("@/views/home/WelcomeView.vue", () => ({ default: {} }));
 vi.mock("@/views/onboarding/BriefingView.vue", () => ({ default: {} }));
 vi.mock("@/views/auth/RegisterView.vue", () => ({ default: {} }));
 vi.mock("@/views/checkin/CheckInFormView.vue", () => ({ default: {} }));
+vi.mock("@/views/checkin/CheckInWelcomeView.vue", () => ({ default: {} }));
 vi.mock("@/views/checkin/CheckInCompleteView.vue", () => ({ default: {} }));
 vi.mock("@/views/quest/StageView.vue", () => ({ default: {} }));
 vi.mock("@/views/quest/QuizView.vue", () => ({ default: {} }));
@@ -57,8 +64,11 @@ describe("router config and guard", () => {
 		createRouterMock.mockClear();
 		createWebHistoryMock.mockClear();
 		beforeEachMock.mockClear();
+		afterEachMock.mockClear();
 		setEntryIntentMock.mockClear();
 		normalizeQueryEntryMock.mockReset();
+		clearCheckinWelcomePassedMock.mockClear();
+		isCheckinWelcomePassedMock.mockImplementation(() => true);
 	});
 
 	it("registers check-in and game entry redirects", async () => {
@@ -76,6 +86,7 @@ describe("router config and guard", () => {
 
 		expect(checkinRedirect()).toEqual({ name: "checkinWelcome" });
 		expect(setEntryIntentMock).toHaveBeenCalledWith("checkin");
+		expect(clearCheckinWelcomePassedMock).toHaveBeenCalledTimes(1);
 
 		expect(gameRedirect()).toEqual({ name: "welcome" });
 		expect(setEntryIntentMock).toHaveBeenCalledWith("game");
@@ -94,5 +105,43 @@ describe("router config and guard", () => {
 		normalizeQueryEntryMock.mockReturnValueOnce(null);
 		guard({ query: { entry: "invalid" } });
 		expect(setEntryIntentMock).not.toHaveBeenCalled();
+	});
+
+	it("checkin beforeEnter sends users to welcome when welcome not yet passed", async () => {
+		isCheckinWelcomePassedMock.mockReturnValue(false);
+		await import("@/router");
+		const config = getRouterConfig();
+		const routes = config.routes as Array<Record<string, unknown>>;
+		const checkin = routes.find((r) => r.name === "checkin");
+		expect(checkin).toBeTruthy();
+		const guard = checkin?.beforeEnter as (
+			to: { query: Record<string, string>; hash?: string },
+			from: unknown,
+			next: (arg?: unknown) => void,
+		) => void;
+		const next = vi.fn();
+		guard({ query: { x: "1" }, hash: "#h" }, {}, next);
+		expect(next).toHaveBeenCalledWith({
+			name: "checkinWelcome",
+			replace: true,
+			query: { x: "1" },
+			hash: "#h",
+		});
+	});
+
+	it("checkin beforeEnter allows form when welcome passed", async () => {
+		isCheckinWelcomePassedMock.mockReturnValue(true);
+		await import("@/router");
+		const config = getRouterConfig();
+		const routes = config.routes as Array<Record<string, unknown>>;
+		const checkin = routes.find((r) => r.name === "checkin");
+		const guard = checkin?.beforeEnter as (
+			to: unknown,
+			from: unknown,
+			next: (arg?: unknown) => void,
+		) => void;
+		const next = vi.fn();
+		guard({}, {}, next);
+		expect(next).toHaveBeenCalledWith();
 	});
 });

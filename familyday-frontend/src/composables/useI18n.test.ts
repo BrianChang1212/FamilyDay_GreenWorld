@@ -16,7 +16,7 @@ describe("useI18n", () => {
 	it("supports uppercase APP_CONFIG keys in template", () => {
 		const { t } = useI18n();
 		expect(t("checkinComplete.subtitle")).toBe(
-			`感謝參加瑞軒科技${APP_CONFIG.YEAR}家庭日`,
+			`感謝參加瑞軒科技${APP_CONFIG.YEAR}家庭日\n準備好跟我們一起在森林中展開冒險了嗎？`,
 		);
 	});
 

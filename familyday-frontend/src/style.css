@@ -47,6 +47,8 @@ body {
 		overflow-y: auto;
 		overscroll-behavior-y: contain;
 		-webkit-overflow-scrolling: touch;
+		/* 換頁時避免 scroll anchoring 把捲動黏在舊內容，導致新頁頂端留白誤判白屏 */
+		overflow-anchor: none;
 	}
 
 	/* 闖關流程內頁底（與 tailwind `bg-gw-page-mesh` 一致） */
@@ -132,6 +134,52 @@ body {
 		border-radius: 9999px;
 		padding-top: 0.875rem;
 		padding-bottom: 0.875rem;
+	}
+
+	/* 報到流程 CTA：對齊設計稿的深綠大按鈕 */
+	.gw-checkin-cta {
+		display: inline-flex;
+		width: 100%;
+		min-height: 3.5rem;
+		align-items: center;
+		justify-content: center;
+		gap: 0.625rem;
+		border-radius: 0.5rem;
+		background-color: #2f7354;
+		color: #fff;
+		font-size: 1.25rem;
+		line-height: 1.75rem;
+		font-weight: 800;
+		letter-spacing: 0.03em;
+		box-shadow: 0 10px 24px rgba(47, 115, 84, 0.24);
+		transition:
+			filter 0.2s ease,
+			transform 0.2s ease,
+			box-shadow 0.2s ease;
+	}
+
+	.gw-checkin-cta:hover {
+		filter: brightness(1.06);
+	}
+
+	.gw-checkin-cta:active {
+		transform: scale(0.99);
+	}
+
+	.gw-checkin-cta:focus-visible {
+		outline: none;
+		box-shadow:
+			0 10px 24px rgba(47, 115, 84, 0.24),
+			0 0 0 3px #fff,
+			0 0 0 5px rgba(47, 115, 84, 0.4);
+	}
+
+	.gw-checkin-cta--pill {
+		min-height: 3rem;
+		border-radius: 9999px;
+		font-size: 1rem;
+		line-height: 1.5rem;
+		letter-spacing: 0;
 	}
 
 	.gw-btn-primary-sm {
@@ -248,6 +296,7 @@ body {
 	transform: translateY(0);
 }
 
+/* 報到歡迎 ↔ 表單：關閉過場，避免 enter opacity 卡死呈現白屏 */
 @media (prefers-reduced-motion: reduce) {
 	.gw-route-enter-active,
 	.gw-route-leave-active {

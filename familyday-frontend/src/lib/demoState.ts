@@ -275,7 +275,7 @@ export const QR_SCAN_STICKER_SRC = "/images/qr-scan-sticker.png" as const;
 
 /** 完成報到頁主視覺（`public/images/`） */
 export const CHECKIN_COMPLETE_STICKER_SRC =
-	"/images/checkin-complete-sticker.png" as const;
+	"/images/checkin-complete-familyday-scene.png" as const;
 
 /** 關卡貼圖（`public/images/stages/`），與 STAGE_NAMES 順序一致 */
 export function stageStickerSrc(n: number): string {

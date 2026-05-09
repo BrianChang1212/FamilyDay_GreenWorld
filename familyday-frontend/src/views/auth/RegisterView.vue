@@ -20,7 +20,7 @@ const isGame = computed(() => getEntryIntent() === "game");
 
 onMounted(() => {
 	if (getEntryIntent() === "checkin") {
-		router.replace({ name: "checkin" });
+		router.replace({ name: "checkinWelcome" });
 	}
 });
 

@@ -31,7 +31,7 @@ const companionOptions = Array.from(
 );
 
 const inputClass =
-	"w-full rounded-2xl border-0 bg-[#eef0ed] px-4 py-3.5 text-base text-gw-navy shadow-inner outline-none ring-1 ring-black/[0.04] transition focus:ring-2 focus:ring-gw-brand/35 placeholder:text-neutral-400";
+	"w-full rounded-xl border-0 bg-[#f6f7f6] px-4 py-3.5 pr-12 text-base text-gw-navy outline-none ring-1 ring-black/[0.03] transition focus:bg-white focus:ring-2 focus:ring-[#2f7354]/30 placeholder:text-neutral-400";
 
 function friendlyCheckinError(err: unknown): string {
 	if (!(err instanceof Error)) {
@@ -110,101 +110,137 @@ async function commitCheckIn() {
 
 <template>
 	<div class="relative flex min-h-full flex-col bg-[#f7f8f6]">
-		<main class="relative z-[1] flex flex-1 flex-col px-5 pb-6 pt-8 sm:mx-auto sm:max-w-md sm:px-6">
-			<header class="text-left">
-				<div class="flex items-start gap-2">
-					<span class="text-xl leading-none text-gw-brand" aria-hidden="true">🌲</span>
-					<span
-						class="inline-flex rounded-full bg-gw-mint/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-gw-brand-dark ring-1 ring-gw-mint-soft"
-					>
-						{{ t('checkin.tag') }}
-					</span>
-				</div>
-				<h1 class="font-display mt-6 text-[1.4rem] font-bold leading-snug tracking-tight text-gw-navy sm:text-[1.55rem]">
-					{{ t('checkin.title') }}
+		<div class="bg-[#2f7354] px-5 pb-4 pt-7 text-center text-white shadow-sm">
+			<p class="font-display text-2xl italic tracking-wide">AmTRAN</p>
+			<p class="-mt-1 text-sm font-semibold tracking-[0.18em]">瑞軒科技</p>
+		</div>
+
+		<main class="relative z-[1] flex flex-1 flex-col px-4 pb-6 pt-4 sm:mx-auto sm:max-w-md sm:px-6">
+			<header class="text-center">
+				<p class="text-lg font-semibold tracking-wide text-neutral-900">歡迎來到</p>
+				<h1 class="font-display mt-2 text-[1.7rem] font-extrabold leading-tight tracking-tight text-[#2f7354] sm:text-[1.9rem]">
+					瑞軒科技{{ APP_CONFIG.YEAR }}家庭日
 				</h1>
-				<p class="mt-3 text-base font-bold text-gw-brand">{{ t('checkin.subtitle') }}</p>
-				<div class="mt-2 h-1 w-12 rounded-full bg-[#e8a87c]" aria-hidden="true" />
+				<p class="mt-3 text-xs font-medium text-neutral-600">{{ t('checkin.subtitle') }}</p>
 			</header>
 
-			<form class="mt-10 flex flex-1 flex-col gap-6" @submit.prevent="openConfirm" novalidate>
-				<div class="space-y-2">
-					<label for="checkin-name" class="text-sm font-bold text-neutral-600">{{ t('checkin.form.name') }}</label>
-					<input
-						id="checkin-name"
-						v-model="name"
-						type="text"
-						name="name"
-						autocomplete="name"
-						:placeholder="t('checkin.form.namePlaceholder')"
-						:class="inputClass"
-					/>
-				</div>
-				<div class="space-y-2">
-					<label for="checkin-employee-id" class="text-sm font-bold text-neutral-600">{{ t('checkin.form.employeeId') }}</label>
-					<input
-						id="checkin-employee-id"
-						v-model="employeeId"
-						type="text"
-						name="username"
-						autocomplete="username"
-						:placeholder="t('checkin.form.employeeIdPlaceholder')"
-						:class="inputClass"
-					/>
-				</div>
-				<div class="space-y-2">
-					<label for="checkin-companions" class="text-sm font-bold text-neutral-600">{{ t('checkin.form.companions') }}</label>
-					<div class="relative">
-						<select
-							id="checkin-companions"
-							v-model.number="companionCount"
-							:class="[
-								inputClass,
-								'cursor-pointer appearance-none bg-[#eef0ed] pr-10',
-							]"
-						>
-							<option v-for="n in companionOptions" :key="n" :value="n">
-								{{ n }} {{ t('checkin.form.companionUnit') }}{{ n === 1 ? t('checkin.form.self') : "" }}
-							</option>
-						</select>
-						<span
-							class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-gw-brand"
-							aria-hidden="true"
-							>⌄</span
-						>
-					</div>
-				</div>
-
-				<div
-					class="flex gap-3 rounded-2xl border border-neutral-200/80 bg-white px-4 py-4 shadow-sm ring-1 ring-black/[0.03]"
-					role="status"
+			<form class="mt-5 flex flex-1 flex-col" @submit.prevent="openConfirm" novalidate>
+				<section
+					class="space-y-5 rounded-2xl border border-neutral-200/80 bg-white px-5 py-6 shadow-sm ring-1 ring-black/[0.02]"
 				>
-					<span
-						class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-600"
-						aria-hidden="true"
-					>
-						<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
-							<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" />
-							<path
-								d="M12 10v5M12 7h.01"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
+					<div class="space-y-2">
+						<label for="checkin-name" class="text-sm font-bold text-neutral-700">{{ t('checkin.form.name') }}</label>
+						<div class="relative">
+							<input
+								id="checkin-name"
+								v-model="name"
+								type="text"
+								name="name"
+								autocomplete="name"
+								:placeholder="t('checkin.form.namePlaceholder')"
+								:class="inputClass"
 							/>
-						</svg>
-					</span>
-					<p class="border-l-4 border-[#8b6914]/40 pl-3 text-sm leading-relaxed text-neutral-700">
-						{{ t('checkin.notice') }}
-					</p>
-				</div>
+							<span
+								class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-300"
+								aria-hidden="true"
+							>
+								<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+									<path
+										d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+										stroke="currentColor"
+										stroke-width="1.8"
+									/>
+									<path
+										d="M5 20a7 7 0 0 1 14 0"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-width="1.8"
+									/>
+								</svg>
+							</span>
+						</div>
+					</div>
 
-				<div class="mt-auto pt-4">
+					<div class="space-y-2">
+						<label for="checkin-employee-id" class="text-sm font-bold text-neutral-700">{{ t('checkin.form.employeeId') }}</label>
+						<div class="relative">
+							<input
+								id="checkin-employee-id"
+								v-model="employeeId"
+								type="text"
+								name="username"
+								autocomplete="username"
+								:placeholder="t('checkin.form.employeeIdPlaceholder')"
+								:class="inputClass"
+							/>
+							<span
+								class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-300"
+								aria-hidden="true"
+							>
+								<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+									<rect
+										x="5"
+										y="6"
+										width="14"
+										height="14"
+										rx="2"
+										stroke="currentColor"
+										stroke-width="1.8"
+									/>
+									<path
+										d="M9 4v4M15 4v4M8.5 12h7M8.5 16h4"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-width="1.8"
+									/>
+								</svg>
+							</span>
+						</div>
+					</div>
+
+					<div class="space-y-2">
+						<label for="checkin-companions" class="text-sm font-bold text-neutral-700">{{ t('checkin.form.companions') }}</label>
+						<div class="relative">
+							<select
+								id="checkin-companions"
+								v-model.number="companionCount"
+								:class="[inputClass, 'cursor-pointer appearance-none']"
+							>
+								<option v-for="n in companionOptions" :key="n" :value="n">
+									{{ n }} {{ t('checkin.form.companionUnit') }}{{ n === 1 ? t('checkin.form.self') : "" }}
+								</option>
+							</select>
+							<span
+								class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-500"
+								aria-hidden="true"
+								>⌄</span
+							>
+						</div>
+					</div>
+
+					<div
+						class="flex gap-3 rounded-xl border border-[#f3c7a7] bg-[#fff3ea] px-4 py-4 text-[#a7541f]"
+						role="status"
+					>
+						<span
+							class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#df8b43] text-xs font-bold"
+							aria-hidden="true"
+						>
+							i
+						</span>
+						<p class="text-sm font-medium leading-relaxed">
+							{{ t('checkin.notice') }}
+						</p>
+					</div>
+				</section>
+
+				<div class="mt-auto pt-7">
 					<button
 						type="submit"
 						:disabled="!formValid()"
-						class="flex w-full items-center justify-center gap-2 rounded-full bg-[#1a5f2a] py-4 text-base font-bold text-white shadow-[0_8px_24px_rgba(26,95,42,0.25)] transition enabled:active:scale-[0.99] enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+						class="gw-checkin-cta disabled:cursor-not-allowed disabled:opacity-45"
 					>
-						{{ t('common.submit') }}
+						{{ t('checkin.submitButton') }}
 						<span aria-hidden="true">›</span>
 					</button>
 				</div>
@@ -220,22 +256,22 @@ async function commitCheckIn() {
 		<Teleport to="body">
 			<div
 				v-if="showConfirm"
-				class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 px-4 backdrop-blur-[2px]"
+				class="fixed inset-0 z-[100] flex items-center justify-center bg-neutral-900/55 px-4 backdrop-blur-[2px]"
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="checkin-confirm-title"
 			>
 				<div
-					class="w-full max-w-md rounded-[1.35rem] bg-white p-6 shadow-2xl ring-1 ring-black/5"
+					class="w-full max-w-md rounded-[1.35rem] bg-white p-6 shadow-2xl ring-1 ring-black/[0.06]"
 					@click.stop
 				>
 					<div class="flex flex-col items-center">
 						<div
-							class="flex h-16 w-16 items-center justify-center rounded-full bg-gw-mint ring-4 ring-gw-mint-soft/50"
+							class="flex h-16 w-16 items-center justify-center rounded-full bg-[#e8f4ee] ring-4 ring-[#d7ebdf]"
 							aria-hidden="true"
 						>
 							<div
-								class="flex h-11 w-11 items-center justify-center rounded-full bg-gw-brand text-lg text-white"
+								class="flex h-11 w-11 items-center justify-center rounded-full bg-[#2f7354] text-lg font-bold text-white"
 							>
 								✓
 							</div>
@@ -265,7 +301,7 @@ async function commitCheckIn() {
 						<button
 							type="button"
 							:disabled="isSubmitting"
-							class="w-full rounded-full bg-[#1a5f2a] py-3.5 text-center text-base font-bold text-white shadow-md transition enabled:hover:brightness-110 enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+							class="gw-checkin-cta gw-checkin-cta--pill disabled:cursor-not-allowed disabled:opacity-60"
 							@click="commitCheckIn"
 						>
 							{{ isSubmitting ? "Submitting..." : t('common.confirm') }}
@@ -273,7 +309,7 @@ async function commitCheckIn() {
 						<button
 							type="button"
 							:disabled="isSubmitting"
-							class="w-full rounded-full bg-[#e8e4dc] py-3.5 text-center text-base font-semibold text-neutral-800 transition enabled:hover:bg-[#ded9cf] enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
+							class="w-full rounded-full bg-[#e8e4dc] py-3.5 text-center text-base font-semibold text-[#343831] transition enabled:hover:bg-[#ded9cf] enabled:active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
 							@click="closeConfirm"
 						>
 							{{ t('common.back') }}

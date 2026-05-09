@@ -37,5 +37,7 @@ export const STORAGE_KEYS = {
 	finishClaimed: "fdgw_finishClaimed",
 	companionCount: "fdgw_companionCount",
 	checkinDone: "fdgw_checkin_done",
+	/** 使用者已於 `/checkin/welcome` 點過「開始探索」，才可進 `/checkin` 表單 */
+	checkinWelcomePassed: "fdgw_checkin_welcome_passed",
 	entryIntent: "fdgw_entry_intent",
 } as const;
