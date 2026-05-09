@@ -51,7 +51,10 @@ async function verifyFromDecodedQr(payload: string) {
 		setPendingStationVerification(stage.value, cid);
 		inZone.value = true;
 		setInZone(true);
-		viewPhase.value = "arrival";
+		await router.push({
+			name: "quiz",
+			query: { challengeId: cid },
+		});
 	} catch (_err: unknown) {
 		scanError.value = "站點驗證失敗，請重新對準 QR code。";
 		throw _err;

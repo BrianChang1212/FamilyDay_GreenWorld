@@ -12,7 +12,8 @@
     "test:api:game": "node ./mock/test-game-api.js",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "qr:mock-stations": "node ./scripts/generate-mock-station-qr.mjs"
   },
   "dependencies": {
     "jsqr": "^1.4.0",
@@ -27,6 +28,7 @@
     "autoprefixer": "^10.4.20",
     "happy-dom": "^15.11.7",
     "postcss": "^8.4.49",
+    "qrcode": "^1.5.4",
     "tailwindcss": "^3.4.16",
     "typescript": "~5.6.2",
     "vite": "^6.0.3",
