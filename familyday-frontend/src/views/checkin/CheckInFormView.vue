@@ -251,7 +251,7 @@ async function commitCheckIn() {
 			</p>
 		</main>
 
-		<AppFooter class="relative z-[1] border-t-0 bg-transparent" />
+		<AppFooter class="relative z-[1]" />
 
 		<Teleport to="body">
 			<div

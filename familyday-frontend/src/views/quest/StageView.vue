@@ -136,8 +136,8 @@ function selectStage(id: number) {
 
 <template>
 	<div
-		class="gw-page-fill relative flex min-h-0 flex-1 flex-col bg-[#eef0eb]"
-		:class="viewPhase === 'scanning' ? 'overflow-hidden' : ''"
+		class="gw-page-fill relative flex flex-1 flex-col bg-[#eef0eb]"
+		:class="viewPhase === 'scanning' ? 'min-h-0 overflow-hidden' : 'min-h-min'"
 	>
 		<!-- 品牌條（與 Quiz / Result 對齊） -->
 		<GwBrandBar v-if="viewPhase === 'arrival'" />
@@ -466,7 +466,7 @@ function selectStage(id: number) {
 			</section>
 		</main>
 
-		<AppFooter v-if="viewPhase === 'arrival'" class="relative z-[2] border-t-0 bg-transparent" />
+		<AppFooter v-if="viewPhase === 'arrival'" class="relative z-[2]" />
 	</div>
 </template>
 

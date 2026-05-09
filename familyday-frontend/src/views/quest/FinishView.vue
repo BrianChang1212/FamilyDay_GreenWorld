@@ -339,7 +339,7 @@ function restartGame() {
 			</div>
 		</main>
 
-		<AppFooter class="relative z-[2] border-t-0 bg-transparent" />
+		<AppFooter class="relative z-[2]" />
 
 		<Teleport to="body">
 			<div

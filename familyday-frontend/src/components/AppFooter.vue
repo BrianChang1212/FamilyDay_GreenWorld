@@ -12,7 +12,7 @@ const links = [
 
 <template>
 	<footer
-		class="mt-auto shrink-0 border-t border-neutral-200/70 bg-white/90 px-4 py-3.5 text-[10px] text-neutral-400 backdrop-blur-md"
+		class="mt-auto shrink-0 border-t border-neutral-300/60 bg-gw-page px-4 py-3.5 text-[10px] text-neutral-500"
 	>
 		<div class="flex flex-wrap items-center justify-between gap-y-2 gap-x-4">
 			<div class="flex min-w-0 items-center gap-2">

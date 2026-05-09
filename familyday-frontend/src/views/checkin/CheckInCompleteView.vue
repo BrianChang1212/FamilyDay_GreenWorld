@@ -125,6 +125,6 @@ onMounted(() => {
 			</p>
 		</main>
 
-		<AppFooter class="relative z-[1] border-t-0 bg-transparent" />
+		<AppFooter class="relative z-[1]" />
 	</div>
 </template>

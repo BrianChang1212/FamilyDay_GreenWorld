@@ -247,6 +247,6 @@ async function submit() {
 			<p class="mt-8 text-center text-xs text-neutral-400">{{ t("footer.copyright") }}</p>
 		</main>
 
-		<AppFooter class="relative z-[1] border-t-0 bg-transparent" />
+		<AppFooter class="relative z-[1]" />
 	</div>
 </template>
