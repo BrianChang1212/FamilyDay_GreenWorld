@@ -145,18 +145,44 @@ function selectStage(id: number) {
 		<!-- 掃 QR：深灰底、標題紧贴取景上方、取景隨視窗等比縮放（vmin / dvh clamp）-->
 		<div
 			v-if="viewPhase === 'scanning'"
-			class="gw-scan-sheet relative z-[2] flex min-h-0 flex-1 flex-col overflow-hidden bg-[#6b6b6b]"
+			class="gw-scan-sheet relative z-[2] flex min-h-0 flex-1 flex-col overflow-hidden bg-[#757575]"
 		>
-			<!-- 淡葉片水印（裁切在版面內，避免撐開捲軸） -->
+			<!-- 多重樹葉／自然紋路底紋（滿版 vector，裁切在卡片內） -->
 			<div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+				<div
+					class="absolute inset-0 bg-[radial-gradient(ellipse_75%_55%_at_50%_30%,rgba(255,255,255,0.055)_0%,transparent_58%)]"
+				/>
 				<svg
-					class="gw-scan-watermark absolute left-1/2 top-[40%] h-[clamp(240px,min(80vmin,58dvh),440px)] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 -rotate-[14deg] text-white opacity-[0.075]"
-					viewBox="0 0 200 220"
+					class="absolute inset-0 h-full w-full text-white"
+					viewBox="0 0 100 100"
+					preserveAspectRatio="xMidYMid slice"
 				>
-					<path
-						fill="currentColor"
-						d="M118 14c29 28 41 76 29 117-14 52-61 82-114 71C48 223 13 206 12 169c6-62 72-118 136-147 18-9 42-22 62-31 26-15 54-29 74-51 9-10 8-29-12-31-42-15-105 41-154 105z"
-					/>
+					<defs>
+						<path
+							id="gw-scan-leaf-main"
+							d="M118 14c29 28 41 76 29 117-14 52-61 82-114 71C48 223 13 206 12 169c6-62 72-118 136-147 18-9 42-22 62-31 26-15 54-29 74-51 9-10 8-29-12-31-42-15-105 41-154 105z"
+						/>
+						<path
+							id="gw-scan-leaf-alt"
+							d="M50 6C30 28 18 58 24 86c4 18 18 30 26 30s22-12 26-30c6-28-6-58-26-80z"
+						/>
+					</defs>
+					<g fill="currentColor" opacity="0.055">
+						<use href="#gw-scan-leaf-main" transform="translate(38,36) scale(0.13) rotate(-14 100 110)" />
+						<use href="#gw-scan-leaf-main" transform="translate(4,8) scale(0.062) rotate(-32 100 110)" />
+						<use href="#gw-scan-leaf-main" transform="translate(78,10) scale(0.055) rotate(38 100 110)" />
+						<use href="#gw-scan-leaf-main" transform="translate(2,58) scale(0.058) rotate(8 100 110)" />
+						<use href="#gw-scan-leaf-main" transform="translate(86,52) scale(0.048) rotate(-22 100 110)" />
+						<use href="#gw-scan-leaf-main" transform="translate(14,78) scale(0.052) rotate(44 100 110)" />
+						<use href="#gw-scan-leaf-main" transform="translate(68,72) scale(0.042) rotate(-8 100 110)" />
+						<use href="#gw-scan-leaf-main" transform="translate(52,4) scale(0.05) rotate(18 100 110)" />
+						<use href="#gw-scan-leaf-main" transform="translate(30,92) scale(0.046) rotate(-42 100 110)" />
+						<use href="#gw-scan-leaf-alt" transform="translate(62,22) scale(0.11) rotate(12 50 50)" />
+						<use href="#gw-scan-leaf-alt" transform="translate(24,38) scale(0.08) rotate(-26 50 50)" />
+						<use href="#gw-scan-leaf-alt" transform="translate(88,84) scale(0.07) rotate(55 50 50)" />
+						<use href="#gw-scan-leaf-alt" transform="translate(8,28) scale(0.065) rotate(-12 50 50)" />
+						<use href="#gw-scan-leaf-alt" transform="translate(44,62) scale(0.07) rotate(33 50 50)" />
+					</g>
 				</svg>
 			</div>
 
@@ -200,23 +226,23 @@ function selectStage(id: number) {
 							/>
 
 							<div
-								class="gw-scan-corner gw-scan-corner--tl pointer-events-none absolute left-3 top-3 z-[3]"
+								class="gw-scan-corner gw-scan-corner--tl pointer-events-none absolute left-4 top-4 z-[3]"
 								aria-hidden="true"
 							/>
 							<div
-								class="gw-scan-corner gw-scan-corner--tr pointer-events-none absolute right-3 top-3 z-[3]"
+								class="gw-scan-corner gw-scan-corner--tr pointer-events-none absolute right-4 top-4 z-[3]"
 								aria-hidden="true"
 							/>
 							<div
-								class="gw-scan-corner gw-scan-corner--bl pointer-events-none absolute bottom-3 left-3 z-[3]"
+								class="gw-scan-corner gw-scan-corner--bl pointer-events-none absolute bottom-4 left-4 z-[3]"
 								aria-hidden="true"
 							/>
 							<div
-								class="gw-scan-corner gw-scan-corner--br pointer-events-none absolute bottom-3 right-3 z-[3]"
+								class="gw-scan-corner gw-scan-corner--br pointer-events-none absolute bottom-4 right-4 z-[3]"
 								aria-hidden="true"
 							/>
 
-							<div class="gw-scan-beam-mask pointer-events-none absolute inset-[11px] z-[4] overflow-hidden rounded-[1.65rem]" aria-hidden="true">
+							<div class="gw-scan-beam-mask pointer-events-none absolute inset-4 z-[4] overflow-hidden rounded-2xl" aria-hidden="true">
 								<div class="gw-scan-beam-line" />
 							</div>
 						</div>
@@ -462,22 +488,18 @@ function selectStage(id: number) {
 }
 
 .gw-scan-corner--tr {
-	right: 0;
 	border-left: none;
 	border-bottom: none;
 	border-top-right-radius: 1rem;
 }
 
 .gw-scan-corner--bl {
-	bottom: 0;
 	border-right: none;
 	border-top: none;
 	border-bottom-left-radius: 1rem;
 }
 
 .gw-scan-corner--br {
-	right: 0;
-	bottom: 0;
 	border-left: none;
 	border-top: none;
 	border-bottom-right-radius: 1rem;
