@@ -13,7 +13,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "qr:mock-stations": "node ./scripts/generate-mock-station-qr.mjs"
+    "qr:mock-stations": "node ./scripts/generate-mock-station-qr.mjs",
+    "qr:staging-stations": "node ./scripts/generate-staging-station-qr.mjs"
   },
   "dependencies": {
     "jsqr": "^1.4.0",

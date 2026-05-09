@@ -12,6 +12,8 @@ __pycache__/
 .env
 .env.*
 !.env.example
+familyday-frontend/staging-qr-payloads.local.txt
+familyday-frontend/public/qr-staging-stations/
 # Never commit Firebase/GCP service account JSON (use repo-external path or team secret store)
 secrets/
 **/*-sa.json

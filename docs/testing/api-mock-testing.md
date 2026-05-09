@@ -33,6 +33,8 @@ VITE_API_BASE=http://localhost:8787
 npm run dev
 ```
 
+**聯調／staging 整包檢核**另見：[`staging-rollout-checklist.md`](./staging-rollout-checklist.md)。
+
 ## 3) `/finish/claimed` 快速案例
 
 | 案例 | 請求範例 | 預期 |

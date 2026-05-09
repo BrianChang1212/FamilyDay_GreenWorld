@@ -1,0 +1,9 @@
+# Copy to staging-qr-payloads.local.txt (gitignored) and replace with six lines
+# of backend-signed JWT (or agreed payload), one per station in order 1..6.
+# Example placeholders — not valid for production:
+replace-with-staging-jwt-for-station-1
+replace-with-staging-jwt-for-station-2
+replace-with-staging-jwt-for-station-3
+replace-with-staging-jwt-for-station-4
+replace-with-staging-jwt-for-station-5
+replace-with-staging-jwt-for-station-6
