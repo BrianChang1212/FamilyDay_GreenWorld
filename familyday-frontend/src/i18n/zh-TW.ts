@@ -136,6 +136,7 @@ export const zhTW = {
     backMapButton: "返回地圖",
   },
   stage: {
+    scanAlignTitle: "請對準QRCode",
     scanTitle: "請掃描 QR code",
     scanHint: "將 QR 對準框線以解鎖站點",
     scanVerifying: "驗證中…",
@@ -154,6 +155,7 @@ export const zhTW = {
     statusCompleted: "已完成",
     statusLocked: "待解鎖",
     statusInProgress: "進行中",
+    scanVideoAria: "相機取景畫面，請將 QR code 對準方框",
     qrImageAlt: "掃描 QR code：扁平自然風取景框、中央條碼與掃描線示意",
     stageImageAlt: "{stationName} 關卡貼圖",
   },

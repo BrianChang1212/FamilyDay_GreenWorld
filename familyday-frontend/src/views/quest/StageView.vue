@@ -5,8 +5,8 @@ import AppFooter from "@/components/AppFooter.vue";
 import GwBrandBar from "@/components/GwBrandBar.vue";
 import { GAME_CONFIG } from "@/constants";
 import { verifyStation } from "@/api/gameFlow";
+import { useQrCameraScan } from "@/composables/useQrCameraScan";
 import {
-	QR_SCAN_STICKER_SRC,
 	clearPendingStationVerification,
 	getCompletedStageIds,
 	getInZone,
@@ -31,8 +31,46 @@ const challengeId = ref("");
 const scanError = ref("");
 const scanLoading = ref(false);
 
-/** 到站畫面 vs 模擬掃碼全屏 */
+/** 到站畫面 vs 掃碼全屏（相機即時取景） */
 const viewPhase = ref<"arrival" | "scanning">("arrival");
+
+const scanVideoRef = ref<HTMLVideoElement | null>(null);
+const qrScanLive = computed(() => viewPhase.value === "scanning");
+const qrDecodePaused = computed(() => scanLoading.value);
+
+async function verifyFromDecodedQr(payload: string) {
+	const token = payload.trim();
+	if (!token) return;
+
+	scanLoading.value = true;
+	scanError.value = "";
+	try {
+		const cid = await verifyStation(stage.value, token);
+		scanError.value = "";
+		challengeId.value = cid;
+		setPendingStationVerification(stage.value, cid);
+		inZone.value = true;
+		setInZone(true);
+		viewPhase.value = "arrival";
+	} catch (_err: unknown) {
+		scanError.value = "站點驗證失敗，請重新對準 QR code。";
+		throw _err;
+	} finally {
+		scanLoading.value = false;
+	}
+}
+
+const cameraSetupError = useQrCameraScan({
+	videoRef: scanVideoRef,
+	active: qrScanLive,
+	paused: qrDecodePaused,
+	onDecode: verifyFromDecodedQr,
+});
+
+/** 優先顯示相機權限／硬體錯誤，其次 API 錯誤 */
+const scanUiMessage = computed(
+	() => cameraSetupError.value || scanError.value,
+);
 
 const doneStationCount = computed(() => getCompletedStageIds().length);
 
@@ -67,34 +105,15 @@ function startQuiz() {
 }
 
 function openScanUi() {
+	scanError.value = "";
+	cameraSetupError.value = "";
 	viewPhase.value = "scanning";
 }
 
 function closeScanUi() {
 	viewPhase.value = "arrival";
-}
-
-function finishScanDemo() {
-	scanLoading.value = true;
 	scanError.value = "";
-	verifyStation(stage.value, `stage-${stage.value}-token`)
-		.then((cid) => {
-			scanError.value = "";
-			challengeId.value = cid;
-			setPendingStationVerification(stage.value, cid);
-			inZone.value = true;
-			setInZone(true);
-			viewPhase.value = "arrival";
-		})
-		.catch((err) => {
-			scanError.value =
-				err instanceof Error && err.message
-					? "站點驗證失敗，請重新掃描。"
-					: "站點驗證失敗，請稍後再試。";
-		})
-		.finally(() => {
-			scanLoading.value = false;
-		});
+	cameraSetupError.value = "";
 }
 
 function rowState(id: number): "done" | "current" | "open" {
@@ -120,81 +139,96 @@ function selectStage(id: number) {
 		<!-- 品牌條（與 Quiz / Result 對齊） -->
 		<GwBrandBar v-if="viewPhase === 'arrival'" />
 
-		<!-- —— 模擬掃碼全屏（深色半透明 + 毛玻璃） —— -->
+		<!-- 掃 QR：深灰底、上方指引、方形取景（裝置相機）＋四角框線與綠色掃描線 -->
 		<div
 			v-if="viewPhase === 'scanning'"
-			class="relative z-[2] flex min-h-full flex-1 flex-col"
+			class="relative z-[2] flex min-h-full flex-1 flex-col bg-[#5a5a5a]"
 		>
-			<GwBrandBar />
-
-			<div
-				class="relative flex flex-1 flex-col bg-[radial-gradient(ellipse_120%_80%_at_50%_0%,rgba(47,115,84,0.18)_0%,transparent_55%),linear-gradient(180deg,rgba(26,34,30,0.34)_0%,rgba(26,34,30,0.42)_100%)] px-5 pb-8 pt-6 backdrop-blur-xl backdrop-saturate-150 ring-1 ring-inset ring-white/[0.08]"
+			<!-- 淡葉片水印 -->
+			<svg
+				class="gw-scan-watermark pointer-events-none absolute inset-0 m-auto aspect-square w-[118vmin] max-w-none text-white opacity-[0.065]"
+				viewBox="0 0 200 220"
+				aria-hidden="true"
 			>
-				<!-- 淡葉紋水印 -->
-				<div
-					class="pointer-events-none absolute inset-0 overflow-hidden opacity-[0.09]"
-					aria-hidden="true"
-				>
-					<span
-						class="absolute -left-[10%] top-[15%] select-none text-[18rem] text-white"
-						>🍃</span
-					>
-					<span
-						class="absolute -right-[8%] bottom-[10%] select-none text-[14rem] text-white"
-						>🍃</span
-					>
-				</div>
+				<path
+					fill="currentColor"
+					d="M118 14c29 28 41 76 29 117-14 52-61 82-114 71C48 223 13 206 12 169c6-62 72-118 136-147 18-9 42-22 62-31 26-15 54-29 74-51 9-10 8-29-12-31-42-15-105 41-154 105z"
+				/>
+			</svg>
 
-				<h1 class="relative text-center text-lg font-bold text-white [text-shadow:0_1px_14px_rgba(0,0,0,0.5)]">
-					{{ t("stage.scanTitle") }}
-				</h1>
-				<p class="relative mt-2 text-center text-xs text-white/80 [text-shadow:0_1px_8px_rgba(0,0,0,0.45)]">
-					{{ t("stage.scanHint") }}
+			<div class="relative flex flex-1 flex-col px-8 pb-10 pt-[clamp(3rem,10vh,4.5rem)]">
+				<p class="relative text-center text-[1.06rem] font-bold tracking-wide text-white">
+					{{ t("stage.scanAlignTitle") }}
+				</p>
+				<p
+					v-if="scanLoading"
+					class="relative mt-3 text-center text-xs font-semibold text-white/80"
+				>
+					{{ t("stage.scanVerifying") }}
 				</p>
 
-				<div class="relative mx-auto mt-8 w-full max-w-[18rem]">
+				<div class="relative flex flex-1 flex-col items-center justify-center py-8">
 					<div
-						class="overflow-hidden rounded-2xl border border-white/25 bg-white/[0.06] shadow-[0_8px_32px_rgba(0,0,0,0.22)] ring-1 ring-white/15"
+						class="relative aspect-square w-full max-w-[min(17.75rem,calc(100vw-5rem))] overflow-hidden rounded-[2rem] bg-black shadow-[inset_0_0_0_2px_rgba(255,255,255,0.42)] ring-4 ring-black/35"
 					>
-						<img
-							:src="QR_SCAN_STICKER_SRC"
-							width="1024"
-							height="1024"
-							:alt="t('stage.qrImageAlt')"
-							class="aspect-square h-auto w-full object-cover object-center"
-							loading="lazy"
-							decoding="async"
+						<video
+							ref="scanVideoRef"
+							class="absolute inset-0 block h-full w-full object-cover"
+							autoplay
+							muted
+							playsinline
+							:aria-label="t('stage.scanVideoAria')"
 						/>
+
+						<div
+							class="gw-scan-corner gw-scan-corner--tl pointer-events-none absolute left-3 top-3 z-[3]"
+							aria-hidden="true"
+						/>
+						<div
+							class="gw-scan-corner gw-scan-corner--tr pointer-events-none absolute right-3 top-3 z-[3]"
+							aria-hidden="true"
+						/>
+						<div
+							class="gw-scan-corner gw-scan-corner--bl pointer-events-none absolute bottom-3 left-3 z-[3]"
+							aria-hidden="true"
+						/>
+						<div
+							class="gw-scan-corner gw-scan-corner--br pointer-events-none absolute bottom-3 right-3 z-[3]"
+							aria-hidden="true"
+						/>
+
+						<div class="gw-scan-beam-mask pointer-events-none absolute inset-[11px] z-[4] overflow-hidden rounded-[1.65rem]" aria-hidden="true">
+							<div class="gw-scan-beam-line" />
+						</div>
 					</div>
 				</div>
 
-				<div class="relative mt-auto flex flex-col gap-3 pt-8">
-					<button
-						type="button"
-						class="w-full rounded-full bg-gw-brand py-3.5 text-base font-bold text-white shadow-lg transition hover:brightness-110"
-						:disabled="scanLoading"
-						@click="finishScanDemo"
+				<button
+					type="button"
+					class="relative mx-auto mt-auto flex w-[min(22rem,calc(100vw-4rem))] items-center justify-center gap-2 rounded-2xl bg-[#264a35] py-[0.95rem] text-base font-semibold text-white shadow-[0_6px_22px_rgba(0,0,0,0.35)] ring-1 ring-white/[0.06] transition hover:brightness-[1.06] active:brightness-95"
+					@click="closeScanUi"
+				>
+					<svg
+						class="h-[1.05em] w-[1.05em] shrink-0"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2.35"
+						stroke-linecap="round"
+						stroke-linejoin="round"
+						aria-hidden="true"
 					>
-						{{ scanLoading ? t("stage.scanVerifying") : t("stage.scanSuccessButton") }}
-					</button>
-					<button
-						type="button"
-						class="flex w-full items-center justify-center gap-2 rounded-full border-2 border-white/25 bg-white/10 py-3.5 text-base font-semibold text-white shadow-sm transition hover:bg-white/15"
-						@click="closeScanUi"
-					>
-						<span aria-hidden="true">←</span>
-						{{ t("stage.scanBackButton") }}
-					</button>
-				</div>
+						<polyline points="15 18 9 12 15 6" />
+					</svg>
+					{{ t("stage.scanBackButton") }}
+				</button>
+
 				<p
-					v-if="scanError"
-					class="relative mt-3 rounded-xl border border-red-400/40 bg-red-950/50 px-3 py-2 text-center text-xs text-red-200"
+					v-if="scanUiMessage"
+					class="relative mt-6 rounded-xl border border-red-300/45 bg-red-950/55 px-4 py-3 text-center text-[0.8rem] leading-snug text-red-100"
 					role="alert"
 				>
-					{{ scanError }}
-				</p>
-				<p class="relative mt-6 text-center text-[10px] uppercase tracking-[0.2em] text-white/40">
-					{{ t("stage.prototypeLabel") }}
+					{{ scanUiMessage }}
 				</p>
 			</div>
 		</div>
@@ -382,3 +416,77 @@ function selectStage(id: number) {
 		<AppFooter v-if="viewPhase === 'arrival'" class="relative z-[2] border-t-0 bg-transparent" />
 	</div>
 </template>
+
+<style scoped>
+.gw-scan-watermark {
+	pointer-events: none;
+	transform: rotate(-14deg);
+}
+
+.gw-scan-corner {
+	position: absolute;
+	width: var(--corner);
+	height: var(--corner);
+	border: 4px solid #fff;
+	--corner: 3.125rem;
+}
+
+.gw-scan-corner--tl {
+	border-right: none;
+	border-bottom: none;
+	border-top-left-radius: 1rem;
+	border-top-right-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+.gw-scan-corner--tr {
+	right: 0;
+	border-left: none;
+	border-bottom: none;
+	border-top-right-radius: 1rem;
+}
+
+.gw-scan-corner--bl {
+	bottom: 0;
+	border-right: none;
+	border-top: none;
+	border-bottom-left-radius: 1rem;
+}
+
+.gw-scan-corner--br {
+	right: 0;
+	bottom: 0;
+	border-left: none;
+	border-top: none;
+	border-bottom-right-radius: 1rem;
+}
+
+@keyframes gw-scan-beam-bounce {
+	0%,
+	100% {
+		top: 18%;
+	}
+	50% {
+		top: 72%;
+	}
+}
+
+.gw-scan-beam-line {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 18%;
+	height: 3px;
+	border-radius: 9999px;
+	background: linear-gradient(
+		90deg,
+		rgba(0, 242, 120, 0),
+		rgba(0, 255, 157, 0.95),
+		rgba(0, 235, 120, 0)
+	);
+	box-shadow:
+		0 0 14px rgba(0, 255, 157, 0.85),
+		0 0 4px rgba(255, 255, 255, 0.9);
+	animation: gw-scan-beam-bounce 2.15s ease-in-out infinite;
+}
+</style>

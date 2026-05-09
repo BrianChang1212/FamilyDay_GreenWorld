@@ -458,7 +458,10 @@ const server = http.createServer((req, res) => {
 	if (req.method === "POST" && urlObj.pathname === "/api/v1/stations/verify") {
 		return readJsonBody(req)
 			.then((body) => {
-				const challengeId = challengeIdByStageToken(body.token);
+				const token = normalizeStr(
+					body.qrJwt ?? body.token ?? body.qrToken,
+				);
+				const challengeId = challengeIdByStageToken(token);
 				writeJson(res, 200, {
 					ok: true,
 					challengeId,

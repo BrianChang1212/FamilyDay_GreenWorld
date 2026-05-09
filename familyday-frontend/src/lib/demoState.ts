@@ -274,10 +274,6 @@ export const LEVEL_COMPLETE_STICKER_SRC =
 export const CLAIM_SUCCESS_STICKER_SRC =
 	"/images/claim-success-sticker.png" as const;
 
-/** 掃描 QR code 全屏示意（正方形、扁平插畫／與地圖同系風格，`public/images/`） */
-export const QR_SCAN_STICKER_SRC =
-	"/images/qr-scan-flat-board-style.png" as const;
-
 /** 完成報到頁主視覺（`public/images/`） */
 export const CHECKIN_COMPLETE_STICKER_SRC =
 	"/images/checkin-complete-familyday-scene.png" as const;
