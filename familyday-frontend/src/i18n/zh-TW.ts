@@ -156,6 +156,11 @@ export const zhTW = {
     statusLocked: "待解鎖",
     statusInProgress: "進行中",
     scanVideoAria: "相機取景畫面，請將 QR code 對準方框",
+    scanQrMismatch:
+      "此 QR 不是您目前選擇的關卡，請在列表切換到正確關卡後再掃描，或改掃描本關專用 QR。",
+    scanQrUnrecognized:
+      "無法辨識此 QR 為本站通行碼，請確認掃描的是活動關卡專用 QR。",
+    scanVerifyFailed: "站點驗證失敗，請重新對準 QR code。",
     qrImageAlt: "掃描 QR code：扁平自然風取景框、中央條碼與掃描線示意",
     stageImageAlt: "{stationName} 關卡貼圖",
   },

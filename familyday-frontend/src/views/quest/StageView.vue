@@ -4,7 +4,7 @@ import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import GwBrandBar from "@/components/GwBrandBar.vue";
 import { GAME_CONFIG } from "@/constants";
-import { verifyStation } from "@/api/gameFlow";
+import { verifyStation, type VerifyStationHttpError } from "@/api/gameFlow";
 import { useQrCameraScan } from "@/composables/useQrCameraScan";
 import {
 	clearPendingStationVerification,
@@ -56,7 +56,18 @@ async function verifyFromDecodedQr(payload: string) {
 			query: { challengeId: cid },
 		});
 	} catch (_err: unknown) {
-		scanError.value = "站點驗證失敗，請重新對準 QR code。";
+		const e = _err as Partial<VerifyStationHttpError>;
+		if (e && typeof e.code === "string") {
+			if (e.code === "STATION_QR_MISMATCH") {
+				scanError.value = t("stage.scanQrMismatch");
+			} else if (e.code === "STATION_QR_UNRECOGNIZED") {
+				scanError.value = t("stage.scanQrUnrecognized");
+			} else {
+				scanError.value = t("stage.scanVerifyFailed");
+			}
+		} else {
+			scanError.value = t("stage.scanVerifyFailed");
+		}
 		throw _err;
 	} finally {
 		scanLoading.value = false;

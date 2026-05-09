@@ -38,6 +38,24 @@ gameRouter.post("/stations/verify", (req, res) => {
 		return;
 	}
 
+	/*
+	 * Align with mock: `stage-{n}-token` must match selected stage (dev / printed test QRs).
+	 * Real JWT validation can extend this without breaking clients that map STATION_QR_*.
+	 */
+	const mockTok = qrJwt.match(/^stage-(\d+)-token$/);
+	if (mockTok) {
+		const n = Number(mockTok[1]);
+		if (Number.isFinite(n) && n >= 1 && n <= maxStage && n !== stageId) {
+			res.status(409).json(
+				badRequest(
+					"STATION_QR_MISMATCH",
+					`QR is for stage ${n}; selected stage is ${stageId}`,
+				),
+			);
+			return;
+		}
+	}
+
 	res.status(200).json({
 		ok: true,
 		challengeId: stageIdToChallengeId(stageId),

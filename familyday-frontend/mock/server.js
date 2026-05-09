@@ -212,18 +212,6 @@ function normalizeStr(v) {
 	return String(v || "").trim();
 }
 
-function challengeIdByStageToken(token) {
-	const m = String(token || "").match(/^stage-(\d+)-token$/);
-	if (!m) {
-		return "c1";
-	}
-	const n = Number(m[1]);
-	if (!Number.isFinite(n) || n < 1 || n > 6) {
-		return "c1";
-	}
-	return `c${n}`;
-}
-
 const server = http.createServer((req, res) => {
 	applyCors(req, res);
 	if (req.method === "OPTIONS") {
@@ -458,13 +446,58 @@ const server = http.createServer((req, res) => {
 	if (req.method === "POST" && urlObj.pathname === "/api/v1/stations/verify") {
 		return readJsonBody(req)
 			.then((body) => {
+				const stageId = toPositiveInt(body.stageId, 1);
+				if (stageId < 1 || stageId > 6) {
+					writeJson(res, 400, {
+						code: "INVALID_STAGE_ID",
+						message: "stageId must be between 1 and 6",
+					});
+					return;
+				}
 				const token = normalizeStr(
 					body.qrJwt ?? body.token ?? body.qrToken,
 				);
-				const challengeId = challengeIdByStageToken(token);
+				/* Legacy smoke token (mock/test-game-api.js) — maps to current stageId */
+				if (token === "station-token") {
+					writeJson(res, 200, {
+						ok: true,
+						challengeId: `c${stageId}`,
+						stationId: "station-a",
+					});
+					return;
+				}
+				const m = token.match(/^stage-(\d+)-token$/);
+				if (!m) {
+					writeJson(res, 400, {
+						code: "STATION_QR_UNRECOGNIZED",
+						message:
+							"此 QR 無法辨識為任一站點通行碼，請掃描本活動關卡專用 QR。",
+					});
+					return;
+				}
+				const n = Number(m[1]);
+				if (
+					!Number.isFinite(n) ||
+					n < 1 ||
+					n > 6
+				) {
+					writeJson(res, 400, {
+						code: "STATION_QR_UNRECOGNIZED",
+						message:
+							"此 QR 無法辨識為任一站點通行碼，請掃描本活動關卡專用 QR。",
+					});
+					return;
+				}
+				if (n !== stageId) {
+					writeJson(res, 409, {
+						code: "STATION_QR_MISMATCH",
+						message: `此 QR 為第 ${n} 關，您目前選擇的是第 ${stageId} 關。請先切換至第 ${n} 關再掃描，或改掃描第 ${stageId} 關專用 QR。`,
+					});
+					return;
+				}
 				writeJson(res, 200, {
 					ok: true,
-					challengeId,
+					challengeId: `c${n}`,
 					stationId: "station-a",
 				});
 			})

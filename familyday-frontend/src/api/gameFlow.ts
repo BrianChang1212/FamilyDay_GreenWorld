@@ -36,6 +36,37 @@ function getBaseOrThrow(): string {
 	return base;
 }
 
+/** Thrown by verifyStation when HTTP error body may include API { code, message }. */
+export type VerifyStationHttpError = Error & {
+	status: number;
+	code?: string;
+};
+
+function throwVerifyStationHttpError(
+	status: number,
+	text: string,
+): never {
+	let code: string | undefined;
+	let apiMessage: string | undefined;
+	try {
+		const j = JSON.parse(text) as { code?: string; message?: string };
+		if (typeof j.code === "string" && j.code.length > 0) {
+			code = j.code;
+		}
+		if (typeof j.message === "string" && j.message.length > 0) {
+			apiMessage = j.message;
+		}
+	} catch {
+		/* use generic below */
+	}
+	const err = new Error(
+		apiMessage || `stations/verify ${status}: ${text.slice(0, 200)}`,
+	) as VerifyStationHttpError;
+	err.status = status;
+	err.code = code;
+	throw err;
+}
+
 export async function verifyStation(stageId: number, qrJwt: string): Promise<string> {
 	const base = getBaseOrThrow();
 	const res = await fetch(`${base}/api/v1/stations/verify`, {
@@ -50,7 +81,7 @@ export async function verifyStation(stageId: number, qrJwt: string): Promise<str
 
 	if (!res.ok) {
 		const text = await res.text().catch(() => "");
-		throw new Error(`stations/verify ${res.status}: ${text.slice(0, 200)}`);
+		throwVerifyStationHttpError(res.status, text);
 	}
 
 	const data = (await res.json()) as VerifyJson;

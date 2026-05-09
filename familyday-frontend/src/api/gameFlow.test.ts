@@ -6,6 +6,7 @@ import {
 	restartPlaythrough,
 	submitChallengeAttempt,
 	verifyStation,
+	type VerifyStationHttpError,
 } from "@/api/gameFlow";
 import * as apiBase from "@/lib/apiBase";
 
@@ -48,6 +49,29 @@ describe("gameFlow api", () => {
 				body: JSON.stringify({ stageId: 2, qrJwt: "site-jwt" }),
 			}),
 		);
+	});
+
+	it("verifyStation throws with code when API returns JSON error body", async () => {
+		globalThis.fetch = vi.fn().mockResolvedValue({
+			ok: false,
+			status: 409,
+			text: () =>
+				Promise.resolve(
+					JSON.stringify({
+						code: "STATION_QR_MISMATCH",
+						message: "server detail",
+					}),
+				),
+		}) as typeof fetch;
+
+		try {
+			await verifyStation(2, "stage-3-token");
+			expect.fail("expected throw");
+		} catch (e: unknown) {
+			const err = e as VerifyStationHttpError;
+			expect(err.code).toBe("STATION_QR_MISMATCH");
+			expect(err.status).toBe(409);
+		}
 	});
 
 	it("fetchChallenge maps fallback fields when payload is partial", async () => {
