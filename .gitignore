@@ -29,3 +29,6 @@ Thumbs.db
 *.log
 npm-debug.log*
 
+# Local design / exports — do not commit
+UI_0505/
+
