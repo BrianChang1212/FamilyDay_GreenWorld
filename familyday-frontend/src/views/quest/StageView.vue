@@ -135,100 +135,127 @@ function selectStage(id: number) {
 </script>
 
 <template>
-	<div class="gw-page-fill relative flex min-h-full flex-col bg-[#eef0eb]">
+	<div
+		class="gw-page-fill relative flex min-h-0 flex-1 flex-col bg-[#eef0eb]"
+		:class="viewPhase === 'scanning' ? 'overflow-hidden' : ''"
+	>
 		<!-- 品牌條（與 Quiz / Result 對齊） -->
 		<GwBrandBar v-if="viewPhase === 'arrival'" />
 
-		<!-- 掃 QR：深灰底、上方指引、方形取景（裝置相機）＋四角框線與綠色掃描線 -->
+		<!-- 掃 QR：深灰底、標題紧贴取景上方、取景隨視窗等比縮放（vmin / dvh clamp）-->
 		<div
 			v-if="viewPhase === 'scanning'"
-			class="relative z-[2] flex min-h-full flex-1 flex-col bg-[#5a5a5a]"
+			class="gw-scan-sheet relative z-[2] flex min-h-0 flex-1 flex-col overflow-hidden bg-[#6b6b6b]"
 		>
-			<!-- 淡葉片水印 -->
-			<svg
-				class="gw-scan-watermark pointer-events-none absolute inset-0 m-auto aspect-square w-[118vmin] max-w-none text-white opacity-[0.065]"
-				viewBox="0 0 200 220"
-				aria-hidden="true"
-			>
-				<path
-					fill="currentColor"
-					d="M118 14c29 28 41 76 29 117-14 52-61 82-114 71C48 223 13 206 12 169c6-62 72-118 136-147 18-9 42-22 62-31 26-15 54-29 74-51 9-10 8-29-12-31-42-15-105 41-154 105z"
-				/>
-			</svg>
-
-			<div class="relative flex flex-1 flex-col px-8 pb-10 pt-[clamp(3rem,10vh,4.5rem)]">
-				<p class="relative text-center text-[1.06rem] font-bold tracking-wide text-white">
-					{{ t("stage.scanAlignTitle") }}
-				</p>
-				<p
-					v-if="scanLoading"
-					class="relative mt-3 text-center text-xs font-semibold text-white/80"
+			<!-- 淡葉片水印（裁切在版面內，避免撐開捲軸） -->
+			<div class="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+				<svg
+					class="gw-scan-watermark absolute left-1/2 top-[40%] h-[clamp(240px,min(80vmin,58dvh),440px)] w-auto max-w-none -translate-x-1/2 -translate-y-1/2 -rotate-[14deg] text-white opacity-[0.075]"
+					viewBox="0 0 200 220"
 				>
-					{{ t("stage.scanVerifying") }}
-				</p>
+					<path
+						fill="currentColor"
+						d="M118 14c29 28 41 76 29 117-14 52-61 82-114 71C48 223 13 206 12 169c6-62 72-118 136-147 18-9 42-22 62-31 26-15 54-29 74-51 9-10 8-29-12-31-42-15-105 41-154 105z"
+					/>
+				</svg>
+			</div>
 
-				<div class="relative flex flex-1 flex-col items-center justify-center py-8">
+			<div
+				class="relative flex min-h-0 flex-1 flex-col overflow-hidden pb-[max(0.65rem,env(safe-area-inset-bottom,0px))]
+					ps-[max(1.25rem,env(safe-area-inset-left,0px))] pe-[max(1.25rem,env(safe-area-inset-right,0px))]
+					pt-[max(0.5rem,env(safe-area-inset-top,0px))]
+					sm:px-8 sm:pb-5 sm:pt-8"
+			>
+				<!-- 等比取景：邊長 = min(父層寬, 88vmin, 28rem, 視窗高度扣留白) —— 較前一版再大一圈 -->
+				<div class="relative flex min-h-0 flex-1 flex-col overflow-hidden pb-3 pt-1 sm:py-3">
 					<div
-						class="relative aspect-square w-full max-w-[min(17.75rem,calc(100vw-5rem))] overflow-hidden rounded-[2rem] bg-black shadow-[inset_0_0_0_2px_rgba(255,255,255,0.42)] ring-4 ring-black/35"
+						class="flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-hidden px-0"
 					>
-						<video
-							ref="scanVideoRef"
-							class="absolute inset-0 block h-full w-full object-cover"
-							autoplay
-							muted
-							playsinline
-							:aria-label="t('stage.scanVideoAria')"
-						/>
+						<div
+							class="flex w-full flex-col items-center gap-2 sm:gap-2.5"
+						>
+						<p
+							class="w-full max-w-[min(100%,88vmin,28rem,calc(100dvh-12.5rem))] shrink-0 px-1 text-center text-[2.12rem] font-bold leading-tight tracking-wide text-white"
+						>
+							{{ t("stage.scanAlignTitle") }}
+						</p>
+						<p
+							v-if="scanLoading"
+							class="-mt-1 w-full shrink-0 text-center text-xs font-semibold text-white/80"
+						>
+							{{ t("stage.scanVerifying") }}
+						</p>
+						<div
+							class="gw-scan-frame relative box-border aspect-square shrink-0 overflow-hidden rounded-[2rem]
+								bg-black shadow-[inset_0_0_0_2px_rgba(255,255,255,0.45)] ring-[3px] ring-black/45
+								w-[min(100%,88vmin,28rem,calc(100dvh-12.5rem))]"
+						>
+							<video
+								ref="scanVideoRef"
+								class="absolute inset-0 block h-full w-full object-cover"
+								autoplay
+								muted
+								playsinline
+								:aria-label="t('stage.scanVideoAria')"
+							/>
 
-						<div
-							class="gw-scan-corner gw-scan-corner--tl pointer-events-none absolute left-3 top-3 z-[3]"
-							aria-hidden="true"
-						/>
-						<div
-							class="gw-scan-corner gw-scan-corner--tr pointer-events-none absolute right-3 top-3 z-[3]"
-							aria-hidden="true"
-						/>
-						<div
-							class="gw-scan-corner gw-scan-corner--bl pointer-events-none absolute bottom-3 left-3 z-[3]"
-							aria-hidden="true"
-						/>
-						<div
-							class="gw-scan-corner gw-scan-corner--br pointer-events-none absolute bottom-3 right-3 z-[3]"
-							aria-hidden="true"
-						/>
+							<div
+								class="gw-scan-corner gw-scan-corner--tl pointer-events-none absolute left-3 top-3 z-[3]"
+								aria-hidden="true"
+							/>
+							<div
+								class="gw-scan-corner gw-scan-corner--tr pointer-events-none absolute right-3 top-3 z-[3]"
+								aria-hidden="true"
+							/>
+							<div
+								class="gw-scan-corner gw-scan-corner--bl pointer-events-none absolute bottom-3 left-3 z-[3]"
+								aria-hidden="true"
+							/>
+							<div
+								class="gw-scan-corner gw-scan-corner--br pointer-events-none absolute bottom-3 right-3 z-[3]"
+								aria-hidden="true"
+							/>
 
-						<div class="gw-scan-beam-mask pointer-events-none absolute inset-[11px] z-[4] overflow-hidden rounded-[1.65rem]" aria-hidden="true">
-							<div class="gw-scan-beam-line" />
+							<div class="gw-scan-beam-mask pointer-events-none absolute inset-[11px] z-[4] overflow-hidden rounded-[1.65rem]" aria-hidden="true">
+								<div class="gw-scan-beam-line" />
+							</div>
+						</div>
 						</div>
 					</div>
 				</div>
 
 				<button
 					type="button"
-					class="relative mx-auto mt-auto flex w-[min(22rem,calc(100vw-4rem))] items-center justify-center gap-2 rounded-2xl bg-[#264a35] py-[0.95rem] text-base font-semibold text-white shadow-[0_6px_22px_rgba(0,0,0,0.35)] ring-1 ring-white/[0.06] transition hover:brightness-[1.06] active:brightness-95"
+					class="relative mx-auto w-full max-w-[min(min(88vmin,28rem),calc(100vw-2.5rem))] shrink-0 rounded-[1.75rem] bg-[#2d5a41] px-6 py-[0.9rem] text-base font-semibold text-white shadow-[0_6px_22px_rgba(0,0,0,0.32)] ring-1 ring-black/10 transition hover:brightness-[1.05] active:brightness-95 sm:rounded-[2rem] sm:py-[0.95rem]"
 					@click="closeScanUi"
 				>
-					<svg
-						class="h-[1.05em] w-[1.05em] shrink-0"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2.35"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						aria-hidden="true"
-					>
-						<polyline points="15 18 9 12 15 6" />
-					</svg>
-					{{ t("stage.scanBackButton") }}
+					<span class="flex items-center justify-center gap-2">
+						<svg
+							class="h-[1.05em] w-[1.05em] shrink-0"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.35"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<polyline points="15 18 9 12 15 6" />
+						</svg>
+						{{ t("stage.scanBackButton") }}
+					</span>
 				</button>
 
 				<p
 					v-if="scanUiMessage"
-					class="relative mt-6 rounded-xl border border-red-300/45 bg-red-950/55 px-4 py-3 text-center text-[0.8rem] leading-snug text-red-100"
+					class="relative shrink-0 overflow-hidden px-2 text-center text-[0.75rem] leading-snug text-red-100"
 					role="alert"
 				>
-					{{ scanUiMessage }}
+					<span
+						class="inline-block max-w-full break-words rounded-xl border border-red-300/45 bg-red-950/55 px-3 py-2 text-center line-clamp-3"
+					>
+						{{ scanUiMessage }}
+					</span>
 				</p>
 			</div>
 		</div>
@@ -418,11 +445,6 @@ function selectStage(id: number) {
 </template>
 
 <style scoped>
-.gw-scan-watermark {
-	pointer-events: none;
-	transform: rotate(-14deg);
-}
-
 .gw-scan-corner {
 	position: absolute;
 	width: var(--corner);

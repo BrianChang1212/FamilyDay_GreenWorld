@@ -34,7 +34,7 @@ const route = useRoute();
 						<component
 							:is="Component"
 							:key="route.fullPath"
-							class="flex min-h-full min-w-0 w-full shrink-0 flex-col"
+							class="flex min-h-0 min-w-0 w-full flex-1 flex-col"
 						/>
 					</RouterView>
 				</div>
