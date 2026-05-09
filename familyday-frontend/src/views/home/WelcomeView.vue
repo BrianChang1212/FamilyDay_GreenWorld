@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import AppFooter from "@/components/AppFooter.vue";
+import { APP_CONFIG } from "@/constants";
 import { resetScavengerRun } from "@/lib/demoState";
 import { useI18n } from "@/composables/useI18n";
 
@@ -14,46 +14,118 @@ function next() {
 </script>
 
 <template>
-	<div class="relative flex min-h-full flex-col bg-[#f0f9f4]">
-		<main
-			class="relative z-[1] flex flex-1 flex-col px-4 pb-5 pt-3 sm:mx-auto sm:max-w-xl sm:px-6 sm:pb-6 sm:pt-5"
-		>
-			<!-- 手機：左右出血加寬圖；sm+：維持圓角卡 -->
-			<div
-				class="relative -mx-4 w-[calc(100%+2rem)] overflow-hidden border-y border-gw-mint-soft/70 bg-white shadow-[0_8px_24px_rgba(15,31,46,0.06)] sm:mx-0 sm:w-full sm:rounded-3xl sm:border sm:border-gw-mint-soft/80 sm:shadow-md sm:ring-1 sm:ring-black/[0.04]"
-			>
+	<!--
+		與報到歡迎頁 CheckInWelcomeView 同款：插圖滿铺 flex-1；標語疊頂；CTA 疊底。
+	-->
+	<div
+		class="box-border flex h-full max-h-full min-h-0 min-w-0 w-full flex-col overflow-hidden bg-[#2B5038]"
+	>
+		<div class="relative min-h-0 flex-1 overflow-hidden">
+			<picture class="contents">
+				<source
+					media="(min-width: 640px)"
+					srcset="/images/enroll-welcome-alpaca-adventure-wide-headroom.png"
+				/>
 				<img
-					src="/images/family-day-forest-walk.png"
-					width="1024"
-					height="1024"
+					src="/images/enroll-welcome-alpaca-adventure-wide-headroom.png"
 					:alt="t('welcome.heroAlt')"
-					class="aspect-[5/4] h-auto min-h-[13.5rem] w-full object-cover object-[center_36%] sm:aspect-[16/10] sm:min-h-[17rem]"
+					class="absolute inset-0 h-full w-full object-cover object-center"
 					loading="eager"
-					decoding="async"
 					fetchpriority="high"
 				/>
+			</picture>
+			<div
+				class="pointer-events-none absolute inset-x-0 top-0 z-10 flex justify-center px-2 pt-5 sm:px-4 sm:pt-6"
+			>
+				<div class="welcome-hero-slogan">
+					<p class="welcome-hero-line1">
+						{{ APP_CONFIG.YEAR }} 瑞軒科技家庭日
+					</p>
+					<p class="welcome-hero-line2">視野無界，綠動未來</p>
+					<p class="welcome-hero-line3">AmTRAN Go Wild</p>
+				</div>
 			</div>
-
-			<div class="mt-4 text-center sm:mt-5">
-				<h1 class="font-display text-2xl font-bold text-gw-navy sm:text-[1.75rem]">{{ t('welcome.title') }}</h1>
-				<p class="font-display mt-1.5 text-xl font-bold italic text-gw-brand">{{ t('welcome.subtitle') }}</p>
-				<p class="mx-auto mt-3 max-w-sm text-pretty text-sm leading-relaxed text-neutral-600 sm:mt-4">
-					{{ t('welcome.description') }}
-				</p>
-			</div>
-
-			<div class="mt-5 sm:mt-6">
+			<div
+				class="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 pt-12"
+			>
 				<button
 					type="button"
-					class="flex w-full items-center justify-center gap-2 rounded-full bg-gw-brand py-4 text-base font-bold text-white shadow-[0_10px_28px_rgba(26,157,74,0.35)] transition hover:brightness-105 active:scale-[0.99]"
+					class="gw-checkin-cta pointer-events-auto"
 					@click="next"
 				>
-					{{ t('welcome.startButton') }}
-					<span aria-hidden="true">→</span>
+					{{ t("welcome.startButton") }}
+					<span
+						class="text-3xl leading-none"
+						aria-hidden="true"
+					>›</span>
 				</button>
 			</div>
-		</main>
-
-		<AppFooter class="relative z-[1] border-t-0 bg-transparent" />
+		</div>
 	</div>
 </template>
+
+<style scoped>
+/*
+ * 與 CheckInWelcomeView 一致：三行共用 vmin + clamp
+ */
+.welcome-hero-slogan {
+	display: flex;
+	width: 100%;
+	max-width: min(100%, 36rem);
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	min-height: clamp(13rem, 48vmin, 22rem);
+	padding-bottom: min(2vmin, 0.75rem);
+	gap: clamp(0.15rem, 1.2vmin, 0.55rem);
+	text-align: center;
+	filter: drop-shadow(0 0 10px rgba(15, 40, 25, 0.28));
+}
+
+.welcome-hero-line1 {
+	margin: 0;
+	max-width: 100%;
+	padding: 0 0.25rem;
+	font-size: clamp(1.45rem, 7.2vmin, 2.47rem);
+	font-weight: 800;
+	line-height: 1.15;
+	color: #fff;
+	letter-spacing: 0.04em;
+	text-align: center;
+	-webkit-text-stroke: 1.2px #0a0a0a;
+	paint-order: stroke fill;
+	text-shadow:
+		1px 0 0 #0a0a0a,
+		-1px 0 0 #0a0a0a,
+		0 1px 0 #0a0a0a,
+		0 -1px 0 #0a0a0a,
+		0 2px 0 rgba(0, 0, 0, 0.35),
+		0 3px 10px rgba(0, 0, 0, 0.4);
+}
+
+.welcome-hero-line2,
+.welcome-hero-line3 {
+	margin: 0;
+	max-width: 100%;
+	font-weight: 800;
+	line-height: 1.12;
+	letter-spacing: 0.02em;
+	color: #ff8a3c;
+	-webkit-text-stroke: 1.75px #1a0f08;
+	paint-order: stroke fill;
+	text-shadow:
+		2px 2px 0 rgba(0, 0, 0, 0.34),
+		0 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+.welcome-hero-line2 {
+	font-size: clamp(1.85rem, 9.2vmin, 3.15rem);
+}
+
+.welcome-hero-line3 {
+	font-size: clamp(2.05rem, 10.5vmin, 3.55rem);
+	font-family: ui-sans-serif, system-ui, sans-serif;
+	letter-spacing: 0.04em;
+	text-transform: none;
+}
+</style>

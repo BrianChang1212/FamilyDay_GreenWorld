@@ -15,76 +15,105 @@ function next() {
 </script>
 
 <template>
-	<div class="relative flex min-h-full flex-col bg-[#fafaf8]">
-		<main class="relative z-[1] flex flex-1 flex-col px-5 pb-8 pt-8 sm:mx-auto sm:max-w-md">
-			<h1 class="font-display text-2xl font-bold text-gw-navy">
-				{{ t("briefing.title") }}
-			</h1>
-			<p class="mt-3 text-sm leading-relaxed text-neutral-800">
-				{{ t("briefing.intro") }}
-			</p>
+	<div class="relative flex min-h-full flex-col bg-[#e8eae7]">
+		<div class="bg-[#2f7354] px-5 pb-4 pt-7 text-center text-white shadow-sm">
+			<p class="font-display text-2xl italic tracking-wide">AmTRAN</p>
+			<p class="-mt-1 text-sm font-semibold tracking-[0.18em]">瑞軒科技</p>
+		</div>
 
+		<main
+			class="relative z-[1] flex flex-1 flex-col px-4 pb-8 pt-4 sm:mx-auto sm:w-full sm:max-w-md sm:px-6"
+		>
+			<!-- 闖關 map 主視覺（截圖二：地圖優先） -->
 			<div
-				class="mt-6 overflow-hidden rounded-3xl border border-neutral-200/90 bg-white p-3 shadow-sm ring-1 ring-black/[0.03]"
+				class="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white p-3 shadow-md ring-1 ring-black/[0.04]"
 			>
-				<div
-					class="overflow-hidden rounded-2xl border border-gw-brand/10 bg-[#faf8f3] ring-1 ring-black/[0.04]"
+				<img
+					src="/images/game-board-map-flat-generated.png"
+					width="1376"
+					height="768"
+					:alt="t('briefing.mapAlt')"
+					class="block h-auto w-full rounded-xl"
+					loading="eager"
+					decoding="async"
+				/>
+				<p
+					class="mt-3 text-center font-serif text-[10px] uppercase tracking-[0.2em] text-neutral-500"
 				>
-					<img
-						src="/images/game-instructions-map.png"
-						width="1200"
-						height="800"
-						:alt="t('briefing.mapAlt')"
-						class="block h-auto w-full max-w-full"
-						loading="lazy"
-						decoding="async"
-					/>
-				</div>
-				<p class="mt-3 text-center font-serif text-xs italic text-neutral-500">
 					{{ t("briefing.mapCaption") }}
 				</p>
 			</div>
 
-			<ul class="mt-8 space-y-5">
-				<li class="flex gap-3">
-					<span class="text-lg" aria-hidden="true">📍</span>
-					<div>
-						<p class="font-bold text-gw-brand">{{ t("briefing.missionTitle") }}</p>
-						<p class="mt-1 text-sm text-neutral-700">{{ t("briefing.missionText") }}</p>
-					</div>
-				</li>
-				<li class="flex gap-3">
-					<span class="text-lg" aria-hidden="true">📍</span>
-					<div>
-						<p class="font-bold text-gw-brand">{{ t("briefing.locationsTitle") }}</p>
-						<p class="mt-1 text-sm leading-relaxed text-neutral-700">
-							{{ t("briefing.routeLine") }}
-						</p>
-					</div>
-				</li>
-			</ul>
-
-			<div
-				class="mt-8 rounded-2xl bg-neutral-100/90 px-4 py-4 ring-1 ring-black/[0.04]"
-				role="region"
-				:aria-label="t('briefing.noticeAriaLabel')"
+			<h1
+				class="font-display mt-6 text-center text-xl font-extrabold text-[#2f7354] sm:text-2xl"
 			>
-				<p class="flex items-center gap-2 font-bold text-red-700">
-					<span aria-hidden="true">⚠️</span>
-					{{ t("briefing.noticeTitle") }}
-				</p>
-				<ul class="mt-3 list-inside list-disc space-y-1.5 text-sm text-neutral-800">
-					<li>{{ t("briefing.noticeRuleDevices") }}</li>
-					<li>{{ t("briefing.noticeRuleRewards") }}</li>
-				</ul>
+				{{ t("briefing.title") }}
+			</h1>
+			<p class="mt-3 text-center text-sm leading-relaxed text-neutral-700">
+				{{ t("briefing.intro") }}
+			</p>
+
+			<div class="mt-5 flex flex-col gap-4">
+				<section
+					class="rounded-2xl border border-neutral-200/60 bg-white px-4 py-4 shadow-sm ring-1 ring-black/[0.04]"
+				>
+					<h2 class="flex items-center gap-2 text-base font-bold text-[#2f7354]">
+						<span class="text-lg leading-none" aria-hidden="true">🎁</span>
+						{{ t("briefing.giftsTitle") }}
+					</h2>
+					<ul class="mt-3 space-y-2 text-sm leading-relaxed text-neutral-800">
+						<li class="flex gap-2">
+							<span
+								class="mt-[0.4em] h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-700"
+								aria-hidden="true"
+							/>
+							<span>{{ t("briefing.giftsBullet1") }}</span>
+						</li>
+						<li class="flex gap-2">
+							<span
+								class="mt-[0.4em] h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-700"
+								aria-hidden="true"
+							/>
+							<span>{{ t("briefing.giftsBullet2") }}</span>
+						</li>
+					</ul>
+				</section>
+				<section
+					class="rounded-2xl border border-neutral-200/60 bg-white px-4 py-4 shadow-sm ring-1 ring-black/[0.04]"
+				>
+					<h2 class="flex items-center gap-2 text-base font-bold text-[#2f7354]">
+						<span class="text-lg leading-none" aria-hidden="true">📍</span>
+						{{ t("briefing.locationsTitle") }}
+					</h2>
+					<ul class="mt-3 space-y-2 text-sm leading-relaxed text-neutral-800">
+						<li class="flex gap-2">
+							<span
+								class="mt-[0.4em] h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-700"
+								aria-hidden="true"
+							/>
+							<div>
+								<p>{{ t("briefing.locationsExploreLead") }}</p>
+								<p class="mt-1 text-neutral-800">
+									{{ t("briefing.locationsList") }}
+								</p>
+							</div>
+						</li>
+						<li class="flex gap-2">
+							<span
+								class="mt-[0.4em] h-1.5 w-1.5 shrink-0 rounded-full bg-neutral-700"
+								aria-hidden="true"
+							/>
+							<span>{{ t("briefing.locationsAnyOrder") }}</span>
+						</li>
+					</ul>
+				</section>
 			</div>
 
 			<button
 				type="button"
-				class="mt-10 flex w-full items-center justify-center gap-2 rounded-full bg-[#1a5f2a] py-4 text-base font-bold text-white shadow-lg transition hover:brightness-110 active:scale-[0.99]"
+				class="gw-checkin-cta gw-checkin-cta--pill mt-8"
 				@click="next"
 			>
-				<span aria-hidden="true">🧭</span>
 				{{ t("briefing.startButton") }}
 			</button>
 		</main>

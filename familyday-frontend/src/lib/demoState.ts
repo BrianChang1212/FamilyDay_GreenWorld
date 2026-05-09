@@ -13,7 +13,7 @@ const K = {
 	employeeId: STORAGE_KEYS.employeeId,
 	inZone: STORAGE_KEYS.inZone,
 	pendingStationChallenge: STORAGE_KEYS.pendingStationChallenge,
-	/** 完成頁已領取次數 0–3 */
+	/** 終點領獎已領次數 0…FINISH_REWARD_SLOTS（僅此路徑有「最多 N 次」上限） */
 	finishClaimed: STORAGE_KEYS.finishClaimed,
 	/** 現場報到：同行人數（原型暫存） */
 	companionCount: STORAGE_KEYS.companionCount,
@@ -67,8 +67,7 @@ export function setStage(n: number): void {
 }
 
 /**
- * 從歡迎頁／遊戲說明／註冊再次進入闖關時重置進度，避免沿用上一輪 session 的關卡（例如仍停在第 6 關）。
- * 不會清除姓名、員編、報到或領獎次數。
+ * 解碼 `sessionStorage` 內已答對站台 id 陣列。
  */
 function readCompletedStageIdsRaw(): number[] {
 	try {
@@ -130,6 +129,11 @@ export function isStageCompleted(stageId: number): boolean {
 	return getCompletedStageIds().includes(stageId);
 }
 
+/**
+ * 重置關卡進度（站點、到站狀態、已完成站點列表）。
+ * 不會清除姓名、員編、報到。不會清除終點 **闖關禮已領取次數**（僅領獎路徑受 `FINISH_REWARD_SLOTS` 上限；關卡可反复通關）。
+ * 由歡迎／說明頁進入時呼叫；闖關登入另於 `RegisterView` 在 `restartPlaythrough` 成功後才 `syncLocalProgressFromDashboard`。
+ */
 export function resetScavengerRun(): void {
 	setStage(GAME_CONFIG.MIN_STAGE);
 	setInZone(false);
@@ -270,12 +274,21 @@ export const LEVEL_COMPLETE_STICKER_SRC =
 export const CLAIM_SUCCESS_STICKER_SRC =
 	"/images/claim-success-sticker.png" as const;
 
-/** 掃描 QR code 全屏示意貼圖（`public/images/`） */
-export const QR_SCAN_STICKER_SRC = "/images/qr-scan-sticker.png" as const;
+/** 掃描 QR code 全屏示意（正方形、扁平插畫／與地圖同系風格，`public/images/`） */
+export const QR_SCAN_STICKER_SRC =
+	"/images/qr-scan-flat-board-style.png" as const;
 
 /** 完成報到頁主視覺（`public/images/`） */
 export const CHECKIN_COMPLETE_STICKER_SRC =
 	"/images/checkin-complete-familyday-scene.png" as const;
+
+/** 關卡頁主視覺（森林探索扁平插畫，`public/images/`） */
+export const STAGE_PAGE_HERO_SRC =
+	"/images/stage-hero-forest-exploration-flat.png" as const;
+
+/** 闖關完成頁主視覺（慶典森林扁平插畫，與過關中頁面區隔，`public/images/`） */
+export const FINISH_PAGE_HERO_SRC =
+	"/images/stage-hero-festive-forest-flat.png" as const;
 
 /** 關卡貼圖（`public/images/stages/`），與 STAGE_NAMES 順序一致 */
 export function stageStickerSrc(n: number): string {

@@ -1,12 +1,10 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import AppHeader from "@/components/AppHeader.vue";
-import AppFooter from "@/components/AppFooter.vue";
+import GwBrandBar from "@/components/GwBrandBar.vue";
 import {
 	clearPendingStationVerification,
 	getCompletedStageIds,
-	getStage,
 	setInZone,
 } from "@/lib/demoState";
 import { useI18n } from "@/composables/useI18n";
@@ -15,17 +13,11 @@ import { GAME_CONFIG } from "@/constants";
 const route = useRoute();
 const router = useRouter();
 const { t } = useI18n();
-const stage = ref(1);
 const currentChallengeId = computed(() => {
 	const v = route.query.challengeId;
 	return typeof v === "string" ? v : "";
 });
 const ok = computed(() => route.query.ok === "1");
-const doneStationCount = computed(() => getCompletedStageIds().length);
-
-onMounted(() => {
-	stage.value = getStage();
-});
 
 function next() {
 	if (!ok.value) {
@@ -49,102 +41,113 @@ function next() {
 
 <template>
 	<div
-		class="relative flex min-h-full flex-col bg-gw-cream bg-[radial-gradient(ellipse_120%_80%_at_50%_-30%,rgba(26,157,74,0.06),transparent_50%)]"
+		class="relative flex min-h-full flex-col bg-[#eef0eb] bg-[radial-gradient(ellipse_120%_80%_at_50%_-30%,rgba(47,115,84,0.08),transparent_50%)]"
 	>
-		<AppHeader
-			class="relative z-[2]"
-			:stage="stage"
-			:completed-stages-count="doneStationCount"
-			show-progress
-			show-user
-		/>
+		<GwBrandBar />
 
 		<main
-			class="relative z-[2] flex flex-1 flex-col items-center px-5 pb-8 pt-6 sm:mx-auto sm:max-w-md sm:w-full"
+			class="relative z-[2] flex flex-1 flex-col items-center px-5 pb-10 pt-6 sm:mx-auto sm:w-full sm:max-w-md"
 		>
-			<!-- 純 CSS／SVG 雙層圓形狀態圖示（無圖檔） -->
-			<div
-				class="result-icon-wrap relative flex h-[7.25rem] w-[7.25rem] shrink-0 items-center justify-center"
-				aria-hidden="true"
-			>
+			<div class="relative flex w-full flex-col items-center">
+				<!-- 成功頁：葉／星裝飾（放大） -->
 				<div
-					:class="[
-						'absolute inset-0 rounded-full',
-						ok ? 'bg-gw-mint/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]' : 'bg-rose-100/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]',
-					]"
-				/>
+					v-if="ok"
+					class="pointer-events-none absolute left-[2%] top-[14%] text-4xl text-[#2f7354]/75 sm:left-[6%] sm:text-5xl"
+					aria-hidden="true"
+				>
+					🍃
+				</div>
 				<div
+					v-if="ok"
+					class="pointer-events-none absolute right-[4%] top-[10%] text-3xl text-amber-400/95 sm:right-[8%] sm:text-4xl"
+					aria-hidden="true"
+				>
+					✦
+				</div>
+
+				<div
+					class="result-icon-wrap relative flex h-[11rem] w-[11rem] shrink-0 items-center justify-center sm:h-[12rem] sm:w-[12rem]"
+					aria-hidden="true"
+				>
+					<div
+						:class="[
+							'absolute inset-0 rounded-full',
+							ok
+								? 'bg-gw-mint/90 shadow-[inset_0_1px_0_rgba(255,255,255,0.65)]'
+								: 'bg-rose-100/95 shadow-[0_0_56px_rgba(251,113,133,0.5)]',
+						]"
+					/>
+					<div
+						:class="[
+							'relative flex h-[7rem] w-[7rem] items-center justify-center rounded-full shadow-lg sm:h-[7.75rem] sm:w-[7.75rem]',
+							ok
+								? 'bg-[#22c55e] text-white shadow-gw-soft ring-[3px] ring-white/55'
+								: 'bg-[#b4232c] text-white shadow-[0_12px_28px_rgba(180,35,44,0.35)] ring-[3px] ring-white/35',
+						]"
+					>
+						<svg
+							v-if="ok"
+							class="h-12 w-12 translate-y-px sm:h-14 sm:w-14"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+						>
+							<path d="M5 13l5 5L20 7" />
+						</svg>
+						<svg
+							v-else
+							class="h-11 w-11 sm:h-12 sm:w-12"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.5"
+							stroke-linecap="round"
+						>
+							<path d="M7 7l10 10M17 7L7 17" />
+						</svg>
+					</div>
+				</div>
+
+				<h1
 					:class="[
-						'relative flex h-[4.75rem] w-[4.75rem] items-center justify-center rounded-full shadow-lg',
-						ok
-							? 'bg-gw-forest text-white shadow-gw-soft ring-2 ring-white/35'
-							: 'bg-[#b4232c] text-white shadow-[0_12px_28px_rgba(180,35,44,0.35)] ring-2 ring-white/30',
+						'mt-10 max-w-[22rem] text-center font-display text-[1.75rem] font-bold leading-snug tracking-tight text-balance sm:text-[2rem]',
+						ok ? 'text-[#2f7354]' : 'text-[#b4232c]',
 					]"
 				>
-					<svg
-						v-if="ok"
-						class="h-9 w-9 translate-y-px"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2.6"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-					>
-						<path d="M5 13l5 5L20 7" />
-					</svg>
-					<svg
-						v-else
-						class="h-8 w-8"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="2.6"
-						stroke-linecap="round"
-					>
-						<path d="M7 7l10 10M17 7L7 17" />
-					</svg>
-				</div>
+					{{ ok ? t("result.correctTitle") : t("result.wrongTitle") }}
+				</h1>
+
+				<p
+					class="mt-5 max-w-[24rem] text-center text-base leading-relaxed text-neutral-600 sm:text-lg"
+				>
+					{{
+						ok
+							? t("result.correctMessage")
+							: t("result.wrongMessage")
+					}}
+				</p>
 			</div>
 
-			<h1
-				:class="[
-					'mt-9 text-center font-display text-2xl font-bold tracking-tight sm:text-[1.65rem]',
-					ok ? 'text-gw-forest' : 'text-[#b4232c]',
-				]"
-			>
-				{{ ok ? t("result.correctTitle") : t("result.wrongTitle") }}
-			</h1>
-
-			<p
-				class="mt-4 max-w-[20rem] text-center text-[0.95rem] leading-relaxed text-gw-navy/88"
-			>
-				{{
-					ok
-						? t("result.correctMessage")
-						: t("result.wrongMessage")
-				}}
-			</p>
-
-			<div class="mt-auto flex w-full max-w-md flex-col gap-3 pt-12">
+			<div class="mt-12 flex w-full max-w-md flex-col gap-5">
 				<button
 					type="button"
-					class="w-full rounded-full bg-gradient-to-b from-gw-brand to-gw-forest py-4 text-base font-bold text-white shadow-btn transition duration-300 ease-gw-smooth hover:brightness-[1.05] active:scale-[0.99]"
+					class="w-full rounded-2xl bg-[#2f7354] py-[1.05rem] text-lg font-bold text-white shadow-lg transition hover:brightness-110 active:scale-[0.99] sm:py-5"
 					@click="next"
 				>
 					{{ ok ? t("result.nextButton") : t("result.retryButton") }}
 				</button>
 				<button
 					type="button"
-					class="w-full rounded-full border-2 border-gw-forest/85 bg-white py-3.5 text-base font-bold text-gw-forest transition hover:bg-gw-mint/40"
+					class="w-full py-2 text-center text-base font-semibold text-[#2f7354] underline decoration-[#2f7354]/40 underline-offset-4 transition hover:text-[#1f5a40]"
 					@click="router.push({ name: 'stage' })"
 				>
 					{{ t("result.backMapButton") }}
 				</button>
 			</div>
 		</main>
-
-		<AppFooter class="relative z-[2]" />
 	</div>
 </template>
 

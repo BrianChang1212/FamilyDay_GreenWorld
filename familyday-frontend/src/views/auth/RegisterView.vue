@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
+import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import { resetScavengerRun, setProfile } from "@/lib/demoState";
 import { getEntryIntent } from "@/lib/entryIntent";
 import { loginGame } from "@/api/authLogin";
-import { syncLocalProgressFromDashboard } from "@/api/gameFlow";
+import {
+	restartPlaythrough,
+	syncLocalProgressFromDashboard,
+} from "@/api/gameFlow";
 import { getViteApiBase } from "@/lib/apiBase";
 import { useI18n } from "@/composables/useI18n";
 
@@ -16,8 +19,6 @@ const employeeId = ref("");
 const isSubmitting = ref(false);
 const submitError = ref("");
 
-const isGame = computed(() => getEntryIntent() === "game");
-
 onMounted(() => {
 	if (getEntryIntent() === "checkin") {
 		router.replace({ name: "checkinWelcome" });
@@ -25,7 +26,7 @@ onMounted(() => {
 });
 
 const inputClass =
-	"w-full rounded-2xl border-0 bg-[#eef0ed] px-4 py-3.5 text-base text-gw-navy shadow-inner outline-none ring-1 ring-black/[0.04] transition focus:ring-2 focus:ring-gw-brand/35 placeholder:text-neutral-400";
+	"w-full rounded-xl border-0 bg-[#eef0ed] px-4 py-3.5 pr-12 text-base text-gw-navy outline-none ring-1 ring-black/[0.04] transition focus:bg-white focus:ring-2 focus:ring-[#2f7354]/30 placeholder:text-neutral-400";
 
 function friendlyAuthError(err: unknown): string {
 	if (!(err instanceof Error)) {
@@ -59,11 +60,21 @@ async function submit() {
 		await submitAuthApi(nameValue, employeeIdValue);
 		setProfile(nameValue, employeeIdValue);
 		resetScavengerRun();
+		/* 後端若仍保留上一輪通關紀錄，sync 會把舊進度寫回；須先 restart 再 sync。 */
 		if (getViteApiBase()) {
+			let restarted = false;
 			try {
-				await syncLocalProgressFromDashboard();
+				await restartPlaythrough();
+				restarted = true;
 			} catch {
-				/* ignore when dashboard is unreachable */
+				/* 離線或 API 不可用：維持僅清除 session，避免 sync 拉回舊儀表板 */
+			}
+			if (restarted) {
+				try {
+					await syncLocalProgressFromDashboard();
+				} catch {
+					/* ignore when dashboard is unreachable */
+				}
 			}
 		}
 		router.push({ name: "stage" });
@@ -76,87 +87,152 @@ async function submit() {
 </script>
 
 <template>
-	<div class="relative flex min-h-full flex-col bg-[#f7f8f6]">
-		<main class="relative z-[1] flex flex-1 flex-col px-5 pb-8 pt-8 sm:mx-auto sm:max-w-md">
-			<header>
-				<div class="flex items-start gap-2">
-					<span class="text-xl leading-none text-gw-brand" aria-hidden="true">🌲</span>
-					<span
-						class="inline-flex rounded-full bg-gw-mint/90 px-3 py-1 text-[10px] font-bold uppercase tracking-wide text-gw-brand-dark ring-1 ring-gw-mint-soft"
-					>
-						{{ t("register.tag") }}
-					</span>
-				</div>
-				<h1 class="font-display mt-8 text-[1.35rem] font-bold leading-snug text-gw-navy">
-					<span class="block">{{ t("register.titleLine1") }}</span>
-					<span class="mt-1 block font-bold italic text-[#1a5f2a]">{{
-						t("register.titleLine2")
-					}}</span>
-				</h1>
-				<div class="mt-3 h-1 w-14 rounded-full bg-[#e8a87c]" aria-hidden="true" />
-			</header>
+	<div class="relative flex min-h-full flex-col bg-[#eef0eb]">
+		<div class="bg-[#2f7354] px-5 pb-4 pt-7 text-center text-white shadow-sm">
+			<p class="font-display text-2xl italic tracking-wide">AmTRAN</p>
+			<p class="-mt-1 text-sm font-semibold tracking-[0.18em]">瑞軒科技</p>
+		</div>
 
-			<form class="mt-10 flex flex-1 flex-col gap-6" @submit.prevent="submit" novalidate>
-				<div class="space-y-2">
-					<label for="reg-name" class="text-sm font-bold text-neutral-600">{{
-						t("checkin.form.name")
-					}}</label>
-					<input
-						id="reg-name"
-						v-model="name"
-						type="text"
-						name="name"
-						autocomplete="name"
-						:placeholder="t('checkin.form.namePlaceholder')"
-						:class="inputClass"
-					/>
-				</div>
-				<div class="space-y-2">
-					<label for="reg-employee-id" class="text-sm font-bold text-neutral-600">{{
-						t("checkin.form.employeeId")
-					}}</label>
-					<input
-						id="reg-employee-id"
-						v-model="employeeId"
-						type="text"
-						name="username"
-						autocomplete="username"
-						:placeholder="t('checkin.form.employeeIdPlaceholder')"
-						:class="inputClass"
-					/>
-				</div>
-
+		<main
+			class="relative z-[1] flex flex-1 flex-col px-4 pb-8 pt-2 sm:mx-auto sm:w-full sm:max-w-md sm:px-6 sm:pt-3"
+		>
+			<div class="flex justify-center pb-3 pt-0">
 				<div
-					class="flex gap-3 rounded-2xl border border-neutral-200/80 bg-white px-4 py-4 shadow-sm ring-1 ring-black/[0.03]"
-					role="status"
+					class="flex h-[7.25rem] w-[7.25rem] shrink-0 items-center justify-center rounded-full bg-[#c8e6d6] shadow-[inset_0_2px_12px_rgba(47,115,84,0.12)] ring-4 ring-white/90"
 				>
-					<span
-						class="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-600"
+					<svg
+						class="h-16 w-16 origin-center -rotate-45 text-[#2f7354]"
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="currentColor"
+						stroke-width="2"
+						stroke-linecap="round"
+						stroke-linejoin="round"
 						aria-hidden="true"
 					>
-						<svg class="h-4 w-4" viewBox="0 0 24 24" fill="none">
-							<circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5" />
-							<path
-								d="M12 10v5M12 7h.01"
-								stroke="currentColor"
-								stroke-width="2"
-								stroke-linecap="round"
-							/>
-						</svg>
-					</span>
-					<p class="border-l-4 border-[#8b6914]/40 pl-3 text-sm leading-relaxed text-neutral-700">
-						{{ t("register.infoNotice") }}
-					</p>
+						<path
+							d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"
+						/>
+						<path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
+						<path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+						<path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+					</svg>
+				</div>
+			</div>
+
+			<h1
+				class="font-display w-full pb-6 text-center text-xl font-extrabold leading-snug text-[#2f7354] sm:text-[1.35rem]"
+			>
+				{{ t("register.heroTitle") }}
+			</h1>
+
+			<form class="flex flex-1 flex-col" @submit.prevent="submit" novalidate>
+				<div
+					class="rounded-2xl border border-neutral-200/70 bg-white p-5 shadow-md ring-1 ring-black/[0.04]"
+				>
+					<div class="space-y-5">
+						<div class="space-y-2">
+							<label
+								for="reg-name"
+								class="text-sm font-bold text-neutral-600"
+								>{{ t("checkin.form.name") }}</label
+							>
+							<div class="relative">
+								<input
+									id="reg-name"
+									v-model="name"
+									type="text"
+									name="name"
+									autocomplete="name"
+									:placeholder="t('register.namePlaceholder')"
+									:class="inputClass"
+								/>
+								<span
+									class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400"
+									aria-hidden="true"
+								>
+									<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+										<path
+											d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+											stroke="currentColor"
+											stroke-width="1.8"
+										/>
+										<path
+											d="M5 20a7 7 0 0 1 14 0"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-width="1.8"
+										/>
+									</svg>
+								</span>
+							</div>
+						</div>
+						<div class="space-y-2">
+							<label
+								for="reg-employee-id"
+								class="text-sm font-bold text-neutral-600"
+								>{{ t("checkin.form.employeeId") }}</label
+							>
+							<div class="relative">
+								<input
+									id="reg-employee-id"
+									v-model="employeeId"
+									type="text"
+									name="username"
+									autocomplete="username"
+									:placeholder="t('register.employeeIdPlaceholder')"
+									:class="inputClass"
+								/>
+								<span
+									class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-400"
+									aria-hidden="true"
+								>
+									<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+										<rect
+											x="5"
+											y="6"
+											width="14"
+											height="14"
+											rx="2"
+											stroke="currentColor"
+											stroke-width="1.8"
+										/>
+										<path
+											d="M9 4v4M15 4v4M8.5 12h7M8.5 16h4"
+											stroke="currentColor"
+											stroke-linecap="round"
+											stroke-width="1.8"
+										/>
+									</svg>
+								</span>
+							</div>
+						</div>
+
+						<div
+							class="flex gap-3 rounded-xl border border-[#f3c7a7] bg-[#fff3ea] px-4 py-4 text-[#a7541f]"
+							role="status"
+						>
+							<span
+								class="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full border border-[#df8b43] text-xs font-bold"
+								aria-hidden="true"
+							>
+								i
+							</span>
+							<p class="text-sm font-medium leading-relaxed">
+								{{ t("register.infoNotice") }}
+							</p>
+						</div>
+					</div>
 				</div>
 
-				<div class="mt-auto pt-4">
+				<div class="mt-8">
 					<button
 						type="submit"
 						:disabled="isSubmitting || !name.trim() || !employeeId.trim()"
-						class="flex w-full items-center justify-center gap-2 rounded-full bg-[#1a5f2a] py-4 text-base font-bold text-white shadow-[0_8px_24px_rgba(26,95,42,0.25)] transition enabled:active:scale-[0.99] enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+						class="gw-checkin-cta gw-checkin-cta--pill disabled:cursor-not-allowed disabled:opacity-45"
 					>
-						{{ isSubmitting ? "Signing in..." : t("register.submitButton") }}
-						<span aria-hidden="true">›</span>
+						{{ isSubmitting ? t("register.signingIn") : t("register.submitButton") }}
 					</button>
 					<p
 						v-if="submitError"
@@ -168,10 +244,7 @@ async function submit() {
 				</div>
 			</form>
 
-			<p v-if="!isGame" class="mt-4 text-center text-xs text-neutral-500">
-				{{ t("register.normalFlowHint") }}
-			</p>
-			<p class="mt-6 text-center text-xs text-neutral-400">{{ t("footer.copyright") }}</p>
+			<p class="mt-8 text-center text-xs text-neutral-400">{{ t("footer.copyright") }}</p>
 		</main>
 
 		<AppFooter class="relative z-[1] border-t-0 bg-transparent" />

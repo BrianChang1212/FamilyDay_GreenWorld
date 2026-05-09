@@ -1,13 +1,12 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
-import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
+import GwBrandBar from "@/components/GwBrandBar.vue";
 import { claimFinishReward, logoutGame, restartPlaythrough } from "@/api/gameFlow";
 import {
-	LEVEL_COMPLETE_STICKER_SRC,
+	FINISH_PAGE_HERO_SRC,
 	getProfile,
-	getStage,
 	getFinishClaimedCount,
 	resetScavengerRun,
 } from "@/lib/demoState";
@@ -15,11 +14,10 @@ import { incrementLocalFinishClaimIfNoApiBase } from "@/lib/provisionalFinishCla
 import { resolveRewardClaimPresentation } from "@/lib/rewardClaimPresentation";
 import { getViteApiBase } from "@/lib/apiBase";
 import { useI18n } from "@/composables/useI18n";
-import { FINISH_REWARD_SLOTS, GAME_CONFIG } from "@/constants";
+import { FINISH_REWARD_SLOTS } from "@/constants";
 
 const router = useRouter();
 const { t } = useI18n();
-const stage = ref(GAME_CONFIG.TOTAL_STAGES);
 const name = ref("");
 const employeeId = ref("");
 const showClaimModal = ref(false);
@@ -77,7 +75,6 @@ function retryLoadStatus() {
 }
 
 onMounted(() => {
-	stage.value = getStage();
 	const p = getProfile();
 	name.value = p.name || t("finish.fallbackName");
 	employeeId.value = p.employeeId || "—";
@@ -86,6 +83,7 @@ onMounted(() => {
 
 function openClaimModal() {
 	if (isClaimFull.value || statusLoadState.value !== "ok") return;
+	claimError.value = "";
 	showClaimModal.value = true;
 }
 
@@ -102,7 +100,7 @@ async function confirmClaim() {
 		try {
 			await claimFinishReward();
 			showClaimModal.value = false;
-			await router.push({ name: "finishClaimSuccess" });
+			await refreshClaimed();
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
 			if (/REWARD_CLAIM_LIMIT_REACHED|409/.test(msg)) {
@@ -120,10 +118,7 @@ async function confirmClaim() {
 	}
 	showClaimModal.value = false;
 	incrementLocalFinishClaimIfNoApiBase();
-	claimedCount.value = getFinishClaimedCount();
-	if (claimedCount.value >= maxSlots.value) {
-		await router.push({ name: "finishClaimSuccess" });
-	}
+	await refreshClaimed();
 }
 
 function goHome() {
@@ -157,30 +152,17 @@ function restartGame() {
 </script>
 
 <template>
-	<div class="relative flex min-h-full flex-col bg-[#f5f6f4]">
-		<AppHeader
-			class="relative z-[2]"
-			:stage="stage"
-			:completed-override="GAME_CONFIG.TOTAL_STAGES"
-			show-progress
-			show-user
-		/>
+	<div class="gw-page-fill relative flex min-h-full flex-col bg-[#eef0eb]">
+		<GwBrandBar />
 
-		<main class="relative z-[2] flex flex-1 flex-col px-4 pb-6 pt-4 sm:mx-auto sm:max-w-md sm:w-full">
-			<div class="rounded-2xl bg-gw-brand px-4 py-4 text-center shadow-md">
-				<p class="text-xs font-bold uppercase tracking-wider text-white/90">
-					{{ t("finish.bannerTitle") }}
-				</p>
-				<p class="mt-1 font-display text-xl font-bold text-white">
-					{{ t("finish.title") }}
-				</p>
-			</div>
-
+		<main
+			class="relative z-[2] flex flex-1 flex-col px-4 pb-8 pt-5 sm:mx-auto sm:w-full sm:max-w-md"
+		>
 			<div
-				class="mt-6 overflow-hidden rounded-3xl border border-gw-brand/15 bg-[#f5f0e8] shadow-card-sm ring-1 ring-black/[0.04]"
+				class="overflow-hidden rounded-3xl border border-neutral-200/80 bg-white shadow-[0_12px_40px_-12px_rgba(15,31,46,0.12)] ring-1 ring-black/[0.04]"
 			>
 				<img
-					:src="LEVEL_COMPLETE_STICKER_SRC"
+					:src="FINISH_PAGE_HERO_SRC"
 					width="1200"
 					height="900"
 					:alt="t('finish.imageAlt')"
@@ -190,115 +172,163 @@ function restartGame() {
 				/>
 			</div>
 
-			<p class="mt-8 text-center text-base font-bold leading-relaxed text-gw-navy">
+			<h1
+				class="mt-8 text-center font-display text-[2rem] font-extrabold leading-[1.15] tracking-tight text-[#2f7354] sm:text-[2.5rem] md:text-[2.65rem]"
+			>
+				{{ t("finish.headline") }}
+			</h1>
+			<p
+				class="mx-auto mt-4 max-w-[26rem] text-center text-[0.95rem] leading-relaxed text-neutral-600 sm:text-base"
+			>
 				{{ t("finish.completeMessage") }}
 			</p>
-
-			<p class="mt-4 text-center text-base font-bold text-gw-navy">
+			<p
+				class="mt-5 text-center text-lg font-bold tabular-nums tracking-tight text-gw-navy sm:text-xl"
+			>
 				{{ userLine }}
 			</p>
 
 			<section class="mt-8">
-				<h2 class="text-center text-base font-bold text-[#b45309]">
-					{{ t("finish.statusTitle") }}
-				</h2>
 				<div
 					v-if="statusLoadState === 'loading'"
-					class="mt-6 text-center text-sm text-neutral-500"
+					class="rounded-2xl bg-neutral-100/95 px-4 py-10 text-center text-sm text-neutral-500"
 					aria-live="polite"
 				>
 					{{ t("claimSuccess.loadingStatus") }}
 				</div>
 				<div
 					v-else-if="statusLoadState === 'error'"
-					class="mt-6 rounded-xl border border-red-200 bg-red-50/90 px-3 py-3 text-center text-[12px] text-red-900"
+					class="rounded-2xl border border-red-200 bg-red-50/90 px-4 py-4 text-center text-[12px] text-red-900"
 					role="alert"
 				>
 					<p>{{ statusError }}</p>
 					<button
 						type="button"
-						class="mt-2 text-[11px] font-semibold text-gw-brand underline underline-offset-2"
+						class="mt-3 text-[11px] font-semibold text-[#2f7354] underline underline-offset-2"
 						@click="retryLoadStatus"
 					>
 						{{ t("claimSuccess.retryButton") }}
 					</button>
 				</div>
-				<p
-					v-if="statusLoadState === 'ok' && isClaimFull"
-					class="mx-auto mt-4 max-w-[22rem] rounded-xl border border-amber-200/90 bg-amber-50/95 px-3 py-3 text-center text-[12px] font-semibold leading-relaxed text-amber-950"
-					role="status"
-				>
-					{{ t("finish.rewardLimitReached", { maxSlots }) }}
-				</p>
 				<div
-					v-if="statusLoadState === 'ok'"
-					class="mt-6 flex justify-between gap-2 px-1"
+					v-else-if="statusLoadState === 'ok'"
+					class="rounded-2xl bg-neutral-100/95 px-4 py-6 ring-1 ring-neutral-200/80"
 				>
-					<div
-						v-for="(label, i) in slotLabels"
-						:key="i"
-						class="flex flex-1 flex-col items-center"
-					>
-						<div
-							:class="[
-								'flex h-14 w-14 items-center justify-center rounded-full text-xl transition',
-								slotActive(i)
-									? 'bg-[#fecaca] text-[#78350f] shadow-sm ring-2 ring-white'
-									: 'bg-neutral-200/90 text-neutral-500',
-							]"
+					<div class="flex items-center justify-center gap-2">
+						<svg
+							class="h-6 w-6 shrink-0 text-[#2f7354]"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="1.6"
+							stroke-linecap="round"
+							stroke-linejoin="round"
 							aria-hidden="true"
 						>
-							🎁
+							<circle cx="12" cy="9" r="5" />
+							<path d="M8 14l-1.5 8 5.5-3 5.5 3L16 14" />
+						</svg>
+						<h2 class="text-center text-base font-bold text-neutral-800">
+							{{ t("finish.statusTitle") }}
+						</h2>
+					</div>
+
+					<p
+						v-if="isClaimFull"
+						class="mx-auto mt-4 max-w-[22rem] rounded-xl border border-amber-200/90 bg-amber-50/95 px-3 py-3 text-center text-[12px] font-medium leading-relaxed text-amber-950"
+						role="status"
+					>
+						{{ t("finish.rewardLimitReached", { maxSlots }) }}
+					</p>
+
+					<div class="mt-6 flex justify-center gap-2 sm:gap-3">
+						<div
+							v-for="(label, i) in slotLabels"
+							:key="i"
+							class="flex min-w-0 flex-1 flex-col items-center"
+						>
+							<div
+								:class="[
+									'flex h-[4.75rem] w-full max-w-[6.5rem] items-center justify-center rounded-xl border-2 transition sm:h-[5.25rem]',
+									slotActive(i)
+										? 'border-orange-200 bg-orange-50/90 shadow-sm'
+										: 'border-dashed border-neutral-300 bg-white',
+								]"
+							>
+								<svg
+									class="h-9 w-9 sm:h-10 sm:w-10"
+									viewBox="0 0 24 24"
+									fill="none"
+									stroke="currentColor"
+									stroke-width="1.5"
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									:class="
+										slotActive(i) ? 'text-orange-500' : 'text-neutral-400'
+									"
+									aria-hidden="true"
+								>
+									<path
+										d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"
+									/>
+									<path
+										d="M4 12h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3.5a3.5 3.5 0 0 1-7 0H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2Z"
+									/>
+									<path d="M12 8v13" />
+								</svg>
+							</div>
+							<p
+								:class="[
+									'mt-2.5 text-center text-[11px] font-semibold sm:text-xs',
+									slotActive(i) ? 'text-orange-700/90' : 'text-neutral-400',
+								]"
+							>
+								{{ label }}
+							</p>
 						</div>
-						<p class="mt-2 text-center text-[11px] font-semibold text-gw-navy/85">
-							{{ label }}
-						</p>
 					</div>
 				</div>
-				<p
-					v-if="statusLoadState === 'ok' && !isClaimFull && claimedCount > 0"
-					class="mx-auto mt-4 max-w-[22rem] text-center text-[11px] leading-relaxed text-neutral-500"
-				>
-					{{ t("finish.loopHint", { maxSlots }) }}
-				</p>
 			</section>
 
-			<div class="mt-auto flex flex-col gap-3 pt-10">
+			<p
+				v-if="statusLoadState === 'ok' && !isClaimFull"
+				class="mt-8 text-center text-sm font-medium text-neutral-600"
+			>
+				{{ t("finish.staffHintClaim") }}
+			</p>
+
+			<div class="mt-3 flex flex-col gap-3">
 				<button
 					type="button"
-					class="w-full rounded-full py-4 text-base font-bold shadow-lg transition"
+					class="w-full rounded-2xl py-[1.05rem] text-lg font-bold shadow-md transition sm:py-5"
 					:class="
 						isClaimFull || statusLoadState !== 'ok'
-							? 'cursor-not-allowed bg-neutral-300 text-neutral-500'
-							: 'bg-[#1a5f2a] text-white hover:brightness-110'
+							? 'cursor-not-allowed bg-neutral-200 text-neutral-500'
+							: 'bg-[#2f7354] text-white shadow-[0_8px_24px_rgba(47,115,84,0.35)] hover:brightness-110'
 					"
 					:disabled="isClaimFull || statusLoadState !== 'ok'"
 					@click="openClaimModal"
 				>
 					{{ isClaimFull ? t("finish.claimButtonDone") : t("finish.claimButton") }}
 				</button>
-				<p
-					v-if="statusLoadState === 'ok' && !isClaimFull"
-					class="text-center text-[11px] leading-relaxed text-neutral-500"
-				>
-					{{ t("finish.staffHint") }}
-				</p>
-				<button
-					type="button"
-					:disabled="actionLoading"
-					class="w-full rounded-full border-2 border-gw-brand/35 bg-white py-3.5 text-base font-bold text-gw-brand transition enabled:hover:bg-gw-mint/30 disabled:cursor-not-allowed disabled:opacity-60"
-					@click="restartGame"
-				>
-					{{ actionLoading ? "Processing..." : "再玩一輪" }}
-				</button>
-				<button
-					type="button"
-					class="w-full rounded-full border-2 border-[#1a5f2a] bg-white py-3.5 text-base font-bold text-[#1a5f2a] transition hover:bg-neutral-50"
-					:disabled="actionLoading"
-					@click="goHome"
-				>
-					{{ t("finish.backHomeButton") }}
-				</button>
+				<div class="flex flex-col gap-2 pt-2">
+					<button
+						type="button"
+						:disabled="actionLoading"
+						class="w-full rounded-2xl border border-[#2f7354]/30 bg-white py-3.5 text-base font-bold text-[#2f7354] transition enabled:hover:bg-gw-mint/35 disabled:cursor-not-allowed disabled:opacity-60"
+						@click="restartGame"
+					>
+						{{ actionLoading ? t("common.loading") : t("finish.restartPlayButton") }}
+					</button>
+					<button
+						type="button"
+						class="w-full rounded-2xl border-2 border-[#2f7354]/25 bg-transparent py-3.5 text-base font-bold text-[#2f7354] transition hover:bg-white/80"
+						:disabled="actionLoading"
+						@click="goHome"
+					>
+						{{ t("finish.backHomeButton") }}
+					</button>
+				</div>
 				<p
 					v-if="actionError"
 					class="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-800"
@@ -309,47 +339,68 @@ function restartGame() {
 			</div>
 		</main>
 
-		<AppFooter class="relative z-[2]" />
+		<AppFooter class="relative z-[2] border-t-0 bg-transparent" />
 
 		<Teleport to="body">
 			<div
 				v-if="showClaimModal"
-				class="fixed inset-0 z-[200] flex items-center justify-center bg-black/45 px-5 backdrop-blur-[2px]"
+				class="fixed inset-0 z-[200] flex items-center justify-center bg-black/55 px-5 backdrop-blur-sm"
 				role="dialog"
 				aria-modal="true"
 				aria-labelledby="finish-claim-modal-title"
 				@click.self="closeClaimModal"
 			>
 				<div
-					class="w-full max-w-sm overflow-hidden rounded-3xl border border-neutral-200 bg-white p-6 shadow-2xl"
+					class="w-full max-w-[min(22rem,calc(100vw-2.5rem))] overflow-hidden rounded-[1.35rem] border border-neutral-200/90 bg-[#fafaf8] p-8 shadow-2xl ring-1 ring-black/[0.03]"
 					@click.stop
 				>
-					<div
-						class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-gw-mint text-3xl"
-						aria-hidden="true"
-					>
-						🎁
+					<div class="flex flex-col items-center">
+						<div
+							class="flex h-20 w-20 items-center justify-center rounded-full bg-[#d9ead3] shadow-inner ring-1 ring-[#2f7354]/10"
+							aria-hidden="true"
+						>
+							<svg
+								class="h-11 w-11 text-[#2f7354]"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.5"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path
+									d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"
+								/>
+								<path
+									d="M4 12h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3.5a3.5 3.5 0 0 1-7 0H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2Z"
+								/>
+								<path d="M12 8v13" />
+							</svg>
+						</div>
+						<h2
+							id="finish-claim-modal-title"
+							class="mt-6 text-center text-xl font-bold text-neutral-900"
+						>
+							{{ t("finish.modalTitle") }}
+						</h2>
+						<p class="mt-3 text-center text-[0.95rem] leading-relaxed text-neutral-600">
+							{{ t("finish.modalMessage", { nextClaimIndex }) }}
+						</p>
+						<p class="mt-5 text-center text-sm text-neutral-400">
+							{{ t("finish.modalStaffInstruction") }}
+						</p>
 					</div>
-					<h2 id="finish-claim-modal-title" class="mt-4 text-center text-lg font-bold text-gw-navy">
-						{{ t("finish.modalTitle") }}
-					</h2>
-					<p class="mt-2 text-center text-sm text-neutral-600">
-						{{ t("finish.modalMessage", { nextClaimIndex }) }}
-					</p>
-					<p class="mt-3 text-center text-[11px] text-neutral-500">
-						{{ t("finish.staffHint") }}
-					</p>
 					<p
 						v-if="claimError"
-						class="mt-3 rounded-lg border border-red-200 bg-red-50 px-2 py-2 text-center text-[11px] text-red-900"
+						class="mt-4 rounded-xl border border-red-200 bg-red-50/95 px-3 py-2.5 text-center text-[12px] leading-snug text-red-900"
 						role="alert"
 					>
 						{{ claimError }}
 					</p>
-					<div class="mt-6 flex flex-col gap-2">
+					<div class="mt-8 flex flex-col gap-3">
 						<button
 							type="button"
-							class="w-full rounded-full bg-gw-brand py-3.5 text-base font-bold text-white shadow-md transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
+							class="w-full rounded-2xl bg-[#2f7354] py-4 text-lg font-bold text-white shadow-md transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
 							:disabled="claimSubmitting"
 							@click="confirmClaim"
 						>
@@ -357,7 +408,7 @@ function restartGame() {
 						</button>
 						<button
 							type="button"
-							class="w-full rounded-full border-2 border-neutral-200 bg-white py-3 text-sm font-semibold text-neutral-700 transition enabled:hover:bg-neutral-50 disabled:cursor-not-allowed disabled:opacity-50"
+							class="w-full rounded-2xl bg-neutral-200 py-[0.95rem] text-base font-bold text-neutral-600 transition enabled:hover:bg-neutral-300 disabled:cursor-not-allowed disabled:opacity-50"
 							:disabled="claimSubmitting"
 							@click="closeClaimModal"
 						>

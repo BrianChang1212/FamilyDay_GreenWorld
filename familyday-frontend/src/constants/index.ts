@@ -12,12 +12,13 @@ export const APP_CONFIG = {
 	EVENT_NAME: b.eventTitle,
 	LOCATION: b.location,
 	MAX_COMPANIONS: b.maxCompanions,
+	/** 闖關禮領取上限（輪數）；不同於「可玩幾輪關卡」—後者無此常數限制 */
 	MAX_REWARD_CLAIMS: g.maxRewardRounds,
 	DEFAULT_PLAYER_NAME: b.defaultPlayerName,
 	COPYRIGHT: b.copyright,
 };
 
-/** 闖關禮可領取次數上限（完成頁／領取成功頁與後端 dashboard 預設對齊） */
+/** 終點闖關禮「領取」次數上限（`fdgw.game.maxRewardRounds`／後端）。僅領獎有此限制；關卡通關可重複、登入重製進度不影響此計數。 */
 export const FINISH_REWARD_SLOTS = APP_CONFIG.MAX_REWARD_CLAIMS;
 
 export const GAME_CONFIG = {
