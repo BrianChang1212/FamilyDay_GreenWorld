@@ -10,8 +10,9 @@
 
 | 資料夾 | 用途 |
 |--------|------|
+| [`overview/`](./overview/) | **根 README 補充**（[`root-readme-supplement.md`](./overview/root-readme-supplement.md)：截圖、Demo 內嵌、Mermaid、目錄表、長篇待辦） |
 | [`project/`](./project/) | **專案主文件**（需求、會議、待確認、狀態、技術規格合併版） |
-| [`specs/`](./specs/) | **舊版介面規格快照**（目前正式契約維護於 `familyday-api-contract/`） |
+| [`specs/`](./specs/) | **`api-v0.1.md` 副本**（與 [`familyday-api-contract/api-v0.1.md`](../familyday-api-contract/api-v0.1.md) **同步維護**；便於 `docs/` 內相對連結與 PR diff） |
 | [`architecture/`](./architecture/) | **架構討論總結**（前後端技術選型、部署、流量） |
 | [`testing/`](./testing/) | **整合驗證清單**（前後端 API 實測流程與驗收 Checklist） |
 | [`setup/`](./setup/) | **本機與預覽**（GCP／Firestore、靜態預覽、Windows Node.js；詳見 [`setup/README.md`](./setup/README.md)） |
@@ -27,8 +28,8 @@
 
 ## 開發環境（Windows／Node）
 
-- **最短路徑：** 根目錄 [`README.md`](../README.md#快速開始)（`npm run dev`、測試、CI）。  
-- **前端 + API + 雲端 Firestore（Windows 一鍵）：** 根 [`README.md`](../README.md) **「Windows：一鍵啟動」**、`scripts/dev-oneclick.ps1`。  
+- **最短路徑：** 根目錄 [`README.md`](../README.md#quick-start)（`npm run dev`、測試、CI）。  
+- **前端 + API + 雲端 Firestore（Windows 一鍵）：** [`setup/README.md`](./setup/README.md)、[`setup/local-firestore-gcp.md`](./local-firestore-gcp.md)；根 [`README.md`](../README.md) 僅保留最短摘要。
 - **詳細：** [`setup/README.md`](./setup/README.md)（Firestore／GCP、靜態預覽、Windows Node 疑難排解）。
 
 ---
@@ -38,16 +39,16 @@
 | 想找… | 檔案 |
 |--------|------|
 | 需求與專案狀態 | [`project/project-master.md`](./project/project-master.md) |
-| API v0.1 草案（現行） | [`../familyday-api-contract/api-v0.1.md`](../familyday-api-contract/api-v0.1.md) |
-| API v0.1 草案（歷史快照） | [`specs/api-v0.1.md`](./specs/api-v0.1.md) |
-| Firestore Schema（v1 草案） | [`architecture/firestore-schema-v1.md`](./architecture/firestore-schema-v1.md) |
+| API v0.1 草案（契約 repo · 現行） | [`../familyday-api-contract/api-v0.1.md`](../familyday-api-contract/api-v0.1.md) |
+| API v0.1 草案（`docs/specs` · 與契約同步副本） | [`specs/api-v0.1.md`](./specs/api-v0.1.md) |
 | API 整合清單（精簡） | [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md) |
 | API Mock 測試流程 | [`testing/api-mock-testing.md`](./testing/api-mock-testing.md) |
 | API 歷史驗證紀錄 | [`testing/api-integration-history.md`](./testing/api-integration-history.md) |
 | 本機 GCP 服務帳戶（Firestore／verify） | [`setup/local-firestore-gcp.md`](./setup/local-firestore-gcp.md)；[`architecture/summary-backend.md`](./architecture/summary-backend.md) **§2.0** |
 | Firebase 相關檔案分類（`familyday-backend/` 設定 vs fdgw） | [`firebase/README.md`](./firebase/README.md) |
 | 前端／後端／部署／流量摘要 | [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) 等 |
-| 測試 Web UI（Netlify、QR） | [`setup/static-preview-netlify-github.md`](./setup/static-preview-netlify-github.md)；根 [`README`](../README.md#preview-netlify-test-ui) 錨點 **`preview-netlify-test-ui`**；[`summary-deployment.md`](./architecture/summary-deployment.md) **§1.1**（**v1.6**） |
+| 根 README 補充（截圖／技術圖／目錄表／長篇待辦） | [`overview/root-readme-supplement.md`](./overview/root-readme-supplement.md) |
+| 測試 Web UI（Netlify、QR） | [`setup/static-preview-netlify-github.md`](./setup/static-preview-netlify-github.md)；錨點 [`overview/root-readme-supplement.md#preview-netlify-test-ui`](./overview/root-readme-supplement.md#preview-netlify-test-ui)；[`summary-deployment.md`](./architecture/summary-deployment.md) **§1.1**（**v1.6**） |
 | 前端單元測試（Vitest） | `familyday-frontend/`：`npm run test`；規格見 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) **§1.1**（**v1.31**） |
 | 提案 PDF | [`proposals/FamilyDayApp_Proposal_v1.pdf`](./proposals/FamilyDayApp_Proposal_v1.pdf) |
 | Wireframe PNG | [`design/wireframe/`](./design/wireframe/) |
@@ -57,11 +58,11 @@
 
 ## 根目錄 README
 
-對外總覽與表格連結請見倉庫根目錄 [`README.md`](../README.md)（內含已更新之路徑）。
+根目錄 [`README.md`](../README.md) 為**精簡總覽**（快速開始、即時進度、待辦摘要、舊錨點對照）。**長文、截圖、Mermaid、目錄表**見 [`overview/root-readme-supplement.md`](./overview/root-readme-supplement.md)。
 
 ---
 
-**最後整理：** 2026-05-05（續：**`api-v0.1` v0.1.21**／**`summary-frontend` v1.31** 版本鏈；**`api-v0.1`** CORS／`eventId` 對齊 `fdgw`；**checklist** §7.1 歷史表加對照說明、儀表板 curl 註記 mock 8787；根 **README** 埠號指向 `fdgw.frontend`；**`project-master` v1.3.33**）。先前同日：**`firebase/`** 索引；**`dev-oneclick`**；**`local-firestore-gcp`／checklist／summary-backend`** 與 `-FunctionsOnly`。再前：2026-05-03（**`setup/`**；**`summary-deployment` v1.6**；**`api-v0.1` v0.1.20**；**`summary-frontend` v1.30**）。**`api-v0.1`** 已於 2026-05-05 遞增至 **v0.1.21**，**`summary-frontend`** 至 **v1.31**（見本日「續」條目）。版本與修訂歷史以各檔案檔頭及
+**最後整理：** 2026-05-11（**`api-v0.1` v0.1.22**：契約與 `docs/specs` 副本同步—Mock／MVP 路徑對齊 `familyday-frontend/mock`、`familyday-backend/`；根 **README** v2.58 同步 API 函式／Vitest 檔數）。2026-05-05（續：**`api-v0.1` v0.1.21**／**`summary-frontend` v1.31** 版本鏈；**`api-v0.1`** CORS／`eventId` 對齊 `fdgw`；**checklist** §7.1 歷史表加對照說明、儀表板 curl 註記 mock 8787；根 **README** 埠號指向 `fdgw.frontend`；**`project-master` v1.3.33**）。先前同日：**`firebase/`** 索引；**`dev-oneclick`**；**`local-firestore-gcp`／checklist／summary-backend`** 與 `-FunctionsOnly`。再前：2026-05-03（**`setup/`**；**`summary-deployment` v1.6**；**`api-v0.1` v0.1.20**；**`summary-frontend` v1.30**）。**`api-v0.1`** 已於 2026-05-05 遞增至 **v0.1.21**，**`summary-frontend`** 至 **v1.31**（見本日「續」條目）。版本與修訂歷史以各檔案檔頭及
 [`project/project-master.md`](./project/project-master.md) 頁尾版本列為準。
 技術細節請直接查閱對應單一來源文件：前端
 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md)、後端
@@ -70,4 +71,4 @@
 [`architecture/summary-traffic.md`](./architecture/summary-traffic.md)、API
 [`specs/api-v0.1.md`](./specs/api-v0.1.md)、整合驗證
 [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md)；
-測試 Web UI 見 [`setup/static-preview-netlify-github.md`](./setup/static-preview-netlify-github.md) 或根 [`README`](../README.md#preview-netlify-test-ui)。
+測試 Web UI 見 [`setup/static-preview-netlify-github.md`](./setup/static-preview-netlify-github.md) 或 [`overview/root-readme-supplement.md#preview-netlify-test-ui`](./overview/root-readme-supplement.md#preview-netlify-test-ui)。

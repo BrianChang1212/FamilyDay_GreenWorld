@@ -1,13 +1,14 @@
 # 家庭日闖關系統 — 專案主文件（合併版）
 
 > **專案：** 瑞軒 2026 家庭日闖關系統  
-> **最後更新：** 2026-04-30（同步 Cloud Functions、CORS allowlist 與 Firestore 驗證阻塞現況）。
+> **最後更新：** 2026-05-11  
+> **工作約定（執行來源）：** **進度現況**（View／API 函式數／測試檔數／端點與阻塞敘述）以根目錄 [`README.md`](../../README.md#readme-live-progress) **「即時進度」** 區塊為準；**待辦勾選與行動清單**以本檔 [§ 待辦事項](#work-backlog) 為準。二者並列為日常跟進來源，更新時請避免只靠本檔舊數字敘述。根 README 長文已遷至 [`overview/root-readme-supplement.md`](../overview/root-readme-supplement.md)。  
 > 前端流程與路由見 [`summary-frontend.md`](../architecture/summary-frontend.md)
 > §2.1–§2.3；測試 Web UI／Netlify 預覽見根
-> [`README.md`](../../README.md#preview-netlify-test-ui)；部署摘要見
+> [`README.md`](../../README.md)；**測試 Web UI 錨點**見 [`docs/overview/root-readme-supplement.md#preview-netlify-test-ui`](../overview/root-readme-supplement.md#preview-netlify-test-ui)；部署摘要見
 > [`summary-deployment.md`](../architecture/summary-deployment.md) §1.1；API 詳規見
-> [`api-v0.1.md`](../specs/api-v0.1.md)。
-> **維護：** 以本檔為單一詳細文件；根目錄 [`README.md`](../../README.md) 為總覽；[`docs/README.md`](../README.md) 為 `docs/` 分類索引。
+> [`api-v0.1.md`](../specs/api-v0.1.md)。  
+> **維護：** 需求／待確認／技術細節以本檔為主；根 [`README.md`](../../README.md) 為總覽與**即時進度**；[`docs/README.md`](../README.md) 為 `docs/` 分類索引。
 
 ## 本文件目錄
 
@@ -16,6 +17,7 @@
 - [需求與流程](#需求與流程)
 - [待確認與會議](#待確認與會議)
 - [專案狀態](#專案狀態)
+- [待辦事項 · 工作來源](#work-backlog)
 - [技術規格](#技術規格)
 - [附錄：維護與閱讀順序](#附錄維護與閱讀順序)
 
@@ -26,7 +28,7 @@
 | [`api-v0.1.md`](../specs/api-v0.1.md) | REST API v0.1 單一來源（簽到／登入分開、站點 JWT、`GET /api/v1/me/dashboard` 等端點與欄位、mock 驗證差異註記）。 |
 | [`summary-frontend.md`](../architecture/summary-frontend.md) | 前端單一來源（Vue 3 + Vite + TS + Tailwind + Vue Router、`views/` 分群、`constants`/`i18n` 集中化、`api/` 與 `composables` 分層、Vitest 與 CI）。 |
 | [`summary-backend.md`](../architecture/summary-backend.md) | 後端：Firebase（Firestore / Realtime Database）、安全規則與資料模型重點 |
-| [`summary-deployment.md`](../architecture/summary-deployment.md) | 部署：Firebase 專案、Blaze 預算告警與環境分層；**§1.1** 靜態預覽、**測試 Web UI** 與 **CI**（**v1.6**）；操作細節見 [`setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)，根 [`README.md`](../../README.md#preview-netlify-test-ui) 保留錨點 |
+| [`summary-deployment.md`](../architecture/summary-deployment.md) | 部署：Firebase 專案、Blaze 預算告警與環境分層；**§1.1** 靜態預覽、**測試 Web UI** 與 **CI**（**v1.6**）；操作細節見 [`setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)，**測試 Web UI 錨點**見 [`overview/root-readme-supplement.md`](../overview/root-readme-supplement.md#preview-netlify-test-ui) |
 | [`summary-traffic.md`](../architecture/summary-traffic.md) | 流量：在線≠RPS、限流、尖峰與壓測建議 |
 
 **說明：** 上表為開發架構討論之**建議草案**，與本檔下方「技術規格」大章中歷史「待選項」並存；**正式定案**仍應經會議／IT／採購確認後更新本檔並勾選 [待確認與會議](#待確認與會議) 對應項目。操作示範錄影與截圖維護見 [`media/README.md`](../media/README.md)。
@@ -482,9 +484,9 @@
 
 ## 專案狀態
 
-> **最後更新：** 2026-05-10（原始碼掃描校正：前端 11 View 全數完整實作、後端 19 端點落地、雙模式資料層完整）  
+> **最後更新：** 2026-05-11（與根 [`README.md`](../../README.md#readme-live-progress) **即時進度**對齊：**11** View、**11** 支前端 API 函式、**15** 個 Vitest 檔、後端 **19** 端點）  
 > **專案階段：** 開發驗證與阻塞解除  
-> **整體進度：** 78%（程式碼實際掃描結果；阻塞點為 Firestore IAM 憑證未設定，非程式碼問題）
+> **整體進度：** 78%（概估；**計數與阻塞敘述**以上方連結之 **README 即時進度** 為準）
 
 ---
 
@@ -496,7 +498,7 @@
 ✓ 需求收集與整理      [████████████] 100%
 → 技術選型            [██████████░░]  85%（架構草案完成，待正式簽核）
   UI/UX 設計          [███░░░░░░░░░]  22%（流程稿先行；正式視覺資產持續補齊）
-✓ 前端開發            [███████████░]  95%（11 View 全數 REAL、10 API 函式、14 測試無 skip）
+✓ 前端開發            [████████████] 100%（11 View、11 API 函式、15 測試無 skip；見 README 即時進度）
 → 後端開發            [██████████░░]  90%（19 端點落地；admin attendance total hardcoded）
   整合測試            [██████░░░░░░]  55%（in-memory Pass 17；Firestore Blocked 憑證）
   壓力測試            [░░░░░░░░░░░░]   0%
@@ -520,10 +522,10 @@
    - [x] 需求／技術／待確認／狀態等已合併為本檔 `project-master.md`
    - [x] 專案 README
 
-3. **前端開發（原始碼掃描確認 2026-05-10）**
+3. **前端開發（與根 README 即時進度對齊 · 2026-05-11）**
    - [x] 全數 11 個 View 完整實作（WelcomeView / BriefingView / RegisterView / CheckInWelcomeView / CheckInFormView / CheckInCompleteView / StageView / QuizView / ResultView / FinishView / ClaimSuccessView）
-   - [x] API 層 10 支函式對應真實端點，含完整 error handling
-   - [x] Vitest 14 個測試檔無 skip、無 stub，CI 通過
+   - [x] API 層 **11** 支函式對應真實端點，含完整 error handling
+   - [x] Vitest **15** 個測試檔無 skip、無 stub，CI 通過
    - [x] Router 12 條路由含 redirect 意圖分流（報到 `/checkin`、闖關 `/register`）
    - [x] 完成頁 `/finish` 領獎互動與 `/finish/claimed` 領取成功頁（接 `GET /me/dashboard`，無 API 時 `local-fallback`）
 
@@ -563,7 +565,7 @@
    - [x] 獎品兌換系統開發（`staff/redeem/token` + `staff/redeem/confirm`）
 
 3. **測試**
-   - [x] **前端**單元測試（**Vitest**；`familyday-frontend/src/**/*.test.ts`；**CI** 見 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)；最新驗證：**14 檔全通過、無 skip、無 stub**；細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) **§1.1** **v1.31**）
+   - [x] **前端**單元測試（**Vitest**；`familyday-frontend/src/**/*.test.ts`；**CI** 見 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)；最新驗證：**15 檔全通過、無 skip、無 stub**；細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) **§1.1** **v1.31**）
    - [ ] 後端單元測試（待補齊）
    - [x] 整合測試（4/30 已完成核心流程、401/409、CORS 邊界；in-memory Pass 17）
    - [x] Firestore 驗證流程腳本已建立（`verify:firestore`）；**Blocked** — 本機憑證未設定
@@ -616,12 +618,15 @@
 
 ---
 
-### 待辦事項（2026-05-10 更新）
+<a id="work-backlog"></a>
+
+### 待辦事項（2026-05-11 更新）
+
+**工作約定：** 日常跟進以本節為**待辦權威**；**進度數字**以根 [`README.md`](../../README.md#readme-live-progress) **即時進度**為準。完成項目請於此勾選並視需要同步 README 摘要。
 
 #### 高優先級
 - [ ] **Firestore IAM 憑證設定**（擇一）：安裝 gcloud → `gcloud auth application-default login`；或 Firebase Console 下載 SA JSON → 設定 `GOOGLE_APPLICATION_CREDENTIALS`
 - [ ] 重跑 `familyday-backend/`：`npm run verify:firestore` 並確認 Firestore 四集合寫入/讀取成功
-- [ ] 將 Firestore 驗證結果回填 `docs/testing/api-integration-checklist.md §7`，解除 Blocked
 - [ ] 修正 `routes/admin.ts` `GET /admin/reports/attendance` 的 `total` 欄位（現為 hardcoded `1000`，改為動態查詢 Firestore checkins）
 - [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、Cookie）
 
@@ -730,24 +735,24 @@
 | 需求變更 | 本檔「需求與流程」與相關待確認列 |
 | 會議後 | 「待確認與會議」與「專案狀態」 |
 | 技術決策 | 「技術規格」 |
-| 里程碑 | 根目錄 README.md |
+| 里程碑 | 根目錄 [`README.md`](../../README.md#readme-live-progress) **即時進度**與本檔 [§ 待辦事項](#work-backlog) |
 | `docs/` 結構變更 | 同步更新 [`docs/README.md`](../README.md) 索引表與根 README 路徑 |
 
 ### 建議閱讀順序（角色）
 
 | 角色 | 順序 |
 |------|------|
-| PM | README.md → 本檔「專案狀態」→「待確認與會議」→「需求與流程」 |
-| 開發 | README.md → 本檔「技術規格」→「需求與流程」→「待確認與會議」 |
-| UI/UX | README.md → 本檔「需求與流程」→「待確認與會議」 |
-| 測試 | README.md → 本檔「需求與流程」→「技術規格」 |
+| PM | 根 [`README.md`](../../README.md#readme-live-progress) **即時進度** → 本檔 [§ 待辦事項](#work-backlog) →「專案狀態」→「待確認與會議」→「需求與流程」 |
+| 開發 | 根 [`README.md`](../../README.md#readme-live-progress) **即時進度** → 本檔 [§ 待辦事項](#work-backlog) →「技術規格」→「需求與流程」→「待確認與會議」 |
+| UI/UX | 根 [`README.md`](../../README.md) → 本檔「需求與流程」→「待確認與會議」 |
+| 測試 | 根 [`README.md`](../../README.md#readme-live-progress) → 本檔「需求與流程」→「技術規格」 |
 
 ### FAQ（精簡）
 
-1. **新進成員：** 先讀 README.md，再讀本檔「專案狀態」與「需求與流程」。
-2. **需求變更：** 改本檔並同步 README.md 摘要。
+1. **新進成員：** 先讀根 [`README.md`](../../README.md#readme-live-progress) **即時進度**，再讀本檔 [§ 待辦事項](#work-backlog) 與「需求與流程」。
+2. **需求變更：** 改本檔並同步根 [`README.md`](../../README.md#readme-live-progress) 摘要（若影響進度敘述）。
 3. **會議前：** 檢視「待確認與會議」高優先級表格。
 
 ---
 
-**文件版本：** 合併版 v1.3.34 · 2026-05-10（原始碼掃描校正：整體進度 62% → 78%；前端 95%、後端 90%；admin attendance total stub 登錄；前版 **v1.3.33**）
+**文件版本：** 合併版 v1.3.36 · 2026-05-11（根 README 精簡；細節→ [`overview/root-readme-supplement.md`](../overview/root-readme-supplement.md)；`preview-netlify-test-ui` 錨點遷移；前版 **v1.3.35**）

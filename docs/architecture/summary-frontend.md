@@ -167,7 +167,7 @@ flowchart TD
 
 - 開發期：可於 **`vite.config`** 設定 **proxy** 指向本機或測試 API（`familyday-frontend/vite.config.ts` **目前未**預設 proxy，由專案依環境補上）。  
 - 正式／測試建置：於 **`familyday-frontend/`** 設定 **`VITE_API_BASE`** = API **主機根**（**無**尾隨 `/`），例如 `https://api.example.com` 或同源 `https://event.example.com`；程式會請求 **`{VITE_API_BASE}/api/v1/...`**（見 **`familyday-frontend/src/lib/apiBase.ts`**）。**舊稿若寫 `VITE_API_BASE_URL` 應改為此名稱。**  
-- **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`familyday-frontend/vite.config.ts`**。步驟與 QR 分流見 [`docs/setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；根 [`README.md`](../../README.md#preview-netlify-test-ui) 保留錨點 **`preview-netlify-test-ui`**；[`summary-deployment.md`](./summary-deployment.md) **§1.1**（**v1.6**）摘要連動。  
+- **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`familyday-frontend/vite.config.ts`**。步驟與 QR 分流見 [`static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；摘要與錨點 [`overview/root-readme-supplement.md#preview-netlify-test-ui`](../overview/root-readme-supplement.md#preview-netlify-test-ui)；[`summary-deployment.md`](./summary-deployment.md) **§1.1**（**v1.6**）摘要連動。  
 - **關卡瀏覽與領取狀態呈現**：可共用 **`GET /api/v1/me/dashboard`**（合併 API）；HTTP 與 JSON 映射見 **`familyday-frontend/src/api/rewardClaimStatus.ts`**；領取成功頁之 mock／API／fallback 編排見 **`lib/rewardClaimPresentation.ts`** 與 **`composables/useRewardClaimPresentation.ts`**。  
 - 完整端點列表見 [`api-v0.1.md`](../specs/api-v0.1.md)。
 
@@ -217,7 +217,7 @@ flowchart TD
 | 1.18 | 2026-04-18 | **§2.1／§2.3／§3／§4**：**`/finish/claimed`** 無 **`VITE_API_BASE`** 時一律 **`local-fallback`**（含預覽建置），廢止「僅 DEV／正式顯示錯誤」舊述；補 **靜態預覽** 與 **`VITE_BASE_PATH`** |
 | 1.19 | 2026-04-18 | **§4**：靜態預覽條目補與根 **`README.md`**「公開預覽部署 · 測試 Web UI」（錨點 **`preview-netlify-test-ui`**）及 **`summary-deployment` §1.1 v1.2** 之**連動**（Netlify 範例、QR、`main` 部署） |
 | 1.20 | 2026-04-18 | 修訂表 **v1.16** 列：補 **v1.18** 承接敘述，避免讀者誤以為仍「僅開發建置」後備；**v1.19** 列補明錨點 **`preview-netlify-test-ui`**（與根 **`README`** 一致） |
-| 1.21 | 2026-04-18 | **§4**：「靜態預覽」條目之根 **`README`** 改為可點連結 [`README.md#preview-netlify-test-ui`](../../README.md#preview-netlify-test-ui) |
+| 1.21 | 2026-04-18 | **§4**：「靜態預覽」條目之根 **`README`** 改為可點連結 [`root-readme-supplement#preview-netlify-test-ui`](../overview/root-readme-supplement.md#preview-netlify-test-ui)（長文已遷至該檔；**連結 2026-05-11 修正**） |
 | 1.22 | 2026-04-19 | **§2** 目錄：**`api/`**／**`lib/constants/`**／**`rewardClaimPresentation`**／**`provisionalFinishClaim`**／**`composables/`** 與程式分層一致；**§2.1**「領取狀態」、**§3** 完成頁列、**§4** dashboard 條目同步 |
 | 1.23 | 2026-04-19 | **§1.1**：**Vitest** 單元測試（`source/src/**/*.test.ts`）、指令與 **`.github/workflows/ci.yml`**（`npm run test` → build） |
 | 1.24 | 2026-04-20 | **§2／§2.1**：補 `source/src/constants/index.ts`（`APP_CONFIG`／`GAME_CONFIG`／`STORAGE_KEYS`）與 `useI18n.ts`、`i18n/zh-TW.ts` 之集中化描述；狀態鍵改述為 `STORAGE_KEYS` 單一來源 |
