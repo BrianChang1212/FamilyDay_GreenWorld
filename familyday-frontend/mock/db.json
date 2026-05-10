@@ -47,6 +47,12 @@
       "name": "Brian",
       "partySize": 3,
       "checkinAt": "2026-05-03T09:48:08.252Z"
+    },
+    {
+      "employeeId": "1141043",
+      "name": "Bob",
+      "partySize": 1,
+      "checkinAt": "2026-05-09T18:56:37.304Z"
     }
   ]
 }

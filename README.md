@@ -79,13 +79,15 @@ npm run dev
 
 ### 目前實際進度（即時狀態）
 
+> 2026-05-10 依原始碼掃描更新（非文件自述）
+
 | 面向 | 現況 |
 |------|------|
-| 前端 | `familyday-frontend/` 可本機啟動、建置與預覽；已可透過 `VITE_API_BASE` 串接 Firebase Functions |
-| API | `familyday-backend/` Cloud Functions 已落地核心與 Phase 2 端點（`health/auth/checkin/dashboard/me/progress/stations/challenges/restart/reward/claim/staff/admin`） |
-| 後端資料層 | 已完成 in-memory + Firestore toggle（`FDGW_USE_FIRESTORE`）；Firestore 最終實證目前卡在 IAM 權限 |
-| 測試 | Vitest 單元測試與 CI 持續通過；4/30 已完成 Functions 聯調與 CORS allowlist 驗證 |
-| 部署 | 可進行 dev/stage 驗證上架；正式對外上線仍需先完成 IAM 與最小安全基線 |
+| 前端 | 11 個 View **全數完整實作**（WelcomeView → ClaimSuccessView）；API 層 10 支函式對應真實端點；14 個測試檔無 skip/stub；CI 通過 |
+| API | 19 個端點均已實作；唯 `GET /admin/reports/attendance` 的 `total` 欄位 hardcoded `1000`，其餘為動態資料 |
+| 後端資料層 | roster / checkins / player_progress / redeem 四集合已完整實作 Firestore + in-memory 雙模式切換；阻塞點為本機 IAM 憑證未設定（`GOOGLE_APPLICATION_CREDENTIALS`） |
+| 測試 | 前端 Vitest 14 檔通過；後端 4/30 聯調驗證 Pass 17（in-memory）；Firestore 驗證 Blocked（憑證未設定）；後端單元測試待補齊 |
+| 部署 | dev/stage 可驗證上架；正式上線需先完成 Firestore IAM 憑證設定、Security Rules 與安全基線 |
 
 ### Windows：Node.js／npm 問題
 
@@ -242,16 +244,16 @@ flowchart LR
 
 ### 專案進度（概覽）
 
-整體約 **62%**（前端可操作 + Functions API 已落地 + 4/30 聯調驗證 + CORS allowlist 收斂；阻塞點為 Firestore IAM 權限，尚未完成最終實證與正式上線安全項）。細項見 `docs/project/project-master.md`「專案狀態」。
+整體約 **78%**（2026-05-10 原始碼掃描校正：前端 11 View 全數完整實作、後端 19 端點落地、雙模式資料層完整、14 測試檔全通過；阻塞點為 Firestore IAM 憑證未設定，非程式碼問題）。細項見 `docs/project/project-master.md`「專案狀態」。
 
 | 項目 | 狀態 |
 | ---------------- | --------------------------------------- |
 | 需求收集與整理 | 完成 |
 | 技術選型 | Cloud Functions + Firestore 路線已落地實作；正式維運參數待簽核 |
 | UI/UX 設計（設計稿／KV） | 進行中（功能流程先行，正式視覺資產持續補齊） |
-| 開發 | **前端 + API + 後端（in-memory）** 已完成主要流程；Firestore 模式程式路徑已打通，待 IAM 權限完成最終驗證 |
-| 測試 | **前端** Vitest + CI 持續通過；**後端聯調**已完成健康檢查、登入、報到、闖關、staff/admin、401/409 與 CORS 驗證 |
-| 部署 | **dev/stage 可驗證上架**；正式上線需先完成 Firestore IAM、憑證與安全基線（HTTPS/Cookie/權限） |
+| 開發 | 前端 **100% 實作完整**（11 View、10 API 函式、無 TODO）；後端 **95% 實作完整**（19 端點；`admin/reports/attendance` total 仍 hardcoded）；Firestore 四集合雙模式完整 |
+| 測試 | 前端 Vitest 14 檔無 skip 全通過 + CI；後端 in-memory 聯調 Pass 17；**Firestore Blocked**（IAM 憑證）；後端單元測試待補齊 |
+| 部署 | **dev/stage 可驗證上架**；正式上線需完成 Firestore IAM 憑證設定、Security Rules 與安全基線 |
 
 ### 下一步（本週）
 
@@ -308,4 +310,4 @@ flowchart LR
 
 ---
 
-*README v2.56 · 2026-05-05（快速開始：`fdgw` 埠號註記；版本鏈：`api-v0.1` **v0.1.21**、`summary-frontend` **v1.31**、`summary-deployment` **v1.6**、`summary-backend` **v1.6**、`summary-traffic` **v1.2**；前版 v2.55）*
+*README v2.57 · 2026-05-10（原始碼掃描校正：整體進度 62% → 78%；前端 11 View 全數 REAL、後端 19 端點落地、admin attendance total stub 登錄；前版 v2.56）*

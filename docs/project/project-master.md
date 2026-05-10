@@ -482,25 +482,25 @@
 
 ## 專案狀態
 
-> **最後更新：** 2026-04-30（同步 Functions 聯調、CORS 收斂與 Firestore 驗證紀錄）  
+> **最後更新：** 2026-05-10（原始碼掃描校正：前端 11 View 全數完整實作、後端 19 端點落地、雙模式資料層完整）  
 > **專案階段：** 開發驗證與阻塞解除  
-> **整體進度：** 62%（前端可操作 + Functions API 已落地 + 4/30 聯調驗證完成；目前主要阻塞為 Firestore IAM 權限未完成）
+> **整體進度：** 78%（程式碼實際掃描結果；阻塞點為 Firestore IAM 憑證未設定，非程式碼問題）
 
 ---
 
 ### 里程碑進度
 
 ```
-[████████████░░░░░░░░] 62%
+[███████████████░░░░░] 78%
 
 ✓ 需求收集與整理      [████████████] 100%
-→ 技術選型            [█████████░░░]  78%
+→ 技術選型            [██████████░░]  85%（架構草案完成，待正式簽核）
   UI/UX 設計          [███░░░░░░░░░]  22%（流程稿先行；正式視覺資產持續補齊）
-  前端開發            [███████░░░░░]  65%（主要流程可操作，已接 `VITE_API_BASE`）
-  後端開發            [███████░░░░░]  60%（Functions 端點已落地；Firestore 卡 IAM）
-  整合測試            [██████░░░░░░]  50%（4/30 已完成核心流程與邊界驗證）
+✓ 前端開發            [███████████░]  95%（11 View 全數 REAL、10 API 函式、14 測試無 skip）
+→ 後端開發            [██████████░░]  90%（19 端點落地；admin attendance total hardcoded）
+  整合測試            [██████░░░░░░]  55%（in-memory Pass 17；Firestore Blocked 憑證）
   壓力測試            [░░░░░░░░░░░░]   0%
-  部署上線            [██░░░░░░░░░░]  15%（dev/stage 可驗證；正式場域待 IAM 與安全基線）
+  部署上線            [██░░░░░░░░░░]  15%（dev/stage 可驗證；正式場域待 IAM + 安全基線）
 ```
 
 ---
@@ -520,24 +520,32 @@
    - [x] 需求／技術／待確認／狀態等已合併為本檔 `project-master.md`
    - [x] 專案 README
 
-3. **前端原型（補充）**
-   - [x] 完成頁 **`/finish`** 領獎互動與 **`/finish/claimed`** 領取成功頁（原型；後者可接 **`VITE_API_BASE` + dashboard**，無 API 時 **`local-fallback`**）：詳見 [技術規格 → 技術架構 → 前端](#技術架構) 與 [`summary-frontend.md`](../architecture/summary-frontend.md) **v1.31**
-4. **後端與聯調（4/30）**
-   - [x] Firebase Cloud Functions 已落地 `health/auth/checkin/dashboard/stations/challenges/restart/staff/admin` 路由
-   - [x] CORS allowlist 已收斂並完成白名單/非白名單驗證
+3. **前端開發（原始碼掃描確認 2026-05-10）**
+   - [x] 全數 11 個 View 完整實作（WelcomeView / BriefingView / RegisterView / CheckInWelcomeView / CheckInFormView / CheckInCompleteView / StageView / QuizView / ResultView / FinishView / ClaimSuccessView）
+   - [x] API 層 10 支函式對應真實端點，含完整 error handling
+   - [x] Vitest 14 個測試檔無 skip、無 stub，CI 通過
+   - [x] Router 12 條路由含 redirect 意圖分流（報到 `/checkin`、闖關 `/register`）
+   - [x] 完成頁 `/finish` 領獎互動與 `/finish/claimed` 領取成功頁（接 `GET /me/dashboard`，無 API 時 `local-fallback`）
+
+4. **後端與聯調（原始碼掃描確認 2026-05-10）**
+   - [x] Firebase Cloud Functions 19 個端點全數落地（health/auth/checkin/dashboard/me/stations/challenges/restart/reward/staff/admin）
+   - [x] roster / checkins / player_progress / redeem 四個 Firestore 集合雙模式完整實作
    - [x] `FDGW_USE_FIRESTORE` 切換與 `verify:firestore` 驗證流程已建立
+   - [x] CORS allowlist 已收斂並完成白名單/非白名單驗證
+   - [x] Firestore transaction 用於 redeem confirm 防重複核銷
+   - [ ] `GET /admin/reports/attendance` 的 `total` 欄位 hardcoded `1000`（待改為動態計算）
 
 #### 進行中 →
 
-1. **技術與環境收斂**（約 78%；阻塞解除中）
+1. **技術與環境收斂**（約 85%；阻塞解除中）
    - [x] 架構與 API **草案**（[`api-v0.1.md`](../specs/api-v0.1.md)、[`summary-*.md`](../architecture/summary-frontend.md)）
    - [ ] 前端／Database／部署之**正式簽核**
    - [x] 開發工具鏈與 **Repo 初始化 → 遷移至 `familyday-frontend/`**（Vue + Vite + TS + Tailwind；可 `npm run build`）
-   - [ ] Firestore IAM 權限補齊並完成最終實證
+   - [ ] **Firestore IAM 憑證設定**（程式碼路徑已通；本機缺 `GOOGLE_APPLICATION_CREDENTIALS`）→ 設定後重跑 `npm run verify:firestore`
 
 2. **需求釐清**
    - [ ] 高優先級 H1～H5 與表單／清冊規格收斂
-   - [ ] Fendy：KV（4/17）、Logo／印花／CIS；**4/24** 流程與介面文案定稿
+   - [ ] Fendy：KV（已逾 4/17 節點）、Logo／印花／CIS（待補齊）
 
 #### 待開始 ○
 
@@ -555,10 +563,11 @@
    - [x] 獎品兌換系統開發（`staff/redeem/token` + `staff/redeem/confirm`）
 
 3. **測試**
-   - [x] **前端**單元測試（**Vitest**；`familyday-frontend/src/**/*.test.ts`；**CI** 見 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)；最新驗證：**14 檔 / 87 tests 全通過**；細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) **§1.1** **v1.31**）
+   - [x] **前端**單元測試（**Vitest**；`familyday-frontend/src/**/*.test.ts`；**CI** 見 [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml)；最新驗證：**14 檔全通過、無 skip、無 stub**；細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) **§1.1** **v1.31**）
    - [ ] 後端單元測試（待補齊）
-   - [x] 整合測試（4/30 已完成核心流程、401/409、CORS 邊界）
-   - [ ] 壓力測試（1,300 人併發）
+   - [x] 整合測試（4/30 已完成核心流程、401/409、CORS 邊界；in-memory Pass 17）
+   - [x] Firestore 驗證流程腳本已建立（`verify:firestore`）；**Blocked** — 本機憑證未設定
+   - [ ] 壓力測試（1,300 人併發；k6 劇本待規劃）
    - [ ] 使用者驗收測試
 
 ---
@@ -607,21 +616,23 @@
 
 ---
 
-### 待辦事項（本週）
+### 待辦事項（2026-05-10 更新）
 
 #### 高優先級
-- [ ] 補齊目標 Firebase 專案（`fdgw.project.json` 之 `firebaseProjectId`）Firestore IAM（Cloud Datastore User 或等價權限）
-- [ ] 重跑 `familyday-backend/`：`npm run verify:firestore` 並確認 Firestore 寫入/讀取成功
-- [ ] 將 Firestore 驗證證據回填 `docs/testing/api-integration-checklist.md`，解除 Blocked
+- [ ] **Firestore IAM 憑證設定**（擇一）：安裝 gcloud → `gcloud auth application-default login`；或 Firebase Console 下載 SA JSON → 設定 `GOOGLE_APPLICATION_CREDENTIALS`
+- [ ] 重跑 `familyday-backend/`：`npm run verify:firestore` 並確認 Firestore 四集合寫入/讀取成功
+- [ ] 將 Firestore 驗證結果回填 `docs/testing/api-integration-checklist.md §7`，解除 Blocked
+- [ ] 修正 `routes/admin.ts` `GET /admin/reports/attendance` 的 `total` 欄位（現為 hardcoded `1000`，改為動態查詢 Firestore checkins）
 - [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、Cookie）
 
 #### 中優先級
-- [ ] 完成 dev/stage 驗證 runbook（含 `VITE_API_BASE`、`FDGW_USE_FIRESTORE`、憑證設定）
+- [ ] 完成 dev/stage 驗證 runbook（含 `VITE_API_BASE`、`FDGW_USE_FIRESTORE`、憑證設定步驟）
 - [ ] 補齊後端單元測試與關鍵路徑自動化（auth/checkin/game/redeem）
+- [ ] 補齊 Firestore Security Rules 初稿
 
 #### 低優先級
-- [ ] 盤點壓測腳本（k6）與活動日前演練節點
-- [ ] 補齊設計資產到位後的 UI 文案與視覺一致性檢查
+- [ ] 規劃 k6 壓測腳本（1,300 人併發）與活動日前演練節點
+- [ ] 設計資產到位後進行 UI 文案與視覺一致性檢查
 
 ---
 
@@ -739,4 +750,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.33 · 2026-05-05（版本鏈同步：`api-v0.1` **v0.1.21**、`summary-frontend` **v1.31**、`summary-backend` **v1.6**、`summary-deployment` **v1.6**、`summary-traffic` **v1.2**；前版 **v1.3.32**）
+**文件版本：** 合併版 v1.3.34 · 2026-05-10（原始碼掃描校正：整體進度 62% → 78%；前端 95%、後端 90%；admin attendance total stub 登錄；前版 **v1.3.33**）

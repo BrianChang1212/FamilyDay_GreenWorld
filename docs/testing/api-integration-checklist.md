@@ -71,7 +71,39 @@
 
 ---
 
-## 7) 執行結果模板
+## 7) 執行結果
+
+### 最新一次完整執行（2026-04-30）
+
+- **執行日期：** 2026-04-30
+- **環境（dev/stage）：** dev — Functions Emulator (port 5003) + in-memory roster
+- **Seed 版本：** in-memory (`functions/src/state/*.ts`)
+- **涵蓋章節（1~6）：** 1、2、3、4、5、6（401 / 409 / CORS）
+- **Pass / Fail / Blocked：** Pass 17、Fail 0、Blocked 1
+- **證據：** CLI 驗證：`health/ready/login/me/checkin/status/dashboard/stations/verify/challenges/attempts/restart(409)/staff/redeem/admin/reports`；CORS allowlist 驗證（`evil.example.com` 無 ACAO）
+- **結論：** **Go（dev in-memory）**；**Blocked（Firestore）** — `PERMISSION_DENIED` on `familyday-greenworld-dev`
+- **備註：** Firestore IAM 授權未完成（`firebase login:list` 顯示 No authorized accounts）；IAM 到位後需重跑 `npm run verify:firestore`
+
+### Firestore 待驗狀態（截至 2026-05-10）
+
+- **環境：** dev + `FDGW_USE_FIRESTORE=true`
+- **涵蓋章節：** 0（前置）、3、5（Firestore 真切換）
+- **Pass / Fail / Blocked：** Pass 0、Fail 0、Blocked 1
+- **結論：** **Conditional Go** — 流程腳本就緒，IAM 授權後可直接重跑
+- **備註：** 需先取得目標 Firebase 專案 `Cloud Datastore User` 角色，再執行 `npm run verify:firestore`
+
+### 執行紀錄 2026-05-10（Firestore 憑證驗證）
+
+- **執行日期：** 2026-05-10
+- **環境（dev/stage）：** dev — Cloud Firestore (`FDGW_USE_FIRESTORE=true`, project: `rare-lattice-495009-i9`)
+- **Seed 版本：** `familyday-backend/scripts/verify-firestore-flow.mjs`
+- **涵蓋章節（1~6）：** 0（前置憑證檢查）
+- **Pass / Fail / Blocked：** Pass 0、Fail 0、Blocked 1
+- **證據：** `node ./scripts/verify-firestore-flow.mjs` → `FAIL firestore verification: GOOGLE_APPLICATION_CREDENTIALS is not set.`；Firebase CLI 已登入（`jhangjie999@gmail.com`）；gcloud CLI 未安裝，ADC 憑證檔（`%APPDATA%\gcloud\application_default_credentials.json`）不存在
+- **結論：** **Blocked** — IAM 角色已取得，但本機尚未設定 GCP 憑證
+- **備註：** 解除方式（擇一）：① 安裝 gcloud → `gcloud auth application-default login`；② Firebase Console 下載 SA JSON → 設定 `GOOGLE_APPLICATION_CREDENTIALS=<path>` → 重跑 `npm run verify:firestore`
+
+### 下次執行模板
 
 - 執行日期：
 - 環境（dev/stage）：
