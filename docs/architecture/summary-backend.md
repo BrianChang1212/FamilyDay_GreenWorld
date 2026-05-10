@@ -1,7 +1,7 @@
 # 後端技術與 API — 討論總結
 
 > 本文件彙整**後端語言、框架、資料庫、業務模型與 API 文件**之討論結論。  
-> **完整 REST 草案**見 [`api-v0.1.md`](../specs/api-v0.1.md)。
+> **完整 REST 草案**見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)。
 
 ---
 
@@ -133,7 +133,7 @@ Firebase/Google Cloud 可設定 **Budgets & Alerts** 做費用通知，建議：
 
 ## 5. API 文件
 
-- 端點清單、請求／回應範例、畫面對照：**[`api-v0.1.md`](../specs/api-v0.1.md)**。  
+- 端點清單、請求／回應範例、畫面對照：**[`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)**。  
 - 後續可由此產生 **OpenAPI** 供前端型別與測試工具使用。
 
 ### DB 設計參考入口

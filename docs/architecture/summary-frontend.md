@@ -1,7 +1,7 @@
 # 前端技術與設計 — 討論總結
 
 > 本文件彙整專案關於**前端架構、介面方向、與 API 銜接**之討論結論，作為後續實作與評審依據。  
-> 相關 API 細節見 [`api-v0.1.md`](../specs/api-v0.1.md)（修訂紀錄見該檔文末；§11 **Vitest** 客戶端測試註記，**不重**定義 REST）。
+> 相關 API 細節見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)（修訂紀錄見該檔文末；§11 **Vitest** 客戶端測試註記，**不重**定義 REST）。
 
 ---
 
@@ -155,7 +155,7 @@ flowchart TD
 |------|------|
 | 裝置 | **手機優先**；支援平板、桌機（RWD） |
 | 現場 | 戶外強光、單手操作；按鈕與選項（三選一）**夠大、對比夠** |
-| 流程 | **簽到頁**與**闖關頁**分開（不同路由），資訊架構清楚。**闖關線：** 歡迎 → 遊戲說明 → **闖關登入頁（全屏，非彈窗）** → 關卡流程；**報到線**見 §2.2。**同一 SPA** 內報到與闖關可共用表單元件，但路由與欄位不同。**報到 QR** 與**闖關入口 QR** 指向不同 URL／query（`entry=checkin`／`entry=game` 等）。各關**到站 QR** 仍為獨立連結（常含站點 JWT，見 [`api-v0.1.md`](../specs/api-v0.1.md)） |
+| 流程 | **簽到頁**與**闖關頁**分開（不同路由），資訊架構清楚。**闖關線：** 歡迎 → 遊戲說明 → **闖關登入頁（全屏，非彈窗）** → 關卡流程；**報到線**見 §2.2。**同一 SPA** 內報到與闖關可共用表單元件，但路由與欄位不同。**報到 QR** 與**闖關入口 QR** 指向不同 URL／query（`entry=checkin`／`entry=game` 等）。各關**到站 QR** 仍為獨立連結（常含站點 JWT，見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)） |
 | 闖關頁 | 以「**目前選擇之站**、題目、**已完成站數／6**」為主；地圖可切換未完成之站；**不自動輪詢**，使用者操作才打 API |
 | 櫃台驗證 | 完成畫面需**高可讀、少動效**，利於工作人員掃視 |
 | 完成頁／領取成功 | **`/finish`**（`FinishView.vue`）：與「**3 次／3 份**」對齊之確認領獎彈窗；無 API 時遞增本機次數見 **`provisionalFinishClaim.ts`**。**`/finish/claimed`**（`ClaimSuccessView.vue`）：**已設定 `VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 顯示已領進度；**未設定 API** 時以 **`local-fallback`** 顯示 **`fdgw_finishClaimed`**（`demoState.ts`；槽位上限 **`constants/index.ts`** 之 **`FINISH_REWARD_SLOTS`**）。編排邏輯見 **`useRewardClaimPresentation`**／**`rewardClaimPresentation.ts`**。**上線**應設定 **`VITE_API_BASE`**；**`reward/claim` 成功**後再導向領取成功頁；**已領滿**時可停留 **`/finish`** 顯示上限提醒，不強制導向 **`/finish/claimed`** |
@@ -169,7 +169,7 @@ flowchart TD
 - 正式／測試建置：於 **`familyday-frontend/`** 設定 **`VITE_API_BASE`** = API **主機根**（**無**尾隨 `/`），例如 `https://api.example.com` 或同源 `https://event.example.com`；程式會請求 **`{VITE_API_BASE}/api/v1/...`**（見 **`familyday-frontend/src/lib/apiBase.ts`**）。**舊稿若寫 `VITE_API_BASE_URL` 應改為此名稱。**  
 - **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`familyday-frontend/vite.config.ts`**。步驟與 QR 分流見 [`static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；摘要與錨點 [`overview/root-readme-supplement.md#preview-netlify-test-ui`](../overview/root-readme-supplement.md#preview-netlify-test-ui)；[`summary-deployment.md`](./summary-deployment.md) **§1.1**（**v1.6**）摘要連動。  
 - **關卡瀏覽與領取狀態呈現**：可共用 **`GET /api/v1/me/dashboard`**（合併 API）；HTTP 與 JSON 映射見 **`familyday-frontend/src/api/rewardClaimStatus.ts`**；領取成功頁之 mock／API／fallback 編排見 **`lib/rewardClaimPresentation.ts`** 與 **`composables/useRewardClaimPresentation.ts`**。  
-- 完整端點列表見 [`api-v0.1.md`](../specs/api-v0.1.md)。
+- 完整端點列表見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)。
 
 ---
 

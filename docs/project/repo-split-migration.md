@@ -1,4 +1,4 @@
-# FamilyDay Repo Split Migration
+# FamilyDay Repo Split (Migration & Boundary)
 
 This mono-repo has been split into three independent repositories to support
 separate frontend/backend team schedules and release cadences.
@@ -15,11 +15,56 @@ separate frontend/backend team schedules and release cadences.
 - `20260410_FamilyDay_GreenWorld_App/familyday-backend`
 - `20260410_FamilyDay_GreenWorld_App/familyday-api-contract`
 
-## Content mapping
+## Historical content mapping (pre-split)
 
 - Old `source/**` -> `familyday-frontend`
 - Old `functions/**` + root Firebase config -> `familyday-backend`
-- Old `docs/specs/api-v0.1.md` -> `familyday-api-contract/api-v0.1.md`
+- Old `docs/specs/api-v0.1.md` -> `familyday-api-contract/api-v0.1.md` (mono-repo
+  copy removed; contract file is the only maintained source)
+
+## Target file mapping (split output)
+
+### familyday-frontend
+
+- `source/**` (historical name; live tree is `familyday-frontend/**`)
+- frontend-specific workflow converted from `.github/workflows/ci.yml`
+- frontend `README.md`, `.gitignore`, `.env.example`
+
+### familyday-backend
+
+- `functions/**` (live tree under `familyday-backend/functions/**`)
+- backend config files:
+  - `firebase.json`
+  - `.firebaserc`
+  - `fdgw.project.json`
+  - `firestore.rules`
+  - `firestore.indexes.json`
+- backend `README.md`, `.gitignore`, `.env.example`
+
+### familyday-api-contract
+
+- `api-v0.1.md` (REST contract baseline)
+- contract governance files:
+  - `README.md`
+  - `CHANGELOG.md`
+  - `CODEOWNERS`
+  - contract CI workflow
+
+## Exclusions for split output
+
+Never migrate generated/build/local cache content:
+
+- `**/node_modules/**`
+- `source/dist/**`
+- `functions/lib/**`
+- `*.log`
+- `.env*` (except template files such as `.env.example`)
+
+## Cross-repo integration rules
+
+- Frontend consumes backend via `VITE_API_BASE`, not mono-repo paths.
+- Backend keeps `fdgw.project.json` as source-of-truth for deployment project identity.
+- API contract changes are versioned in `familyday-api-contract` and consumed by both repos.
 
 ## Cutover rules
 

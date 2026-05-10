@@ -1,6 +1,6 @@
 # 前後端 API 整合驗證清單（精簡版）
 
-> 適用範圍：[`docs/specs/api-v0.1.md`](../specs/api-v0.1.md)  
+> 適用範圍：[`familyday-api-contract/api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)  
 > 目的：用最短流程驗證「前端 UI + API + 後端資料層」是否可用。  
 > 詳細補充：  
 > - Mock 流程：[`api-mock-testing.md`](./api-mock-testing.md)  
