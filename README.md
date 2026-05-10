@@ -1,7 +1,7 @@
 # 瑞軒 2026 家庭日 — 解謎闖關遊戲（綠世界生態農場）
 
 <p align="center">
-  <img src="docs/preview/screenshots/preview-welcome.png" alt="瑞軒 2026 家庭日 — 解謎闖關遊戲（綠世界生態農場）主視覺" width="720" />
+  <img src="familyday-frontend/public/images/enroll-welcome-alpaca-adventure-wide-headroom.png" alt="瑞軒 2026 家庭日 — 綠世界闖關活動主視覺（羊駝與熱帶雨林插畫；與 Welcome 頁相同資產）" width="720" />
 </p>
 
 ## 這是什麼
@@ -81,4 +81,4 @@ npm run dev
 
 ---
 
-*README v2.62 · 2026-05-11（精簡總覽；細節→ `docs/overview/root-readme-supplement.md`；前版 v2.61）*
+*README v2.63 · 2026-05-11（精簡總覽；細節→ `docs/overview/root-readme-supplement.md`；前版 v2.62）*

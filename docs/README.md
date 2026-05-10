@@ -18,7 +18,6 @@
 | [`setup/`](./setup/) | **本機與預覽**（GCP／Firestore、靜態預覽、Windows Node.js；詳見 [`setup/README.md`](./setup/README.md)） |
 | [`firebase/`](./firebase/) | **Firebase 檔案分類索引**（`familyday-backend/firebase.json`、`familyday-backend/.firebaserc`、Rules、Functions、與 `fdgw.project.json` 關係；詳見 [`firebase/README.md`](./firebase/README.md)） |
 | [`proposals/`](./proposals/) | **外部提案／簡報**（PDF） |
-| [`design/`](./design/) | **設計資產**（線框圖等） |
 | [`media/`](./media/) | **媒體索引**（Preview 截圖路徑與重產流程） |
 | [`preview/`](./preview/) | Preview 截圖檔案目錄（重產步驟見 [`media/README.md`](./media/README.md)） |
 | `zip/` | 壓縮備份（如線框 zip）；非正式規格來源時以展開檔為準 |
@@ -49,8 +48,7 @@
 | 根 README 補充（截圖／技術圖／目錄表／長篇待辦） | [`overview/root-readme-supplement.md`](./overview/root-readme-supplement.md) |
 | 測試 Web UI（Netlify、QR） | [`setup/static-preview-netlify-github.md`](./setup/static-preview-netlify-github.md)；錨點 [`overview/root-readme-supplement.md#preview-netlify-test-ui`](./overview/root-readme-supplement.md#preview-netlify-test-ui)；[`summary-deployment.md`](./architecture/summary-deployment.md) **§1.1**（**v1.6**） |
 | 前端單元測試（Vitest） | `familyday-frontend/`：`npm run test`；規格見 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) **§1.1**（**v1.31**） |
-| 提案 PDF | [`proposals/FamilyDayApp_Proposal_v1.pdf`](./proposals/FamilyDayApp_Proposal_v1.pdf) |
-| Wireframe PNG | [`design/wireframe/`](./design/wireframe/) |
+| 提案／線框 PDF | [`proposals/FamilyDayApp_Proposal_v1.pdf`](./proposals/FamilyDayApp_Proposal_v1.pdf)；[`proposals/FamilyDayApp_wireframe_v2.pdf`](./proposals/FamilyDayApp_wireframe_v2.pdf) |
 | 介面截圖維護（Preview） | [`media/README.md`](./media/README.md) |
 
 ---
@@ -61,7 +59,7 @@
 
 ---
 
-**最後整理：** 2026-05-11（**`docs/specs` 已移除**—API 僅維護 [`familyday-api-contract/api-v0.1.md`](../familyday-api-contract/api-v0.1.md)；**`repo-split-boundary` → `repo-split-migration`**；刪空 **`docs/migration/`**）。早先同日（**`api-v0.1` v0.1.22**：契約 Mock／MVP 路徑對齊 `familyday-frontend/mock`、`familyday-backend/`；根 **README** v2.58 同步 API 函式／Vitest 檔數）。2026-05-05（續：**`api-v0.1` v0.1.21**／**`summary-frontend` v1.31** 版本鏈；**`api-v0.1`** CORS／`eventId` 對齊 `fdgw`；**checklist** §7.1 歷史表加對照說明、儀表板 curl 註記 mock 8787；根 **README** 埠號指向 `fdgw.frontend`；**`project-master` v1.3.33**）。先前同日：**`firebase/`** 索引；**`dev-oneclick`**；**`local-firestore-gcp`／checklist／summary-backend`** 與 `-FunctionsOnly`。再前：2026-05-03（**`setup/`**；**`summary-deployment` v1.6**；**`api-v0.1` v0.1.20**；**`summary-frontend` v1.30**）。**`api-v0.1`** 已於 2026-05-05 遞增至 **v0.1.21**，**`summary-frontend`** 至 **v1.31**（見本日「續」條目）。版本與修訂歷史以各檔案檔頭及
+**最後整理：** 2026-05-11（**`docs/specs` 已移除**—API 僅維護 [`familyday-api-contract/api-v0.1.md`](../familyday-api-contract/api-v0.1.md)；**`repo-split-boundary` → `repo-split-migration`**；刪空 **`docs/migration/`**；**`docs/design` 已移除**（早期線框 PNG；靜態線框見 **`proposals/FamilyDayApp_wireframe_v2.pdf`**、實作畫面見 **`docs/preview/screenshots/`**）。早先同日（**`api-v0.1` v0.1.22**：契約 Mock／MVP 路徑對齊 `familyday-frontend/mock`、`familyday-backend/`；根 **README** v2.58 同步 API 函式／Vitest 檔數）。2026-05-05（續：**`api-v0.1` v0.1.21**／**`summary-frontend` v1.31** 版本鏈；**`api-v0.1`** CORS／`eventId` 對齊 `fdgw`；**checklist** §7.1 歷史表加對照說明、儀表板 curl 註記 mock 8787；根 **README** 埠號指向 `fdgw.frontend`；**`project-master` v1.3.33**）。先前同日：**`firebase/`** 索引；**`dev-oneclick`**；**`local-firestore-gcp`／checklist／summary-backend`** 與 `-FunctionsOnly`。再前：2026-05-03（**`setup/`**；**`summary-deployment` v1.6**；**`api-v0.1` v0.1.20**；**`summary-frontend` v1.30**）。**`api-v0.1`** 已於 2026-05-05 遞增至 **v0.1.21**，**`summary-frontend`** 至 **v1.31**（見本日「續」條目）。版本與修訂歷史以各檔案檔頭及
 [`project/project-master.md`](./project/project-master.md) 頁尾版本列為準。
 技術細節請直接查閱對應單一來源文件：前端
 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md)、後端

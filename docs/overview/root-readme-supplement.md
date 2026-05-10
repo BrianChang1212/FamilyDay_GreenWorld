@@ -75,7 +75,7 @@
 | ------ | --------------------------------------------------------------------------------------------------------- |
 | 活動     | 新竹北埔**綠世界生態農場**；對象為**台北辦公室同仁及眷屬**（預估約 **1,000～1,300** 人）；活動日**確認中**（偏好**六月底**，或七月初）                       |
 | 產品     | 解謎 Web 應用；同仁與家人體驗生態探索，完成關卡可至指定地點領取紀念品                                                                     |
-| 提案／線框 PDF | `docs/proposals/FamilyDayApp_Proposal_v1.pdf`（v1，2026.04.10）、[`FamilyDayApp_wireframe_v2.pdf`](../proposals/FamilyDayApp_wireframe_v2.pdf)（線框 v2）；靜態圖另見 [`docs/design/wireframe/`](../design/wireframe/) |
+| 提案／線框 PDF | `docs/proposals/FamilyDayApp_Proposal_v1.pdf`（v1，2026.04.10）、[`FamilyDayApp_wireframe_v2.pdf`](../proposals/FamilyDayApp_wireframe_v2.pdf)（線框 v2）；實作畫面見 [介面預覽（截圖）](#ui-preview-screenshots) |
 | 需求主文件  | `docs/project/project-master.md`（合併版：需求、待確認、狀態、技術）；索引見 `docs/README.md`                                             |
 | 資訊開發人員 | Ken、Brian                                                                                                 |
 | GitHub | [BrianChang1212/FamilyDay_GreenWorld](https://github.com/BrianChang1212/FamilyDay_GreenWorld)             |
@@ -159,7 +159,7 @@ flowchart LR
 
 - 預計 **每週五 10:00** 開會（**A1 會議室**；以行事曆為準）。
 
-**線框（靜態）** — [`docs/design/wireframe/`](../design/wireframe/)。動態畫面請見 [介面預覽（截圖）](#ui-preview-screenshots) 或 [公開預覽部署（測試 Web UI）](#preview-netlify-test-ui)。
+**線框** — 靜態以 [`FamilyDayApp_wireframe_v2.pdf`](../proposals/FamilyDayApp_wireframe_v2.pdf) 為準；實作畫面請見 [介面預覽（截圖）](#ui-preview-screenshots) 或 [公開預覽部署（測試 Web UI）](#preview-netlify-test-ui)。
 
 ---
 
