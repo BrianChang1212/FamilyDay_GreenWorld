@@ -38,9 +38,44 @@ const scanVideoRef = ref<HTMLVideoElement | null>(null);
 const qrScanLive = computed(() => viewPhase.value === "scanning");
 const qrDecodePaused = computed(() => scanLoading.value);
 
+/**
+ * Extract stageId embedded in QR payload without making an API call.
+ * Supports:
+ *   - Mock format:    stage-{n}-token
+ *   - JWT format:     base64url.payload.sig  (reads .stageId from JSON payload)
+ * Returns null when the format is unrecognised or contains no stageId.
+ */
+function extractQrStageId(payload: string): number | null {
+	const mockMatch = payload.match(/^stage-(\d+)-token$/);
+	if (mockMatch) {
+		const n = Number(mockMatch[1]);
+		return Number.isFinite(n) && n >= 1 ? n : null;
+	}
+	const parts = payload.split(".");
+	if (parts.length === 3) {
+		try {
+			const padded = parts[1].replace(/-/g, "+").replace(/_/g, "/");
+			const json = JSON.parse(atob(padded));
+			const n = Number(json.stageId ?? json.stage_id ?? json.sid);
+			return Number.isFinite(n) && n >= 1 ? n : null;
+		} catch {
+			return null;
+		}
+	}
+	return null;
+}
+
 async function verifyFromDecodedQr(payload: string) {
 	const token = payload.trim();
 	if (!token) return;
+
+	// Front-end guard: reject QR that clearly belongs to a different stage
+	// before making any network request, so the user gets instant feedback.
+	const qrStage = extractQrStageId(token);
+	if (qrStage !== null && qrStage !== stage.value) {
+		scanError.value = `此 QR 是第 ${qrStage} 關的通行碼，您目前選擇的是第 ${stage.value} 關，請掃描第 ${stage.value} 關專用的 QR。`;
+		return;
+	}
 
 	scanLoading.value = true;
 	scanError.value = "";
