@@ -1,80 +1,76 @@
-# FamilyDay Repo Split (Migration & Boundary)
+# FamilyDay 倉庫拆分（遷移與邊界）
 
-This mono-repo has been split into three independent repositories to support
-separate frontend/backend team schedules and release cadences.
+為支援前後端團隊**各自排程與發佈節奏**，本 mono-repo 已拆分為三支獨立倉庫（敘述上的目標邊界與對照如下）。
 
-## New repositories
+## 新倉庫
 
-- `familyday-frontend`: frontend runtime and tests.
-- `familyday-backend`: Firebase Functions backend runtime.
-- `familyday-api-contract`: API contract source-of-truth and governance.
+- `familyday-frontend`：前端執行環境與測試。
+- `familyday-backend`：Firebase Functions 後端執行環境。
+- `familyday-api-contract`：API 契約之**單一來源**與治理（版本／變更流程）。
 
-## Current local layout
+## 現行本機目錄配置
 
 - `20260410_FamilyDay_GreenWorld_App/familyday-frontend`
 - `20260410_FamilyDay_GreenWorld_App/familyday-backend`
 - `20260410_FamilyDay_GreenWorld_App/familyday-api-contract`
 
-## Historical content mapping (pre-split)
+## 歷史內容對照（拆分前）
 
-- Old `source/**` -> `familyday-frontend`
-- Old `functions/**` + root Firebase config -> `familyday-backend`
-- Old `docs/specs/api-v0.1.md` -> `familyday-api-contract/api-v0.1.md` (mono-repo
-  copy removed; contract file is the only maintained source)
+- 舊 `source/**` → `familyday-frontend`
+- 舊 `functions/**` ＋ 根目錄 Firebase 設定 → `familyday-backend`
+- 舊 `docs/specs/api-v0.1.md` → `familyday-api-contract/api-v0.1.md`（mono-repo 內副本已移除；**僅保留契約檔為維護來源**）
 
-## Target file mapping (split output)
+## 目標檔案對照（拆分產出）
 
 ### familyday-frontend
 
-- `source/**` (historical name; live tree is `familyday-frontend/**`)
-- frontend-specific workflow converted from `.github/workflows/ci.yml`
-- frontend `README.md`, `.gitignore`, `.env.example`
+- `source/**`（歷史名稱；實際開發樹為 `familyday-frontend/**`）
+- 由 `.github/workflows/ci.yml` 轉出／對應的前端專用 workflow
+- 前端 `README.md`、`.gitignore`、`.env.example`
 
 ### familyday-backend
 
-- `functions/**` (live tree under `familyday-backend/functions/**`)
-- backend config files:
+- `functions/**`（實際樹位於 `familyday-backend/functions/**`）
+- 後端設定檔：
   - `firebase.json`
   - `.firebaserc`
   - `fdgw.project.json`
   - `firestore.rules`
   - `firestore.indexes.json`
-- backend `README.md`, `.gitignore`, `.env.example`
+- 後端 `README.md`、`.gitignore`、`.env.example`
 
 ### familyday-api-contract
 
-- `api-v0.1.md` (REST contract baseline)
-- contract governance files:
+- `api-v0.1.md`（REST 契約基準）
+- 契約治理相關檔：
   - `README.md`
   - `CHANGELOG.md`
   - `CODEOWNERS`
-  - contract CI workflow
+  - 契約用 CI workflow
 
-## Exclusions for split output
+## 拆分產出之排除項目
 
-Never migrate generated/build/local cache content:
+**勿**遷移下列建置產物／本機快取：
 
 - `**/node_modules/**`
 - `source/dist/**`
 - `functions/lib/**`
 - `*.log`
-- `.env*` (except template files such as `.env.example`)
+- `.env*`（範本如 `.env.example` 除外）
 
-## Cross-repo integration rules
+## 跨倉庫整合規則
 
-- Frontend consumes backend via `VITE_API_BASE`, not mono-repo paths.
-- Backend keeps `fdgw.project.json` as source-of-truth for deployment project identity.
-- API contract changes are versioned in `familyday-api-contract` and consumed by both repos.
+- 前端透過 `VITE_API_BASE` 存取後端，**不依賴** mono-repo 相對路徑硬連。
+- 後端以 `fdgw.project.json` 作為部署專案識別之**單一來源**。
+- API 契約變更於 `familyday-api-contract` **版型／版本化**後，再由前後端倉庫取用以發佈。
 
-## Cutover rules
+## 切換（cutover）規則
 
-- New development should happen in split repositories.
-- This mono-repo is kept for historical traceability.
-- Contract changes must be released from `familyday-api-contract` first, then
-  consumed by frontend/backend release branches.
-- Legacy folders in root (`source/`, `functions/`) are read-only historical
-  references and should not receive new feature development.
+- **新功能開發**應以拆分後之三倉庫為準。
+- 本 mono-repo **可保留**以利歷程追蹤（若組織政策如此）。
+- 契約變更須**先**自 `familyday-api-contract` 釋出，再由前後端 release 分支接軌。
+- 根目錄舊資料夾（`source/`、`functions/`）若仍存在，視為**唯讀歷史參考**，**不應**再新增功能開發。
 
-## Repository URLs
+## 倉庫網址
 
-<!-- TODO: Fill in remote URLs for the three split repositories -->
+<!-- TODO：補上三支拆分倉庫之遠端 URL（例如 GitHub） -->
