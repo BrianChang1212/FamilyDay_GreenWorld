@@ -4,6 +4,8 @@ import { FINISH_REWARD_SLOTS } from "@/constants";
 export type RewardClaimStatusPayload = {
 	claimedCount: number;
 	maxSlots: number;
+	/** 伺服器已結算、可用於領獎的完整通關次數（見後端 `bankedFullClears`） */
+	bankedFullClears: number;
 };
 
 function clampCount(n: number, max: number): number {
@@ -11,10 +13,15 @@ function clampCount(n: number, max: number): number {
 	return Math.max(0, Math.min(max, Math.floor(n)));
 }
 
+function nonNegativeInt(n: number): number {
+	if (!Number.isFinite(n)) return 0;
+	return Math.max(0, Math.floor(n));
+}
+
 type DashboardProgress = {
 	maxRounds?: number;
 	fullClearCount?: number;
-	/** 若後端另開欄位記錄櫃台核銷次數，優先採用（見 docs/specs/api-v0.1.md 演進） */
+	bankedFullClears?: number;
 	rewardRedeemCount?: number;
 };
 
@@ -24,7 +31,8 @@ type DashboardJson = {
 
 /**
  * 闖關禮領取狀態：資料來源為後端，此函式僅請求並正規化為畫面用數字。
- * 映射規則：優先 `progress.rewardRedeemCount`，否則暫用 `progress.fullClearCount`（以前後端對齊為準）。
+ * `claimedCount` 僅對應 **已領／已核銷** 的 `rewardRedeemCount`，不使用 `fullClearCount`
+ *（後者為通關輪次統計，語意不同）。
  */
 export async function fetchRewardClaimStatus(): Promise<RewardClaimStatusPayload> {
 	const base = getViteApiBase();
@@ -54,11 +62,12 @@ export async function fetchRewardClaimStatus(): Promise<RewardClaimStatusPayload
 			? Math.floor(maxRaw)
 			: FINISH_REWARD_SLOTS;
 
-	const rawClaimed =
-		p?.rewardRedeemCount ?? p?.fullClearCount ?? 0;
+	const rawClaimed = p?.rewardRedeemCount ?? 0;
+	const rawBanked = p?.bankedFullClears ?? 0;
 
 	return {
 		claimedCount: clampCount(Number(rawClaimed), maxSlots),
 		maxSlots,
+		bankedFullClears: nonNegativeInt(Number(rawBanked)),
 	};
 }

@@ -94,6 +94,11 @@ export const zhTW = {
     staffHintClaim: "請交由工作人員點選領取",
     rewardLimitReached:
       "您已達本活動闖關禮領取上限（共 {maxSlots} 次）。仍可繼續體驗闖關或返回首頁。",
+    rewardClaimNotEligible:
+      "尚無可領取的結算額度（伺服器判定尚未累積新的完整通關禮）。請確認已完成並通關本輪關卡後再試，或請工作人員協助確認紀錄。",
+    rewardClaimNotReady: "尚未完成全部關卡，無法領取闖關禮。",
+    rewardWaitingBanked:
+      "目前沒有可結算的領獎次數（上一輪獎勵若已領取，須再玩一輪並通關後才可領下一次）。請使用「再玩一輪」完成挑戰後再試。",
     staffHint: "請由現場工作人員協助點擊「確認領取」。",
     modalStaffInstruction: "請交由工作人員點選操作",
     backHomeButton: "返回首頁",

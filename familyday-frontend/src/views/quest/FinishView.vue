@@ -12,6 +12,7 @@ import {
 } from "@/lib/demoState";
 import { incrementLocalFinishClaimIfNoApiBase } from "@/lib/provisionalFinishClaim";
 import { resolveRewardClaimPresentation } from "@/lib/rewardClaimPresentation";
+import { parseApiErrorCode } from "@/lib/parseApiErrorJson";
 import { getViteApiBase } from "@/lib/apiBase";
 import { useI18n } from "@/composables/useI18n";
 import { FINISH_REWARD_SLOTS } from "@/constants";
@@ -22,6 +23,7 @@ const name = ref("");
 const employeeId = ref("");
 const showClaimModal = ref(false);
 const claimedCount = ref(0);
+const bankedFullClears = ref(0);
 const maxSlots = ref(FINISH_REWARD_SLOTS);
 const statusLoadState = ref<"loading" | "ok" | "error">("loading");
 const statusError = ref("");
@@ -38,6 +40,11 @@ const userLine = computed(() => {
 
 const isClaimFull = computed(
 	() => claimedCount.value >= maxSlots.value && maxSlots.value > 0,
+);
+
+/** 伺服器尚有「已通關結算、尚未領」的額度（bankedFullClears > rewardRedeemCount） */
+const hasClaimCredit = computed(
+	() => bankedFullClears.value > claimedCount.value,
 );
 
 const nextClaimIndex = computed(() =>
@@ -67,6 +74,7 @@ async function refreshClaimed(): Promise<void> {
 	}
 	claimedCount.value = r.claimed;
 	maxSlots.value = r.maxSlots;
+	bankedFullClears.value = r.bankedFullClears;
 	statusLoadState.value = "ok";
 }
 
@@ -82,7 +90,13 @@ onMounted(() => {
 });
 
 function openClaimModal() {
-	if (isClaimFull.value || statusLoadState.value !== "ok") return;
+	if (
+		isClaimFull.value ||
+		statusLoadState.value !== "ok" ||
+		!hasClaimCredit.value
+	) {
+		return;
+	}
 	claimError.value = "";
 	showClaimModal.value = true;
 }
@@ -103,14 +117,20 @@ async function confirmClaim() {
 			await refreshClaimed();
 		} catch (err) {
 			const msg = err instanceof Error ? err.message : String(err);
-			if (/REWARD_CLAIM_LIMIT_REACHED|409/.test(msg)) {
+			const code = parseApiErrorCode(msg);
+			if (code === "REWARD_CLAIM_LIMIT_REACHED") {
 				claimError.value = t("finish.rewardLimitReached", {
 					maxSlots: maxSlots.value,
 				});
+			} else if (code === "REWARD_CLAIM_NOT_ELIGIBLE") {
+				claimError.value = t("finish.rewardClaimNotEligible");
+			} else if (code === "FINISH_CLAIM_NOT_READY") {
+				claimError.value = t("finish.rewardClaimNotReady");
 			} else {
 				claimError.value =
 					msg.length > 180 ? `${msg.slice(0, 180)}…` : msg;
 			}
+			void refreshClaimed();
 		} finally {
 			claimSubmitting.value = false;
 		}
@@ -293,10 +313,17 @@ function restartGame() {
 			</section>
 
 			<p
-				v-if="statusLoadState === 'ok' && !isClaimFull"
+				v-if="statusLoadState === 'ok' && !isClaimFull && hasClaimCredit"
 				class="mt-8 text-center text-sm font-medium text-neutral-600"
 			>
 				{{ t("finish.staffHintClaim") }}
+			</p>
+			<p
+				v-else-if="statusLoadState === 'ok' && !isClaimFull && !hasClaimCredit"
+				class="mx-auto mt-8 max-w-[26rem] rounded-xl border border-amber-200/90 bg-amber-50/95 px-3 py-3 text-center text-[12px] font-medium leading-relaxed text-amber-950"
+				role="status"
+			>
+				{{ t("finish.rewardWaitingBanked") }}
 			</p>
 
 			<div class="mt-3 flex flex-col gap-3">
@@ -304,11 +331,13 @@ function restartGame() {
 					type="button"
 					class="w-full rounded-2xl py-[1.05rem] text-lg font-bold shadow-md transition sm:py-5"
 					:class="
-						isClaimFull || statusLoadState !== 'ok'
+						isClaimFull || statusLoadState !== 'ok' || !hasClaimCredit
 							? 'cursor-not-allowed bg-neutral-200 text-neutral-500'
 							: 'bg-[#2f7354] text-white shadow-[0_8px_24px_rgba(47,115,84,0.35)] hover:brightness-110'
 					"
-					:disabled="isClaimFull || statusLoadState !== 'ok'"
+					:disabled="
+						isClaimFull || statusLoadState !== 'ok' || !hasClaimCredit
+					"
 					@click="openClaimModal"
 				>
 					{{ isClaimFull ? t("finish.claimButtonDone") : t("finish.claimButton") }}

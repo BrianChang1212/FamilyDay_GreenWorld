@@ -61,10 +61,12 @@ describe("useRewardClaimPresentation", () => {
 		vi.mocked(rewardApi.fetchRewardClaimStatus).mockResolvedValue({
 			claimedCount: 2,
 			maxSlots: 3,
+			bankedFullClears: 3,
 		});
 		const { wrapper } = await mountWithRoute({});
 		expect(wrapper.vm.statusLoadState).toBe("ok");
 		expect(wrapper.vm.claimed).toBe(2);
+		expect(wrapper.vm.bankedFullClears).toBe(3);
 		expect(wrapper.vm.statusSource).toBe("api");
 		expect(rewardApi.fetchRewardClaimStatus).toHaveBeenCalledOnce();
 	});

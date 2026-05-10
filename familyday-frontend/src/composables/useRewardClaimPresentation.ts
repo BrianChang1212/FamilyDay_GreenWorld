@@ -14,6 +14,7 @@ function applyPresentationResult(
 	r: RewardClaimPresentationResult,
 	claimed: { value: number },
 	maxSlots: { value: number },
+	bankedFullClears: { value: number },
 	statusSource: { value: RewardClaimStatusSource },
 	statusLoadState: { value: "loading" | "ok" | "error" },
 	statusError: { value: string },
@@ -26,6 +27,7 @@ function applyPresentationResult(
 	}
 	claimed.value = r.claimed;
 	maxSlots.value = r.maxSlots;
+	bankedFullClears.value = r.bankedFullClears;
 	statusSource.value = r.statusSource;
 	statusLoadState.value = "ok";
 	statusError.value = "";
@@ -36,6 +38,7 @@ export function useRewardClaimPresentation() {
 
 	const claimed = ref(0);
 	const maxSlots = ref(FINISH_REWARD_SLOTS);
+	const bankedFullClears = ref(FINISH_REWARD_SLOTS);
 	const statusSource = ref<RewardClaimStatusSource>("api");
 	const statusLoadState = ref<"loading" | "ok" | "error">("loading");
 	const statusError = ref("");
@@ -65,6 +68,7 @@ export function useRewardClaimPresentation() {
 			result,
 			claimed,
 			maxSlots,
+			bankedFullClears,
 			statusSource,
 			statusLoadState,
 			statusError,
@@ -81,6 +85,7 @@ export function useRewardClaimPresentation() {
 	return {
 		claimed,
 		maxSlots,
+		bankedFullClears,
 		statusSource,
 		statusLoadState,
 		statusError,

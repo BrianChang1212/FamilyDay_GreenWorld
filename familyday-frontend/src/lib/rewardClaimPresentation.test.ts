@@ -5,6 +5,7 @@ import {
 } from "@/lib/rewardClaimPresentation";
 import * as apiBase from "@/lib/apiBase";
 import * as rewardApi from "@/api/rewardClaimStatus";
+import { FINISH_REWARD_SLOTS } from "@/constants";
 
 vi.mock("@/lib/apiBase");
 vi.mock("@/api/rewardClaimStatus");
@@ -58,7 +59,8 @@ describe("resolveRewardClaimPresentation", () => {
 		expect(r).toEqual({
 			loadState: "ok",
 			claimed: 2,
-			maxSlots: 3,
+			maxSlots: FINISH_REWARD_SLOTS,
+			bankedFullClears: FINISH_REWARD_SLOTS,
 			statusSource: "mock-query",
 		});
 		expect(rewardApi.fetchRewardClaimStatus).not.toHaveBeenCalled();
@@ -70,7 +72,8 @@ describe("resolveRewardClaimPresentation", () => {
 		expect(r).toEqual({
 			loadState: "ok",
 			claimed: 2,
-			maxSlots: 3,
+			maxSlots: FINISH_REWARD_SLOTS,
+			bankedFullClears: FINISH_REWARD_SLOTS,
 			statusSource: "local-fallback",
 		});
 	});
@@ -80,12 +83,14 @@ describe("resolveRewardClaimPresentation", () => {
 		vi.mocked(rewardApi.fetchRewardClaimStatus).mockResolvedValue({
 			claimedCount: 1,
 			maxSlots: 5,
+			bankedFullClears: 2,
 		});
 		const r = await resolveRewardClaimPresentation(null, () => 0);
 		expect(r).toEqual({
 			loadState: "ok",
 			claimed: 1,
 			maxSlots: 5,
+			bankedFullClears: 2,
 			statusSource: "api",
 		});
 		expect(rewardApi.fetchRewardClaimStatus).toHaveBeenCalledOnce();

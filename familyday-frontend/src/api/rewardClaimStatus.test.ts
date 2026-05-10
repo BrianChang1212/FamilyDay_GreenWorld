@@ -30,12 +30,17 @@ describe("fetchRewardClaimStatus", () => {
 			ok: true,
 			json: () =>
 				Promise.resolve({
-					progress: { rewardRedeemCount: 1, maxRounds: 3 },
+					progress: {
+						rewardRedeemCount: 1,
+						bankedFullClears: 2,
+						maxRounds: 3,
+					},
 				}),
 		});
 		globalThis.fetch = fetchMock as typeof fetch;
 
-		await fetchRewardClaimStatus();
+		const r = await fetchRewardClaimStatus();
+		expect(r.bankedFullClears).toBe(2);
 
 		expect(fetchMock).toHaveBeenCalledWith(
 			"https://api.example.com/api/v1/me/dashboard",
@@ -62,9 +67,10 @@ describe("fetchRewardClaimStatus", () => {
 		const r = await fetchRewardClaimStatus();
 		expect(r.claimedCount).toBe(2);
 		expect(r.maxSlots).toBe(3);
+		expect(r.bankedFullClears).toBe(0);
 	});
 
-	it("falls back to fullClearCount when rewardRedeemCount is absent", async () => {
+	it("uses rewardRedeemCount only; ignores fullClearCount when redeem absent", async () => {
 		globalThis.fetch = vi.fn().mockResolvedValue({
 			ok: true,
 			json: () =>
@@ -74,7 +80,8 @@ describe("fetchRewardClaimStatus", () => {
 		}) as typeof fetch;
 
 		const r = await fetchRewardClaimStatus();
-		expect(r.claimedCount).toBe(2);
+		expect(r.claimedCount).toBe(0);
+		expect(r.bankedFullClears).toBe(0);
 	});
 
 	it("uses FINISH_REWARD_SLOTS when maxRounds is invalid", async () => {
@@ -150,6 +157,7 @@ describe("fetchRewardClaimStatus", () => {
 		const r = await fetchRewardClaimStatus();
 		expect(r.claimedCount).toBe(0);
 		expect(r.maxSlots).toBe(FINISH_REWARD_SLOTS);
+		expect(r.bankedFullClears).toBe(0);
 	});
 
 	it("uses rewardRedeemCount 0 without falling through to fullClearCount", async () => {
@@ -167,6 +175,7 @@ describe("fetchRewardClaimStatus", () => {
 
 		const r = await fetchRewardClaimStatus();
 		expect(r.claimedCount).toBe(0);
+		expect(r.bankedFullClears).toBe(0);
 	});
 
 	it("clamps claimed above maxSlots", async () => {

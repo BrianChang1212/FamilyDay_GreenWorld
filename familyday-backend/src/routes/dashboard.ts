@@ -37,6 +37,7 @@ dashboardRouter.get("/me/dashboard", async (req, res) => {
 			completedStageIds: progress.completedStageIds,
 			allCompleted: progress.completedStageIds.length >= total,
 			fullClearCount: progress.fullClearCount,
+			bankedFullClears: progress.bankedFullClears,
 			rewardRedeemCount: progress.rewardRedeemCount,
 			canStartNewRound: progress.completedStageIds.length >= total,
 			maxRounds: progress.maxRounds,
