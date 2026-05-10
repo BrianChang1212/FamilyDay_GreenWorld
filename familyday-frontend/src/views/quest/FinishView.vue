@@ -152,7 +152,9 @@ function restartGame() {
 </script>
 
 <template>
-	<div class="gw-page-fill relative flex min-h-full flex-col bg-[#eef0eb]">
+	<div
+		class="gw-page-fill relative flex min-h-min flex-1 flex-col bg-[#eef0eb]"
+	>
 		<GwBrandBar />
 
 		<main
