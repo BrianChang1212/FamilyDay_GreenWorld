@@ -1,7 +1,8 @@
 # 後端技術與 API — 討論總結
 
 > 本文件彙整**後端語言、框架、資料庫、業務模型與 API 文件**之討論結論。  
-> **完整 REST 草案**見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)。
+> **完整 REST 草案**見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)。  
+> **全系統架構一覽（含 Firestore／Functions）** → [`system-architecture.md`](./system-architecture.md)。
 
 ---
 

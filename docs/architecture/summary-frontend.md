@@ -1,7 +1,8 @@
 # 前端技術與設計 — 討論總結
 
 > 本文件彙整專案關於**前端架構、介面方向、與 API 銜接**之討論結論，作為後續實作與評審依據。  
-> 相關 API 細節見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)（修訂紀錄見該檔文末；§11 **Vitest** 客戶端測試註記，**不重**定義 REST）。
+> 相關 API 細節見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)（修訂紀錄見該檔文末；§11 **Vitest** 客戶端測試註記，**不重**定義 REST）。  
+> **全系統架構一覽（前端 + API + 後端 Mermaid）** → [`system-architecture.md`](./system-architecture.md)。
 
 ---
 
@@ -20,8 +21,8 @@
 ### 1.1 自動化測試（實作 · 2026-04）
 
 - **執行器：** **Vitest**（`familyday-frontend/vitest.config.ts`），環境 **happy-dom**（`sessionStorage` 等）。  
-- **檔案配置：** 與原始碼並列，**`familyday-frontend/src/**/*.test.ts`**（例：`api/rewardClaimStatus.test.ts`、`lib/rewardClaimPresentation.test.ts`、`composables/useRewardClaimPresentation.test.ts`）。  
-- **涵蓋範圍（現況）：** `apiBase`、`fetchRewardClaimStatus`／dashboard 映射、`rewardClaimPresentation`、`demoState`、`entryIntent`、`provisionalFinishClaim`、`useRewardClaimPresentation` 等；**未**含各 `.vue` 畫面之完整 E2E。  
+- **檔案配置：** 與原始碼並列，**`familyday-frontend/src/**/*.test.ts`**（例：`api/rewardClaimStatus.test.ts`、`lib/rewardClaimPresentation.test.ts`）。  
+- **涵蓋範圍（現況）：** `apiBase`、`fetchRewardClaimStatus`／dashboard 映射、`rewardClaimPresentation`、`demoState`、`entryIntent`、`provisionalFinishClaim` 等；**未**含各 `.vue` 畫面之完整 E2E。  
 - **指令：** `familyday-frontend/` 內 **`npm run test`**（單次）、**`npm run test:watch`**、**`npm run test:coverage`**。  
 - **CI：** [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) 對 **`main`** 之 push／PR：**`npm ci` → `npm run test` → `npm run build`**。
 
@@ -38,7 +39,7 @@
 - **`api/`** — **僅** HTTP 與回應正規化（例：**`rewardClaimStatus.ts`** → `GET /api/v1/me/dashboard`；**不**依賴 Vue／`demoState`）  
 - **`constants/`** — 全域執行期常數（例：**`APP_CONFIG`**、**`GAME_CONFIG`**、**`STORAGE_KEYS`**、**`FINISH_REWARD_SLOTS`**（與 **`GAME_CONFIG.MAX_REWARD_CLAIMS`** 對齊）；供 i18n／狀態邏輯／測試共用）  
 - **`lib/`** — 工具與原型狀態（例：**`familyday-frontend/src/lib/apiBase.ts`**、**`demoState.ts`**、**`entryIntent.ts`**）；**應用編排**（無 Vue）：**`rewardClaimPresentation.ts`**（領取成功頁：mock／API／`local-fallback` 決策）、**`provisionalFinishClaim.ts`**（完成頁：無 API 時遞增本機次數）  
-- **`composables/`** — Vue 黏著層（例：**`useRewardClaimPresentation.ts`** 綁 `useRoute`、loading、`watch`；**`useI18n.ts`** 集中 UI 字串與參數替換）  
+- **`composables/`** — Vue 黏著層（例：**`useI18n.ts`** 集中 UI 字串與參數替換）  
 - **`i18n/`** — 介面文案字典（例：**`zh-TW.ts`**；頁面文案改由 key 管理，降低硬編碼重複）  
 - `styles` / design tokens — 色票、間距、字級（主視覺／CIS 定案後統一）
 
@@ -54,14 +55,14 @@
 | `/checkin` | **報到**單頁三欄 + **Modal** 確認 → **`/checkin/complete`**；**不**連闖關。已報到完成 → redirect 完成頁 |
 | `/checkin/complete` | 報到完成提示；闖關另掃 QR |
 | `/briefing` | 遊戲說明；下一步：**一律** → **`register`（闖關登入／全屏表單）**；**不**因 session 已有 profile 直跳 `stage`（對齊 §2.3：說明後下一屏即登入）。於登入頁按確定後再 **`stage`** |
-| `/stage`、`/quiz`、`/result`、`/finish` | 闖關流程（既有） |
-| `/finish/claimed` | **領取成功**（`ClaimSuccessView`）：闖關禮三格狀態之**呈現**（見下段「領取狀態資料來源」） |
+| `/stage`、`/quiz`、`/result`、`/finish` | 闖關流程；**`/finish`** 含完成文案、領獎 Modal 與三格領獎狀態（見下段「領取狀態資料來源」） |
+| `/finish/claimed` | **僅 redirect → `/finish`**（相容舊連結；無獨立頁面） |
 
 **狀態鍵（原型，`sessionStorage`）：** 由 **`constants/index.ts`** 之 **`STORAGE_KEYS`** 集中管理（`entryIntent.ts`／`demoState.ts` 共用）；值域包含 **意圖**、**profile**、**目前選擇之站**（`fdgw_stage`）、**已答對站列表**（**`fdgw_completed_stage_ids`**，JSON 陣列，與後端 **`completedStageIds`** 同步）、**報到狀態**、**領獎次數**。  
 
 **到站掃碼與題組（`StageView.vue`／`demoState.ts` · 2026-05）：** **`POST /api/v1/stations/verify`** 成功後，以 **`fdgw_pending_station_challenge`**（**`STORAGE_KEYS.pendingStationChallenge`**）儲存 **`{ stage, challengeId }`**，與 **`fdgw_stage`** 對齊；改選列表站點或答對返回地圖時清除。**`getInZone()`** 僅在 **`fdgw_inZone === "1"`** 時為 true（未寫入視為未掃碼），避免誤顯「已解鎖」卻無 **`challengeId`**。**`/quiz`** 一律以 **`?challengeId=`** 導頁（來自掃碼結果）；無效時不可導航（避免落回 **`QuizView` 預設 `c1`**）。**`ResultView.vue`** 於答對且返回地圖前執行 **`setInZone(false)`** 並 **`clearPendingStationVerification()`**，與任意順序下一站一致。
 
-**領取狀態資料來源（與程式對齊 · `ClaimSuccessView`／`FinishView`）：** 畫面僅透過 **`composables/useRewardClaimPresentation.ts`** 載入；**決策與呼叫 API** 在 **`lib/rewardClaimPresentation.ts`**（無 Vue 依賴）。已設定 **`VITE_API_BASE`** 時，**`/finish`** 與 **`/finish/claimed`** 皆以 **`GET /api/v1/me/dashboard`** 回傳之 `progress` 映射次數（優先 **`rewardRedeemCount`**；暫可 **`fullClearCount`**），實作見 **`familyday-frontend/src/api/rewardClaimStatus.ts`**（預設欄位上限與 **`constants/index.ts`** 之 **`FINISH_REWARD_SLOTS`** 對齊）。**未**設定 **`VITE_API_BASE`** 時（含預覽站），該頁以 **`local-fallback`** 後備讀取 **`fdgw_finishClaimed`**（`demoState.ts`），並標示**非伺服器紀錄**。**`?mock_claimed=`** 僅供離線 UI 覆寫。**`/finish`** 確認領獎後，若無 API 底網址則由 **`lib/provisionalFinishClaim.ts`** 遞增 **`fdgw_finishClaimed`**；**有 API 時**改為呼叫 **`POST /api/v1/me/reward/claim`** 由後端遞增 **`rewardRedeemCount`**（成功後再導向 **`/finish/claimed`**）。**若已領滿**（`rewardRedeemCount` 達 `maxRounds`），**不再**自動導向 **`/finish/claimed`**，使用者留在 **`/finish`**，並顯示「已達領獎上限」提醒（三格狀態仍由 **`dashboard`** 映射）。
+**領取狀態資料來源（與程式對齊 · `FinishView`）：** **`FinishView.vue`** 透過 **`resolveRewardClaimPresentation()`**（**`lib/rewardClaimPresentation.ts`**）載入儀表板／mock／`local-fallback`。**決策與呼叫 API** 皆在 **`rewardClaimPresentation.ts`**（無 Vue 依賴）。已設定 **`VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 之 `progress` 映射次數（優先 **`rewardRedeemCount`**；暫可 **`fullClearCount`**），實作見 **`familyday-frontend/src/api/rewardClaimStatus.ts`**（槽位上限 **`FINISH_REWARD_SLOTS`**）。**未**設定 **`VITE_API_BASE`** 時以 **`local-fallback`** 讀 **`fdgw_finishClaimed`**（`demoState.ts`），並標示**非伺服器紀錄**。**`?mock_claimed=`** 僅供離線 UI 覆寫。**`/finish`** 確認領獎後，無 API 時由 **`provisionalFinishClaim.ts`** 遞增本機次數；有 API 時呼叫 **`POST /api/v1/me/reward/claim`** 後**仍停留 `/finish`** 並刷新狀態。**已領滿**時顯示上限提醒（三格狀態仍由 **`dashboard`** 映射）。舊網址 **`/finish/claimed`** 僅 **redirect** 至 **`/finish`**。
 
 ### 2.2 報到 UI 流程（掃描**報到** QR／連結 · 線框對齊 · 2026-04-18）
 
@@ -120,7 +121,7 @@ flowchart TD
 
 1. **完成闖關** — 恭喜文案、姓名／員編、領獎地點說明；獎項／點數圖示（狀態依是否已領）；「領取闖關禮」；**工作人員**核銷提示。  
 2. **確認領取（Modal）** — 第 n 次領取、不可復原提示；確認／取消。  
-3. **領取成功**（**`/finish/claimed`**）— 感謝文案；三格領獎狀態由**後端** `dashboard.progress` 供數、前端映射（`FINISH_REWARD_SLOTS` 與 **`maxRounds`** 對齊）。**已接 API** 時，Modal 內按確認會先呼叫 **`POST /api/v1/me/reward/claim`** 再進入本頁；**未接 API** 時見上表「領取狀態資料來源」（**`local-fallback`**、`sessionStorage` 類比，畫面有預覽提示）。**已領滿**時完成頁 **`/finish`** 顯示上限提醒且不強制導向本頁；進入本頁後若儀表板顯示已滿格，亦顯示上限說明。
+3. **領獎狀態更新**（仍於 **`/finish`**）— Modal 確認後呼叫 **`POST /api/v1/me/reward/claim`**（有 API）或本機遞增（無 API）；三格狀態由 **`dashboard.progress`**／`local-fallback` 映射。**已領滿**時僅顯示上限說明，不另開頁。
 
 #### 闖關流程圖（Mermaid）
 
@@ -158,7 +159,7 @@ flowchart TD
 | 流程 | **簽到頁**與**闖關頁**分開（不同路由），資訊架構清楚。**闖關線：** 歡迎 → 遊戲說明 → **闖關登入頁（全屏，非彈窗）** → 關卡流程；**報到線**見 §2.2。**同一 SPA** 內報到與闖關可共用表單元件，但路由與欄位不同。**報到 QR** 與**闖關入口 QR** 指向不同 URL／query（`entry=checkin`／`entry=game` 等）。各關**到站 QR** 仍為獨立連結（常含站點 JWT，見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)） |
 | 闖關頁 | 以「**目前選擇之站**、題目、**已完成站數／6**」為主；地圖可切換未完成之站；**不自動輪詢**，使用者操作才打 API |
 | 櫃台驗證 | 完成畫面需**高可讀、少動效**，利於工作人員掃視 |
-| 完成頁／領取成功 | **`/finish`**（`FinishView.vue`）：與「**3 次／3 份**」對齊之確認領獎彈窗；無 API 時遞增本機次數見 **`provisionalFinishClaim.ts`**。**`/finish/claimed`**（`ClaimSuccessView.vue`）：**已設定 `VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`** 顯示已領進度；**未設定 API** 時以 **`local-fallback`** 顯示 **`fdgw_finishClaimed`**（`demoState.ts`；槽位上限 **`constants/index.ts`** 之 **`FINISH_REWARD_SLOTS`**）。編排邏輯見 **`useRewardClaimPresentation`**／**`rewardClaimPresentation.ts`**。**上線**應設定 **`VITE_API_BASE`**；**`reward/claim` 成功**後再導向領取成功頁；**已領滿**時可停留 **`/finish`** 顯示上限提醒，不強制導向 **`/finish/claimed`** |
+| 完成頁／領獎狀態 | **`/finish`**（`FinishView.vue`）：完成文案、三格領獎狀態、與「**3 次／3 份**」對齊之確認領獎 Modal；無 API 時遞增本機次數見 **`provisionalFinishClaim.ts`**。**已設定 `VITE_API_BASE`** 時以 **`GET /api/v1/me/dashboard`**／**`POST …/reward/claim`** 同步進度；**未設定 API** 時以 **`local-fallback`**。編排見 **`rewardClaimPresentation.ts`**。**上線**應設定 **`VITE_API_BASE`**。**已領滿**時顯示上限提醒。舊路徑 **`/finish/claimed`** → **`/finish`** |
 | 視覺 | KV／Logo／CIS 定案後以 **design token** 統一兩路流程，避免兩套風格 |
 
 ---
@@ -168,7 +169,7 @@ flowchart TD
 - 開發期：可於 **`vite.config`** 設定 **proxy** 指向本機或測試 API（`familyday-frontend/vite.config.ts` **目前未**預設 proxy，由專案依環境補上）。  
 - 正式／測試建置：於 **`familyday-frontend/`** 設定 **`VITE_API_BASE`** = API **主機根**（**無**尾隨 `/`），例如 `https://api.example.com` 或同源 `https://event.example.com`；程式會請求 **`{VITE_API_BASE}/api/v1/...`**（見 **`familyday-frontend/src/lib/apiBase.ts`**）。**舊稿若寫 `VITE_API_BASE_URL` 應改為此名稱。**  
 - **靜態預覽（無後端）**：根目錄 **`netlify.toml`**、**`.github/workflows/deploy-github-pages.yml`**；建置時 **`VITE_BASE_PATH`** 僅在 **GitHub Pages 專案站**（網址形如 `/<repo>/`）需要，見 **`familyday-frontend/vite.config.ts`**。步驟與 QR 分流見 [`static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；摘要與錨點 [`overview/root-readme-supplement.md#preview-netlify-test-ui`](../overview/root-readme-supplement.md#preview-netlify-test-ui)；[`summary-deployment.md`](./summary-deployment.md) **§1.1**（**v1.6**）摘要連動。  
-- **關卡瀏覽與領取狀態呈現**：可共用 **`GET /api/v1/me/dashboard`**（合併 API）；HTTP 與 JSON 映射見 **`familyday-frontend/src/api/rewardClaimStatus.ts`**；領取成功頁之 mock／API／fallback 編排見 **`lib/rewardClaimPresentation.ts`** 與 **`composables/useRewardClaimPresentation.ts`**。  
+- **關卡瀏覽與領取狀態呈現**：可共用 **`GET /api/v1/me/dashboard`**（合併 API）；HTTP 與 JSON 映射見 **`familyday-frontend/src/api/rewardClaimStatus.ts`**；**`/finish`** 之 mock／API／fallback 編排見 **`lib/rewardClaimPresentation.ts`**。  
 - 完整端點列表見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)。
 
 ---
@@ -223,7 +224,7 @@ flowchart TD
 | 1.24 | 2026-04-20 | **§2／§2.1**：補 `source/src/constants/index.ts`（`APP_CONFIG`／`GAME_CONFIG`／`STORAGE_KEYS`）與 `useI18n.ts`、`i18n/zh-TW.ts` 之集中化描述；狀態鍵改述為 `STORAGE_KEYS` 單一來源 |
 | 1.25 | 2026-04-20 | **§2**：`views/` 依路由分群（**`home/`**、**`onboarding/`**、**`auth/`**、**`checkin/`**、**`quest/`**）；**`FINISH_REWARD_SLOTS`** 併入 **`constants/index.ts`** 敘述；**§2.1**、**§3** 領獎槽位說明改與程式一致（移除已刪之 **`lib/constants/finishReward.ts`** 路徑） |
 | 1.26 | 2026-04-27 | 版本鏈同步：部署摘要引用更新為 `summary-deployment` **v1.5** |
-| 1.27 | 2026-05-03 | 檔首 API 版本改指 `api-v0.1` 修訂紀錄；**§2.1／§2.3／§3**：**已領滿**時完成頁 **`/finish`** 不強制導 **`/finish/claimed`**，與 `FinishView`／`ClaimSuccessView` 現況一致 |
+| 1.27 | 2026-05-03 | 檔首 API 版本改指 `api-v0.1` 修訂紀錄；**§2.1／§2.3／§3**：**已領滿**時完成頁 **`/finish`** 不強制另開頁，與 `FinishView` 現況一致（**2026-05-11**：廢 **`ClaimSuccessView`**，**`/finish/claimed`** 改 **redirect** **`/finish`**） |
 | 1.28 | 2026-05-03 | **§2.1** 補 **`fdgw_completed_stage_ids`** 與登入後 **`syncLocalProgressFromDashboard`**；**§2.3**／流程圖／**§3**：六站**任意順序**、地圖選站與進度語意；對齊 `api-v0.1` **v0.1.19** |
 | 1.29 | 2026-05-03 | **§2.1** 補 **`fdgw_pending_station_challenge`**、**`getInZone()`** 語意、**`/quiz`** 與 **`challengeId` query** 綁定、**`ResultView`** 清除到站狀態；**§2.3 B** 掃碼→作答步驟與 `StageView` 原型一致；對齊 `api-v0.1` **v0.1.20** |
 | 1.30 | 2026-05-03 | **§4**：靜態預覽長文改指向 [`docs/setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；`summary-deployment` **§1.1** 連動 **v1.6** |

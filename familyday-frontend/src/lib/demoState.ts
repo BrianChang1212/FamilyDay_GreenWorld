@@ -266,14 +266,6 @@ export function stageTitle(n: number): string {
 	return STAGE_NAMES[n] ?? `第 ${n} 站`;
 }
 
-/** 恭喜完成所有關卡／慶祝主視覺（`public/images/`） */
-export const LEVEL_COMPLETE_STICKER_SRC =
-	"/images/level-complete-celebration.png" as const;
-
-/** 領取成功頁專用主視覺（禮品／兌換成功意象，`public/images/`） */
-export const CLAIM_SUCCESS_STICKER_SRC =
-	"/images/claim-success-sticker.png" as const;
-
 /** 完成報到頁主視覺（`public/images/`） */
 export const CHECKIN_COMPLETE_STICKER_SRC =
 	"/images/checkin-complete-familyday-scene.png" as const;

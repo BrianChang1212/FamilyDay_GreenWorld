@@ -327,7 +327,7 @@ service cloud.firestore {
 | `/checkin`（查報到狀態） | `GET /api/v1/checkin/status` | `checkins`（讀） |
 | `/register`（闖關登入） | `POST /api/v1/auth/login` | `users` / `roster`（讀） |
 | App 初始化或頁面重整（登入態恢復） | `GET /api/v1/auth/me` | `users`（讀） |
-| `/stage` / `/finish/claimed`（進度與領取狀態顯示） | `GET /api/v1/me/dashboard` | `events/stages` + `progress`（讀） |
+| `/stage` / `/finish`（進度與領取狀態顯示） | `GET /api/v1/me/dashboard` | `events/stages` + `progress`（讀） |
 | 掃站點 QR（到站驗證） | `POST /api/v1/stations/verify` | `events/stages`（讀，另含 JWT 驗簽） |
 | 題目頁載入 | `GET /api/v1/challenges/{challengeId}` | `events/stages` / 題庫文件（讀） |
 | 題目作答送出 | `POST /api/v1/challenges/{challengeId}/attempts` | `attempts`（寫）+ `progress`（寫） |
@@ -339,7 +339,7 @@ service cloud.firestore {
 | 後台出席報表 | `GET /api/v1/admin/reports/attendance` | `checkins`（讀） |
 | 後台闖關報表 | `GET /api/v1/admin/reports/progress` | `progress` / `redeems`（讀） |
 
-> 註：`/finish/claimed` 在前端目前可有 `local-fallback`；正式上線仍以
+> 註：完成頁 **`/finish`** 可有 `local-fallback`；正式上線仍以
 > `GET /api/v1/me/dashboard` 回傳之 `progress` 欄位為準。
 
 ---

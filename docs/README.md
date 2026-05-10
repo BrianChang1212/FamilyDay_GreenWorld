@@ -10,18 +10,17 @@
 
 | 資料夾 | 用途 |
 |--------|------|
-| [`overview/`](./overview/) | **根 README 補充**（[`root-readme-supplement.md`](./overview/root-readme-supplement.md)：截圖、Demo 內嵌、Mermaid、目錄表、長篇待辦） |
+| [`overview/`](./overview/) | **根 README 補充**（[`root-readme-supplement.md`](./overview/root-readme-supplement.md)：截圖、Mermaid、目錄表、長篇待辦） |
 | [`project/`](./project/) | **專案主文件**（需求、會議、待確認、狀態、技術規格合併版） |
 | [`project/repo-split-migration.md`](./project/repo-split-migration.md) | **Mono → 三支線 repo** 遷移敘事、**檔案邊界對照**、cutover（已合併原 `architecture/repo-split-boundary.md`） |
-| [`architecture/`](./architecture/) | **架構討論總結**（前後端技術選型、部署、流量） |
+| [`architecture/`](./architecture/) | **架構討論總結**（[`system-architecture.md`](./architecture/system-architecture.md) 全系統圖、前後端選型、部署、流量） |
 | [`testing/`](./testing/) | **整合驗證清單**（前後端 API 實測流程與驗收 Checklist） |
 | [`setup/`](./setup/) | **本機與預覽**（GCP／Firestore、靜態預覽、Windows Node.js；詳見 [`setup/README.md`](./setup/README.md)） |
 | [`firebase/`](./firebase/) | **Firebase 檔案分類索引**（`familyday-backend/firebase.json`、`familyday-backend/.firebaserc`、Rules、Functions、與 `fdgw.project.json` 關係；詳見 [`firebase/README.md`](./firebase/README.md)） |
 | [`proposals/`](./proposals/) | **外部提案／簡報**（PDF） |
 | [`design/`](./design/) | **設計資產**（線框圖等） |
-| [`media/`](./media/) | **媒體索引**（整合 Demo 錄影與 Preview 截圖維護說明） |
-| [`demo/`](./demo/) | Demo 影片檔案目錄（規範改由 [`media/README.md`](./media/README.md) 維護） |
-| [`preview/`](./preview/) | Preview 截圖檔案目錄（重產步驟改由 [`media/README.md`](./media/README.md) 維護） |
+| [`media/`](./media/) | **媒體索引**（Preview 截圖路徑與重產流程） |
+| [`preview/`](./preview/) | Preview 截圖檔案目錄（重產步驟見 [`media/README.md`](./media/README.md)） |
 | `zip/` | 壓縮備份（如線框 zip）；非正式規格來源時以展開檔為準 |
 
 ---
@@ -38,6 +37,7 @@
 
 | 想找… | 檔案 |
 |--------|------|
+| **全系統架構圖（前端 + API + 後端）** | [`architecture/system-architecture.md`](./architecture/system-architecture.md) |
 | 需求與專案狀態 | [`project/project-master.md`](./project/project-master.md) |
 | API v0.1 契約（單一來源） | [`../familyday-api-contract/api-v0.1.md`](../familyday-api-contract/api-v0.1.md) |
 | API 整合清單（精簡） | [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md) |
@@ -51,7 +51,7 @@
 | 前端單元測試（Vitest） | `familyday-frontend/`：`npm run test`；規格見 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) **§1.1**（**v1.31**） |
 | 提案 PDF | [`proposals/FamilyDayApp_Proposal_v1.pdf`](./proposals/FamilyDayApp_Proposal_v1.pdf) |
 | Wireframe PNG | [`design/wireframe/`](./design/wireframe/) |
-| 操作示範錄影與截圖維護 | [`media/README.md`](./media/README.md) |
+| 介面截圖維護（Preview） | [`media/README.md`](./media/README.md) |
 
 ---
 

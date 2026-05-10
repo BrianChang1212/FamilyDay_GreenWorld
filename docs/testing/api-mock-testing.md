@@ -35,9 +35,9 @@ npm run dev
 
 **聯調／staging 整包檢核**另見：[`staging-rollout-checklist.md`](./staging-rollout-checklist.md)。
 
-## 3) `/finish/claimed` 快速案例
+## 3) `/finish` 儀表板／領獎狀態（Mock）
 
-| 案例 | 請求範例 | 預期 |
+於瀏覽器開 **`/finish`** 驗證畫面（離線 UI 可試 **`?mock_claimed=2`** 等 query）。下列為 **`GET /api/v1/me/dashboard`** 之 mock 案例：
 |------|----------|------|
 | ok | `/api/v1/me/dashboard` | 顯示預設進度 |
 | missing | `/api/v1/me/dashboard?scenario=missing` | 使用預設值，不崩潰 |

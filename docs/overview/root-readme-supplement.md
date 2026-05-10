@@ -54,7 +54,7 @@
 
 ## 介面預覽（截圖）
 
-以下為 **`familyday-frontend/` 生產建置**（`npm run build`）後，以 **390×844**（常見手機寬度）全頁截圖；與 [Netlify 測試站](#preview-netlify-test-ui)／本機 `npm run preview` **同一套輸出**。原始檔置於 [`docs/preview/screenshots/`](../preview/screenshots/)（重新產生步驟見 [`docs/media/README.md`](../media/README.md)）。
+以下皆為 **`familyday-frontend/` 生產建置**（`npm run build`）後，以 **390×844**（常見手機寬度）對 `vite preview` 畫面做全頁截圖，與 [Netlify 測試站](#preview-netlify-test-ui)／本機輸出一致。原始檔在 [`docs/preview/screenshots/`](../preview/screenshots/)；重產步驟見 [`docs/media/README.md`](../media/README.md)。若歡迎頁需改放**非建置畫面**之主視覺檔，請手動覆蓋 `preview-welcome.png` 並將 [`tool/capture-preview-screenshots.ps1`](../../tool/capture-preview-screenshots.ps1) 內 **`$CaptureWelcomeFromApp`** 設為 **`$false`**（略過程式重拍該張）。
 
 | 歡迎 `/` | 報到 `/checkin` |
 | :---: | :---: |
@@ -62,7 +62,8 @@
 | 闖關登入 `/register` | 闖關地圖 `/stage` |
 | [![闖關登入](../preview/screenshots/preview-register.png)](../preview/screenshots/preview-register.png) | [![闖關地圖](../preview/screenshots/preview-stage.png)](../preview/screenshots/preview-stage.png) |
 
-**領取成功**（`/finish/claimed`）— [![領取成功](../preview/screenshots/preview-claim-success.png)](../preview/screenshots/preview-claim-success.png)
+**完成領獎**（**定稿**：僅 **`/finish`** 一頁，含恭喜完成闖關、使用者識別、領獎狀態／上限提示）— [![完成頁](../preview/screenshots/preview-finish.png)](../preview/screenshots/preview-finish.png)  
+（已廢止獨立「領取成功」畫面；舊網址 `/finish/claimed` 會 **redirect** 至 `/finish`。）
 
 ---
 
@@ -86,16 +87,6 @@
 | 需求筆記        | 已結構化寫入 `docs/project/` 等（細節見 `docs/project/project-master.md`）                                                                               |
 | 文件體系        | 詳見 [`docs/README.md`](../README.md)（分類索引）→ `docs/project/project-master.md`                                                                  |
 | 最後更新 README | 見根 [`README.md`](../../README.md) 頁尾版本列；`project-master` 頁尾版本見主文件。 |
-
----
-
-## Demo 影片預覽
-
-內嵌播放與檔名、GitHub／本機預覽注意事項見 **[`docs/media/README.md`](../media/README.md)**。若下列路徑無檔案，請改點後援連結。
-
-<video src="../demo/family-day-prototype-demo.mp4" controls playsinline width="100%" style="max-width:720px;border-radius:8px"></video>
-
-**後援：** [family-day-prototype-demo.mp4](../demo/family-day-prototype-demo.mp4) · [docs/demo](../demo/)
 
 ---
 
@@ -128,7 +119,7 @@ flowchart LR
 
 - 報到入口：`/check-in` -> `/checkin` -> `/checkin/complete`
 - 闖關入口：`/game` -> `/` -> `/register` -> `/stage`
-- 領獎頁：`/finish`、`/finish/claimed`
+- 領獎頁：**`/finish`**（舊 **`/finish/claimed`** → redirect **`/finish`**）
 
 完整流程圖與資料流請看 `docs/project/project-master.md`（需求與流程、技術規格）及 [`docs/architecture/summary-frontend.md`](../architecture/summary-frontend.md)。
 
@@ -168,7 +159,7 @@ flowchart LR
 
 - 預計 **每週五 10:00** 開會（**A1 會議室**；以行事曆為準）。
 
-**線框（靜態）** — [`docs/design/wireframe/`](../design/wireframe/)（畫面操作錄影見上節 [Demo 影片預覽](#demo-影片預覽)）。
+**線框（靜態）** — [`docs/design/wireframe/`](../design/wireframe/)。動態畫面請見 [介面預覽（截圖）](#ui-preview-screenshots) 或 [公開預覽部署（測試 Web UI）](#preview-netlify-test-ui)。
 
 ---
 
@@ -263,7 +254,7 @@ flowchart LR
 | 文件分類索引 | [`docs/README.md`](../README.md) |
 | API 契約（v0.1） | [`familyday-api-contract/api-v0.1.md`](../../familyday-api-contract/api-v0.1.md) |
 | 前後端／部署／流量摘要 | [`docs/architecture/summary-frontend.md`](../architecture/summary-frontend.md) 等 |
-| Demo 錄影與截圖維護 | [`docs/media/README.md`](../media/README.md) |
+| 介面截圖維護（Preview） | [`docs/media/README.md`](../media/README.md) |
 | **根 README 長文／表格（本檔）** | [`docs/overview/root-readme-supplement.md`](./root-readme-supplement.md) |
 
 | 文件 | 建議更新時機 |

@@ -336,7 +336,7 @@
 | 掃站點 QR | `POST /api/v1/stations/verify` |
 | 載入題目／作答 | `GET /api/v1/challenges/{challengeId}`、`POST /api/v1/challenges/{challengeId}/attempts` |
 | 再玩一輪 | `POST /api/v1/me/playthrough/restart` |
-| Finish 頁 Modal「確認領獎」 | **`POST /api/v1/me/reward/claim`**（成功後再導 **`/finish/claimed`**；**已領滿**時前端可停留 **`/finish`** 顯示上限提醒，不強制導向 claimed） |
+| Finish 頁 Modal「確認領獎」 | **`POST /api/v1/me/reward/claim`**（成功後**停留 `/finish`** 並刷新儀表板；**已領滿**時僅顯示上限提醒；舊連結 **`/finish/claimed`** 會 redirect **`/finish`**） |
 | 領取成功頁（闖關禮狀態呈現） | 與關卡瀏覽共用 **`GET /api/v1/me/dashboard`**；讀取 `progress.rewardRedeemCount`（選用）或暫用 `fullClearCount`（見 §5 示例） |
 | 櫃台掃碼核銷（若有） | `POST /api/v1/staff/redeem/token`、`POST /api/v1/staff/redeem/confirm` |
 
@@ -472,7 +472,7 @@ sequenceDiagram
 |------|------|------|
 | v0.1 | 2026-04-10 | 初稿：整合簽到／登入分開、JWT 站點、作法 A、合併 dashboard |
 | v0.1.1 | 2026-04-18 | §5：`progress` 示例補**選用** `rewardRedeemCount`；§11：補「領取成功頁」與 dashboard 對照（與前端 `rewardClaimStatus.ts` 對齊） |
-| v0.1.2 | 2026-04-19 | §11：補註前端已將 dashboard 讀取與畫面編排分離（`api/rewardClaimStatus.ts`、`lib/rewardClaimPresentation.ts`、`composables/useRewardClaimPresentation.ts`）；**端點與欄位語意**仍以此規格為準 |
+| v0.1.2 | 2026-04-19 | §11：補註前端以 **`api/rewardClaimStatus.ts`**、**`lib/rewardClaimPresentation.ts`** 處理 dashboard 讀取與 **`/finish`** 編排；**端點與欄位語意**仍以此規格為準 |
 | v0.1.3 | 2026-04-19 | §11：補 **Vitest** 客戶端測試註記（`rewardClaimStatus.test.ts` 等）；**不重**定義 REST 路徑或 `progress` 語意 |
 | v0.1.4 | 2026-04-19 | 檔首：**dashboard** 端點改為 **`GET /api/v1/me/dashboard`**（與本文端點表一致；**無**契約變更） |
 | v0.1.5 | 2026-04-27 | 新增「Firebase 實作對齊註記」：補充 API 契約層與 Firebase 定案（Firestore/Realtime DB/Auth/Security Rules）之連動邊界；**不改**端點 |

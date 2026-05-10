@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import { computed, onMounted, ref } from "vue";
-import { useRouter } from "vue-router";
+import { computed, onMounted, ref, watch } from "vue";
+import { useRouter, useRoute } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import GwBrandBar from "@/components/GwBrandBar.vue";
 import { claimFinishReward, logoutGame, restartPlaythrough } from "@/api/gameFlow";
@@ -11,13 +11,14 @@ import {
 	resetScavengerRun,
 } from "@/lib/demoState";
 import { incrementLocalFinishClaimIfNoApiBase } from "@/lib/provisionalFinishClaim";
-import { resolveRewardClaimPresentation } from "@/lib/rewardClaimPresentation";
+import { resolveRewardClaimPresentation, parseMockClaimedQueryParam } from "@/lib/rewardClaimPresentation";
 import { parseApiErrorCode } from "@/lib/parseApiErrorJson";
 import { getViteApiBase } from "@/lib/apiBase";
 import { useI18n } from "@/composables/useI18n";
 import { FINISH_REWARD_SLOTS } from "@/constants";
 
 const router = useRouter();
+const route = useRoute();
 const { t } = useI18n();
 const name = ref("");
 const employeeId = ref("");
@@ -66,7 +67,14 @@ function slotActive(index: number): boolean {
 async function refreshClaimed(): Promise<void> {
 	statusLoadState.value = "loading";
 	statusError.value = "";
-	const r = await resolveRewardClaimPresentation(null, getFinishClaimedCount);
+	const mockClaimed = parseMockClaimedQueryParam(
+		route.query.mock_claimed,
+		FINISH_REWARD_SLOTS,
+	);
+	const r = await resolveRewardClaimPresentation(
+		mockClaimed,
+		getFinishClaimedCount,
+	);
 	if (r.loadState === "error") {
 		statusLoadState.value = "error";
 		statusError.value = r.error;
@@ -88,6 +96,13 @@ onMounted(() => {
 	employeeId.value = p.employeeId || "—";
 	void refreshClaimed();
 });
+
+watch(
+	() => route.query.mock_claimed,
+	() => {
+		void refreshClaimed();
+	},
+);
 
 function openClaimModal() {
 	if (

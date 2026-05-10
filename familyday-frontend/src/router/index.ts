@@ -10,7 +10,6 @@ import StageView from "@/views/quest/StageView.vue";
 import QuizView from "@/views/quest/QuizView.vue";
 import ResultView from "@/views/quest/ResultView.vue";
 import FinishView from "@/views/quest/FinishView.vue";
-import ClaimSuccessView from "@/views/quest/ClaimSuccessView.vue";
 import {
 	clearCheckinWelcomePassed,
 	isCheckinWelcomePassed,
@@ -75,10 +74,10 @@ const router = createRouter({
 		{ path: "/quiz", name: "quiz", component: QuizView },
 		{ path: "/result", name: "result", component: ResultView },
 		{ path: "/finish", name: "finish", component: FinishView },
+		/* Legacy URL: 領獎狀態已合併於 FinishView */
 		{
 			path: "/finish/claimed",
-			name: "finishClaimSuccess",
-			component: ClaimSuccessView,
+			redirect: { name: "finish" },
 		},
 	],
 });

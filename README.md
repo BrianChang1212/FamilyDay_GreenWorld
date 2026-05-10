@@ -1,7 +1,7 @@
 # 瑞軒 2026 家庭日 — 解謎闖關遊戲（綠世界生態農場）
 
 <p align="center">
-  <img src="familyday-frontend/public/images/family-day-forest-walk.png" alt="瑞軒家庭日綠世界主視覺：一家人攜手漫步林間小徑" width="720" />
+  <img src="docs/preview/screenshots/preview-welcome.png" alt="瑞軒 2026 家庭日 — 解謎闖關遊戲（綠世界生態農場）主視覺" width="720" />
 </p>
 
 ## 這是什麼
@@ -30,6 +30,7 @@ npm run dev
 
 | 用途 | 連結 |
 |------|------|
+| **全系統架構圖（前端 + API + 後端）** | [`docs/architecture/system-architecture.md`](docs/architecture/system-architecture.md) |
 | 需求／待辦／狀態（主文件） | [`docs/project/project-master.md`](docs/project/project-master.md) |
 | 本機與預覽 | [`docs/setup/README.md`](docs/setup/README.md) |
 | API v0.1 | [`familyday-api-contract/api-v0.1.md`](familyday-api-contract/api-v0.1.md) |
@@ -47,7 +48,7 @@ npm run dev
 
 | 面向 | 現況 |
 |------|------|
-| 前端 | 11 個 View **全數完整實作**（WelcomeView → ClaimSuccessView）；API 層 11 支函式對應真實端點；15 個測試檔無 skip/stub；CI 通過 |
+| 前端 | 10 個 View **全數完整實作**（WelcomeView → FinishView；舊 **`/finish/claimed`** 僅 redirect **`/finish`**）；API 層 11 支函式對應真實端點；14 個測試檔無 skip/stub；CI 通過 |
 | API | 19 個端點均已實作；唯 `GET /admin/reports/attendance` 的 `total` 欄位 hardcoded `1000`，其餘為動態資料 |
 | 後端資料層 | roster / checkins / player_progress / redeem 四集合已完整實作 Firestore + in-memory 雙模式切換；阻塞點為本機 IAM 憑證未設定（`GOOGLE_APPLICATION_CREDENTIALS`） |
 | 測試 | 前端 Vitest 15 檔通過；後端 4/30 聯調驗證 Pass 17（in-memory）；Firestore 驗證 Blocked（憑證未設定）；後端單元測試待補齊 |
@@ -80,4 +81,4 @@ npm run dev
 
 ---
 
-*README v2.61 · 2026-05-11（精簡總覽；細節→ `docs/overview/root-readme-supplement.md`；前版 v2.60）*
+*README v2.62 · 2026-05-11（精簡總覽；細節→ `docs/overview/root-readme-supplement.md`；前版 v2.61）*

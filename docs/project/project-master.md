@@ -232,7 +232,7 @@
 |:----:|------|------|
 | 1 | **完成闖關** | 如「恭喜完成闖關」、顯示姓名／員編；引導至**統籌站／指定處**領取闖關禮；可含獎項／點數圖示（未領前為未啟用狀態）；主按鈕「領取闖關禮」等；附註請**工作人員**協助核銷。 |
 | 2 | **確認領取（彈窗）** | 如「確認領取？」、第幾次領取、確認後無法取消；**確認領取**／**取消**。 |
-| 3 | **領取成功** | 成功文案與感謝；獎項圖示狀態更新（已領項目視覺區隔）；領取次數與份數上限依 [一、人數與身分規則](#一人數與身分規則) 準線，並與櫃檯驗證並列考量（詳 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)；前端 **`/finish`** 確認領獎成功後導 **`/finish/claimed`**；**已領滿**時可停留 **`/finish`** 顯示上限提醒。`ClaimSuccessView` 以 **`GET /api/v1/me/dashboard`** 之 `progress` 呈現次數，無 API 時 **`local-fallback`**，見 [`summary-frontend.md`](../architecture/summary-frontend.md) §2.1、§2 目錄 **v1.31**）。 |
+| 3 | **領取成功** | 於 **`/finish`** 呈現成功文案、三格領獎狀態與感謝；領取次數與份數上限依 [一、人數與身分規則](#一人數與身分規則) 準線，並與櫃檯驗證並列考量（詳 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)）。儀表板以 **`GET /api/v1/me/dashboard`** 之 `progress` 呈現次數，無 API 時 **`local-fallback`**；**`?mock_claimed=`** 僅供離線 UI。見 [`summary-frontend.md`](../architecture/summary-frontend.md)。 |
 
 **實作對照：** [`summary-frontend.md`](../architecture/summary-frontend.md) **§2.1**（路由）、**§2.2**（報到）、**§2.3**（闖關流程圖）。`familyday-frontend/` 已對齊：`/game`→歡迎、報到單頁+確認彈窗、闖關登入後→地圖；細節仍以本節為產品敘述準線。
 
@@ -523,11 +523,11 @@
    - [x] 專案 README
 
 3. **前端開發（與根 README 即時進度對齊 · 2026-05-11）**
-   - [x] 全數 11 個 View 完整實作（WelcomeView / BriefingView / RegisterView / CheckInWelcomeView / CheckInFormView / CheckInCompleteView / StageView / QuizView / ResultView / FinishView / ClaimSuccessView）
+   - [x] 全數 10 個 View 完整實作（WelcomeView / BriefingView / RegisterView / CheckInWelcomeView / CheckInFormView / CheckInCompleteView / StageView / QuizView / ResultView / FinishView）
    - [x] API 層 **11** 支函式對應真實端點，含完整 error handling
    - [x] Vitest **15** 個測試檔無 skip、無 stub，CI 通過
    - [x] Router 12 條路由含 redirect 意圖分流（報到 `/checkin`、闖關 `/register`）
-   - [x] 完成頁 `/finish` 領獎互動與 `/finish/claimed` 領取成功頁（接 `GET /me/dashboard`，無 API 時 `local-fallback`）
+   - [x] 完成頁 **`/finish`** 領獎互動與三格狀態（接 `GET /me/dashboard`，無 API 時 `local-fallback`；舊 **`/finish/claimed`** → **`/finish`**）
 
 4. **後端與聯調（原始碼掃描確認 2026-05-10）**
    - [x] Firebase Cloud Functions 19 個端點全數落地（health/auth/checkin/dashboard/me/stations/challenges/restart/reward/staff/admin）
@@ -755,4 +755,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.37 · 2026-05-11（API 連結改指 [`familyday-api-contract/api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)；`docs/specs` 副本移除；前版 **v1.3.36**）
+**文件版本：** 合併版 v1.3.38 · 2026-05-11（廢 **`ClaimSuccessView`**／**`/finish/claimed`** 獨立頁（改 **redirect** **`/finish`**）；領獎狀態合併於 **`FinishView`**；前版 **v1.3.37**）
