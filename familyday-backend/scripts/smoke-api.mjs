@@ -73,6 +73,26 @@ function expectStatus(name, status, allowed) {
 	row.expected = allowed.join("|");
 }
 
+/** Validates GET /admin/reports/attendance shape (Firestore count aggregates + roster total). */
+function expectAttendancePayload(body, ctx = "report_attendance") {
+	if (!body || typeof body !== "object") {
+		throw new Error(`${ctx}: body must be a JSON object`);
+	}
+	const { total, checkedIn } = body;
+	if (!Number.isInteger(total)) {
+		throw new Error(`${ctx}: total must be integer, got ${JSON.stringify(total)}`);
+	}
+	if (!Number.isInteger(checkedIn)) {
+		throw new Error(`${ctx}: checkedIn must be integer, got ${JSON.stringify(checkedIn)}`);
+	}
+	if (total < 1) {
+		throw new Error(`${ctx}: roster total ${total}; expected >= 1 after roster_import smoke row`);
+	}
+	if (checkedIn < 1) {
+		throw new Error(`${ctx}: checkedIn ${checkedIn}; expected >= 1 after POST /checkin smoke`);
+	}
+}
+
 async function run() {
 	await call("health", "/health");
 	await call("health_ready", "/health/ready");
@@ -136,7 +156,7 @@ async function run() {
 			body: JSON.stringify({ staffId: SMOKE_STAFF_ID, token }),
 		});
 	}
-	await call("report_attendance", "/admin/reports/attendance");
+	const attendance = await call("report_attendance", "/admin/reports/attendance");
 	await call("report_progress", "/admin/reports/progress");
 	await call("auth_logout", "/auth/logout", { method: "POST" });
 
@@ -158,6 +178,8 @@ async function run() {
 	expectStatus("report_attendance", 200, [200]);
 	expectStatus("report_progress", 200, [200]);
 	expectStatus("auth_logout", 200, [200]);
+
+	expectAttendancePayload(attendance.body);
 
 	console.log(
 		JSON.stringify(

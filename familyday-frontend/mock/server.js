@@ -592,10 +592,12 @@ const server = http.createServer((req, res) => {
 	}
 
 	if (req.method === "GET" && urlObj.pathname === "/api/v1/admin/reports/attendance") {
-		return writeJson(res, 200, {
-			total: 1000,
-			checkedIn: 750,
-		});
+		return readDb().then((db) =>
+			writeJson(res, 200, {
+				total: db.employees.length,
+				checkedIn: db.checkins.length,
+			}),
+		);
 	}
 
 	if (req.method === "GET" && urlObj.pathname === "/api/v1/admin/reports/progress") {

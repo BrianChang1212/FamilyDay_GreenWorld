@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { getRedeemSummary } from "../state/redeem";
-import { getCheckin } from "../state/checkins";
-import { upsertRosterEntries } from "../state/roster";
+import { countCheckins } from "../state/checkins";
+import { upsertRosterEntries, countRosterEmployeesForCurrentEvent } from "../state/roster";
 import { badRequest } from "../utils/http";
 
 export const adminRouter = Router();
@@ -28,10 +28,13 @@ adminRouter.post("/admin/roster/import", async (req, res) => {
 });
 
 adminRouter.get("/admin/reports/attendance", async (_req, res) => {
-	const anyCheckin = await getCheckin();
+	const [total, checkedIn] = await Promise.all([
+		countRosterEmployeesForCurrentEvent(),
+		countCheckins(),
+	]);
 	res.status(200).json({
-		total: 1000,
-		checkedIn: anyCheckin ? 1 : 0,
+		total,
+		checkedIn,
 	});
 });
 

@@ -1,13 +1,18 @@
 /**
  * Upsert N roster documents in Firestore (collection "roster").
  * Default numeric mode: distinct English first names per row (first row Bob for 1141043 / verify script).
+ * Given names slot 95+ come from sibling file seed-roster-extra-first-names.json (94 + 406 = 500, matches max seed count cap).
  *
- * Env (required):
- *   GOOGLE_APPLICATION_CREDENTIALS — path to service account JSON
+ * Env (credentials · pick one):
+ *   GOOGLE_APPLICATION_CREDENTIALS — service account JSON path (recommended)
+ *   Or omit and use Application Default Credentials (e.g. gcloud ADC)
  *
  * Env (optional):
  *   SEED_COUNT — default 10
  *   SEED_EMPLOYEE_ID_START — default "1141043"
+ *   SEED_NAME_SLOT_ANCHOR — optional; numeric employeeId that maps to name slot 0 (default:
+ *       fdgw.project.json seed.defaultEmployeeIdStart). Keeps English names stable by **employee number** so
+ *       split runs (e.g. 1141043–52 then 1141053+) do not reuse "Bob" etc.
  *   FDGW_EVENT_ID — overrides event id (default: fdgw.project.json)
  *   Defaults for count / party size / employee start: fdgw.project.json seed.*
  *   FDGW_FIRESTORE_DATABASE_ID — default "default"
@@ -18,11 +23,15 @@
 
 import process from "node:process";
 import fs from "node:fs";
+import { dirname, join } from "node:path";
+import { fileURLToPath } from "node:url";
 import { applicationDefault, getApps, initializeApp } from "firebase-admin/app";
 import { getFirestore } from "firebase-admin/firestore";
-import { getEventId, loadFdgwProject } from "./read-fdgw-project.mjs";
+import { getEventId, getFirebaseProjectId, loadFdgwProject } from "./read-fdgw-project.mjs";
 
-/** Distinct English given names; longer than typical SEED_COUNT; no duplicates. */
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+/** Distinct English given names; concatenated with seed-roster-extra-first-names.json up to max seed count. */
 const ENGLISH_FIRST_NAMES = [
 	"Bob",
 	"Alice",
@@ -120,19 +129,26 @@ const ENGLISH_FIRST_NAMES = [
 	"Walt",
 ];
 
+const EXTRA_FIRST_NAMES_PATH = join(__dirname, "seed-roster-extra-first-names.json");
+const ENGLISH_FIRST_NAMES_EXTRA = JSON.parse(
+	fs.readFileSync(EXTRA_FIRST_NAMES_PATH, "utf8"),
+);
+const ALL_ENGLISH_FIRST_NAMES = ENGLISH_FIRST_NAMES.concat(ENGLISH_FIRST_NAMES_EXTRA);
+
 function assertCred() {
 	const p = process.env.GOOGLE_APPLICATION_CREDENTIALS || "";
-	if (!p) {
-		throw new Error("GOOGLE_APPLICATION_CREDENTIALS is not set.");
-	}
-	if (!fs.existsSync(p)) {
+	if (p && !fs.existsSync(p)) {
 		throw new Error(`Credential file not found: ${p}`);
 	}
 }
 
 function initDb() {
+	const projectId = getFirebaseProjectId();
 	if (getApps().length === 0) {
-		initializeApp({ credential: applicationDefault() });
+		initializeApp({
+			credential: applicationDefault(),
+			projectId,
+		});
 	}
 	const id = process.env.FDGW_FIRESTORE_DATABASE_ID || "default";
 	return getFirestore(id);
@@ -143,8 +159,8 @@ function rosterDocId(eventId, employeeId) {
 }
 
 function englishNameAt(slotIndex) {
-	if (slotIndex < ENGLISH_FIRST_NAMES.length) {
-		return ENGLISH_FIRST_NAMES[slotIndex];
+	if (slotIndex < ALL_ENGLISH_FIRST_NAMES.length) {
+		return ALL_ENGLISH_FIRST_NAMES[slotIndex];
 	}
 	return `RosterSeed${String(slotIndex + 1).padStart(4, "0")}`;
 }
@@ -200,9 +216,24 @@ async function run() {
 		if (!Number.isFinite(startNum) || startNum < 0) {
 			throw new Error(`Invalid SEED_EMPLOYEE_ID_START: ${startRaw}`);
 		}
+		const anchorRaw = (
+			process.env.SEED_NAME_SLOT_ANCHOR ||
+			String(seedCfg.defaultEmployeeIdStart ?? "1141043")
+		).trim();
+		const anchorNum = parseInt(anchorRaw, 10);
+		if (!Number.isFinite(anchorNum)) {
+			throw new Error(`Invalid SEED_NAME_SLOT_ANCHOR: ${anchorRaw}`);
+		}
 		for (let i = 0; i < count; i += 1) {
 			const employeeId = String(startNum + i);
-			let name = englishNameAt(i);
+			const nameSlotIndex = startNum + i - anchorNum;
+			if (nameSlotIndex < 0) {
+				throw new Error(
+					`employeeId ${employeeId} is below SEED_NAME_SLOT_ANCHOR (${anchorRaw}); ` +
+						`raise anchor or use higher SEED_EMPLOYEE_ID_START`,
+				);
+			}
+			let name = englishNameAt(nameSlotIndex);
 			if (usedNames.has(name)) {
 				name = `${name}_${employeeId}`;
 			}

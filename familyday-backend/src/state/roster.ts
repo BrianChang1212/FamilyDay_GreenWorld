@@ -75,3 +75,15 @@ export async function upsertRosterEntries(
 	}
 	return importedCount;
 }
+
+/** Employees on the roster for the configured `eventId` (one document per employee). */
+export async function countRosterEmployeesForCurrentEvent(): Promise<number> {
+	const eventId = getEventId();
+	const db = getDb();
+	const agg = await db
+		.collection("roster")
+		.where("eventId", "==", eventId)
+		.count()
+		.get();
+	return agg.data().count;
+}

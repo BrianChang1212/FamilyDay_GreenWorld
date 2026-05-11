@@ -43,3 +43,13 @@ export async function getCheckin(employeeId?: string): Promise<CheckinRecord | n
 	);
 	return values[0] ?? null;
 }
+
+/** Distinct employees who have checked in (matches `checkins` collection size). */
+export async function countCheckins(): Promise<number> {
+	if (useFirestoreStore()) {
+		const db = getDb();
+		const agg = await db.collection("checkins").count().get();
+		return agg.data().count;
+	}
+	return checkins.size;
+}

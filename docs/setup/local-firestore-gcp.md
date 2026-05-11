@@ -45,7 +45,9 @@ npm run seed:roster
 
 預設值來源：
 - `eventId`、seed 參數：`fdgw.project.json`
-- 可覆寫：`FDGW_EVENT_ID`、`SEED_COUNT`、`SEED_EMPLOYEE_ID_START`
+- 英文字名：**前 94 筆槽位**在 [`familyday-backend/scripts/seed-roster-test-rows.mjs`](../../familyday-backend/scripts/seed-roster-test-rows.mjs)，**槽位 95～500（與 `seed.maxCount` 上限對齊）**讀 sibling [`familyday-backend/scripts/seed-roster-extra-first-names.json`](../../familyday-backend/scripts/seed-roster-extra-first-names.json)。
+- **英文名不重複（分段種子）：** `SEED_NAME_SLOT_ANCHOR`（預設等同 `seed.defaultEmployeeIdStart`）決定「工號減去錨點＝名字槽位」。分段跑（先 1141043–52 再 1141053+）時勿改錨點，即可與單次連續種子得到相同 `1141043→Bob、1141053→Kate…` 對應。
+- 可覆寫：`FDGW_EVENT_ID`、`SEED_COUNT`、`SEED_EMPLOYEE_ID_START`、`SEED_NAME_SLOT_ANCHOR`
 
 ### C) 部署 Firestore Rules／索引
 
