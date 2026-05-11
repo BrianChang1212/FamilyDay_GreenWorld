@@ -151,20 +151,23 @@ export const zhTW = {
     scanAriaLabel: "開啟掃碼",
     unlocked: "任務已解鎖",
     startQuizButton: "開始作答挑戰 →",
-    routeTitle: "六站蒐集（順序不限，點選切換）",
+    routeTitle:
+      "六站進度（按相機掃描該站 QR 進題；順序不拘，此處不支援手動點選切站）",
     heroBannerAlt:
       "森林探索風格主視覺：放大鏡、相機、寶箱、地圖與林間小徑",
     heroTitle: "一起完成挑戰吧！",
     heroSubtitle:
-      "前往關卡地點，點擊上方相機圖示掃描 QRCode，即可開始闖關。",
+      "請點選相機並掃描各關現場 QR code，將直接進入該關選擇題；完成後回到本頁更新進度。下方列表僅顯示狀態，無法手動選站。",
     statusCompleted: "已完成",
+    /** 列表「未完成」狀態（僅展示，解鎖靠掃 QR） */
     statusLocked: "待解鎖",
-    statusInProgress: "進行中",
     scanVideoAria: "相機取景畫面，請將 QR code 對準方框",
+    scanQrStageAlreadyDone:
+      "此關已完成，請掃描尚未完成之站點 QR code。",
     scanQrMismatch:
-      "此 QR 不是您目前選擇的關卡，請在列表切換到正確關卡後再掃描，或改掃描本關專用 QR。",
+      "此 QR 與站台驗證不符，請確認掃描的是正確關卡之現場 QR。",
     scanQrUnrecognized:
-      "無法辨識此 QR 為本站通行碼，請確認掃描的是活動關卡專用 QR。",
+      "無法從 QR 辨識關卡編號，請確認掃描的是活動關卡通行碼。",
     scanVerifyFailed: "站點驗證失敗，請重新對準 QR code。",
     qrImageAlt: "掃描 QR code：扁平自然風取景框、中央條碼與掃描線示意",
     stageImageAlt: "{stationName} 關卡貼圖",

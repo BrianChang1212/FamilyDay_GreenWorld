@@ -7,7 +7,6 @@ import { GAME_CONFIG } from "@/constants";
 import { verifyStation, type VerifyStationHttpError } from "@/api/gameFlow";
 import { useQrCameraScan } from "@/composables/useQrCameraScan";
 import {
-	clearPendingStationVerification,
 	getCompletedStageIds,
 	getInZone,
 	getPendingStationVerification,
@@ -39,25 +38,32 @@ const qrScanLive = computed(() => viewPhase.value === "scanning");
 const qrDecodePaused = computed(() => scanLoading.value);
 
 /**
- * Extract stageId embedded in QR payload without making an API call.
+ * QR payload → 站台編號（1…TOTAL_STAGES）。
  * Supports:
- *   - Mock format:    stage-{n}-token
- *   - JWT format:     base64url.payload.sig  (reads .stageId from JSON payload)
- * Returns null when the format is unrecognised or contains no stageId.
+ *   - Mock: stage-{n}-token
+ *   - JWT-shaped: base64url payload with stageId / stage_id / sid
  */
 function extractQrStageId(payload: string): number | null {
 	const mockMatch = payload.match(/^stage-(\d+)-token$/);
 	if (mockMatch) {
 		const n = Number(mockMatch[1]);
-		return Number.isFinite(n) && n >= 1 ? n : null;
+		return Number.isFinite(n) &&
+			n >= GAME_CONFIG.MIN_STAGE &&
+			n <= GAME_CONFIG.TOTAL_STAGES
+			? n
+			: null;
 	}
 	const parts = payload.split(".");
 	if (parts.length === 3) {
 		try {
 			const padded = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-			const json = JSON.parse(atob(padded));
+			const json = JSON.parse(atob(padded)) as Record<string, unknown>;
 			const n = Number(json.stageId ?? json.stage_id ?? json.sid);
-			return Number.isFinite(n) && n >= 1 ? n : null;
+			return Number.isFinite(n) &&
+				n >= GAME_CONFIG.MIN_STAGE &&
+				n <= GAME_CONFIG.TOTAL_STAGES
+				? n
+				: null;
 		} catch {
 			return null;
 		}
@@ -69,21 +75,28 @@ async function verifyFromDecodedQr(payload: string) {
 	const token = payload.trim();
 	if (!token) return;
 
-	// Front-end guard: reject QR that clearly belongs to a different stage
-	// before making any network request, so the user gets instant feedback.
 	const qrStage = extractQrStageId(token);
-	if (qrStage !== null && qrStage !== stage.value) {
-		scanError.value = `此 QR 是第 ${qrStage} 關的通行碼，您目前選擇的是第 ${stage.value} 關，請掃描第 ${stage.value} 關專用的 QR。`;
+	if (qrStage === null) {
+		scanError.value = t("stage.scanQrUnrecognized");
 		return;
 	}
+
+	if (isStageCompleted(qrStage)) {
+		scanError.value = t("stage.scanQrStageAlreadyDone");
+		return;
+	}
+
+	/* QR 決定進哪一關：與伺服器 verify 請求對齊 */
+	setStage(qrStage);
+	stage.value = qrStage;
 
 	scanLoading.value = true;
 	scanError.value = "";
 	try {
-		const cid = await verifyStation(stage.value, token);
+		const cid = await verifyStation(qrStage, token);
 		scanError.value = "";
 		challengeId.value = cid;
-		setPendingStationVerification(stage.value, cid);
+		setPendingStationVerification(qrStage, cid);
 		inZone.value = true;
 		setInZone(true);
 		await router.push({
@@ -124,14 +137,15 @@ const scanUiMessage = computed(
 const doneStationCount = computed(() => getCompletedStageIds().length);
 
 onMounted(() => {
-	stage.value = getStage();
 	const pending = getPendingStationVerification();
-	if (pending && pending.stage === stage.value) {
+	if (pending) {
+		stage.value = pending.stage;
 		challengeId.value = pending.challengeId;
-		setInZone(true);
+		setStage(pending.stage);
 		inZone.value = true;
+		setInZone(true);
 	} else {
-		if (pending) clearPendingStationVerification();
+		stage.value = getStage();
 		if (getInZone()) setInZone(false);
 		inZone.value = false;
 		challengeId.value = "";
@@ -165,21 +179,9 @@ function closeScanUi() {
 	cameraSetupError.value = "";
 }
 
-function rowState(id: number): "done" | "current" | "open" {
+function rowState(id: number): "done" | "open" {
 	if (isStageCompleted(id)) return "done";
-	if (id === stage.value) return "current";
 	return "open";
-}
-
-function selectStage(id: number) {
-	if (isStageCompleted(id)) return;
-	setStage(id);
-	stage.value = id;
-	setInZone(false);
-	inZone.value = false;
-	clearPendingStationVerification();
-	challengeId.value = "";
-	scanError.value = "";
 }
 </script>
 
@@ -460,26 +462,19 @@ function selectStage(id: number) {
 					<li
 						v-for="id in stageIds()"
 						:key="id"
-						role="button"
-						:tabindex="isStageCompleted(id) ? -1 : 0"
-						:class="[
-							'flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm transition',
-							rowState(id) === 'current'
-								? 'border-[#2f7354]/40 bg-white shadow-sm'
-								: rowState(id) === 'done'
-									? 'cursor-default border-neutral-200 bg-white'
-									: 'cursor-pointer border-neutral-100 bg-white hover:border-[#2f7354]/30 hover:bg-[#f7faf7]',
-						]"
-						@click="selectStage(id)"
-						@keydown.enter.prevent="selectStage(id)"
-						@keydown.space.prevent="selectStage(id)"
+						class="flex items-center gap-3 rounded-xl border px-3 py-2.5 text-sm transition"
+						:class="
+							rowState(id) === 'done'
+								? 'cursor-default border-neutral-200/90 bg-white shadow-sm'
+								: 'cursor-default border-neutral-100 bg-neutral-100/75'
+						"
 					>
 						<span
 							:class="[
-								'flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold',
-								rowState(id) === 'done' || rowState(id) === 'current'
+								'flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold tabular-nums',
+								rowState(id) === 'done'
 									? 'bg-[#2f7354] text-white'
-									: 'bg-neutral-200 text-neutral-500',
+									: 'bg-[#b0b0b0] text-white',
 							]"
 							>{{ id }}</span
 						>
@@ -488,22 +483,21 @@ function selectStage(id: number) {
 						}}</span>
 						<span
 							v-if="rowState(id) === 'done'"
-							class="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-bold text-[#2f7354]"
+							class="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-[#ddeee4] px-2.5 py-1 text-xs font-bold text-[#2f7354]"
 						>
 							<span aria-hidden="true">✓</span>
 							{{ t("stage.statusCompleted") }}
 						</span>
 						<span
-							v-else-if="rowState(id) === 'current'"
-							class="shrink-0 whitespace-nowrap text-xs font-bold text-[#2f7354]"
-						>
-							{{ t("stage.statusInProgress") }}
-						</span>
-						<span
 							v-else
-							class="flex shrink-0 items-center gap-1 whitespace-nowrap text-xs font-semibold text-neutral-500"
+							class="flex shrink-0 items-center gap-1 whitespace-nowrap rounded-full bg-neutral-200/90 px-2.5 py-1 text-xs font-semibold text-neutral-500"
 						>
-							<svg class="h-4 w-4 opacity-75" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+							<svg
+								class="h-3.5 w-3.5 shrink-0 opacity-90"
+								viewBox="0 0 24 24"
+								fill="currentColor"
+								aria-hidden="true"
+							>
 								<path
 									d="M17 8V6a5 5 0 00-10 0v2H7a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V10a2 2 0 00-2-2h-2zM12 17a2 2 0 112 0 2 2 0 01-2 0zm3.75-9H8.25V6a3.75 3.75 0 017.5 0v2z"
 								/>
