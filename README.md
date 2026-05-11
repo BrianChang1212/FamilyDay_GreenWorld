@@ -81,4 +81,4 @@ npm run dev
 
 ---
 
-*README v2.65 · 2026-05-11（`admin/reports` 與後端對齊；前版 v2.64）*
+*README v2.66 · 2026-05-11（介面 PNG 統一由同層 `FamilyDay_GreenWorld_UI_Screenshots` 維護；移除 `tool/capture-preview-screenshots`；前版 v2.65）*

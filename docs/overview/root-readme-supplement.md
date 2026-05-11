@@ -54,16 +54,22 @@
 
 ## 介面預覽（截圖）
 
-以下皆為 **`familyday-frontend/` 生產建置**（`npm run build`）後，以 **390×844**（常見手機寬度）對 `vite preview` 畫面做全頁截圖，與 [Netlify 測試站](#preview-netlify-test-ui)／本機輸出一致。原始檔在 [`docs/preview/screenshots/`](../preview/screenshots/)；重產步驟見 [`docs/media/README.md`](../media/README.md)。若歡迎頁需改放**非建置畫面**之主視覺檔，請手動覆蓋 `preview-welcome.png` 並將 [`tool/capture-preview-screenshots.ps1`](../../tool/capture-preview-screenshots.ps1) 內 **`$CaptureWelcomeFromApp`** 設為 **`$false`**（略過程式重拍該張）。
+**單一維護來源：** 與本倉庫**同層**之 [`FamilyDay_GreenWorld_UI_Screenshots`](../../../FamilyDay_GreenWorld_UI_Screenshots/README.md)（`screenshots/` PNG、`manifest.json`、 **`npm run capture`**）。重產步驟與完整路由對照見該 repo **`README.md`**；索引說明見本庫 [`docs/media/README.md`](../media/README.md)。
 
-| 歡迎 `/` | 報到 `/checkin` |
+下列內嵌圖使用**相對路徑**：僅在本倉庫與截圖 repo **並列於同一上層目錄**（例如皆在 `projects/Personal/`）時，Markdown 預覽可正常載入檔案。
+
+> 截圖為 **dev + mock API**、`390×844` 擷取；與 [公開預覽部署（測試 Web UI）](#preview-netlify-test-ui) 之生產建置畫面可能略有差異。
+
+| 闖關歡迎 `/` | 報到歡迎 `/checkin` |
 | :---: | :---: |
-| [![歡迎頁](../preview/screenshots/preview-welcome.png)](../preview/screenshots/preview-welcome.png) | [![報到表單](../preview/screenshots/preview-checkin-form.png)](../preview/screenshots/preview-checkin-form.png) |
+| [![闖關歡迎](../../../FamilyDay_GreenWorld_UI_Screenshots/screenshots/05-game_welcome.png)](../../../FamilyDay_GreenWorld_UI_Screenshots/screenshots/05-game_welcome.png) | [![報到歡迎](../../../FamilyDay_GreenWorld_UI_Screenshots/screenshots/01-checkin-welcome.png)](../../../FamilyDay_GreenWorld_UI_Screenshots/screenshots/01-checkin-welcome.png) |
 | 闖關登入 `/register` | 闖關地圖 `/stage` |
-| [![闖關登入](../preview/screenshots/preview-register.png)](../preview/screenshots/preview-register.png) | [![闖關地圖](../preview/screenshots/preview-stage.png)](../preview/screenshots/preview-stage.png) |
+| [![闖關登入](../../../FamilyDay_GreenWorld_UI_Screenshots/screenshots/07-register.png)](../../../FamilyDay_GreenWorld_UI_Screenshots/screenshots/07-register.png) | [![闖關地圖](../../../FamilyDay_GreenWorld_UI_Screenshots/screenshots/08-stage-map.png)](../../../FamilyDay_GreenWorld_UI_Screenshots/screenshots/08-stage-map.png) |
 
-**完成領獎**（**定稿**：僅 **`/finish`** 一頁，含恭喜完成闖關、使用者識別、領獎狀態／上限提示）— [![完成頁](../preview/screenshots/preview-finish.png)](../preview/screenshots/preview-finish.png)  
+**完成領獎**（**定稿**：僅 **`/finish`** 一頁，含恭喜完成闖關、使用者識別、領獎狀態／上限提示）— [![完成領獎](../../../FamilyDay_GreenWorld_UI_Screenshots/screenshots/12-finish.png)](../../../FamilyDay_GreenWorld_UI_Screenshots/screenshots/12-finish.png)  
 （已廢止獨立「領取成功」畫面；舊網址 `/finish/claimed` 會 **redirect** 至 `/finish`。）
+
+**其餘路由**（表單、簡報、測驗／結果、QR 取景等）見截圖 repo [**檔案與路由對照**](../../../FamilyDay_GreenWorld_UI_Screenshots/README.md#files-mapped-to-routes-current-local)。
 
 ---
 
@@ -239,7 +245,7 @@ flowchart LR
 | `functions/`      | 舊版後端目錄（legacy，僅保留歷史追溯） |
 | `.claude/skills/`（全域） | Agent skills 由全域管理；本專案不需額外內嵌 skills（非執行期依賴） |
 | `test/`           | 倉庫根目錄**驗收／測試紀錄**用（**選用**；目前僅 **`.gitkeep`**）。**程式單元測試**在 **`familyday-frontend/src/**/*.test.ts`**（Vitest），非此資料夾 |
-| `tool/`           | 輔助腳本（**選用**）：例如 [`tool/capture-preview-screenshots.ps1`](../../tool/capture-preview-screenshots.ps1)（重產 [`docs/preview/screenshots/`](../preview/screenshots/)，見 [`docs/media/README.md`](../media/README.md)）；另含 **`.gitkeep`** |
+| （同層截圖 repo） | **`FamilyDay_GreenWorld_UI_Screenshots/`**：介面 PNG **單一來源**（與本倉庫並列時路徑有效）；見該 repo **`README.md`** 與本庫 [`docs/media/README.md`](../media/README.md) |
 | `docs/overview/`  | **本檔**：根 README 之細節補充（截圖、技術圖、目錄表等） |
 
 ---
@@ -255,7 +261,7 @@ flowchart LR
 | 文件分類索引 | [`docs/README.md`](../README.md) |
 | API 契約（v0.1） | [`familyday-api-contract/api-v0.1.md`](../../familyday-api-contract/api-v0.1.md) |
 | 前後端／部署／流量摘要 | [`docs/architecture/summary-frontend.md`](../architecture/summary-frontend.md) 等 |
-| 介面截圖維護（Preview） | [`docs/media/README.md`](../media/README.md) |
+| 介面截圖索引 | [`docs/media/README.md`](../media/README.md) |
 | **根 README 長文／表格（本檔）** | [`docs/overview/root-readme-supplement.md`](./root-readme-supplement.md) |
 
 | 文件 | 建議更新時機 |
