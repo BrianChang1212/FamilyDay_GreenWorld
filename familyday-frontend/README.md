@@ -18,5 +18,5 @@ See `.env.example` for defaults.
 
 ## Contract alignment
 
-- Contract source-of-truth: `../familyday-api-contract`.
+- Contract: `../../docs/api/api-v0.1.md` · Changelog: `../../docs/api/CHANGELOG.md` · Release notes / tags: [`../../docs/api/README.md`](../../docs/api/README.md) · CODEOWNERS: `../../.github/CODEOWNERS`.
 - Frontend releases should reference a tagged contract version.

@@ -17,6 +17,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Validate REST contract doc path
+        run: |
+          test -f docs/api/api-v0.1.md
+          test -f docs/api/CHANGELOG.md
+          grep -q "v0.1" docs/api/api-v0.1.md
+
       - name: Set up Node
         uses: actions/setup-node@v4
         with:

@@ -1,7 +1,7 @@
 # 後端技術與 API — 討論總結
 
 > 本文件彙整**後端語言、框架、資料庫、業務模型與 API 文件**之討論結論。  
-> **完整 REST 草案**見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)。  
+> **完整 REST 草案**見 [`api-v0.1.md`](../api/api-v0.1.md)。  
 > **全系統架構一覽（含 Firestore／Functions）** → [`system-architecture.md`](./system-architecture.md)。
 
 ---
@@ -134,7 +134,7 @@ Firebase/Google Cloud 可設定 **Budgets & Alerts** 做費用通知，建議：
 
 ## 5. API 文件
 
-- 端點清單、請求／回應範例、畫面對照：**[`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)**。  
+- 端點清單、請求／回應範例、畫面對照：**[`api-v0.1.md`](../api/api-v0.1.md)**。  
 - 後續可由此產生 **OpenAPI** 供前端型別與測試工具使用。
 
 ### DB 設計參考入口
@@ -155,7 +155,7 @@ Firebase/Google Cloud 可設定 **Budgets & Alerts** 做費用通知，建議：
 
 ## 7. 待後續定案
 
-- **櫃台核銷**：`POST /api/v1/staff/redeem/token`、`POST /api/v1/staff/redeem/confirm` 已列 [**`api-v0.1.md`**](../../familyday-api-contract/api-v0.1.md) MVP 落地表並實作於 **`familyday-backend/src/routes/staff.ts`**；未定案者為**現場是否啟用**、工作人員介面與帳號治理（**不是**規格／路由缺漏問題）。  
+- **櫃台核銷**：`POST /api/v1/staff/redeem/token`、`POST /api/v1/staff/redeem/confirm` 已列 [**`api-v0.1.md`**](../api/api-v0.1.md) MVP 落地表並實作於 **`familyday-backend/src/routes/staff.ts`**；未定案者為**現場是否啟用**、工作人員介面與帳號治理（**不是**規格／路由缺漏問題）。  
 - Admin 匯入名冊：HTTP 或離線腳本。  
 - 與公司 **個資／留存政策** 對齊之欄位與刪除流程。
 

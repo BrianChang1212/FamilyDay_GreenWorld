@@ -1,7 +1,7 @@
 # Family Day Green World — 全系統架構圖（前端 · API · 後端）
 
 > **範圍：** 依倉庫現況彙整 **Vue SPA**、**REST API（`/api/v1`）**、**Firebase Cloud Functions（Express）** 與 **Firestore／本機 in-memory** 雙模式之關係。  
-> **契約單一來源：** [`familyday-api-contract/api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)。  
+> **契約單一來源（正文）：** [`docs/api/api-v0.1.md`](../api/api-v0.1.md) · **發佈／審查：** [`docs/api/README.md`](../api/README.md)、根 **`.github/CODEOWNERS`**  
 > **程式碼掃描對齊證明（契約 MVP / `routes` / `src/api` / mock）：** 見 **§8**。  
 > **補充讀物：** [`summary-frontend.md`](./summary-frontend.md)、[`summary-backend.md`](./summary-backend.md)、[`summary-deployment.md`](./summary-deployment.md)、[`firestore-schema-v1.md`](./firestore-schema-v1.md)。
 
@@ -51,7 +51,7 @@ flowchart TB
   subgraph repo["儲存庫邊界（mono 或拆線後對齊）"]
     FE["`familyday-frontend`\nVue 3 · Vite · TS · Tailwind"]
     BE["`familyday-backend`\nExpress · firebase-functions/v2/https\n`export const api`"]
-    CT["`familyday-api-contract`\n`api-v0.1.md` REST 契約"]
+    CT["`docs/api`\n`api-v0.1` + `CHANGELOG`\n+ 根 `.github`"]
     FD["`fdgw.project.json`\neventId · CORS · Firebase 專案後設"]
   end
 
@@ -234,7 +234,7 @@ sequenceDiagram
 
 | 項目 | 作法 |
 |------|------|
-| **契約** | [`familyday-api-contract/api-v0.1.md`](../../familyday-api-contract/api-v0.1.md) **§「後端 MVP 落地狀態」**表格；並另列 **§2 活動／進場**之選用端點（未列入 MVP 表者標示「§2」）。 |
+| **契約** | [`api-v0.1.md`](../api/api-v0.1.md) **§「後端 MVP 落地狀態」**表格；並另列 **§2 活動／進場**之選用端點（未列入 MVP 表者標示「§2」）。 |
 | **後端** | 列舉 `familyday-backend/src/routes/*.ts` 內 **`Router` 註冊路徑**（掛載於 `src/index.ts` 之 `/api/v1` 前綴下）。掃描日：2026-05-11。 |
 | **正式 SPA** | 於 `familyday-frontend/src` 搜尋 `` `/api/v1` ``；**僅統計執行期會發請求之模組**（`src/api/*.ts`，不含 `*.test.ts`）。 |
 | **Mock** | `familyday-frontend/mock/server.js` 以 pathname 分派之路由（本機聯調／`test-all-api.js` 等）。 |

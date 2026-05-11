@@ -2,7 +2,7 @@
 
 > 適用專案：FamilyDay_GreenWorld  
 > 後端基線：Firebase（Firestore 為主，Realtime Database 視場景選用）  
-> 對齊文件：`familyday-api-contract/api-v0.1.md`、`docs/architecture/summary-backend.md`
+> 對齊文件：`docs/api/api-v0.1.md`、`docs/architecture/summary-backend.md`
 
 ---
 
@@ -17,7 +17,7 @@
 
 **優先順序（由高到低）：**
 
-1. **`familyday-api-contract/api-v0.1.md`** — REST 契約與行為。  
+1. **`docs/api/api-v0.1.md`** — REST 契約與行為。  
 2. **`familyday-backend/src/state/*.ts`**（及路由處理程式）— 實際寫入／讀取的欄位與文件 ID。  
 3. **前端** — 呼叫上述 API 的流程與呈現（`docs/architecture/summary-frontend.md`）。  
 4. **Firestore Console** — 用來**核對實作結果**，不作為反向定義 schema 的主來源（避免與程式漂移時誤判）。

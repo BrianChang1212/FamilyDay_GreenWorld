@@ -1,5 +1,7 @@
 # 家庭日綠世界闖關 Web — API 規格（v0.1 草案）
 
+> **維護索引：** [`docs/api/README.md`](./README.md) · [`CHANGELOG.md`](./CHANGELOG.md) · [`/.github/CODEOWNERS`](../../.github/CODEOWNERS)
+
 > 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.24** MVP 落地表：**`admin/reports/*`** 備註與 **`familyday-backend/src/routes/admin.ts`** 對齊；**無**契約變更；**v0.1.23** §11：**Vitest** 範例路徑對齊 **`familyday-frontend/src/api/`**；**無**契約變更；**v0.1.22** 文件維護：Mock／MVP 敘述路徑對齊 **`familyday-frontend/mock`**、**`familyday-backend/`**；**無** REST 契約變更；**v0.1.21** 文件維護：`corsOrigins`／mock `eventId` 對齊 **`fdgw.project.json`**；**v0.1.20** 補前端原型：`inZone`／**`pendingStationChallenge`** 與 **`challengeId` query** 綁定註記，避免未掃碼卻進預設題組；**v0.1.19** 任意順序通關：`dashboard.stages[].locked` 語意、`attempts` 回應補 **`completedStageIds`**／**`allStagesCompleted`**；**v0.1.18** 聯調註記 CORS 白名單與 **`familyday-backend/src/index.ts`** 對齊；**v0.1.17** Mock／整合清單與 **`me/progress`** 對齊；**v0.1.16** 補列 **`GET /api/v1/me/progress`** 落地狀態；**v0.1.15** 文件與 §13 流程圖路徑對齊；**v0.1.14** 同步 Cloud Functions：`auth/checkin` 改走 Firestore roster 驗證，`admin/roster/import` 實作 Firestore 寫入；**v0.1.13** 完成 CORS allowlist 收斂驗證；**不改**端點定義）。
 
 ---

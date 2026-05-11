@@ -7,7 +7,7 @@
 > §2.1–§2.3；測試 Web UI／Netlify 預覽見根
 > [`README.md`](../../README.md)；**測試 Web UI 錨點**見 [`docs/overview/root-readme-supplement.md#preview-netlify-test-ui`](../overview/root-readme-supplement.md#preview-netlify-test-ui)；部署摘要見
 > [`summary-deployment.md`](../architecture/summary-deployment.md) §1.1；API 詳規見
-> [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)。  
+> [`api-v0.1.md`](../api/api-v0.1.md)。  
 > **維護：** 需求／待確認／技術細節以本檔為主；根 [`README.md`](../../README.md) 為總覽與**即時進度**；[`docs/README.md`](../README.md) 為 `docs/` 分類索引。
 
 ## 本文件目錄
@@ -24,7 +24,7 @@
 
 | 檔案 | 說明 |
 |------|------|
-| [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md) | REST API v0.1 單一來源（簽到／登入分開、站點 JWT、`GET /api/v1/me/dashboard` 等端點與欄位、mock 驗證差異註記）。 |
+| [`api-v0.1.md`](../api/api-v0.1.md) | REST API v0.1 單一來源（簽到／登入分開、站點 JWT、`GET /api/v1/me/dashboard` 等端點與欄位、mock 驗證差異註記）。 |
 | [`summary-frontend.md`](../architecture/summary-frontend.md) | 前端單一來源（Vue 3 + Vite + TS + Tailwind + Vue Router、`views/` 分群、`constants`/`i18n` 集中化、`api/` 與 `composables` 分層、Vitest 與 CI）。 |
 | [`summary-backend.md`](../architecture/summary-backend.md) | 後端：Firebase（Firestore / Realtime Database）、安全規則與資料模型重點 |
 | [`summary-deployment.md`](../architecture/summary-deployment.md) | 部署：Firebase 專案、Blaze 預算告警與環境分層；**§1.1** 靜態預覽、**測試 Web UI** 與 **CI**（**v1.6**）；操作細節見 [`setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)，**測試 Web UI 錨點**見 [`overview/root-readme-supplement.md`](../overview/root-readme-supplement.md#preview-netlify-test-ui) |
@@ -109,7 +109,7 @@
 ##### 已確認（方向）
 
 - **實作架構（2026-04-18 補充；現況 2026-05-11 更新）：** 簽到與闖關為**同一 Web 應用程式**、**獨立路由**。**歷史原型（`source/` 等）：** 報到曾描述為 **`/checkin` 單頁**（姓名／員編／同行人數＋確認）。**`familyday-frontend` 現況：** **`/checkin`** 為**報到歡迎／引導**（`CheckInWelcomeView`），表單在 **`/checkin/register`**（`CheckInFormView`）；路由細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) §2.1。**闖關**身分為 **`/register`**（姓名／員編）。可共用表單樣式元件，但** URL 與欄位**分流。
-- **進入點（2026-04-18 補充；路徑 2026-05-11）：** 以**不同 QR code（或不同 URL）** 區分意圖——**掃報到用 QR** → **`/check-in`**（寫入意圖）→ **`/checkin`** 歡迎 → **`/checkin/register`** 表單；**掃闖關入口 QR** → **`/` 歡迎** → 說明 → **`/register`** → 關卡／地圖。若 URL 帶有站點參數（例如某關 JWT／站點代碼），身分就緒後再接續**到站驗證／題目頁**（細節見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md) 站點 JWT）。應保留 `entry`、`station` 等 query 或使用 `sessionStorage`，避免流程沖掉導向目標。
+- **進入點（2026-04-18 補充；路徑 2026-05-11）：** 以**不同 QR code（或不同 URL）** 區分意圖——**掃報到用 QR** → **`/check-in`**（寫入意圖）→ **`/checkin`** 歡迎 → **`/checkin/register`** 表單；**掃闖關入口 QR** → **`/` 歡迎** → 說明 → **`/register`** → 關卡／地圖。若 URL 帶有站點參數（例如某關 JWT／站點代碼），身分就緒後再接續**到站驗證／題目頁**（細節見 [`api-v0.1.md`](../api/api-v0.1.md) 站點 JWT）。應保留 `entry`、`station` 等 query 或使用 `sessionStorage`，避免流程沖掉導向目標。
 
 ```
 ┌─────────────────────────────────────┐
@@ -134,7 +134,7 @@
 | **目標** | 現場可印製**至少兩類**入口 QR：**報到**、**闖關**（闖關亦可再細分「總入口」與「各關到站 QR」，後者見 §3.1）。使用者掃碼後進入**同一網域／同一前端專案**，依 URL 參數或路徑決定登入後預設畫面。 |
 | **報到 QR** | 連結指向例如 `/check-in?...` 或 `/?entry=checkin`（實際路徑以實作為準）。**`familyday-frontend`：** `/check-in` → **`/checkin`（歡迎）** → **`/checkin/register`（表單＋確認）**。**不**先走與闖關共用之 `/register`。 |
 | **闖關 QR** | 連結指向例如 `/game?...` 或 `/?entry=game`；**原型（`source/`）：** `/game` 寫入意圖後導向 **`/` 歡迎**，再 **遊戲說明 → `/register` → 地圖／關卡**。若為某關到站，可附加站點 token／參數供後端驗證，身分就緒後接題目流程。 |
-| **與 API 草案** | 簽到與闖關之 **REST 端點分開**（見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)）；前端可共用**表單樣式元件**，並實作 **QR／意圖分流與路由**（報到 **`/checkin`／`/checkin/register`**；闖關 **`/register`**；細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) §2.1）。 |
+| **與 API 草案** | 簽到與闖關之 **REST 端點分開**（見 [`api-v0.1.md`](../api/api-v0.1.md)）；前端可共用**表單樣式元件**，並實作 **QR／意圖分流與路由**（報到 **`/checkin`／`/checkin/register`**；闖關 **`/register`**；細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) §2.1）。 |
 | **待產品定案** | **未報到是否允許進闖關**（建議：不允許時由路由守衛或後端拒絕；允許時需主辦明確同意）。 |
 
 ##### 待確認
@@ -168,7 +168,7 @@
 
 > **範圍：** 僅**闖關動線**（不含報到，見 §2）。闖關登入僅**姓名／員編**；**同行人數**僅於報到收集。
 
-逐步畫面、路由與互動之**單一維護來源**：[`summary-frontend.md`](../architecture/summary-frontend.md) **§2.1**（路由）、**§2.3**（闖關流程與步驟）。**完成／領獎**統一在 **`/finish`**（領獎狀態、次數上限、`?mock_claimed=` 等）— 見該檔與 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)。
+逐步畫面、路由與互動之**單一維護來源**：[`summary-frontend.md`](../architecture/summary-frontend.md) **§2.1**（路由）、**§2.3**（闖關流程與步驟）。**完成／領獎**統一在 **`/finish`**（領獎狀態、次數上限、`?mock_claimed=` 等）— 見該檔與 [`api-v0.1.md`](../api/api-v0.1.md)。
 
 #### 3.2 獎品兌換
 
@@ -181,7 +181,7 @@
 ### 四、技術與架構（精簡）
 
 - **流程準線：** §2.1～§2.4（報到／闖關、QR 分流）；§3.1.1 之畫面細節見 [`summary-frontend.md`](../architecture/summary-frontend.md)。
-- **API／站點 JWT：** [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)。
+- **API／站點 JWT：** [`api-v0.1.md`](../api/api-v0.1.md)。
 - **全系統架構圖：** [`system-architecture.md`](../architecture/system-architecture.md)。
 - **效能／壓測：** 尖峰以約 **1,300** 人規劃；見 [`summary-traffic.md`](../architecture/summary-traffic.md)。
 - **堆疊（已定案實作）：** Vue 3 + Vite + TypeScript + Tailwind + Vue Router；後端 Firebase（Firestore 為主）；簽到 **`/checkin`**、闖關 **`/register`**；報名清冊與即時寫入之 Sheet／DB 分工見 [`summary-backend.md`](../architecture/summary-backend.md)。
@@ -295,7 +295,7 @@
 | 驗證 | 整合測試 in-memory Pass 17；**`verify:firestore` Blocked**（本機缺 `GOOGLE_APPLICATION_CREDENTIALS`） |
 | 產品／主辦 | [待確認與會議](#待確認與會議) H1～H5；設計 D1/D2 |
 
-**細節：** [`summary-frontend.md`](../architecture/summary-frontend.md)、[`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)、[§ 待辦事項](#work-backlog)。
+**細節：** [`summary-frontend.md`](../architecture/summary-frontend.md)、[`api-v0.1.md`](../api/api-v0.1.md)、[§ 待辦事項](#work-backlog)。
 
 ---
 
@@ -311,7 +311,7 @@
 | 2026-04-10 | 闖關到站以實體 QR 取代 GPS | 減少定位誤差 | 須場勘確認布點與防偽 |
 | 2026-04-27 | **後端架構定案**（Vue+Vite+Firebase、API v0.1、流量與部署摘要） | 與會議成本估算及維運策略對齊，降低後端維運負擔 | 見本檔開頭補充文件表；後端以 Firebase 為準 |
 | 2026-04-15 | **`source/` 前端可建置原型**（Vue Router、Tailwind、示範流程） | 驗證技術鏈與 UX 假設；與後端解耦 | Naive UI 未裝；見 `summary-frontend.md` v1.1 |
-| 2026-04-16 | **完成頁 `/finish` 領獎流程（原型）** | 對齊主規則表之次數／份數上限與櫃台驗證情境；先以瀏覽器暫存類比領取次數 | 見 `summary-frontend.md` v1.2（**現況**見 **v1.31**）；**REST 準線**見 [`api-v0.1.md`](../../familyday-api-contract/api-v0.1.md) **以檔首修訂為準**（**v0.1.24**／**v0.1.23**／**v0.1.22** 等均為文件維護：**無** REST 語意變更）。玩家 **`POST …/me/reward/claim`** 與櫃台 **`staff/redeem/*`** 已列 MVP；後端已落地，營運是否啟用依主辦 |
+| 2026-04-16 | **完成頁 `/finish` 領獎流程（原型）** | 對齊主規則表之次數／份數上限與櫃台驗證情境；先以瀏覽器暫存類比領取次數 | 見 `summary-frontend.md` v1.2（**現況**見 **v1.31**）；**REST 準線**見 [`api-v0.1.md`](../api/api-v0.1.md) **以檔首修訂為準**（**v0.1.24**／**v0.1.23**／**v0.1.22** 等均為文件維護：**無** REST 語意變更）。玩家 **`POST …/me/reward/claim`** 與櫃台 **`staff/redeem/*`** 已列 MVP；後端已落地，營運是否啟用依主辦 |
 | 2026-04-30 | Cloud Functions 作為首階段後端執行層 | 可快速承接既有 REST 契約並以最小變更完成前後端聯調 | 核心與 Phase 2 端點已落地，前端可直接驗證 |
 | 2026-04-30 | CORS 採固定 allowlist 白名單策略 | 先堵住任意 Origin 風險，符合活動前最小安全基線 | 白名單來源可通過，非白名單不回傳 ACAO |
 | 2026-04-30 | Firestore 採環境旗標切換（`FDGW_USE_FIRESTORE`） | 允許 in-memory 與 Firestore 並行驗證，降低切換風險 | 目前阻塞點聚焦為 IAM 權限，便於分工追蹤 |
@@ -384,7 +384,7 @@
 - 後端選型、成本與安全：`docs/architecture/summary-backend.md`
 - 部署、告警與環境策略：`docs/architecture/summary-deployment.md`
 - 流量、尖峰與壓測：`docs/architecture/summary-traffic.md`
-- API 端點與 JSON 範例：`familyday-api-contract/api-v0.1.md`
+- API 端點與 JSON 範例：`docs/api/api-v0.1.md`
 - 欄位與資料模型：以前兩者為準，本檔不重複欄位表
 
 ### 開發與驗證最低要求
@@ -431,4 +431,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.42 · 2026-05-11（待辧／Firestore 對齊敘述與 **`admin/reports/*`**、`api-v0.1` **v0.1.24**、`system-architecture` §8.2 補註同步；前版 **v1.3.41**）
+**文件版本：** 合併版 v1.3.46 · 2026-05-11（**移除** **`familyday-api-contract/`** 目錄；契約治理 **`docs/api/README.md`**、根 **`.github/CODEOWNERS`**；前版 **v1.3.45**）

@@ -1,6 +1,6 @@
 # Staging 上線／聯調檢核表
 
-> 對照 `familyday-api-contract/api-v0.1.md` 與 `familyday-frontend/src/lib/apiBase.ts`。  
+> 對照 **`docs/api/api-v0.1.md`** 與 **`familyday-frontend/src/lib/apiBase.ts`**。  
 > Mock 專用 QR：`familyday-frontend/public/qr-mock-stations/`（`stage-N-token`）；正式／staging 請用後端 JWT 與 `npm run qr:staging-stations`（輸出於 **`public/qr-staging-stations/`**，預設 gitignored）。
 
 ## 架構圖（Staging 聯調視角）

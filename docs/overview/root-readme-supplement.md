@@ -102,7 +102,7 @@
 | --- | --- |
 | 前端 | Vue 3 + Vite + TypeScript + Tailwind + Vue Router（`familyday-frontend/`） |
 | 後端 | Firebase（Firestore 為主，Realtime Database 視場景啟用） |
-| API 契約 | `familyday-api-contract/api-v0.1.md` |
+| API 契約 | `docs/api/`（正文、CHANGELOG、發佈約定）； **`contract-v*`** Git 標籤；根 **`.github/CODEOWNERS`**（**`docs/api/*`**） |
 | 架構摘要 | 前端：`docs/architecture/summary-frontend.md`、後端：`docs/architecture/summary-backend.md`、部署：`docs/architecture/summary-deployment.md`、流量：`docs/architecture/summary-traffic.md` |
 
 ### API 觸發時機（簡短版）
@@ -119,7 +119,7 @@ flowchart LR
 - Staff：櫃台核銷與領獎確認時觸發。
 - Admin：名冊匯入與營運報表查詢時觸發。
 - System：監控與部署健康檢查時觸發。
-- 完整版（含分群詳圖與端點表）：[`familyday-api-contract/api-v0.1.md`](../../familyday-api-contract/api-v0.1.md) §12。
+- 完整版（含分群詳圖與端點表）：[`api-v0.1.md`](../api/api-v0.1.md) §12。
 
 ### 快速路由（原型）
 
@@ -236,11 +236,11 @@ flowchart LR
 
 | 路徑                | 用途                                                                                                                |
 | ----------------- | ----------------------------------------------------------------------------------------------------------------- |
-| `docs/`           | 見 [`docs/README.md`](../README.md)（含 **`setup/`** 本機與預覽、`project/`、`architecture/`、`media/` 等；**API 契約**僅 [`familyday-api-contract/api-v0.1.md`](../../familyday-api-contract/api-v0.1.md)） |
+| `docs/`           | 見 [`docs/README.md`](../README.md)（含 **`api/`** 契約、**CHANGELOG**、發佈約定、**`setup/`** …） |
 | `assets/`         | 設計稿、KV、Logo、CIS（註明版本與來源）                                                                                          |
+| `.github/`        | **`workflows/`**（含根 CI）、根 **`CODEOWNERS`**（**`docs/api/*`**） |
 | `familyday-frontend/` | 前端獨立 repo（Vue 3 + Vite + TS + Tailwind + Vue Router）：`npm install` → `npm run dev`；`npm run test`（Vitest） |
 | `familyday-backend/` | 後端獨立 repo（Firebase Functions + Firestore 設定）：`npm install` → `npm run build` / `npm run serve` |
-| `familyday-api-contract/` | API 契約獨立 repo（`api-v0.1.md` + 契約治理檔） |
 | `source/`         | 舊版前端目錄（legacy，僅保留歷史追溯） |
 | `functions/`      | 舊版後端目錄（legacy，僅保留歷史追溯） |
 | `.claude/skills/`（全域） | Agent skills 由全域管理；本專案不需額外內嵌 skills（非執行期依賴） |
@@ -259,7 +259,7 @@ flowchart LR
 | 完整需求、待辦、進度、技術 | [`docs/project/project-master.md`](../project/project-master.md) |
 | Repo 拆分遷移說明 | [`docs/project/repo-split-migration.md`](../project/repo-split-migration.md) |
 | 文件分類索引 | [`docs/README.md`](../README.md) |
-| API 契約（v0.1） | [`familyday-api-contract/api-v0.1.md`](../../familyday-api-contract/api-v0.1.md) |
+| API 契約（v0.1） | [`docs/api/api-v0.1.md`](../api/api-v0.1.md) · [`docs/api/CHANGELOG.md`](../api/CHANGELOG.md) · [`docs/api/README.md`](../api/README.md) |
 | 前後端／部署／流量摘要 | [`docs/architecture/summary-frontend.md`](../architecture/summary-frontend.md) 等 |
 | 介面截圖索引 | [`docs/media/README.md`](../media/README.md) |
 | **根 README 長文／表格（本檔）** | [`docs/overview/root-readme-supplement.md`](./root-readme-supplement.md) |

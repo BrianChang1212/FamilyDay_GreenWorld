@@ -1,31 +1,36 @@
 # FamilyDay 倉庫拆分（遷移與邊界）
 
-為支援前後端團隊**各自排程與發佈節奏**，本 mono-repo 已拆分為三支獨立倉庫（敘述上的目標邊界與對照如下）。
+為支援前後端團隊**各自排程與發佈節奏**，成品交付以**兩個執行 repo**（前端、後端）為邊界；**REST 契約正文與 changelog** 於 **mono-repo `docs/api/`** 維護（**不再**維護 **`familyday-api-contract/`** 目錄）。
 
-## 新倉庫
+## 執行環境倉庫（目標）
 
 - `familyday-frontend`：前端執行環境與測試。
 - `familyday-backend`：Firebase Functions 後端執行環境。
-- `familyday-api-contract`：API 契約之**單一來源**與治理（版本／變更流程）。
+
+## 契約文件（mono `docs/`）
+
+- **`docs/api/api-v0.1.md`**、**`docs/api/CHANGELOG.md`**：**規格與發佈變更敘述**。
+- **`docs/api/README.md`**：索引、標籤與發佈流程約定。
+- 倉庫根 **[`.github/CODEOWNERS`](../../.github/CODEOWNERS)**：對上述 **`docs/api/*`** 之審查清單指派。
 
 ## 現行本機目錄配置
 
 - `20260410_FamilyDay_GreenWorld_App/familyday-frontend`
 - `20260410_FamilyDay_GreenWorld_App/familyday-backend`
-- `20260410_FamilyDay_GreenWorld_App/familyday-api-contract`
 
 ## 歷史內容對照（拆分前）
 
 - 舊 `source/**` → `familyday-frontend`
 - 舊 `functions/**` ＋ 根目錄 Firebase 設定 → `familyday-backend`
-- 舊 `docs/specs/api-v0.1.md` → `familyday-api-contract/api-v0.1.md`（mono-repo 內副本已移除；**僅保留契約檔為維護來源**）
+- 舊 `docs/specs/api-v0.1.md` → **`docs/api/api-v0.1.md`**、**`docs/api/CHANGELOG.md`**
+- 曾存在 **`familyday-api-contract/`**（敘述用 governance／巢狀 CI）→ **2026-05-11 起移除**；內容已收斂至 **`docs/api/`** 與根 **`.github/`**
 
 ## 目標檔案對照（拆分產出）
 
 ### familyday-frontend
 
 - `source/**`（歷史名稱；實際開發樹為 `familyday-frontend/**`）
-- 由 `.github/workflows/ci.yml` 轉出／對應的前端專用 workflow
+- 由 `.github/workflows/ci.yml` 轉出／對應的前端專用 workflow（若拆分後仍存在）
 - 前端 `README.md`、`.gitignore`、`.env.example`
 
 ### familyday-backend
@@ -39,14 +44,9 @@
   - `firestore.indexes.json`
 - 後端 `README.md`、`.gitignore`、`.env.example`
 
-### familyday-api-contract
+### 契約（本 mono-repo，非獨立目錄）
 
-- `api-v0.1.md`（REST 契約基準）
-- 契約治理相關檔：
-  - `README.md`
-  - `CHANGELOG.md`
-  - `CODEOWNERS`
-  - 契約用 CI workflow
+- **`docs/api/api-v0.1.md`**、**`docs/api/CHANGELOG.md`**、**`docs/api/README.md`**
 
 ## 拆分產出之排除項目
 
@@ -58,19 +58,18 @@
 - `*.log`
 - `.env*`（範本如 `.env.example` 除外）
 
-## 跨倉庫整合規則
+## 跨倉庫／ mono 整合規則
 
 - 前端透過 `VITE_API_BASE` 存取後端，**不依賴** mono-repo 相對路徑硬連。
 - 後端以 `fdgw.project.json` 作為部署專案識別之**單一來源**。
-- API 契約變更於 `familyday-api-contract` **版型／版本化**後，再由前後端倉庫取用以發佈。
+- API **規格與 changelog** 變更：**只**改 **`docs/api/`**，並視需要打 **`contract-v*`** tag；前後端 release 再行對齊標籤或 commit。
 
 ## 切換（cutover）規則
 
-- **新功能開發**應以拆分後之三倉庫為準。
-- 本 mono-repo **可保留**以利歷程追蹤（若組織政策如此）。
-- 契約變更須**先**自 `familyday-api-contract` 釋出，再由前後端 release 分支接軌。
+- **新功能開發**以拆分後之 **frontend／backend** 邊界為準。
+- **契約**沿用本 mono-repo **`docs/api/`**，與歷史上的「三支線」敘事中 **`familyday-api-contract/`** 目錄**解耦**（該資料夾**已移除**）。
 - 根目錄舊資料夾（`source/`、`functions/`）若仍存在，視為**唯讀歷史參考**，**不應**再新增功能開發。
 
 ## 倉庫網址
 
-<!-- TODO：補上三支拆分倉庫之遠端 URL（例如 GitHub） -->
+<!-- TODO：補上拆分後前後端遠端 URL（例如 GitHub） -->

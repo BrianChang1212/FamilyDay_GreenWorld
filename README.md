@@ -33,7 +33,7 @@ npm run dev
 | **全系統架構圖（前端 + API + 後端）** | [`docs/architecture/system-architecture.md`](docs/architecture/system-architecture.md) |
 | 需求／待辦／狀態（主文件） | [`docs/project/project-master.md`](docs/project/project-master.md) |
 | 本機與預覽 | [`docs/setup/README.md`](docs/setup/README.md) |
-| API v0.1 | [`familyday-api-contract/api-v0.1.md`](familyday-api-contract/api-v0.1.md) |
+| API v0.1 | [`docs/api/api-v0.1.md`](docs/api/api-v0.1.md) · [`docs/api/CHANGELOG.md`](docs/api/CHANGELOG.md) · 索引 [`docs/api/README.md`](docs/api/README.md) |
 | `docs/` 索引 | [`docs/README.md`](docs/README.md) |
 
 ---
@@ -81,4 +81,4 @@ npm run dev
 
 ---
 
-*README v2.66 · 2026-05-11（介面 PNG 統一由同層 `FamilyDay_GreenWorld_UI_Screenshots` 維護；移除 `tool/capture-preview-screenshots`；前版 v2.65）*
+*README v2.71 · 2026-05-11（移除 **`familyday-api-contract/`**；契約／CODEOWNERS 收斂 **`docs/api/`**＋根 **`.github/`**；前版 v2.69）*

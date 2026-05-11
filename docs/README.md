@@ -1,7 +1,7 @@
 # `docs/` 文件索引
 
-本目錄依**用途分類**；自 2026-05 起核心程式已拆為三個子 repo：
-`familyday-frontend/`、`familyday-backend/`、`familyday-api-contract/`。
+本目錄依**用途分類**；自 2026-05 起核心程式已拆為二個子開發樹：
+`familyday-frontend/`、`familyday-backend/`；**REST v0.1 契約與 changelog** 在 **`docs/api/`**。
 維護主文件仍為 [`project/project-master.md`](./project/project-master.md)。
 
 ---
@@ -10,9 +10,10 @@
 
 | 資料夾 | 用途 |
 |--------|------|
+| [`api/`](./api/) | **`api/api-v0.1.md`**（契約正文）· **`api/CHANGELOG.md`**（變更紀錄）· [`api/README.md`](./api/README.md) |
 | [`overview/`](./overview/) | **根 README 補充**（[`root-readme-supplement.md`](./overview/root-readme-supplement.md)：截圖、Mermaid、目錄表、長篇待辦） |
 | [`project/`](./project/) | **專案主文件**（需求、會議、待確認、狀態、技術規格合併版） |
-| [`project/repo-split-migration.md`](./project/repo-split-migration.md) | **Mono → 三支線 repo** 遷移敘事、**檔案邊界對照**、cutover（已合併原 `architecture/repo-split-boundary.md`） |
+| [`project/repo-split-migration.md`](./project/repo-split-migration.md) | **拆分邊界**遷移敘事：**前後端**執行樹 + **`docs/api/`** 契約／changelog；cutover |
 | [`architecture/`](./architecture/) | **架構討論總結**（[`system-architecture.md`](./architecture/system-architecture.md) 全系統圖、前後端選型、部署、流量） |
 | [`testing/`](./testing/) | **整合驗證清單**（前後端 API 實測流程與驗收 Checklist） |
 | [`setup/`](./setup/) | **本機與預覽**（GCP／Firestore、靜態預覽、Windows Node.js；詳見 [`setup/README.md`](./setup/README.md)） |
@@ -37,7 +38,7 @@
 |--------|------|
 | **全系統架構圖（前端 + API + 後端）** | [`architecture/system-architecture.md`](./architecture/system-architecture.md) |
 | 需求與專案狀態 | [`project/project-master.md`](./project/project-master.md) |
-| API v0.1 契約（單一來源） | [`../familyday-api-contract/api-v0.1.md`](../familyday-api-contract/api-v0.1.md) |
+| API v0.1（`docs/` 維護） | [`api/api-v0.1.md`](./api/api-v0.1.md)、[`api/CHANGELOG.md`](./api/CHANGELOG.md)、[`api/README.md`](./api/README.md)（含 **`contract-v*`** 標籤約定）；審查指派見根 **`.github/CODEOWNERS`** |
 | API 整合清單（精簡） | [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md) |
 | API Mock 測試流程 | [`testing/api-mock-testing.md`](./testing/api-mock-testing.md) |
 | API 歷史驗證紀錄 | [`testing/api-integration-history.md`](./testing/api-integration-history.md) |
@@ -58,13 +59,13 @@
 
 ---
 
-**最後整理：** 2026-05-11（**`docs/specs` 已移除**—API 僅維護 [`familyday-api-contract/api-v0.1.md`](../familyday-api-contract/api-v0.1.md)；**`repo-split-boundary` → `repo-split-migration`**；刪空 **`docs/migration/`**；**`docs/design` 已移除**（早期線框 PNG；靜態線框見 **`proposals/FamilyDayApp_wireframe_v2.pdf`**、實作畫面 PNG 改由同層 **`FamilyDay_GreenWorld_UI_Screenshots`** 維護；**`tool/capture-preview-screenshots.ps1`**／**`docs/preview/screenshots`** 約定已停止使用）。早先同日（**`api-v0.1` v0.1.22**：契約 Mock／MVP 路徑對齊 `familyday-frontend/mock`、`familyday-backend/`；根 **README** v2.58 同步 API 函式／Vitest 檔數）。2026-05-05（續：**`api-v0.1` v0.1.21**／**`summary-frontend` v1.31** 版本鏈；**`api-v0.1`** CORS／`eventId` 對齊 `fdgw`；**checklist** §7.1 歷史表加對照說明、儀表板 curl 註記 mock 8787；根 **README** 埠號指向 `fdgw.frontend`；**`project-master` v1.3.33**）。先前同日：**`firebase/`** 索引；**`dev-oneclick`**；**`local-firestore-gcp`／checklist／summary-backend`** 與 `-FunctionsOnly`。再前：2026-05-03（**`setup/`**；**`summary-deployment` v1.6**；**`api-v0.1` v0.1.20**；**`summary-frontend` v1.30**）。**`api-v0.1`** 已於 2026-05-05 遞增至 **v0.1.21**，**`summary-frontend`** 至 **v1.31**（見本日「續」條目）。版本與修訂歷史以各檔案檔頭及
+**最後整理：** 2026-05-11（**刪除 `familyday-api-contract/`**；契約治理收斂 **`docs/api/README.md`**＋根 **`.github/CODEOWNERS`**。REST **規格**與**契約 CHANGELOG** 於 **`docs/api/`**。**`docs/specs` 已移除**—**`repo-split-boundary` → `repo-split-migration`**；刪空 **`docs/migration/`**；**`docs/design` 已移除**（早期線框 PNG；靜態線框見 **`proposals/FamilyDayApp_wireframe_v2.pdf`**、實作畫面 PNG 改由同層 **`FamilyDay_GreenWorld_UI_Screenshots`** 維護；**`tool/capture-preview-screenshots.ps1`**／**`docs/preview/screenshots`** 約定已停止使用）。早先同日（**`api-v0.1` v0.1.22**：契約 Mock／MVP 路徑對齊 `familyday-frontend/mock`、`familyday-backend/`；根 **README** v2.58 同步 API 函式／Vitest 檔數）。2026-05-05（續：**`api-v0.1` v0.1.21**／**`summary-frontend` v1.31** 版本鏈；**`api-v0.1`** CORS／`eventId` 對齊 `fdgw`；**checklist** §7.1 歷史表加對照說明、儀表板 curl 註記 mock 8787；根 **README** 埠號指向 `fdgw.frontend`；**`project-master` v1.3.33**）。先前同日：**`firebase/`** 索引；**`dev-oneclick`**；**`local-firestore-gcp`／checklist／summary-backend`** 與 `-FunctionsOnly`。再前：2026-05-03（**`setup/`**；**`summary-deployment` v1.6**；**`api-v0.1` v0.1.20**；**`summary-frontend` v1.30**）。**`api-v0.1`** 已於 2026-05-05 遞增至 **v0.1.21**，**`summary-frontend`** 至 **v1.31**（見本日「續」條目）。版本與修訂歷史以各檔案檔頭及
 [`project/project-master.md`](./project/project-master.md) 頁尾版本列為準。
 技術細節請直接查閱對應單一來源文件：前端
 [`architecture/summary-frontend.md`](./architecture/summary-frontend.md)、後端
 [`architecture/summary-backend.md`](./architecture/summary-backend.md)、部署
 [`architecture/summary-deployment.md`](./architecture/summary-deployment.md)、流量
 [`architecture/summary-traffic.md`](./architecture/summary-traffic.md)、API
-[`familyday-api-contract/api-v0.1.md`](../familyday-api-contract/api-v0.1.md)、整合驗證
+[`api/api-v0.1.md`](./api/api-v0.1.md)、[`api/CHANGELOG.md`](./api/CHANGELOG.md)、整合驗證
 [`testing/api-integration-checklist.md`](./testing/api-integration-checklist.md)；
 測試 Web UI 見 [`setup/static-preview-netlify-github.md`](./setup/static-preview-netlify-github.md) 或 [`overview/root-readme-supplement.md#preview-netlify-test-ui`](./overview/root-readme-supplement.md#preview-netlify-test-ui)。
