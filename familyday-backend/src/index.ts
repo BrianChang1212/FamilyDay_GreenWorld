@@ -46,6 +46,7 @@ export const api = onRequest(
 	{
 		region: getFunctionsRegion(),
 		cors: false,
+		invoker: "public",
 	},
 	app,
 );

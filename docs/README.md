@@ -16,7 +16,7 @@
 | [`project/repo-split-migration.md`](./project/repo-split-migration.md) | **拆分邊界**遷移敘事：**前後端**執行樹 + **`docs/api/`** 契約／changelog；cutover |
 | [`architecture/`](./architecture/) | **架構討論總結**（[`system-architecture.md`](./architecture/system-architecture.md) 全系統圖、前後端選型、部署、流量） |
 | [`testing/`](./testing/) | **整合驗證清單**（前後端 API 實測流程與驗收 Checklist） |
-| [`setup/`](./setup/) | **本機與預覽**（GCP／Firestore、靜態預覽、Windows Node.js；詳見 [`setup/README.md`](./setup/README.md)） |
+| [`setup/`](./setup/) | **本機與預覽**（GCP／Firestore、靜態預覽、Windows Node.js；詳見 [`setup/README.md`](./setup/README.md)）；**上架疑難**見 [`functions-deploy-incident-report-2026-05-11.md`](./setup/functions-deploy-incident-report-2026-05-11.md) |
 | [`firebase/`](./firebase/) | **Firebase 檔案分類索引**（`familyday-backend/firebase.json`、`familyday-backend/.firebaserc`、Rules、Functions、與 `fdgw.project.json` 關係；詳見 [`firebase/README.md`](./firebase/README.md)） |
 | [`proposals/`](./proposals/) | **外部提案／簡報**（PDF） |
 | [`media/`](./media/) | **媒體索引**：介面截圖為同層 **`FamilyDay_GreenWorld_UI_Screenshots`**（見 [`media/README.md`](./media/README.md)） |
@@ -43,6 +43,8 @@
 | API Mock 測試流程 | [`testing/api-mock-testing.md`](./testing/api-mock-testing.md) |
 | API 歷史驗證紀錄 | [`testing/api-integration-history.md`](./testing/api-integration-history.md) |
 | 本機 GCP 服務帳戶（Firestore／verify） | [`setup/local-firestore-gcp.md`](./setup/local-firestore-gcp.md)；[`architecture/summary-backend.md`](./architecture/summary-backend.md) **§2.0** |
+| **Cloud Functions 首次部署問題處理報告**（IAM、路徑、Invoker、`.env`） | [`setup/functions-deploy-incident-report-2026-05-11.md`](./setup/functions-deploy-incident-report-2026-05-11.md) |
+| **正式 Hosting 報到／闖關入口 URL**（QR 用） | [`setup/hosting-public-entry-urls.md`](./setup/hosting-public-entry-urls.md) |
 | Firebase 相關檔案分類（`familyday-backend/` 設定 vs fdgw） | [`firebase/README.md`](./firebase/README.md) |
 | 前端／後端／部署／流量摘要 | [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) 等 |
 | 根 README 補充（截圖／技術圖／目錄表／長篇待辦） | [`overview/root-readme-supplement.md`](./overview/root-readme-supplement.md) |

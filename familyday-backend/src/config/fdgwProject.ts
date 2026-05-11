@@ -64,9 +64,9 @@ export type FdgwProjectFile = {
 
 let cache: FdgwProjectFile | null = null;
 
-/** Repo root (…/FamilyDay_GreenWorld_App), from compiled lib/config/*.js */
+/** `familyday-backend/` root — must match packaged Functions deploy (single upload root). */
 function repoRoot(): string {
-	return path.resolve(__dirname, "..", "..", "..");
+	return path.resolve(__dirname, "..", "..");
 }
 
 export function loadFdgwProject(): FdgwProjectFile {

@@ -1,8 +1,12 @@
 node_modules/
+hosting-dist/
 lib/
 *.log
 .env
 .env.*
 !.env.example
+!.env.rare-lattice-495009-i9
 .DS_Store
 Thumbs.db
+.firebase/
+

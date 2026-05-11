@@ -1,0 +1,2 @@
+# Exclude static hosting mirror from Functions source upload (not runtime deps).
+hosting-dist/
