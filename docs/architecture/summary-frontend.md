@@ -43,17 +43,18 @@
 - **`i18n/`** — 介面文案字典（例：**`zh-TW.ts`**；頁面文案改由 key 管理，降低硬編碼重複）  
 - `styles` / design tokens — 色票、間距、字級（主視覺／CIS 定案後統一）
 
-### 2.1 呈現架構：路由與 QR 進入點（`familyday-frontend/` 實作 · 2026-04-18 · 對齊 §2.2–§2.3）
+### 2.1 呈現架構：路由與 QR 進入點（`familyday-frontend/` 實作 · **報到 2026-05**：雙頁；其餘對齊 §2.2–§2.3）
 
-| 路徑 | 行為（原型） |
-|------|----------------|
+| 路徑 | 行為（與 `src/router/index.ts` 對齊） |
+|------|---------------------------------------|
 | `/` | **歡迎** → **遊戲說明** → **闖關登入**（`/register`）→ **闖關地圖**（`/stage`） |
-| `/check-in` | 設意圖 **報到** → **`/checkin`**（單頁：姓名／員編／同行人數 → **確認彈窗** → **`/checkin/complete`**） |
+| `/check-in` | 設意圖 **報到**、重置報到歡迎通過標記 → **redirect `checkinWelcome`（`/checkin`）**：**報到歡迎／引導**（`CheckInWelcomeView`） |
 | `/game` | 設意圖 **闖關** → 歡迎頁（路徑 **`/`**；先歡迎→說明→登入；**不**直跳登入） |
-| 任意路徑 `?entry=checkin`／`?entry=game` | `beforeEach` 寫入意圖（`lib/entryIntent.ts`）；仍須自行進入 `/check-in` 或 `/game` 等才觸發 redirect |
-| `/register` | **闖關登入頁**（`RegisterView`）：姓名、員編；`game` 意圖時標題「請輸入您的基本資料」。若誤入且意圖為 `checkin` → **replace** `checkin`。送出後：`game` 或無意圖（已看過說明）→ **`stage`** |
-| `/checkin` | **報到**單頁三欄 + **Modal** 確認 → **`/checkin/complete`**；**不**連闖關。已報到完成 → redirect 完成頁 |
-| `/checkin/complete` | 報到完成提示；闖關另掃 QR |
+| 任意路徑 `?entry=checkin`／`?entry=game` | `beforeEach` 寫入意圖（`lib/entryIntent.ts`）；仍須自行進入 **`/check-in`** 或 **`/game`** 等才觸發 redirect |
+| `/register` | **闖關登入頁**（`RegisterView`）：姓名、員編；`game` 意圖時標題「請輸入您的基本資料」。若誤入且意圖為 `checkin` → **`replace`** 路由 **`checkinWelcome`**（路徑 **`/checkin`**）。送出後：`game` 或無意圖（已看過說明）→ **`stage`** |
+| `/checkin` | **報到歡迎／引導**（`CheckInWelcomeView`）。使用者按 CTA → 標記通過並進 **`/checkin/register`**（路由 **`name: "checkin"`**，表單頁 **`CheckInFormView`**）；**未完成歡迎**而直達 **`/checkin/register`** 時 **`beforeEnter`** **replace** 回 **`/checkin`** |
+| `/checkin/register` | **`CheckInFormView`**：**姓名／員編／同行人數**三欄＋**確認 Modal** → 成功後 **`/checkin/complete`**。**不**經 **`/register`**（闖關登入）。（完成頁若缺資料或未標記報到完成，會 **replace** 回表單路由 **`name: "checkin"`**，路徑 **`/checkin/register`**） |
+| `/checkin/complete` | **`CheckInCompleteView`** — 報到完成提示；闖關另掃 QR |
 | `/briefing` | 遊戲說明；下一步：**一律** → **`register`（闖關登入／全屏表單）**；**不**因 session 已有 profile 直跳 `stage`（對齊 §2.3：說明後下一屏即登入）。於登入頁按確定後再 **`stage`** |
 | `/stage`、`/quiz`、`/result`、`/finish` | 闖關流程；**`/finish`** 含完成文案、領獎 Modal 與三格領獎狀態（見下段「領取狀態資料來源」） |
 | `/finish/claimed` | **僅 redirect → `/finish`**（相容舊連結；無獨立頁面） |
@@ -67,16 +68,17 @@
 ### 2.2 報到 UI 流程（掃描**報到** QR／連結 · 線框對齊 · 2026-04-18）
 
 > **與闖關分離：** 報到完成後**僅**顯示報到完成頁；**不**自動進入闖關。參加闖關須**另掃闖關專用 QR**（見 §2.3、§2.1 `/game`）。  
-> **需求主線**見 `docs/project/project-master.md` §2；下列為**畫面層**步驟（與 AmTRAN／活動線框：單頁三欄＋確認＋完成一致）。
+> **需求主線**見 `docs/project/project-master.md` §2；下列為**畫面層**步驟。**線框**為「單頁三欄＋確認＋完成」；**`familyday-frontend` 現況**於步驟 0–1 **多一页報到歡迎**（與 **`CheckInWelcomeView`** 對齊，見 §2.1）。
 
 | 順序 | 畫面 | 重點 |
 |:----:|------|------|
-| 0 | **進入** | 掃**報到** QR（建議 URL 含 **`/check-in`**）；僅有 `?entry=checkin` 時 **`beforeEach` 只寫意圖**，須再導到 **`/check-in`** 才會進 **`/checkin`**（§2.1）。 |
-| 1 | **資料填寫** | **同一頁**（線框）：**姓名**、**員工編號**、**同行人數**（下拉或數字）；底部「確定」。提醒：與簽到／領獎資料一致。 |
-| 2 | **確認彈窗** | 覆蓋於表單上：摘要三項；**確認**→ 送 API／寫入；**回上頁**→ 關閉彈窗、可改表單。 |
-| 3 | **報到完成頁** | 恭喜完成報到、感謝文案；**報到資訊**區（姓名、員編、同行人數）；引導**現場領報到禮**。**無**進入闖關之按鈕或自動導向。 |
+| 0 | **進入** | 掃**報到** QR（建議 URL 含 **`/check-in`**）；僅有 `?entry=checkin` 時 **`beforeEach` 只寫意圖**，須再導到 **`/check-in`** 才會進 **`checkinWelcome`**（**`/checkin`**，見 §2.1）。 |
+| 1 | **（現況）報到歡迎** | 全屏歡迎與視覺；CTA → 標記通過並進 **`/checkin/register`**（表單）。每次進入 **`/checkin`** 會清除「已過歡迎」標記，須再按一次 CTA。 |
+| 2 | **資料填寫** | **`/checkin/register`**：與線框同一頁：**姓名**、**員工編號**、**同行人數**（下拉或數字）；底部「確定」。提醒：與簽到／領獎資料一致。 |
+| 3 | **確認彈窗** | 覆蓋於表單上：摘要三項；**確認**→ 送 **`POST /api/v1/checkin`**／寫入；**回上頁**→ 關閉彈窗、可改表單。 |
+| 4 | **報到完成頁** | **`/checkin/complete`**：恭喜完成報到、感謝文案；**報到資訊**區（姓名、員編、同行人數）；引導**現場領報到禮**。**無**進入闖關之按鈕或自動導向。 |
 
-**原型（`familyday-frontend/` · 2026-04-18）：** 已與上表一致——`/check-in` 寫入意圖後 **`/checkin` 單頁**（姓名／員編／同行人數）＋**確認彈窗** → **`/checkin/complete`**；**不**經 `register` 兩段式報到。
+**`familyday-frontend/` 現況（2026-05）：** `/check-in` 寫入意圖 → **`/checkin`歡迎** → **`/checkin/register`** 表單（三欄＋**確認 Modal**）→ **`/checkin/complete`**；**不**經 **`/register`**（闖關登入）。歷史早期稿／`source/` 曾以 **`/checkin` 單頁**涵蓋表單，已與現行 **`router/index.ts`** 分流。
 
 #### 報到流程圖（Mermaid）
 
@@ -87,7 +89,8 @@ flowchart TD
   end
 
   QR --> Intent["寫入報到意圖 fdgw_entry_intent"]
-  Intent --> Form["資料填寫：姓名、員編、同行人數（線框：單頁）"]
+  Intent --> Welcome["報到歡迎／checkin（現況多此步）"]
+  Welcome --> Form["/checkin/register：姓名、員編、同行人數"]
   Form --> Modal["確認彈窗：摘要、確認／回上頁"]
   Modal -->|回上頁| Form
   Modal -->|確認| Save["後端／原型：寫入報到、fdgw_checkin_done"]
@@ -229,3 +232,5 @@ flowchart TD
 | 1.29 | 2026-05-03 | **§2.1** 補 **`fdgw_pending_station_challenge`**、**`getInZone()`** 語意、**`/quiz`** 與 **`challengeId` query** 綁定、**`ResultView`** 清除到站狀態；**§2.3 B** 掃碼→作答步驟與 `StageView` 原型一致；對齊 `api-v0.1` **v0.1.20** |
 | 1.30 | 2026-05-03 | **§4**：靜態預覽長文改指向 [`docs/setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；`summary-deployment` **§1.1** 連動 **v1.6** |
 | 1.31 | 2026-05-05 | 版本鏈同步：`api-v0.1` **v0.1.21**（規格書 **`fdgw.project.json`**／CORS／mock `eventId` 註記；**無** REST 契約變更）；供 `project-master`／根 **`README`** 頁尾對齊 |
+| 1.32 | 2026-05-11 | **§2.1／§2.2**：報到改為 **`/checkin` 歡迎 + `/checkin/register` 表單**（`CheckInWelcomeView`／`CheckInFormView`、`beforeEnter`、Vue Router **`name: "checkin"`** 指表單路由）；Mermaid **§2.2** 補歡迎節點；**`/register`** 錯誤意圖時 **replace `checkinWelcome`**（與程式一致）；**v1.9** 列保留為當時「單頁」假設之歷史紀錄 |
+

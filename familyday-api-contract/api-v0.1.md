@@ -1,6 +1,6 @@
 # 家庭日綠世界闖關 Web — API 規格（v0.1 草案）
 
-> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.22** 文件維護：Mock／MVP 敘述路徑對齊 **`familyday-frontend/mock`**、**`familyday-backend/`**；**無** REST 契約變更；**v0.1.21** 文件維護：`corsOrigins`／mock `eventId` 對齊 **`fdgw.project.json`**；**v0.1.20** 補前端原型：`inZone`／**`pendingStationChallenge`** 與 **`challengeId` query** 綁定註記，避免未掃碼卻進預設題組；**v0.1.19** 任意順序通關：`dashboard.stages[].locked` 語意、`attempts` 回應補 **`completedStageIds`**／**`allStagesCompleted`**；**v0.1.18** 聯調註記 CORS 白名單與 **`familyday-backend/src/index.ts`** 對齊；**v0.1.17** Mock／整合清單與 **`me/progress`** 對齊；**v0.1.16** 補列 **`GET /api/v1/me/progress`** 落地狀態；**v0.1.15** 文件與 §13 流程圖路徑對齊；**v0.1.14** 同步 Cloud Functions：`auth/checkin` 改走 Firestore roster 驗證，`admin/roster/import` 實作 Firestore 寫入；**v0.1.13** 完成 CORS allowlist 收斂驗證；**不改**端點定義）。
+> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.24** MVP 落地表：**`admin/reports/*`** 備註與 **`familyday-backend/src/routes/admin.ts`** 對齊；**無**契約變更；**v0.1.23** §11：**Vitest** 範例路徑對齊 **`familyday-frontend/src/api/`**；**無**契約變更；**v0.1.22** 文件維護：Mock／MVP 敘述路徑對齊 **`familyday-frontend/mock`**、**`familyday-backend/`**；**無** REST 契約變更；**v0.1.21** 文件維護：`corsOrigins`／mock `eventId` 對齊 **`fdgw.project.json`**；**v0.1.20** 補前端原型：`inZone`／**`pendingStationChallenge`** 與 **`challengeId` query** 綁定註記，避免未掃碼卻進預設題組；**v0.1.19** 任意順序通關：`dashboard.stages[].locked` 語意、`attempts` 回應補 **`completedStageIds`**／**`allStagesCompleted`**；**v0.1.18** 聯調註記 CORS 白名單與 **`familyday-backend/src/index.ts`** 對齊；**v0.1.17** Mock／整合清單與 **`me/progress`** 對齊；**v0.1.16** 補列 **`GET /api/v1/me/progress`** 落地狀態；**v0.1.15** 文件與 §13 流程圖路徑對齊；**v0.1.14** 同步 Cloud Functions：`auth/checkin` 改走 Firestore roster 驗證，`admin/roster/import` 實作 Firestore 寫入；**v0.1.13** 完成 CORS allowlist 收斂驗證；**不改**端點定義）。
 
 ---
 
@@ -73,8 +73,8 @@
 | `POST /api/v1/staff/redeem/token` | 已落地 | 回傳短期 token（`FDGW_USE_FIRESTORE=true` 時落地 Firestore） |
 | `POST /api/v1/staff/redeem/confirm` | 已落地 | 成功時遞增 `progress.rewardRedeemCount` 並寫入核銷紀錄；失敗回 409（`code` 如 `REDEEM_LIMIT_REACHED`、`INVALID_REDEEM_TOKEN` 等） |
 | `POST /api/v1/admin/roster/import` | 已落地 | 寫入 Firestore `roster`（`items[]` 匯入） |
-| `GET /api/v1/admin/reports/attendance` | 已落地 | 第二階段先回最小統計欄位 |
-| `GET /api/v1/admin/reports/progress` | 已落地 | 第二階段先回最小統計欄位 |
+| `GET /api/v1/admin/reports/attendance` | 已落地 | **`total`**＝Firestore **`roster`**（符合當期 **`eventId`** 之名冊筆數）；**`checkedIn`**＝**`checkins`** 計數（見 **`familyday-backend/src/routes/admin.ts`**） |
+| `GET /api/v1/admin/reports/progress` | 已落地 | **`redeemed`**＝**`getRedeemSummary()`**；**`players`／`fullClear`** 目前為占位，待接上 **`player_progress`**／**`attempts`** 真實聚合 |
 
 ---
 
@@ -340,7 +340,7 @@
 | 領取成功頁（闖關禮狀態呈現） | 與關卡瀏覽共用 **`GET /api/v1/me/dashboard`**；讀取 `progress.rewardRedeemCount`（選用）或暫用 `fullClearCount`（見 §5 示例） |
 | 櫃台掃碼核銷（若有） | `POST /api/v1/staff/redeem/token`、`POST /api/v1/staff/redeem/confirm` |
 
-**實作測試（前端 · 不變更上表契約）：** `source/src/api/rewardClaimStatus.test.ts`（**Vitest**）等，驗證客戶端對 **`dashboard.progress`** 之映射與錯誤處理；**後端**仍須依本規格實作與回傳 JSON。
+**實作測試（前端 · 不變更上表契約）：** [`familyday-frontend/src/api/rewardClaimStatus.test.ts`](../familyday-frontend/src/api/rewardClaimStatus.test.ts)（**Vitest**）等，驗證客戶端對 **`dashboard.progress`** 之映射與錯誤處理；**後端**仍須依本規格實作與回傳 JSON。
 
 ---
 
@@ -486,10 +486,13 @@ sequenceDiagram
 | v0.1.13 | 2026-04-30 | CORS allowlist 收斂完成並驗證：白名單來源可用，非白名單來源不回傳 ACAO |
 | v0.1.14 | 2026-05-01 | 同步 Cloud Functions 最新實作：`auth/login`、`checkin` 改為 Firestore `roster` 身分比對；`admin/roster/import` 改為實際寫入 Firestore；MVP 落地表與測試註記同步更新 |
 | v0.1.15 | 2026-05-03 | §11 Finish 列：補**已領滿**可停留 **`/finish`**。§13 流程圖：序列圖內路徑統一 **`/api/v1`** 前綴；補 **`POST /api/v1/me/reward/claim`** 選用區塊。根 `README`、`firestore-schema-v1`、`summary-frontend`、`project-master` 與領滿完成頁行為敘述同步 |
-| v0.1.16 | 2026-05-03 | Firebase 實作對齊註記之 MVP 落地表：補 **`GET /api/v1/me/progress`**（`functions/src/routes/game.ts`；主流程仍以 dashboard 為準） |
+| v0.1.16 | 2026-05-03 | Firebase 實作對齊註記之 MVP 落地表：補 **`GET /api/v1/me/progress`**（`familyday-backend/src/routes/game.ts`；主流程仍以 dashboard 為準） |
 | v0.1.17 | 2026-05-03 | **`source/mock/server.js`** 補 **`GET /api/v1/me/progress`**（`scenario` 與 dashboard 一致）；**`test-all-api.js`** 補 **`me/progress`**／**`reward/claim`**；**`test-game-api.js`** 驗證 **`me/progress`** 欄位；**`api-integration-checklist.md`** §9.5／§9.6 與根 **`README`** API 字串同步；§12 觸發表補 **`/auth/logout`**、**`/me/progress`**、**`/me/reward/claim`** |
-| v0.1.18 | 2026-05-03 | 聯調驗證註記：CORS allowlist 補列 **`127.0.0.1:5173`／`4173`**（與 **`functions/src/index.ts`** 一致） |
+| v0.1.18 | 2026-05-03 | 聯調驗證註記：CORS allowlist 補列 **`127.0.0.1:5173`／`4173`**（與 **`familyday-backend/src/index.ts`** 一致） |
 | v0.1.19 | 2026-05-03 | §5：`stages[].locked` 改為「**已通關**為 **`true`**」；補**任意順序**六關與 **`currentStageId`** 說明。§7：`attempts` 回應補 **`completedStageIds`**、**`allStagesCompleted`** 與範例 JSON；§13 流程圖註記同步；Mock 差異表 §「Firebase 實作對齊註記」更新 |
 | v0.1.20 | 2026-05-03 | Mock 差異表：`stations/verify` 補「**`challengeId` 與 `stageId` 對應**」。**`summary-frontend` v1.29**：前端以 **`fdgw_pending_station_challenge`** 綁定選站與驗證回傳之 **`challengeId`**，**`getInZone()`** 僅 **`fdgw_inZone === "1"`** 為 true；**`/quiz`** 必帶 **`challengeId` query**（見 `StageView.vue`／`QuizView.vue`／`ResultView.vue`）。**無**端點或 JSON 契約變更 |
 | v0.1.21 | 2026-05-05 | Mock 差異表：`events` 固定路徑之 `eventId` 改敘為與 backend repo `fdgw.project.json` 一致。聯調 CORS 註記改為以 **`fdgw.corsOrigins`** 為執行時單一來源；**無**端點或 JSON 契約變更。版本鏈：`summary-frontend` **v1.31**、`project-master` **v1.3.33**、根 **`README` v2.56** |
 | v0.1.22 | 2026-05-11 | 實作路徑註記與 monorepo 對齊：**Mock** 改為 **`familyday-frontend/mock`**；**MVP 落地**敘述改為 **`familyday-backend/`**（`src/index.ts`）；CORS 載入說明同步；**無** REST 或 JSON 契約變更 |
+| v0.1.23 | 2026-05-11 | **§11**：**Vitest** 示例路徑 **`source/src/api/`** → **`familyday-frontend/src/api/rewardClaimStatus.test.ts`**（與 mono-repo 目錄一致）；**無** REST 或 JSON 契約變更 |
+| v0.1.24 | 2026-05-11 | **後端 MVP 落地狀態**表格：補 **`admin/reports/attendance`**（**`roster`／`checkins`**）與 **`admin/reports/progress`**（**`redeemed`** vs **`players`／`fullClear`** 占位）與 **`admin.ts`** 一致；**無** REST 或 JSON 契約變更 |
+

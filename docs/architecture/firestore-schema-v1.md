@@ -314,8 +314,8 @@ service cloud.firestore {
 | `POST /api/v1/staff/redeem/token` | `redeemTokens`（寫） |
 | `POST /api/v1/staff/redeem/confirm` | `redeemTokens`（讀寫）+ `redeems`（寫）+ `progress`（寫） |
 | `POST /api/v1/admin/roster/import` | `roster`（寫） |
-| `GET /api/v1/admin/reports/attendance` | `checkins`（讀） |
-| `GET /api/v1/admin/reports/progress` | `progress` / `redeems`（讀） |
+| `GET /api/v1/admin/reports/attendance` | `roster`（讀：`total`＝ **`eventId`** 同名冊筆數）+ `checkins`（讀：`checkedIn`） |
+| `GET /api/v1/admin/reports/progress` | `redeems`／摘要（讀：`redeemed`）；**`players`／`fullClear`** 仍為占位，待對齊 `player_progress`／`attempts` |
 
 ---
 
@@ -323,8 +323,8 @@ service cloud.firestore {
 
 | 前端頁面路由（或操作） | API | Firestore 文件（主） |
 |-----|-----|-----|
-| `/check-in` -> `/checkin`（送出報到） | `POST /api/v1/checkin` | `roster`（讀比對）+ `checkins`（寫） |
-| `/checkin`（查報到狀態） | `GET /api/v1/checkin/status` | `checkins`（讀） |
+| **`/check-in` → `/checkin` → `/checkin/register`（Modal 確認後送出報到）** | `POST /api/v1/checkin` | `roster`（讀比對）+ `checkins`（寫） |
+| **`GET /api/v1/checkin/status`**（`fetchCheckinStatus` 已定義於 `familyday-frontend/src/api/`；迄 2026-05-11 **無 `.vue`** 綁定） | `GET /api/v1/checkin/status` | `checkins`（讀） |
 | `/register`（闖關登入） | `POST /api/v1/auth/login` | `users` / `roster`（讀） |
 | App 初始化或頁面重整（登入態恢復） | `GET /api/v1/auth/me` | `users`（讀） |
 | `/stage` / `/finish`（進度與領取狀態顯示） | `GET /api/v1/me/dashboard` | `events/stages` + `progress`（讀） |
@@ -336,8 +336,8 @@ service cloud.firestore {
 | 櫃台核銷啟動 | `POST /api/v1/staff/redeem/token` | `redeemTokens`（寫） |
 | 櫃台確認領獎 | `POST /api/v1/staff/redeem/confirm` | `redeemTokens`（讀寫）+ `redeems`（寫）+ `progress`（寫） |
 | 後台名冊匯入 | `POST /api/v1/admin/roster/import` | `roster`（寫） |
-| 後台出席報表 | `GET /api/v1/admin/reports/attendance` | `checkins`（讀） |
-| 後台闖關報表 | `GET /api/v1/admin/reports/progress` | `progress` / `redeems`（讀） |
+| 後台出席報表 | `GET /api/v1/admin/reports/attendance` | `roster`（`total`）+ `checkins`（`checkedIn`） |
+| 後台闖關報表 | `GET /api/v1/admin/reports/progress` | `redeemed`（摘要／`redeems`）；**`players`／`fullClear`** 占位，待對齊 `player_progress` |
 
 > 註：完成頁 **`/finish`** 可有 `local-fallback`；正式上線仍以
 > `GET /api/v1/me/dashboard` 回傳之 `progress` 欄位為準。

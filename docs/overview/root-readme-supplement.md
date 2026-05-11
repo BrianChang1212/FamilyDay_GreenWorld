@@ -197,8 +197,8 @@ flowchart LR
 | 需求收集與整理 | 完成 |
 | 技術選型 | Cloud Functions + Firestore 路線已落地實作；正式維運參數待簽核 |
 | UI/UX 設計（設計稿／KV） | 進行中（功能流程先行，正式視覺資產持續補齊） |
-| 開發 | 前端 **100% 實作完整**（11 View、11 API 函式、無 TODO）；後端 **95% 實作完整**（19 端點；`admin/reports/attendance` total 仍 hardcoded）；Firestore 四集合雙模式完整 |
-| 測試 | 前端 Vitest 15 檔無 skip 全通過 + CI；後端 in-memory 聯調 Pass 17；**Firestore Blocked**（IAM 憑證）；後端單元測試待補齊 |
+| 開發 | 前端 **100% 實作完整**（**10** View、11 API 函式、無 TODO）；後端 **95% 實作完整**（19 端點；出席報表 **`total`／`checkedIn`** 已動態：**`roster`＋`checkins`**；**進度報表** **`players`／`fullClear`** 仍占位）；Firestore 四集合雙模式完整 |
+| 測試 | 前端 Vitest **14** 檔無 skip 全通過 + CI；後端 in-memory 聯調 Pass 17；**Firestore Blocked**（IAM 憑證）；後端單元測試待補齊 |
 | 部署 | **dev/stage 可驗證上架**；正式上線需完成 Firestore IAM 憑證設定、Security Rules 與安全基線 |
 
 ### 下一步（本週）— 完整條列
@@ -211,7 +211,8 @@ flowchart LR
 - 確認本機驗證身分已對齊目標專案（`firebase login:list` 需有授權帳號；`GOOGLE_CLOUD_PROJECT=<同上專案 ID>`）
 - 重跑 `familyday-backend/` 的 `npm run verify:firestore` 並保存證據（CLI 輸出 + Firestore 查驗）
 - 將 Firestore 驗證結果回填 `docs/testing/api-integration-checklist.md`（解除 Blocked；主文件為 §7）
-- 修正 `familyday-backend/src/routes/admin.ts`：`GET /admin/reports/attendance` 的 `total`（改為動態查詢 checkins，非 hardcoded `1000`）
+- （可選）依主辦確認 **`GET /admin/reports/attendance` 之 `total` 語意**是否即以 **Firestore `roster`**（現行 **`eventId`**）筆數代表「預計出席人數」（實作已動態：**`checkedIn`**＝**`checkins`** 計數；見 **`familyday-backend/src/routes/admin.ts`**）。
+- （可選）實作 **`GET /admin/reports/progress`** 之 **`players`／`fullClear`**（目前 **`admin.ts`** 為占位常數；**`redeemed`** 已來自 **`getRedeemSummary()`**）。
 - 產出正式上線前**最小安全基線確認單**（憑證、權限、CORS、Cookie）
 - 確認 `VITE_API_BASE`、CORS allowlist 與目標驗證網域一致
 

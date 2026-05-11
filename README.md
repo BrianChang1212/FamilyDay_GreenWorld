@@ -44,14 +44,14 @@ npm run dev
 
 > **工作約定：** **本表**為**進度現況**之**權威**來源（View／API 函式數／測試檔數等）。**待辦勾選與完整行動清單**以 [`docs/project/project-master.md` § 待辦事項](docs/project/project-master.md#work-backlog) 為準。
 
-> 2026-05-11 依原始碼掃描更新（非文件自述）
+> 2026-05-11 依原始碼掃描更新；同日 **對齊**後端：`admin/reports/attendance` 之 **`total`／`checkedIn`**、`admin/reports/progress` **占位欄位**見 [`familyday-backend/src/routes/admin.ts`](familyday-backend/src/routes/admin.ts)。
 
 | 面向 | 現況 |
 |------|------|
 | 前端 | 10 個 View **全數完整實作**（WelcomeView → FinishView；舊 **`/finish/claimed`** 僅 redirect **`/finish`**）；API 層 11 支函式對應真實端點；14 個測試檔無 skip/stub；CI 通過 |
-| API | 19 個端點均已實作；唯 `GET /admin/reports/attendance` 的 `total` 欄位 hardcoded `1000`，其餘為動態資料 |
+| API | **19** 個端點均已實作。**`GET /admin/reports/attendance`**：**`total`**＝Firestore **`roster`**（現行 **`eventId`** 下名冊筆數）；**`checkedIn`**＝**`checkins`** 計數。**`GET /admin/reports/progress`**：**`redeemed`** 取自核銷摘要；**`players`／`fullClear`** 仍為 **`admin.ts`** 占位常數（待對齊 `player_progress` 聚合） |
 | 後端資料層 | roster / checkins / player_progress / redeem 四集合已完整實作 Firestore + in-memory 雙模式切換；阻塞點為本機 IAM 憑證未設定（`GOOGLE_APPLICATION_CREDENTIALS`） |
-| 測試 | 前端 Vitest 15 檔通過；後端 4/30 聯調驗證 Pass 17（in-memory）；Firestore 驗證 Blocked（憑證未設定）；後端單元測試待補齊 |
+| 測試 | 前端 Vitest **14** 檔通過（與上列「前端」列一致）；後端 4/30 聯調驗證 Pass 17（in-memory）；Firestore 驗證 Blocked（憑證未設定）；後端單元測試待補齊 |
 | 部署 | dev/stage 可驗證上架；正式上線需先完成 Firestore IAM 憑證設定、Security Rules 與安全基線 |
 
 ---
@@ -63,8 +63,8 @@ npm run dev
 
 **本週摘要（與主文件對齊；勾選以 `project-master` 為準）**
 
-- **高優先：** Firestore IAM、`verify:firestore`、回填 `api-integration-checklist`、修正 `admin` attendance `total`、安全基線清單、`VITE_API_BASE`／CORS
-- **中優先：** runbook、Security Rules、後端單元測試  
+- **高優先：** Firestore IAM、`verify:firestore`、回填 `api-integration-checklist`、安全基線清單、`VITE_API_BASE`／CORS
+- **中優先：** runbook、Security Rules、後端單元測試、**補強 `GET …/admin/reports/progress`（`players`／`fullClear`）聚合**  
 - **低優先：** 見主文件
 
 ---
@@ -81,4 +81,4 @@ npm run dev
 
 ---
 
-*README v2.63 · 2026-05-11（精簡總覽；細節→ `docs/overview/root-readme-supplement.md`；前版 v2.62）*
+*README v2.65 · 2026-05-11（`admin/reports` 與後端對齊；前版 v2.64）*

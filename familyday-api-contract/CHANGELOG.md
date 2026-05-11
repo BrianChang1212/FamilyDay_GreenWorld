@@ -4,6 +4,8 @@ All notable API contract changes are documented in this file.
 
 ## [Unreleased]
 
+- Docs: `api-v0.1.md` v0.1.24 — MVP table notes for `admin/reports/*` aligned with `familyday-backend/src/routes/admin.ts`; no REST contract change.
+- Docs: `api-v0.1.md` v0.1.23 — §11 Vitest sample path aligned to `familyday-frontend/src/api/`; no REST contract change.
 - Docs: finish flow stays on `/finish`; `/finish/claimed` is redirect-only; table text for `POST …/reward/claim` updated accordingly. No REST contract change.
 - Docs (monorepo): removed duplicate `docs/specs/api-v0.1.md`; API spec links in `docs/` now target this repo’s `api-v0.1.md` only. No REST contract change.
 

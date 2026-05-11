@@ -33,7 +33,7 @@
 
 - `POST /api/v1/checkin` 正常資料成功。
 - 缺欄位（`employeeId`/`name`/`partySize`）回 4xx。
-- `GET /api/v1/checkin/status` 與 UI 顯示一致。
+- `GET /api/v1/checkin/status`：以 **curl／Network／驗證腳本**確認回應與 **`checkins`** 資料一致。**迄 2026-05-11** 玩家 SPA **未**將此端點綁進畫面（`fetchCheckinStatus` 僅 `src/api/`＋單元測試）；若未接 UI，勿以「畫面上狀態列」為唯一驗收依據。對照見 [`system-architecture.md`](../architecture/system-architecture.md) §8.3。
 
 ---
 
@@ -77,7 +77,7 @@
 
 - **執行日期：** 2026-04-30
 - **環境（dev/stage）：** dev — Functions Emulator (port 5003) + in-memory roster
-- **Seed 版本：** in-memory (`functions/src/state/*.ts`)
+- **Seed 版本：** in-memory（`familyday-backend/src/state/*.ts`；舊紀錄或歷史筆記可能寫 **`functions/src/state`**）
 - **涵蓋章節（1~6）：** 1、2、3、4、5、6（401 / 409 / CORS）
 - **Pass / Fail / Blocked：** Pass 17、Fail 0、Blocked 1
 - **證據：** CLI 驗證：`health/ready/login/me/checkin/status/dashboard/stations/verify/challenges/attempts/restart(409)/staff/redeem/admin/reports`；CORS allowlist 驗證（`evil.example.com` 無 ACAO）

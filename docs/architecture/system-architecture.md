@@ -265,6 +265,8 @@ sequenceDiagram
 | GET | `/admin/reports/attendance` | 是 | 同左 | **否** | 是 |
 | GET | `/admin/reports/progress` | 是 | 同左 | **否** | 是 |
 
+**Admin 報表與程式對齊（`familyday-backend/src/routes/admin.ts`）：** **`GET …/reports/attendance`** 之 **`total`** 來自 Firestore **`roster`**（符合當期 **`eventId`** 之名冊筆數），**`checkedIn`** 來自 **`checkins`**；**`GET …/reports/progress`** 之 **`redeemed`** 來自 **`getRedeemSummary()`**，**`players`／`fullClear`** 目前為占位常數（待接上 **`player_progress`**／**`attempts`** 真實聚合）。
+
 **掃描結論（MVP 與後端）：** `api-v0.1` MVP 表所列 **19** 支端點，在 `familyday-backend/src/routes` 均可找到對應 **HTTP 方法 + 路徑**。
 
 ### 8.3 正式 SPA 呼叫彙總（僅 `src/api/*.ts`）
@@ -296,3 +298,5 @@ sequenceDiagram
 |------|------|------|
 | 1.0 | 2026-05-11 | 初稿：依 `familyday-frontend`／`familyday-backend`／`api-v0.1` 彙整之全系統架構圖 |
 | 1.1 | 2026-05-11 | **§8**：程式碼掃描對齊證明（契約 MVP 表 ↔ `routes/*.ts` ↔ `src/api` ↔ `mock/server.js`）；§2 選用端點與後端落差表 |
+| 1.2 | 2026-05-11 | **§8.2**：補 **`admin/reports/*`** 資料來源敘述（**`roster`／`checkins`**、**`redeemed`** vs **`players`／`fullClear`** 占位）；與 `admin.ts` 一致 |
+

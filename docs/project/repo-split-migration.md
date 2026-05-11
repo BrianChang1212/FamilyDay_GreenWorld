@@ -30,7 +30,7 @@
 
 ### familyday-backend
 
-- `functions/**`（實際樹位於 `familyday-backend/functions/**`）
+- 拆分前舊名 **`functions/**`**；現行程式與 **`firebase.json`** 根位於 **`familyday-backend/`**（**`src/**`、`scripts/**`** 等），且 **`firebase.json`** 之 **`functions.source` 為 `.`**，並**無**巢狀子目錄 **`familyday-backend/functions/**`** 作為 NPM 套件根
 - 後端設定檔：
   - `firebase.json`
   - `.firebaserc`
@@ -54,7 +54,7 @@
 
 - `**/node_modules/**`
 - `source/dist/**`
-- `functions/lib/**`
+- `familyday-backend/lib/**`（及歷史上 `functions/lib/**` 若仍存在）
 - `*.log`
 - `.env*`（範本如 `.env.example` 除外）
 

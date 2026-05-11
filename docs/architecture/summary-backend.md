@@ -31,7 +31,7 @@
 
 ## 2.0 本機服務帳戶與環境變數（Firestore 驗證）
 
-**目的：** 在本機執行 `functions` 的 `npm run verify:firestore`，或讓 Functions／Admin SDK 寫入 **Cloud Firestore**（含名冊 `roster` 等一律走 Firestore 的路徑）時，需要具備專案 IAM 的**服務帳戶 JSON 金鑰**。
+**目的：** 於 **`familyday-backend/`** 目錄執行 `npm run verify:firestore`（或等同腳本），或讓 Functions／Admin SDK 寫入 **Cloud Firestore**（含名冊 `roster` 等一律走 Firestore 的路徑）時，需要具備專案 IAM 的**服務帳戶 JSON 金鑰**。（**備註：** `firebase.json` 之 **`functions.source` 為 `.`**，並**無**子目錄 **`familyday-backend/functions/**`**。）
 
 | 項目 | 說明 |
 |------|------|
@@ -155,7 +155,7 @@ Firebase/Google Cloud 可設定 **Budgets & Alerts** 做費用通知，建議：
 
 ## 7. 待後續定案
 
-- Staff 領獎 API 是否納入第一版（`api-v0.1.md` 已列可選 Phase 2）。  
+- **櫃台核銷**：`POST /api/v1/staff/redeem/token`、`POST /api/v1/staff/redeem/confirm` 已列 [**`api-v0.1.md`**](../../familyday-api-contract/api-v0.1.md) MVP 落地表並實作於 **`familyday-backend/src/routes/staff.ts`**；未定案者為**現場是否啟用**、工作人員介面與帳號治理（**不是**規格／路由缺漏問題）。  
 - Admin 匯入名冊：HTTP 或離線腳本。  
 - 與公司 **個資／留存政策** 對齊之欄位與刪除流程。
 
@@ -172,3 +172,6 @@ Firebase/Google Cloud 可設定 **Budgets & Alerts** 做費用通知，建議：
 | 1.4 | 2026-04-27 | **§2.1** 補提案口徑：2,500 人/25,000 次寫入與 2,000 人次/20,000 次流程估算，供會議擇一作為正式基準 |
 | 1.5 | 2026-04-27 | 後端定案改為 **Firebase**，替換原 FastAPI/PostgreSQL 主方案敘述 |
 | 1.6 | 2026-05-03 | **§2.0**：`cloud-firestore-dev.ps1`／seed／purge 詳述改指向 [`setup/local-firestore-gcp.md`](../setup/local-firestore-gcp.md)；金鑰存放列改為泛化路徑說明 |
+| 1.7 | 2026-05-11 | **§7**：`staff/redeem/*` 已納契約 MVP 並落地；刪「Phase 2 是否納入」過期敘述，改為營運是否啟用與工作人員介面／帳號治理未定案 |
+| 1.8 | 2026-05-11 | **§2.0**：`verify:firestore` 工作目錄改明示 **`familyday-backend/`**；補 **`functions.source`** 為 **`.`**、無 **`familyday-backend/functions/**`** 子樹 |
+
