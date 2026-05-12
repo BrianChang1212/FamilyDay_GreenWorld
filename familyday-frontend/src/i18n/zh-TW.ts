@@ -18,7 +18,7 @@ export const zhTW = {
     description: '與家人一同走入自然，翻開屬於我們的生活日誌，寫下美好的回憶篇章。',
     startButton: '開始闖關',
     heroAlt:
-      "叢林冒險風格歡迎畫面：羊駝與巨嘴鳥，瑞軒科技家庭日闖關入口",
+      "2026 瑞軒科技家庭日活動標誌：視野無界，綠動未來、AmTRAN Go Wild",
   },
   checkin: {
     tag: '{year} AMTRAN FAMILY DAY',

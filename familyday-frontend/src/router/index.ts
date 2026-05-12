@@ -20,7 +20,12 @@ import {
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
 	routes: [
-		{ path: "/", name: "welcome", component: WelcomeView },
+		{
+			path: "/",
+			name: "welcome",
+			component: WelcomeView,
+			meta: { fullBleed: true },
+		},
 		{
 			path: "/check-in",
 			name: "checkinEntry",
@@ -69,7 +74,12 @@ const router = createRouter({
 			name: "checkinComplete",
 			component: CheckInCompleteView,
 		},
-		{ path: "/checkin", name: "checkinWelcome", component: CheckInWelcomeView },
+		{
+			path: "/checkin",
+			name: "checkinWelcome",
+			component: CheckInWelcomeView,
+			meta: { fullBleed: true },
+		},
 		{ path: "/stage", name: "stage", component: StageView },
 		{ path: "/quiz", name: "quiz", component: QuizView },
 		{ path: "/result", name: "result", component: ResultView },
