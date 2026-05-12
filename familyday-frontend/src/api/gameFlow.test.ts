@@ -6,6 +6,7 @@ import {
 	restartPlaythrough,
 	submitChallengeAttempt,
 	verifyStation,
+	type ChallengeHttpError,
 	type VerifyStationHttpError,
 } from "@/api/gameFlow";
 import * as apiBase from "@/lib/apiBase";
@@ -84,6 +85,29 @@ describe("gameFlow api", () => {
 		expect(r.challengeId).toBe("天鵝湖");
 		expect(r.title).toBe("天鵝湖");
 		expect(r.options).toEqual([]);
+	});
+
+	it("fetchChallenge throws ChallengeHttpError with status on failure", async () => {
+		globalThis.fetch = vi.fn().mockResolvedValue({
+			ok: false,
+			status: 401,
+			text: () =>
+				Promise.resolve(
+					JSON.stringify({
+						code: "UNAUTHORIZED",
+						message: "missing or invalid session",
+					}),
+				),
+		}) as typeof fetch;
+
+		try {
+			await fetchChallenge("c1");
+			expect.fail("expected throw");
+		} catch (e: unknown) {
+			const err = e as ChallengeHttpError;
+			expect(err.status).toBe(401);
+			expect(err.code).toBe("UNAUTHORIZED");
+		}
 	});
 
 	it("submitChallengeAttempt normalizes nextChallengeId", async () => {

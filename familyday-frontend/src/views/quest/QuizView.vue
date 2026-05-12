@@ -3,7 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
 import GwBrandBar from "@/components/GwBrandBar.vue";
-import { fetchChallenge, submitChallengeAttempt } from "@/api/gameFlow";
+import { fetchChallenge, submitChallengeAttempt, type ChallengeHttpError } from "@/api/gameFlow";
 import {
 	choiceRowsForChallenge,
 	questionForChallenge,
@@ -31,6 +31,20 @@ const submitError = ref("");
 
 function challengeStageIndex(): number {
 	return stageIndexFromChallengeId(challengeId.value) ?? getStage();
+}
+
+function friendlyQuizLoadError(err: unknown): string {
+	if (!(err instanceof Error)) {
+		return t("quiz.loadErrorGeneric");
+	}
+	if (err.message.includes("Failed to fetch")) {
+		return t("quiz.loadErrorNetwork");
+	}
+	const e = err as Partial<ChallengeHttpError>;
+	if (e.status === 401) {
+		return t("quiz.loadErrorUnauthorized");
+	}
+	return t("quiz.loadErrorGeneric");
 }
 
 onMounted(() => {
@@ -61,9 +75,9 @@ function loadChallenge() {
 			);
 			loadState.value = "ok";
 		})
-		.catch(() => {
+		.catch((err: unknown) => {
 			loadState.value = "error";
-			loadErrorText.value = "題目載入失敗，請重試。";
+			loadErrorText.value = friendlyQuizLoadError(err);
 		});
 }
 

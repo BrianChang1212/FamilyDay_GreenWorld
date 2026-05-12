@@ -130,6 +130,10 @@ export const zhTW = {
   quiz: {
     progressTitle: "闖關進度",
     stageAlt: "{stationName} 關卡貼圖",
+    loadErrorGeneric: "題目載入失敗，請重試。",
+    loadErrorUnauthorized:
+      "尚未登入或連線已失效，請返回闖關「登入」頁重新輸入姓名與工號後再試。",
+    loadErrorNetwork: "無法連線到伺服器，請確認網路與 API 後重試。",
   },
   result: {
     correctTitle: "恭喜答對",

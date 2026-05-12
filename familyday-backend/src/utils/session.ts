@@ -53,11 +53,13 @@ export function verifySessionToken(token: string): SessionPayload | null {
 
 function sessionCookieAttrs(): string {
 	/*
-	 * Hosting (e.g. *.web.app) and API (e.g. *.run.app) are cross-site.
-	 * Fetch(..., { credentials: "include" }) does not send SameSite=Lax
-	 * cookies on cross-site subresource requests — session would be
-	 * missing and /challenges/* returns 401 ("題目載入失敗" on the client).
-	 * Cloud Run sets K_SERVICE; use SameSite=None; Secure there.
+	 * Hosting (*.web.app / *.firebaseapp.com) and API (*.run.app) are
+	 * cross-site. SameSite=Lax cookies are not sent on cross-site fetch
+	 * (credentials: "include") → /challenges/* returns 401 on phones.
+	 *
+	 * Firebase sets FUNCTIONS_EMULATOR=true only in emulators; production
+	 * must use SameSite=None; Secure. (K_SERVICE is not relied on — avoids
+	 * edge cases where runtime env differs.)
 	 */
 	const explicit = (process.env.FDGW_SESSION_COOKIE_SAMESITE || "").toLowerCase();
 	if (explicit === "lax" || explicit === "strict" || explicit === "none") {
@@ -69,11 +71,10 @@ function sessionCookieAttrs(): string {
 		}
 		return "Path=/; HttpOnly; SameSite=Lax";
 	}
-	const onCloudRun = typeof process.env.K_SERVICE === "string";
-	if (onCloudRun) {
-		return "Path=/; HttpOnly; SameSite=None; Secure";
+	if (process.env.FUNCTIONS_EMULATOR === "true") {
+		return "Path=/; HttpOnly; SameSite=Lax";
 	}
-	return "Path=/; HttpOnly; SameSite=Lax";
+	return "Path=/; HttpOnly; SameSite=None; Secure";
 }
 
 export function buildSessionCookie(token: string): string {

@@ -42,6 +42,12 @@ export type VerifyStationHttpError = Error & {
 	code?: string;
 };
 
+/** Thrown by fetchChallenge when response is not ok. */
+export type ChallengeHttpError = Error & {
+	status: number;
+	code?: string;
+};
+
 function throwVerifyStationHttpError(
 	status: number,
 	text: string,
@@ -105,7 +111,21 @@ export async function fetchChallenge(
 
 	if (!res.ok) {
 		const text = await res.text().catch(() => "");
-		throw new Error(`challenges/${challengeId} ${res.status}: ${text.slice(0, 200)}`);
+		let code: string | undefined;
+		try {
+			const j = JSON.parse(text) as { code?: string };
+			if (typeof j.code === "string" && j.code.length > 0) {
+				code = j.code;
+			}
+		} catch {
+			/* ignore */
+		}
+		const err = new Error(
+			`challenges/${challengeId} ${res.status}: ${text.slice(0, 200)}`,
+		) as ChallengeHttpError;
+		err.status = res.status;
+		err.code = code;
+		throw err;
 	}
 
 	const data = (await res.json()) as ChallengeJson;
