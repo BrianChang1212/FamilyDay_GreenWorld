@@ -142,7 +142,6 @@ export const zhTW = {
     wrongMessage: "別灰心，請繼續探索大自然的美好",
     nextButton: "前往下一關 >",
     retryButton: "< 重新回答",
-    backMapButton: "返回地圖",
   },
   stage: {
     scanAlignTitle: "請對準QRCode",

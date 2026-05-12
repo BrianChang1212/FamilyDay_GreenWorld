@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
+import GwBrandBar from "@/components/GwBrandBar.vue";
 import { resetScavengerRun } from "@/lib/demoState";
 import { useI18n } from "@/composables/useI18n";
 
@@ -16,10 +17,7 @@ function next() {
 
 <template>
 	<div class="relative flex min-h-full flex-col bg-[#e8eae7]">
-		<div class="bg-[#2f7354] px-5 pb-4 pt-7 text-center text-white shadow-sm">
-			<p class="font-display text-2xl italic tracking-wide">AmTRAN</p>
-			<p class="-mt-1 text-sm font-semibold tracking-[0.18em]">瑞軒科技</p>
-		</div>
+		<GwBrandBar />
 
 		<main
 			class="relative z-[1] flex flex-1 flex-col px-4 pb-8 pt-4 sm:mx-auto sm:w-full sm:max-w-md sm:px-6"

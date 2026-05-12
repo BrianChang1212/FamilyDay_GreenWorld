@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
+import GwBrandBar from "@/components/GwBrandBar.vue";
 import {
 	getCompanionCount,
 	getProfile,
@@ -110,10 +111,7 @@ async function commitCheckIn() {
 
 <template>
 	<div class="relative flex min-h-full flex-col bg-[#f7f8f6]">
-		<div class="bg-[#2f7354] px-5 pb-4 pt-7 text-center text-white shadow-sm">
-			<p class="font-display text-2xl italic tracking-wide">AmTRAN</p>
-			<p class="-mt-1 text-sm font-semibold tracking-[0.18em]">瑞軒科技</p>
-		</div>
+		<GwBrandBar />
 
 		<main class="relative z-[1] flex flex-1 flex-col px-4 pb-6 pt-4 sm:mx-auto sm:max-w-md sm:px-6">
 			<header class="text-center">

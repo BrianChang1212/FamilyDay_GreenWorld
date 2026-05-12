@@ -131,20 +131,13 @@ function next() {
 				</p>
 			</div>
 
-			<div class="mt-12 flex w-full max-w-md flex-col gap-5">
+			<div class="mt-12 w-full max-w-md">
 				<button
 					type="button"
 					class="w-full rounded-2xl bg-[#2f7354] py-[1.05rem] text-lg font-bold text-white shadow-lg transition hover:brightness-110 active:scale-[0.99] sm:py-5"
 					@click="next"
 				>
 					{{ ok ? t("result.nextButton") : t("result.retryButton") }}
-				</button>
-				<button
-					type="button"
-					class="w-full py-2 text-center text-base font-semibold text-[#2f7354] underline decoration-[#2f7354]/40 underline-offset-4 transition hover:text-[#1f5a40]"
-					@click="router.push({ name: 'stage' })"
-				>
-					{{ t("result.backMapButton") }}
 				</button>
 			</div>
 		</main>
