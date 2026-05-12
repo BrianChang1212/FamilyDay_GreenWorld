@@ -73,6 +73,7 @@ export const zhTW = {
     startButton: "我知道了",
   },
   register: {
+    heroRocketAlt: "闖關登入火箭圖示",
     heroTitle: "完成登入，開始闖關",
     namePlaceholder: "請輸入您的真實姓名",
     employeeIdPlaceholder: "例：1110000",
@@ -98,7 +99,7 @@ export const zhTW = {
       "尚無可領取的結算額度（伺服器判定尚未累積新的完整通關禮）。請確認已完成並通關本輪關卡後再試，或請工作人員協助確認紀錄。",
     rewardClaimNotReady: "尚未完成全部關卡，無法領取闖關禮。",
     rewardWaitingBanked:
-      "目前沒有可結算的領獎次數（上一輪獎勵若已領取，須再玩一輪並通關後才可領下一次）。請使用「再玩一輪」完成挑戰後再試。",
+      "目前尚無新一輪可領取之結算（每領取一次後，須重新完成整輪關卡通關後，伺服器才會再累積下一次）。請離開此頁後回到闖關地圖／掃描站點 QR 繼續作答並通關，完成後再回到本頁；或請現場工作人員協助確認與操作。",
     staffHint: "請由現場工作人員協助點擊「確認領取」。",
     modalStaffInstruction: "請交由工作人員點選操作",
     backHomeButton: "返回首頁",
