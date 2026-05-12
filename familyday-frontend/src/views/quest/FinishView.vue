@@ -3,12 +3,11 @@ import { computed, onMounted, ref, watch } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import GwBrandBar from "@/components/GwBrandBar.vue";
-import { claimFinishReward, logoutGame, restartPlaythrough } from "@/api/gameFlow";
+import { claimFinishReward, logoutGame } from "@/api/gameFlow";
 import {
 	FINISH_PAGE_HERO_SRC,
 	getProfile,
 	getFinishClaimedCount,
-	resetScavengerRun,
 } from "@/lib/demoState";
 import { incrementLocalFinishClaimIfNoApiBase } from "@/lib/provisionalFinishClaim";
 import { resolveRewardClaimPresentation, parseMockClaimedQueryParam } from "@/lib/rewardClaimPresentation";
@@ -169,21 +168,6 @@ function goHome() {
 		});
 }
 
-function restartGame() {
-	actionLoading.value = true;
-	actionError.value = "";
-	restartPlaythrough()
-		.then(() => {
-			resetScavengerRun();
-			router.push({ name: "stage" });
-		})
-		.catch(() => {
-			actionError.value = "再玩一輪啟動失敗，請稍後再試。";
-		})
-		.finally(() => {
-			actionLoading.value = false;
-		});
-}
 </script>
 
 <template>
@@ -357,22 +341,17 @@ function restartGame() {
 				>
 					{{ isClaimFull ? t("finish.claimButtonDone") : t("finish.claimButton") }}
 				</button>
-				<div class="flex flex-col gap-2 pt-2">
-					<button
-						type="button"
-						:disabled="actionLoading"
-						class="w-full rounded-2xl border border-[#2f7354]/30 bg-white py-3.5 text-base font-bold text-[#2f7354] transition enabled:hover:bg-gw-mint/35 disabled:cursor-not-allowed disabled:opacity-60"
-						@click="restartGame"
-					>
-						{{ actionLoading ? t("common.loading") : t("finish.restartPlayButton") }}
-					</button>
+				<div
+					v-if="isClaimFull && statusLoadState === 'ok'"
+					class="pt-2"
+				>
 					<button
 						type="button"
 						class="w-full rounded-2xl border-2 border-[#2f7354]/25 bg-transparent py-3.5 text-base font-bold text-[#2f7354] transition hover:bg-white/80"
 						:disabled="actionLoading"
 						@click="goHome"
 					>
-						{{ t("finish.backHomeButton") }}
+						{{ actionLoading ? t("common.loading") : t("finish.backHomeButton") }}
 					</button>
 				</div>
 				<p

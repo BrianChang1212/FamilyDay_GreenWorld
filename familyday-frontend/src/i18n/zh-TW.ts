@@ -102,7 +102,6 @@ export const zhTW = {
     staffHint: "請由現場工作人員協助點擊「確認領取」。",
     modalStaffInstruction: "請交由工作人員點選操作",
     backHomeButton: "返回首頁",
-    restartPlayButton: "再玩一輪",
     modalTitle: "確認領取?",
     modalMessage: "您即將領取第 {nextClaimIndex} 次獎品，確認領取後無法取消喔!",
     modalConfirmButton: "確定",
