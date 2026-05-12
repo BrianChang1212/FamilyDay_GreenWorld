@@ -29,7 +29,7 @@ function next() {
 	>
 		<div class="relative min-h-0 flex-1 overflow-hidden">
 			<img
-				src="/images/checkin-welcome-bg.jpg"
+				src="/images/checkin-welcome-enroll-01.jpg"
 				alt="瑞軒科技2026家庭日報到歡迎畫面"
 				class="absolute inset-0 h-full w-full object-cover object-center"
 				loading="eager"

@@ -21,7 +21,7 @@ function next() {
 	>
 		<div class="relative min-h-0 flex-1 overflow-hidden">
 			<img
-				src="/images/game-welcome-bg.jpg"
+				src="/images/game-welcome-enroll-04.jpg"
 				alt=""
 				class="absolute inset-0 h-full w-full object-cover object-center"
 				loading="eager"
