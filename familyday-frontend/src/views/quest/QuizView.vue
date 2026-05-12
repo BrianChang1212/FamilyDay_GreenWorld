@@ -9,6 +9,7 @@ import {
 	questionForChallenge,
 	stageIndexFromChallengeId,
 } from "@/lib/challengeOptionLabels";
+import { GAME_CONFIG } from "@/constants";
 import {
 	addCompletedStageId,
 	setCompletedStageIdsFromApi,
@@ -31,6 +32,15 @@ const submitError = ref("");
 
 function challengeStageIndex(): number {
 	return stageIndexFromChallengeId(challengeId.value) ?? getStage();
+}
+
+/** 第 1〜10 關顯示為中文數字，與活動文案一致 */
+function stageOrdinalZh(n: number): string {
+	const d = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"];
+	if (n >= 1 && n <= 10) {
+		return d[n]!;
+	}
+	return String(n);
 }
 
 function friendlyQuizLoadError(err: unknown): string {
@@ -119,6 +129,21 @@ const questionBody = computed(() => {
 	if (loadState.value === "error") return loadErrorText.value;
 	return question.value;
 });
+
+const quizStageDisplay = computed(() => challengeStageIndex());
+
+const levelBadgeVisible = computed(
+	() =>
+		quizStageDisplay.value >= GAME_CONFIG.MIN_STAGE &&
+		quizStageDisplay.value <= GAME_CONFIG.TOTAL_STAGES,
+);
+
+const levelBadgeText = computed(() =>
+	t("quiz.levelBadge", {
+		ordinal: stageOrdinalZh(quizStageDisplay.value),
+		stationName: stageTitle(quizStageDisplay.value),
+	}),
+);
 </script>
 
 <template>
@@ -133,15 +158,27 @@ const questionBody = computed(() => {
 					class="rounded-[1.35rem] border border-neutral-200/90 bg-white p-7 pt-8 shadow-md ring-1 ring-black/[0.04] sm:p-8 sm:pt-9"
 				>
 					<span
-						class="pointer-events-none absolute -left-0.5 -top-1 text-4xl leading-none text-[#2f7354] drop-shadow-sm sm:text-[2.75rem]"
+						class="pointer-events-none absolute -right-0.5 -top-1 text-4xl leading-none text-[#2f7354] drop-shadow-sm sm:text-[2.75rem]"
 						aria-hidden="true"
 						>🍃</span
 					>
-					<p
-						class="text-lg font-bold leading-relaxed text-gw-navy sm:text-xl sm:leading-snug"
-					>
-						{{ questionBody }}
-					</p>
+					<div class="relative z-[1] flex flex-col gap-3">
+						<p
+							v-if="levelBadgeVisible"
+							class="m-0"
+						>
+							<span
+								class="inline-flex max-w-full rounded-full bg-[#2f7354] px-3.5 py-2 text-sm font-bold leading-snug text-white shadow-sm sm:px-4 sm:text-[0.9375rem]"
+							>
+								{{ levelBadgeText }}
+							</span>
+						</p>
+						<p
+							class="m-0 text-lg font-bold leading-relaxed text-gw-navy sm:text-xl sm:leading-snug"
+						>
+							{{ questionBody }}
+						</p>
+					</div>
 				</div>
 			</div>
 

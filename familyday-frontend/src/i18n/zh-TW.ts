@@ -129,6 +129,8 @@ export const zhTW = {
   },
   quiz: {
     progressTitle: "闖關進度",
+    /** 選擇題頁題卡頂部：第 N 關（中文數字）＋分站名 */
+    levelBadge: "第 {ordinal} 關：{stationName}",
     stageAlt: "{stationName} 關卡貼圖",
     loadErrorGeneric: "題目載入失敗，請重試。",
     loadErrorUnauthorized:
