@@ -52,8 +52,25 @@ export function verifySessionToken(token: string): SessionPayload | null {
 }
 
 function sessionCookieAttrs(): string {
-	const mode = (process.env.FDGW_SESSION_COOKIE_SAMESITE || "lax").toLowerCase();
-	if (mode === "none") {
+	/*
+	 * Hosting (e.g. *.web.app) and API (e.g. *.run.app) are cross-site.
+	 * Fetch(..., { credentials: "include" }) does not send SameSite=Lax
+	 * cookies on cross-site subresource requests — session would be
+	 * missing and /challenges/* returns 401 ("題目載入失敗" on the client).
+	 * Cloud Run sets K_SERVICE; use SameSite=None; Secure there.
+	 */
+	const explicit = (process.env.FDGW_SESSION_COOKIE_SAMESITE || "").toLowerCase();
+	if (explicit === "lax" || explicit === "strict" || explicit === "none") {
+		if (explicit === "none") {
+			return "Path=/; HttpOnly; SameSite=None; Secure";
+		}
+		if (explicit === "strict") {
+			return "Path=/; HttpOnly; SameSite=Strict; Secure";
+		}
+		return "Path=/; HttpOnly; SameSite=Lax";
+	}
+	const onCloudRun = typeof process.env.K_SERVICE === "string";
+	if (onCloudRun) {
 		return "Path=/; HttpOnly; SameSite=None; Secure";
 	}
 	return "Path=/; HttpOnly; SameSite=Lax";

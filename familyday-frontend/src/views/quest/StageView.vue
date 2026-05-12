@@ -4,8 +4,8 @@ import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import GwBrandBar from "@/components/GwBrandBar.vue";
 import { GAME_CONFIG } from "@/constants";
-import { verifyStation, type VerifyStationHttpError } from "@/api/gameFlow";
 import { useQrCameraScan } from "@/composables/useQrCameraScan";
+import { challengeIdForStage } from "@/lib/challengeOptionLabels";
 import {
 	getCompletedStageIds,
 	getInZone,
@@ -86,15 +86,23 @@ async function verifyFromDecodedQr(payload: string) {
 		return;
 	}
 
-	/* QR 決定進哪一關：與伺服器 verify 請求對齊 */
+	/*
+	 * QR 決定進哪一關：前端解析關卡後直接進測驗（challengeId 與後端
+	 * stageIdToChallengeId 一致：c1…cN）。不呼叫 /stations/verify，避免
+	 * 依賴該端點連線／session 才能進題（實體到站仍由活動方 QR 內容控管）。
+	 */
 	setStage(qrStage);
 	stage.value = qrStage;
+
+	const cid = challengeIdForStage(qrStage);
+	if (!cid) {
+		scanError.value = t("stage.scanQrUnrecognized");
+		return;
+	}
 
 	scanLoading.value = true;
 	scanError.value = "";
 	try {
-		const cid = await verifyStation(qrStage, token);
-		scanError.value = "";
 		challengeId.value = cid;
 		setPendingStationVerification(qrStage, cid);
 		inZone.value = true;
@@ -103,20 +111,6 @@ async function verifyFromDecodedQr(payload: string) {
 			name: "quiz",
 			query: { challengeId: cid },
 		});
-	} catch (_err: unknown) {
-		const e = _err as Partial<VerifyStationHttpError>;
-		if (e && typeof e.code === "string") {
-			if (e.code === "STATION_QR_MISMATCH") {
-				scanError.value = t("stage.scanQrMismatch");
-			} else if (e.code === "STATION_QR_UNRECOGNIZED") {
-				scanError.value = t("stage.scanQrUnrecognized");
-			} else {
-				scanError.value = t("stage.scanVerifyFailed");
-			}
-		} else {
-			scanError.value = t("stage.scanVerifyFailed");
-		}
-		throw _err;
 	} finally {
 		scanLoading.value = false;
 	}
@@ -129,7 +123,7 @@ const cameraSetupError = useQrCameraScan({
 	onDecode: verifyFromDecodedQr,
 });
 
-/** 優先顯示相機權限／硬體錯誤，其次 API 錯誤 */
+/** 優先顯示相機權限／硬體錯誤，其次掃碼／解析錯誤 */
 const scanUiMessage = computed(
 	() => cameraSetupError.value || scanError.value,
 );
@@ -158,7 +152,7 @@ const stationSticker = computed(() => stageStickerSrc(stage.value));
 function startQuiz() {
 	const cid = challengeId.value.trim();
 	if (!cid) {
-		scanError.value = "請先完成掃碼驗證，再開始作答。";
+		scanError.value = "請先掃描站點 QR code，再開始作答。";
 		return;
 	}
 	router.push({

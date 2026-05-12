@@ -1,11 +1,18 @@
 import { describe, expect, it } from "vitest";
 import {
 	apiOptionsAreAbcdKeys,
+	challengeIdForStage,
 	choiceRowsForChallenge,
 	questionForChallenge,
 } from "@/lib/challengeOptionLabels";
 
 describe("challengeOptionLabels", () => {
+	it("maps stage index to challenge id like the backend", () => {
+		expect(challengeIdForStage(1)).toBe("c1");
+		expect(challengeIdForStage(6)).toBe("c6");
+		expect(challengeIdForStage(0)).toBeNull();
+		expect(challengeIdForStage(7)).toBeNull();
+	});
 	it("detects A–D keys from API", () => {
 		expect(apiOptionsAreAbcdKeys(["A", "B", "C", "D"])).toBe(true);
 		expect(apiOptionsAreAbcdKeys(["5種", "10種", "30種", "42種"])).toBe(false);

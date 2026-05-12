@@ -20,11 +20,11 @@
     "count:checkins": "node ./scripts/count-checkins-firestore.mjs",
     "purge:firestore-app": "node ./scripts/purge-firestore-app-data.mjs",
     "shell": "firebase functions:shell",
-    "deploy": "firebase deploy --only functions:api",
+    "deploy": "npm run build && firebase deploy --only functions:api",
     "sync:hosting-dist": "node ./scripts/sync-hosting-dist.mjs",
     "build:frontend:hosting": "node ./scripts/build-frontend-for-hosting.mjs",
-    "deploy:hosting": "node ./scripts/build-frontend-for-hosting.mjs && node ./scripts/sync-hosting-dist.mjs && firebase deploy --only hosting",
-    "deploy:app": "node ./scripts/build-frontend-for-hosting.mjs && node ./scripts/sync-hosting-dist.mjs && firebase deploy --only hosting,functions:api,firestore",
+    "deploy:hosting": "npm run build && node ./scripts/build-frontend-for-hosting.mjs && node ./scripts/sync-hosting-dist.mjs && firebase deploy --only hosting",
+    "deploy:app": "npm run build && node ./scripts/build-frontend-for-hosting.mjs && node ./scripts/sync-hosting-dist.mjs && firebase deploy --only hosting,functions:api,firestore",
     "lint": "echo \"No lint configured\""
   },
   "dependencies": {

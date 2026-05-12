@@ -25,6 +25,18 @@ export function stageIndexFromChallengeId(challengeId: string): number | null {
 	return n;
 }
 
+/** Same mapping as backend `stageIdToChallengeId` (`c1`…`cN`). */
+export function challengeIdForStage(stageId: number): string | null {
+	if (
+		!Number.isFinite(stageId) ||
+		stageId < GAME_CONFIG.MIN_STAGE ||
+		stageId > GAME_CONFIG.TOTAL_STAGES
+	) {
+		return null;
+	}
+	return `c${stageId}`;
+}
+
 /** 題幹：有本地 `c1`…`c6` 題庫時以前端文案為準，否則用 API 的 title */
 export function questionForChallenge(
 	challengeId: string,
