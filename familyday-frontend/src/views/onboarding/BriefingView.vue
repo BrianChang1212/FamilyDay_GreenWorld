@@ -36,7 +36,7 @@ function next() {
 					decoding="async"
 				/>
 				<p
-					class="mt-3 text-center font-serif text-[10px] uppercase tracking-[0.2em] text-neutral-500"
+					class="mt-3 text-center font-sans text-[10px] uppercase tracking-[0.2em] text-neutral-500"
 				>
 					{{ t("briefing.mapCaption") }}
 				</p>

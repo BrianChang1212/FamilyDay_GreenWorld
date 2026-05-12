@@ -1,3 +1,15 @@
+/**
+ * Self-hosted Noto Sans TC (variable font) — 與 ref_no_push 來源同檔，避免執行時依賴 Google Fonts。
+ * weight 範圍供 font-weight 400–800 等 Tailwind 類別使用。
+ */
+@font-face {
+	font-family: "Noto Sans TC";
+	font-style: normal;
+	font-weight: 100 900;
+	font-display: swap;
+	src: url("/fonts/NotoSansTC-VF.ttf") format("truetype");
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;

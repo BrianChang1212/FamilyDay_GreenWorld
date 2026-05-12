@@ -22,8 +22,8 @@ export default {
 			},
 			fontFamily: {
 				sans: ['"Noto Sans TC"', "system-ui", "sans-serif"],
-				/** 標題與短句：與正文的無襯線形成對比，維持中文易讀性 */
-				display: ['"Noto Serif TC"', '"Noto Sans TC"', "ui-serif", "Georgia", "serif"],
+				/** 標題與 UI 全文統一 Noto Sans TC（與 sans 相同 stack） */
+				display: ['"Noto Sans TC"', "system-ui", "sans-serif"],
 			},
 			borderRadius: {
 				"3xl": "1.375rem",
