@@ -12,7 +12,7 @@ winget install OpenJS.NodeJS.LTS --accept-package-agreements --accept-source-agr
 
 成功時 winget 會提示已新增 `node` 指令，並可能提示**需重新開啟終端機**才會套用 PATH。
 
-## 2. 同一個終端機內立即套用 PATH（不必重開 Cursor 時可先執行）
+## 2. 同一個終端機內立即套用 PATH（不必重開終端機時可先執行）
 
 ```powershell
 $env:Path = [System.Environment]::GetEnvironmentVariable("Path","User") + ";" + [System.Environment]::GetEnvironmentVariable("Path","Machine")

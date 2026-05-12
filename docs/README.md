@@ -45,6 +45,7 @@
 | 本機 GCP 服務帳戶（Firestore／verify） | [`setup/local-firestore-gcp.md`](./setup/local-firestore-gcp.md)；[`architecture/summary-backend.md`](./architecture/summary-backend.md) **§2.0** |
 | **Cloud Functions 首次部署問題處理報告**（IAM、路徑、Invoker、`.env`） | [`setup/functions-deploy-incident-report-2026-05-11.md`](./setup/functions-deploy-incident-report-2026-05-11.md) |
 | **正式 Hosting 報到／闖關入口 URL**（QR 用） | [`setup/hosting-public-entry-urls.md`](./setup/hosting-public-entry-urls.md) |
+| **正式 Hosting：`VITE_API_BASE` 本機誤Embed／連線錯誤** | [`setup/hosting-production-api-base-incident-2026-05-12.md`](./setup/hosting-production-api-base-incident-2026-05-12.md) |
 | Firebase 相關檔案分類（`familyday-backend/` 設定 vs fdgw） | [`firebase/README.md`](./firebase/README.md) |
 | 前端／後端／部署／流量摘要 | [`architecture/summary-frontend.md`](./architecture/summary-frontend.md) 等 |
 | 根 README 補充（截圖／技術圖／目錄表／長篇待辦） | [`overview/root-readme-supplement.md`](./overview/root-readme-supplement.md) |

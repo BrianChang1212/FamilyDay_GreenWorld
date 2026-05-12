@@ -7,6 +7,7 @@
 | [`local-firestore-gcp.md`](./local-firestore-gcp.md) | **兩層版**：快速版（4 步）＋進階版（環境變數、seed、Rules、purge） |
 | [`functions-deploy-incident-report-2026-05-11.md`](./functions-deploy-incident-report-2026-05-11.md) | **Cloud Functions 首次部署**：Firebase／GCP 專案混淆、IAM、路徑、`invoker`、`FDGW_USE_FIRESTORE` 等問題與處置 |
 | [`hosting-public-entry-urls.md`](./hosting-public-entry-urls.md) | **正式 Hosting**：報到／闖關兩組入口 URL（QR 用 **`/check-in`**、**`/game`**） |
+| [`hosting-production-api-base-incident-2026-05-12.md`](./hosting-production-api-base-incident-2026-05-12.md) | **正式 Hosting 連線**：`VITE_API_BASE` 誤用本機、報到「無法連線到伺服器」根因與 **`build-frontend-for-hosting`**／`fdgw.productionApi` 處置 |
 | 一鍵本機（Windows） | 倉庫根 [`scripts/dev-oneclick.ps1`](../../scripts/dev-oneclick.ps1)／[`scripts/dev-oneclick.cmd`](../../scripts/dev-oneclick.cmd)；說明見根 [`README.md`](../../README.md)（**Windows：一鍵啟動**） |
 | [`static-preview-netlify-github.md`](./static-preview-netlify-github.md) | Netlify／GitHub Pages 靜態預覽、QR 分流、同網段試機 |
 | [`nodejs-windows.md`](./nodejs-windows.md) | Windows 安裝 Node.js／npm（winget、PATH、常見錯誤） |

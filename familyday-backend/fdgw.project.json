@@ -25,6 +25,9 @@
 		"viteDevPort": 5173,
 		"vitePreviewPort": 4173
 	},
+	"productionApi": {
+		"viteApiBase": "https://api-hxe6k6ncza-uc.a.run.app"
+	},
 	"seed": {
 		"defaultEmployeeIdStart": "1141043",
 		"defaultCount": 10,
