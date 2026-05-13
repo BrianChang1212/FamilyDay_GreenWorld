@@ -1,4 +1,5 @@
 import { getViteApiBase } from "@/lib/apiBase";
+import { authHeaders } from "@/lib/sessionToken";
 
 export type SubmitCheckinInput = {
 	name: string;
@@ -12,16 +13,13 @@ export type SubmitCheckinInput = {
  */
 export async function submitCheckin(input: SubmitCheckinInput): Promise<void> {
 	const base = getViteApiBase();
-	if (!base) {
-		return;
-	}
-
 	const res = await fetch(`${base}/api/v1/checkin`, {
 		method: "POST",
 		credentials: "include",
 		headers: {
 			Accept: "application/json",
 			"Content-Type": "application/json",
+			...authHeaders(),
 		},
 		body: JSON.stringify({
 			name: input.name,

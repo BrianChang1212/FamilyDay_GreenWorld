@@ -23,6 +23,7 @@ app.use(
 			callback(new Error("CORS origin is not allowed"));
 		},
 		credentials: true,
+		allowedHeaders: ["Authorization", "Content-Type", "Accept"],
 	}),
 );
 app.use(express.json());

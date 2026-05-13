@@ -41,4 +41,5 @@ export const STORAGE_KEYS = {
 	/** 使用者已於 `/checkin/welcome` 點過「開始探索」，才可進 `/checkin` 表單 */
 	checkinWelcomePassed: "fdgw_checkin_welcome_passed",
 	entryIntent: "fdgw_entry_intent",
+	sessionToken: "fdgw_session_token",
 } as const;

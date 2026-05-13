@@ -17,18 +17,17 @@ describe("submitCheckin", () => {
 		globalThis.fetch = originalFetch;
 	});
 
-	it("does not call fetch when VITE_API_BASE is not configured", async () => {
+	it("uses relative URL when VITE_API_BASE is empty (same-origin mode)", async () => {
 		vi.mocked(apiBase.getViteApiBase).mockReturnValue("");
-		const fetchMock = vi.fn();
+		const fetchMock = vi.fn().mockResolvedValue({ ok: true });
 		globalThis.fetch = fetchMock as typeof fetch;
 
-		await submitCheckin({
-			name: "A",
-			employeeId: "E1",
-			partySize: 2,
-		});
+		await submitCheckin({ name: "A", employeeId: "E1", partySize: 2 });
 
-		expect(fetchMock).not.toHaveBeenCalled();
+		expect(fetchMock).toHaveBeenCalledWith(
+			"/api/v1/checkin",
+			expect.objectContaining({ method: "POST", credentials: "include" }),
+		);
 	});
 
 	it("posts JSON body with credentials", async () => {

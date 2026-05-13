@@ -1,13 +1,12 @@
 import { Router } from "express";
 import { verifyRosterIdentity } from "../state/roster";
-import { badRequest, getCookie, normalizeText } from "../utils/http";
+import { badRequest, normalizeText } from "../utils/http";
 import {
 	buildClearSessionCookie,
 	buildSessionCookie,
 	createSessionToken,
-	getSessionCookieName,
-	verifySessionToken,
 } from "../utils/session";
+import { getSessionUser } from "../utils/authGuard";
 
 export const authRouter = Router();
 
@@ -41,6 +40,7 @@ authRouter.post("/auth/login", async (req, res) => {
 		res.setHeader("Set-Cookie", buildSessionCookie(token));
 		res.status(200).json({
 			ok: true,
+			token,
 			user: {
 				employeeId: employee.employeeId,
 				name: employee.name,
@@ -57,8 +57,7 @@ authRouter.post("/auth/logout", (_req, res) => {
 });
 
 authRouter.get("/auth/me", (req, res) => {
-	const raw = getCookie(req, getSessionCookieName());
-	const session = raw ? verifySessionToken(raw) : null;
+	const session = getSessionUser(req);
 	if (!session) {
 		res.status(401).json(badRequest("UNAUTHORIZED", "missing or invalid session"));
 		return;

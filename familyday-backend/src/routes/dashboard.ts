@@ -1,14 +1,13 @@
 import { Router } from "express";
 import { loadFdgwProject, getTotalStages } from "../config/fdgwProject";
-import { badRequest, getCookie } from "../utils/http";
-import { getSessionCookieName, verifySessionToken } from "../utils/session";
+import { badRequest } from "../utils/http";
+import { getSessionUser } from "../utils/authGuard";
 import { getOrInitProgress } from "../state/game";
 
 export const dashboardRouter = Router();
 
 dashboardRouter.get("/me/dashboard", async (req, res) => {
-	const raw = getCookie(req, getSessionCookieName());
-	const session = raw ? verifySessionToken(raw) : null;
+	const session = getSessionUser(req);
 	if (!session) {
 		res.status(401).json(badRequest("UNAUTHORIZED", "missing or invalid session"));
 		return;

@@ -42,9 +42,9 @@ const isClaimFull = computed(
 	() => claimedCount.value >= maxSlots.value && maxSlots.value > 0,
 );
 
-/** 伺服器尚有「已通關結算、尚未領」的額度（bankedFullClears > rewardRedeemCount） */
+/** 通關過至少一輪（bankedFullClears >= 1）且未達上限 */
 const hasClaimCredit = computed(
-	() => bankedFullClears.value > claimedCount.value,
+	() => bankedFullClears.value >= 1,
 );
 
 const nextClaimIndex = computed(() =>

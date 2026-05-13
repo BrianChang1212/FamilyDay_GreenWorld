@@ -1,8 +1,10 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { loginGame } from "@/api/authLogin";
 import * as apiBase from "@/lib/apiBase";
+import * as sessionToken from "@/lib/sessionToken";
 
 vi.mock("@/lib/apiBase");
+vi.mock("@/lib/sessionToken");
 
 describe("loginGame", () => {
 	const originalFetch = globalThis.fetch;
@@ -17,15 +19,33 @@ describe("loginGame", () => {
 		globalThis.fetch = originalFetch;
 	});
 
-	it("throws when VITE_API_BASE is not configured", async () => {
-		vi.mocked(apiBase.getViteApiBase).mockReturnValue("");
-		await expect(loginGame("N", "E")).rejects.toThrow(
-			"VITE_API_BASE is not configured",
-		);
+	it("stores token from response body after successful login", async () => {
+		globalThis.fetch = vi.fn().mockResolvedValue({
+			ok: true,
+			json: () => Promise.resolve({ ok: true, token: "test-token-abc" }),
+		}) as typeof fetch;
+
+		await loginGame("N", "E");
+
+		expect(vi.mocked(sessionToken.setSessionToken)).toHaveBeenCalledWith("test-token-abc");
+	});
+
+	it("does not store token when response body has no token", async () => {
+		globalThis.fetch = vi.fn().mockResolvedValue({
+			ok: true,
+			json: () => Promise.resolve({ ok: true }),
+		}) as typeof fetch;
+
+		await loginGame("N", "E");
+
+		expect(vi.mocked(sessionToken.setSessionToken)).not.toHaveBeenCalled();
 	});
 
 	it("posts name and employeeId with credentials", async () => {
-		const fetchMock = vi.fn().mockResolvedValue({ ok: true });
+		const fetchMock = vi.fn().mockResolvedValue({
+			ok: true,
+			json: () => Promise.resolve({ ok: true }),
+		});
 		globalThis.fetch = fetchMock as typeof fetch;
 
 		await loginGame("王小明", "E123");

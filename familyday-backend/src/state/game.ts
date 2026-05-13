@@ -12,7 +12,7 @@ export type PlayerProgress = {
 	completedStageIds: number[];
 	/** 曾按下「再玩一輪」且當時已全通關的次數（統計用，可無限累加） */
 	fullClearCount: number;
-	/** 已成功通關完整一輪的累計次數（每次答完最後一關 +1）；領獎須 banked > rewardRedeemCount */
+	/** 已成功通關完整一輪的累計次數（每次答完最後一關 +1）；>= 1 即可領獎（至多 maxRounds 次） */
 	bankedFullClears: number;
 	rewardRedeemCount: number;
 	/** 闖關禮最多可領次數（目前 3）；闖關本身不限次數 */
@@ -255,11 +255,11 @@ export async function claimFinishRewardProgress(
 			message: "reward claim limit reached",
 		};
 	}
-	if (progress.bankedFullClears <= progress.rewardRedeemCount) {
+	if (progress.bankedFullClears < 1) {
 		return {
 			ok: false,
 			code: "REWARD_CLAIM_NOT_ELIGIBLE",
-			message: "no banked full clear available to claim",
+			message: "no full clear on record",
 		};
 	}
 

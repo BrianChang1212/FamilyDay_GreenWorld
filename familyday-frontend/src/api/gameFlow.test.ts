@@ -26,10 +26,19 @@ describe("gameFlow api", () => {
 		globalThis.fetch = originalFetch;
 	});
 
-	it("throws when VITE_API_BASE is not configured", async () => {
+	it("uses relative URL when VITE_API_BASE is empty (same-origin mode)", async () => {
 		vi.mocked(apiBase.getViteApiBase).mockReturnValue("");
-		await expect(verifyStation(1, "token-1")).rejects.toThrow(
-			"VITE_API_BASE is not configured",
+		const fetchMock = vi.fn().mockResolvedValue({
+			ok: true,
+			json: () => Promise.resolve({ challengeId: "c1" }),
+		});
+		globalThis.fetch = fetchMock as typeof fetch;
+
+		await verifyStation(1, "token-1");
+
+		expect(fetchMock).toHaveBeenCalledWith(
+			"/api/v1/stations/verify",
+			expect.objectContaining({ method: "POST", credentials: "include" }),
 		);
 	});
 

@@ -1,5 +1,6 @@
 import { getViteApiBase } from "@/lib/apiBase";
 import { setCompletedStageIdsFromApi } from "@/lib/demoState";
+import { authHeaders, clearSessionToken } from "@/lib/sessionToken";
 
 type ChallengeJson = {
 	challengeId?: string;
@@ -29,11 +30,7 @@ type RewardClaimJson = {
 };
 
 function getBaseOrThrow(): string {
-	const base = getViteApiBase();
-	if (!base) {
-		throw new Error("VITE_API_BASE is not configured");
-	}
-	return base;
+	return getViteApiBase();
 }
 
 /** Thrown by verifyStation when HTTP error body may include API { code, message }. */
@@ -81,6 +78,7 @@ export async function verifyStation(stageId: number, qrJwt: string): Promise<str
 		headers: {
 			Accept: "application/json",
 			"Content-Type": "application/json",
+			...authHeaders(),
 		},
 		body: JSON.stringify({ stageId, qrJwt }),
 	});
@@ -105,7 +103,7 @@ export async function fetchChallenge(
 		`${base}/api/v1/challenges/${encodeURIComponent(challengeId)}`,
 		{
 			credentials: "include",
-			headers: { Accept: "application/json" },
+			headers: { Accept: "application/json", ...authHeaders() },
 		},
 	);
 
@@ -154,6 +152,7 @@ export async function submitChallengeAttempt(
 			headers: {
 				Accept: "application/json",
 				"Content-Type": "application/json",
+				...authHeaders(),
 			},
 			body: JSON.stringify({ answer }),
 		},
@@ -193,7 +192,7 @@ export async function syncLocalProgressFromDashboard(): Promise<void> {
 	const base = getBaseOrThrow();
 	const res = await fetch(`${base}/api/v1/me/dashboard`, {
 		credentials: "include",
-		headers: { Accept: "application/json" },
+		headers: { Accept: "application/json", ...authHeaders() },
 	});
 	if (!res.ok) {
 		return;
@@ -213,7 +212,7 @@ export async function restartPlaythrough(): Promise<void> {
 	const res = await fetch(`${base}/api/v1/me/playthrough/restart`, {
 		method: "POST",
 		credentials: "include",
-		headers: { Accept: "application/json" },
+		headers: { Accept: "application/json", ...authHeaders() },
 	});
 	if (!res.ok) {
 		const text = await res.text().catch(() => "");
@@ -234,6 +233,7 @@ export async function claimFinishReward(): Promise<{ rewardRedeemCount: number }
 		headers: {
 			Accept: "application/json",
 			"Content-Type": "application/json",
+			...authHeaders(),
 		},
 		body: "{}",
 	});
@@ -253,8 +253,9 @@ export async function logoutGame(): Promise<void> {
 	const res = await fetch(`${base}/api/v1/auth/logout`, {
 		method: "POST",
 		credentials: "include",
-		headers: { Accept: "application/json" },
+		headers: { Accept: "application/json", ...authHeaders() },
 	});
+	clearSessionToken();
 	if (!res.ok) {
 		const text = await res.text().catch(() => "");
 		throw new Error(`auth/logout ${res.status}: ${text.slice(0, 200)}`);

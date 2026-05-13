@@ -1,5 +1,6 @@
 import { getViteApiBase } from "@/lib/apiBase";
 import { FINISH_REWARD_SLOTS } from "@/constants";
+import { authHeaders } from "@/lib/sessionToken";
 
 export type RewardClaimStatusPayload = {
 	claimedCount: number;
@@ -36,13 +37,9 @@ type DashboardJson = {
  */
 export async function fetchRewardClaimStatus(): Promise<RewardClaimStatusPayload> {
 	const base = getViteApiBase();
-	if (!base) {
-		throw new Error("VITE_API_BASE is not configured");
-	}
-
 	const res = await fetch(`${base}/api/v1/me/dashboard`, {
 		credentials: "include",
-		headers: { Accept: "application/json" },
+		headers: { Accept: "application/json", ...authHeaders() },
 	});
 
 	if (!res.ok) {

@@ -1,4 +1,5 @@
 import { getViteApiBase } from "@/lib/apiBase";
+import { authHeaders } from "@/lib/sessionToken";
 
 export type CheckinStatusPayload = {
 	checkedIn: boolean;
@@ -14,16 +15,12 @@ export async function fetchCheckinStatus(
 	employeeId?: string,
 ): Promise<CheckinStatusPayload> {
 	const base = getViteApiBase();
-	if (!base) {
-		throw new Error("VITE_API_BASE is not configured");
-	}
-
 	const q = employeeId?.trim()
 		? `?employeeId=${encodeURIComponent(employeeId.trim())}`
 		: "";
 	const res = await fetch(`${base}/api/v1/checkin/status${q}`, {
 		credentials: "include",
-		headers: { Accept: "application/json" },
+		headers: { Accept: "application/json", ...authHeaders() },
 	});
 
 	if (!res.ok) {

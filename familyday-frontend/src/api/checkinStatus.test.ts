@@ -17,10 +17,19 @@ describe("fetchCheckinStatus", () => {
 		globalThis.fetch = originalFetch;
 	});
 
-	it("throws when VITE_API_BASE is not configured", async () => {
+	it("uses relative URL when VITE_API_BASE is empty (same-origin mode)", async () => {
 		vi.mocked(apiBase.getViteApiBase).mockReturnValue("");
-		await expect(fetchCheckinStatus()).rejects.toThrow(
-			"VITE_API_BASE is not configured",
+		const fetchMock = vi.fn().mockResolvedValue({
+			ok: true,
+			json: () => Promise.resolve({ checkedIn: false }),
+		});
+		globalThis.fetch = fetchMock as typeof fetch;
+
+		await fetchCheckinStatus();
+
+		expect(fetchMock).toHaveBeenCalledWith(
+			"/api/v1/checkin/status",
+			expect.objectContaining({ credentials: "include" }),
 		);
 	});
 
