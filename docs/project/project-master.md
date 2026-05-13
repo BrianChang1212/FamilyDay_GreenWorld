@@ -359,7 +359,8 @@
 #### 中優先級
 - [ ] **`GET /admin/reports/progress` 占位欄位** — 將 **`players`／`fullClear`** 改為 **`player_progress`**（及／或 **`attempts`**）真實聚合；現 **`redeemed`** 已來自 **`getRedeemSummary()`**（見 **`familyday-backend/src/routes/admin.ts`**）
 - [ ] 完成 dev/stage 驗證 runbook（含 `VITE_API_BASE`、`FDGW_USE_FIRESTORE`、憑證設定步驟）
-- [ ] 補齊後端單元測試與關鍵路徑自動化（auth/checkin/game/redeem）
+- [x] 建立後端 Vitest 單元測試基線（http/session/authGuard/game state/health route；**5** 檔／**27** 測試；含「完成一次後可連續領獎至上限」規則）
+- [ ] 擴充後端關鍵路徑自動化（checkin/redeem/admin/Firestore mock 或 emulator）
 - [ ] 補齊 Firestore Security Rules 初稿
 
 #### 低優先級
@@ -433,4 +434,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.52 · 2026-05-13（**`qr-entry-links`** 入口 QR 入庫說明；根 **`README` v2.76**／[`hosting-public-entry-urls`](../setup/hosting-public-entry-urls.md) **v1.3**；前版 **v1.3.51**）
+**文件版本：** 合併版 v1.3.53 · 2026-05-13（補後端 Vitest 單元測試基線；根 **`README` v2.77**；前版 **v1.3.52**）

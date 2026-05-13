@@ -231,7 +231,7 @@ export async function applyAttemptResult(
 
 /**
  * Finish 頁玩家按「確認領獎」：伺服器遞增一次 `rewardRedeemCount`（最多 `maxRounds` 次）。
- * 須已全通關，且尚有一次未領的完整通關額度：`bankedFullClears > rewardRedeemCount`。
+ * 只要至少完成過一次全通關，即可連續領獎直到達到 `maxRounds`。
  */
 export async function claimFinishRewardProgress(
 	employeeId: string,

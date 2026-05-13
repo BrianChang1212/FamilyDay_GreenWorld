@@ -60,7 +60,7 @@ npm run dev
 | 前端 | 10 個 View **全數完整實作**（WelcomeView → FinishView；舊 **`/finish/claimed`** 僅 redirect **`/finish`**）；API 層 11 支函式對應真實端點；14 個測試檔無 skip/stub；CI 通過；**闖關 API 呼叫附 Bearer**（`familyday-frontend/src/lib/sessionToken.ts`） |
 | API | **19** 個端點均已實作。**`GET /admin/reports/attendance`**：**`total`**＝Firestore **`roster`**（現行 **`eventId`** 下名冊筆數）；**`checkedIn`**＝**`checkins`** 計數。**`GET /admin/reports/progress`**：**`redeemed`** 取自核銷摘要；**`players`／`fullClear`** 仍為 **`admin.ts`** 占位常數（待對齊 `player_progress` 聚合） |
 | 後端資料層 | roster / checkins / player_progress / redeem 四集合已完整實作 Firestore + in-memory 雙模式切換；阻塞點為本機 IAM 憑證未設定（`GOOGLE_APPLICATION_CREDENTIALS`） |
-| 測試 | 前端 Vitest **14** 檔通過（與上列「前端」列一致）；後端 4/30 聯調驗證 Pass 17（in-memory）；**Firebase Hosting 上架環境**：報到＋闖關**全端手動驗收 Pass**（符合需求；2026-05-13）；Firestore **本機腳本**驗證仍可能 Blocked（憑證未設定）；後端單元測試待補齊 |
+| 測試 | 前端 Vitest **14** 檔通過（與上列「前端」列一致）；後端 Vitest **5** 檔／**27** 測試通過（http／session／authGuard／game state／health route；含「完成一次後可連續領獎至上限」規則）；後端 4/30 聯調驗證 Pass 17（in-memory）；**Firebase Hosting 上架環境**：報到＋闖關**全端手動驗收 Pass**（符合需求；2026-05-13）；Firestore **本機腳本**驗證仍可能 Blocked（憑證未設定） |
 | 部署 | **Firebase Hosting 已上架**並完成上述主流程驗收；正式上線仍須完成 Firestore IAM／Security Rules／安全基線與主辦簽核事項 |
 
 ---
@@ -73,7 +73,7 @@ npm run dev
 **本週摘要（與主文件對齊；勾選以 `project-master` 為準）**
 
 - **高優先：** Firestore IAM、`verify:firestore`、回填 `api-integration-checklist`、安全基線清單（**Bearer／XSS**、`VITE_API_BASE`）、CORS
-- **中優先：** runbook、Security Rules、後端單元測試、**補強 `GET …/admin/reports/progress`（`players`／`fullClear`）聚合**  
+- **中優先：** runbook、Security Rules、後端 checkin／redeem／admin 自動化擴充、**補強 `GET …/admin/reports/progress`（`players`／`fullClear`）聚合**  
 - **低優先：** 見主文件
 
 ---
@@ -90,4 +90,4 @@ npm run dev
 
 ---
 
-*README v2.76 · 2026-05-13（補 **`public/qr-entry-links`** 入口 QR 說明；前版 v2.75）*
+*README v2.77 · 2026-05-13（補後端 Vitest 單元測試基線；前版 v2.76）*
