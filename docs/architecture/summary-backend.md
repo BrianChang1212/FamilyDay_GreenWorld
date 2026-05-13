@@ -115,7 +115,7 @@ Firebase/Google Cloud 可設定 **Budgets & Alerts** 做費用通知，建議：
 
 ## 3. 認證與安全
 
-- 建議 **HTTP-only Cookie（session）** 或 **短期 JWT**（依資安與跨網域需求）。  
+- **已定案（2026-05）：** SPA 與 API **跨網域**時，闖關身分以 **`POST /api/v1/auth/login`** 回 **`token`**（JSON 亦含 **`ok`**、**`user`**）+ **`Authorization: Bearer`** 為主（前端 **`sessionStorage`**）；起因與威脅模型見 [`docs/setup/ios-mobile-auth-fix-2026-05-13.md`](../setup/ios-mobile-auth-fix-2026-05-13.md)。後端可維持 **HTTP-only Cookie** 作相容路徑（見 **`api-v0.1` v0.1.25–v0.1.26**）。  
 - **站點 QR**：內容為 **signed JWT**；後端 **驗簽**、**exp**、必要時 **jti 防重播**，避免竄改 URL 跳關。  
 - **進場 QR**（若有）：同樣建議伺服器端驗證後再進簽到／登入流程。
 
@@ -174,4 +174,5 @@ Firebase/Google Cloud 可設定 **Budgets & Alerts** 做費用通知，建議：
 | 1.6 | 2026-05-03 | **§2.0**：`cloud-firestore-dev.ps1`／seed／purge 詳述改指向 [`setup/local-firestore-gcp.md`](../setup/local-firestore-gcp.md)；金鑰存放列改為泛化路徑說明 |
 | 1.7 | 2026-05-11 | **§7**：`staff/redeem/*` 已納契約 MVP 並落地；刪「Phase 2 是否納入」過期敘述，改為營運是否啟用與工作人員介面／帳號治理未定案 |
 | 1.8 | 2026-05-11 | **§2.0**：`verify:firestore` 工作目錄改明示 **`familyday-backend/`**；補 **`functions.source`** 為 **`.`**、無 **`familyday-backend/functions/**`** 子樹 |
+| 1.9 | 2026-05-13 | **§3 認證與安全**：定案 **Bearer + `sessionStorage`**（跨 Hosting／API）；補鏈 [`ios-mobile-auth-fix-2026-05-13.md`](../setup/ios-mobile-auth-fix-2026-05-13.md)、**`api-v0.1` v0.1.25–v0.1.26**（**v0.1.26**：登入 JSON 形狀） |
 

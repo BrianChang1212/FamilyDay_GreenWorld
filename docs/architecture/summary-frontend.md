@@ -25,6 +25,7 @@
 - **涵蓋範圍（現況）：** `apiBase`、`fetchRewardClaimStatus`／dashboard 映射、`rewardClaimPresentation`、`demoState`、`entryIntent`、`provisionalFinishClaim` 等；**未**含各 `.vue` 畫面之完整 E2E。  
 - **指令：** `familyday-frontend/` 內 **`npm run test`**（單次）、**`npm run test:watch`**、**`npm run test:coverage`**。  
 - **CI：** [`.github/workflows/ci.yml`](../../.github/workflows/ci.yml) 對 **`main`** 之 push／PR：**`npm ci` → `npm run test` → `npm run build`**。
+- **API 認證（跨網域／iOS · 2026-05）：** 闖關登入 **`POST /api/v1/auth/login`** 回 JSON **`ok`**、**`token`**、**`user`**（與後端一致）；前端以 **`lib/sessionToken.ts`** 存 **`sessionStorage`**，並以 **`Authorization: Bearer`** 呼叫需身分端點（詳見 [`docs/setup/ios-mobile-auth-fix-2026-05-13.md`](../setup/ios-mobile-auth-fix-2026-05-13.md)、[`api-v0.1.md`](../api/api-v0.1.md) **v0.1.25–v0.1.26**）。
 
 ---
 
@@ -190,7 +191,7 @@ flowchart TD
 ## 6. 待後續定案／依賴
 
 - 主視覺與 CIS 時程（README 所載與設計對齊）。  
-- 簽到與闖關是否**同一網域**或子路徑（影響 Cookie 與 CORS）；**建議**同一網域以便單一登入狀態（與 `docs/project/project-master.md` §2.4 一致）。  
+- 簽到與闖關是否**同一網域**或子路徑（影響 Cookie 與 CORS）；**建議**同一網域以便單一登入狀態（與 `docs/project/project-master.md` §2.4 一致）。**實作（2026-05）：** 跨網域時闖關主路徑已改 **Bearer**（見 §1.1、`api-v0.1` **v0.1.25–v0.1.26**）。  
 - **未報到是否允許進闖關**（路由守衛或後端拒絕；產品定案）。  
 - OpenAPI／型別產生與否（可選 `openapi-typescript` 等）。
 
@@ -233,4 +234,6 @@ flowchart TD
 | 1.30 | 2026-05-03 | **§4**：靜態預覽長文改指向 [`docs/setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；`summary-deployment` **§1.1** 連動 **v1.6** |
 | 1.31 | 2026-05-05 | 版本鏈同步：`api-v0.1` **v0.1.21**（規格書 **`fdgw.project.json`**／CORS／mock `eventId` 註記；**無** REST 契約變更）；供 `project-master`／根 **`README`** 頁尾對齊 |
 | 1.32 | 2026-05-11 | **§2.1／§2.2**：報到改為 **`/checkin` 歡迎 + `/checkin/register` 表單**（`CheckInWelcomeView`／`CheckInFormView`、`beforeEnter`、Vue Router **`name: "checkin"`** 指表單路由）；Mermaid **§2.2** 補歡迎節點；**`/register`** 錯誤意圖時 **replace `checkinWelcome`**（與程式一致）；**v1.9** 列保留為當時「單頁」假設之歷史紀錄 |
+| 1.33 | 2026-05-13 | **§1.1**：補 **Bearer**／**`sessionStorage`** API 認證（對齊 **`api-v0.1` v0.1.25**、[`ios-mobile-auth-fix-2026-05-13.md`](../setup/ios-mobile-auth-fix-2026-05-13.md)） |
+| 1.34 | 2026-05-13 | **§1.1／§6**：登入回 **`ok`**／**`user`** 與契約 **v0.1.26** 對齊；版本鏈連動根 **`README` v2.73**／**`project-master` v1.3.49** |
 

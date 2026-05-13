@@ -1,7 +1,7 @@
 # 家庭日闖關系統 — 專案主文件（合併版）
 
 > **專案：** 瑞軒 2026 家庭日闖關系統  
-> **最後更新：** 2026-05-11  
+> **最後更新：** 2026-05-13  
 > **工作約定（執行來源）：** **進度現況**（View／API 函式數／測試檔數／端點與阻塞敘述）以根目錄 [`README.md`](../../README.md#readme-live-progress) **「即時進度」** 區塊為準；**待辦勾選與行動清單**以本檔 [§ 待辦事項](#work-backlog) 為準。二者並列為日常跟進來源，更新時請避免只靠本檔舊數字敘述。根 README 長文已遷至 [`overview/root-readme-supplement.md`](../overview/root-readme-supplement.md)。  
 > 前端流程與路由見 [`summary-frontend.md`](../architecture/summary-frontend.md)
 > §2.1–§2.3；測試 Web UI／Netlify 預覽見根
@@ -108,7 +108,7 @@
 
 ##### 已確認（方向）
 
-- **實作架構（2026-04-18 補充；現況 2026-05-11 更新）：** 簽到與闖關為**同一 Web 應用程式**、**獨立路由**。**歷史原型（`source/` 等）：** 報到曾描述為 **`/checkin` 單頁**（姓名／員編／同行人數＋確認）。**`familyday-frontend` 現況：** **`/checkin`** 為**報到歡迎／引導**（`CheckInWelcomeView`），表單在 **`/checkin/register`**（`CheckInFormView`）；路由細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) §2.1。**闖關**身分為 **`/register`**（姓名／員編）。可共用表單樣式元件，但** URL 與欄位**分流。
+- **實作架構（2026-04-18 補充；現況 2026-05-13 更新）：** 簽到與闖關為**同一 Web 應用程式**、**獨立路由**。**歷史原型（`source/` 等）：** 報到曾描述為 **`/checkin` 單頁**（姓名／員編／同行人數＋確認）。**`familyday-frontend` 現況：** **`/checkin`** 為**報到歡迎／引導**（`CheckInWelcomeView`），表單在 **`/checkin/register`**（`CheckInFormView`）；路由細節見 [`summary-frontend.md`](../architecture/summary-frontend.md) §2.1。**闖關**身分為 **`/register`**（姓名／員編）。可共用表單樣式元件，但** URL 與欄位**分流。
 - **進入點（2026-04-18 補充；路徑 2026-05-11）：** 以**不同 QR code（或不同 URL）** 區分意圖——**掃報到用 QR** → **`/check-in`**（寫入意圖）→ **`/checkin`** 歡迎 → **`/checkin/register`** 表單；**掃闖關入口 QR** → **`/` 歡迎** → 說明 → **`/register`** → 關卡／地圖。若 URL 帶有站點參數（例如某關 JWT／站點代碼），身分就緒後再接續**到站驗證／題目頁**（細節見 [`api-v0.1.md`](../api/api-v0.1.md) 站點 JWT）。應保留 `entry`、`station` 等 query 或使用 `sessionStorage`，避免流程沖掉導向目標。
 
 ```
@@ -279,20 +279,20 @@
 
 ## 專案狀態
 
-> **最後更新：** 2026-05-11。**所有計數與阻塞敘述**以根 [`README.md`](../../README.md#readme-live-progress) **即時進度**為準（與本段若有差異，**以 README 表格為準**）。  
-> **專案階段：** 開發驗證與阻塞解除（Firestore IAM、正式簽核、壓測與上線基線）。
+> **最後更新：** 2026-05-13。**所有計數與阻塞敘述**以根 [`README.md`](../../README.md#readme-live-progress) **即時進度**為準（與本段若有差異，**以 README 表格為準**）。  
+> **專案階段：** **Firebase Hosting 已上架**；報到／闖關**全端手動驗收通過**（2026-05-13，見 [`api-integration-checklist.md`](../testing/api-integration-checklist.md) §7）。仍待：**本機／自動化** Firestore 閉環、正式簽核、壓測與上線安全基線。
 
 ### 里程碑（概估）
 
 需求與**前端主力功能**已落地；技術簽核、Firestore 端到端實證、壓測與正式部署仍待收斂。細部百分比不再於此重複維護。
 
-### 快照（與 README 對齊 · 2026-05-11）
+### 快照（與 README 對齊 · 2026-05-13）
 
 | 面向 | 摘要 |
 |------|------|
-| 前端 | **10** View（Welcome → Finish）；**11** 支 `api/` 函式；Vitest **14** 測試檔、CI 通過；**`/finish`** 領獎與三格狀態；舊 **`/finish/claimed`** → **`/finish`** |
+| 前端 | **10** View（Welcome → Finish）；**11** 支 `api/` 函式；Vitest **14** 測試檔、CI 通過；**`/finish`** 領獎與三格狀態；舊 **`/finish/claimed`** → **`/finish`**；**認證：** Bearer + **`sessionStorage`**（[`ios-mobile-auth-fix-2026-05-13.md`](../setup/ios-mobile-auth-fix-2026-05-13.md)、**`api-v0.1` v0.1.25–v0.1.26**） |
 | 後端 | **19** 端點；四集合 Firestore + in-memory；redeem transaction；**出席報表** **`total`**＝**`roster`** 計數、**`checkedIn`**＝**`checkins`**；**進度報表** **`players`／`fullClear`** 仍占位 |
-| 驗證 | 整合測試 in-memory Pass 17；**`verify:firestore` Blocked**（本機缺 `GOOGLE_APPLICATION_CREDENTIALS`） |
+| 驗證 | **Firebase Hosting**：報到＋闖關全流程手動驗收 **Pass**（符合需求；Bearer 主線；2026-05-13）。整合測試 in-memory Pass 17（歷史）；**`verify:firestore` 本機**仍可能 **Blocked**（缺 `GOOGLE_APPLICATION_CREDENTIALS`） |
 | 產品／主辦 | [待確認與會議](#待確認與會議) H1～H5；設計 D1/D2 |
 
 **細節：** [`summary-frontend.md`](../architecture/summary-frontend.md)、[`api-v0.1.md`](../api/api-v0.1.md)、[§ 待辦事項](#work-backlog)。
@@ -311,10 +311,12 @@
 | 2026-04-10 | 闖關到站以實體 QR 取代 GPS | 減少定位誤差 | 須場勘確認布點與防偽 |
 | 2026-04-27 | **後端架構定案**（Vue+Vite+Firebase、API v0.1、流量與部署摘要） | 與會議成本估算及維運策略對齊，降低後端維運負擔 | 見本檔開頭補充文件表；後端以 Firebase 為準 |
 | 2026-04-15 | **`source/` 前端可建置原型**（Vue Router、Tailwind、示範流程） | 驗證技術鏈與 UX 假設；與後端解耦 | Naive UI 未裝；見 `summary-frontend.md` v1.1 |
-| 2026-04-16 | **完成頁 `/finish` 領獎流程（原型）** | 對齊主規則表之次數／份數上限與櫃台驗證情境；先以瀏覽器暫存類比領取次數 | 見 `summary-frontend.md` v1.2（**現況**見 **v1.31**）；**REST 準線**見 [`api-v0.1.md`](../api/api-v0.1.md) **以檔首修訂為準**（**v0.1.24**／**v0.1.23**／**v0.1.22** 等均為文件維護：**無** REST 語意變更）。玩家 **`POST …/me/reward/claim`** 與櫃台 **`staff/redeem/*`** 已列 MVP；後端已落地，營運是否啟用依主辦 |
+| 2026-04-16 | **完成頁 `/finish` 領獎流程（原型）** | 對齊主規則表之次數／份數上限與櫃台驗證情境；先以瀏覽器暫存類比領取次數 | 見 `summary-frontend.md` v1.2（**現況**見 **v1.33**）；**REST 準線**見 [`api-v0.1.md`](../api/api-v0.1.md) **以檔首修訂為準**（**v0.1.26** 登入 JSON 示例；**v0.1.25** Bearer；**v0.1.24** 等文件維護：**無** REST 語意變更）。玩家 **`POST …/me/reward/claim`** 與櫃台 **`staff/redeem/*`** 已列 MVP；後端已落地，營運是否啟用依主辦 |
 | 2026-04-30 | Cloud Functions 作為首階段後端執行層 | 可快速承接既有 REST 契約並以最小變更完成前後端聯調 | 核心與 Phase 2 端點已落地，前端可直接驗證 |
 | 2026-04-30 | CORS 採固定 allowlist 白名單策略 | 先堵住任意 Origin 風險，符合活動前最小安全基線 | 白名單來源可通過，非白名單不回傳 ACAO |
 | 2026-04-30 | Firestore 採環境旗標切換（`FDGW_USE_FIRESTORE`） | 允許 in-memory 與 Firestore 並行驗證，降低切換風險 | 目前阻塞點聚焦為 IAM 權限，便於分工追蹤 |
+| 2026-05-13 | **闖關 SPA 認證改 Bearer（跨 Firebase Hosting ↔ Cloud Run）** | iOS／WebKit ITP 與 CDN 對第三方 Cookie 限制導致無法依 Cookie 維持登入；改 **`login` 回 `token`** + **`Authorization: Bearer`** + **`sessionStorage`** | 見 [`docs/setup/ios-mobile-auth-fix-2026-05-13.md`](../setup/ios-mobile-auth-fix-2026-05-13.md)；契約 **`api-v0.1` v0.1.25–v0.1.26**、`system-architecture` v1.3–v1.4 |
+| 2026-05-13 | **Firebase Hosting 上架後全端驗收（報到＋闖關）** | 於線上環境走完整使用者動線，確認 UI／API 與需求一致 | **Go（UX／功能）**；紀錄於 [`api-integration-checklist.md`](../testing/api-integration-checklist.md) §7 與 [`api-integration-history.md`](../testing/api-integration-history.md)；不等同 §1–§6 CLI 全自動逐項 |
 
 ---
 
@@ -345,14 +347,14 @@
 
 <a id="work-backlog"></a>
 
-### 待辦事項（2026-05-11 更新）
+### 待辦事項（2026-05-13 更新）
 
 **工作約定：** 日常跟進以本節為**待辦權威**；**進度數字**以根 [`README.md`](../../README.md#readme-live-progress) **即時進度**為準。完成項目請於此勾選並視需要同步 README 摘要。
 
 #### 高優先級
 - [ ] **Firestore IAM 憑證設定**（擇一）：安裝 gcloud → `gcloud auth application-default login`；或 Firebase Console 下載 SA JSON → 設定 `GOOGLE_APPLICATION_CREDENTIALS`
 - [ ] 重跑 `familyday-backend/`：`npm run verify:firestore` 並確認 Firestore 四集合寫入/讀取成功
-- [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、Cookie）
+- [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、**Bearer／sessionStorage（XSS）**、Cookie 相容）
 
 #### 中優先級
 - [ ] **`GET /admin/reports/progress` 占位欄位** — 將 **`players`／`fullClear`** 改為 **`player_progress`**（及／或 **`attempts`**）真實聚合；現 **`redeemed`** 已來自 **`getRedeemSummary()`**（見 **`familyday-backend/src/routes/admin.ts`**）
@@ -431,4 +433,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.46 · 2026-05-11（**移除** **`familyday-api-contract/`** 目錄；契約治理 **`docs/api/README.md`**、根 **`.github/CODEOWNERS`**；前版 **v1.3.45**）
+**文件版本：** 合併版 v1.3.52 · 2026-05-13（**`qr-entry-links`** 入口 QR 入庫說明；根 **`README` v2.76**／[`hosting-public-entry-urls`](../setup/hosting-public-entry-urls.md) **v1.3**；前版 **v1.3.51**）

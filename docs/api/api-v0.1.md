@@ -2,7 +2,7 @@
 
 > **維護索引：** [`docs/api/README.md`](./README.md) · [`CHANGELOG.md`](./CHANGELOG.md) · [`/.github/CODEOWNERS`](../../.github/CODEOWNERS)
 
-> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.24** MVP 落地表：**`admin/reports/*`** 備註與 **`familyday-backend/src/routes/admin.ts`** 對齊；**無**契約變更；**v0.1.23** §11：**Vitest** 範例路徑對齊 **`familyday-frontend/src/api/`**；**無**契約變更；**v0.1.22** 文件維護：Mock／MVP 敘述路徑對齊 **`familyday-frontend/mock`**、**`familyday-backend/`**；**無** REST 契約變更；**v0.1.21** 文件維護：`corsOrigins`／mock `eventId` 對齊 **`fdgw.project.json`**；**v0.1.20** 補前端原型：`inZone`／**`pendingStationChallenge`** 與 **`challengeId` query** 綁定註記，避免未掃碼卻進預設題組；**v0.1.19** 任意順序通關：`dashboard.stages[].locked` 語意、`attempts` 回應補 **`completedStageIds`**／**`allStagesCompleted`**；**v0.1.18** 聯調註記 CORS 白名單與 **`familyday-backend/src/index.ts`** 對齊；**v0.1.17** Mock／整合清單與 **`me/progress`** 對齊；**v0.1.16** 補列 **`GET /api/v1/me/progress`** 落地狀態；**v0.1.15** 文件與 §13 流程圖路徑對齊；**v0.1.14** 同步 Cloud Functions：`auth/checkin` 改走 Firestore roster 驗證，`admin/roster/import` 實作 Firestore 寫入；**v0.1.13** 完成 CORS allowlist 收斂驗證；**不改**端點定義）。
+> 狀態：**假設草案**，供前後端對齊；簽到與闖關登入**分開**、站點 QR 為 **signed JWT**、進度為**作法 A（無獨立 runId）**、關卡瀏覽使用**單一合併** **`GET /api/v1/me/dashboard`**。修訂紀錄見文末（**v0.1.26** §4：**`POST …/auth/login`** 回應示例對齊 **`familyday-backend/src/routes/auth.ts`**（**`ok`**、**`user`**）；**無**契約變更；**v0.1.25** **全域約定／MVP 認證敘述**：SPA 以 **`Authorization: Bearer`** + 登入 JSON **`token`** 為準（Firebase Hosting ↔ Cloud Run 跨網域）；**無** REST 路徑或請求體契約變更；**v0.1.24** MVP 落地表：**`admin/reports/*`** 備註與 **`familyday-backend/src/routes/admin.ts`** 對齊；**無**契約變更；**v0.1.23** §11：**Vitest** 範例路徑對齊 **`familyday-frontend/src/api/`**；**無**契約變更；**v0.1.22** 文件維護：Mock／MVP 敘述路徑對齊 **`familyday-frontend/mock`**、**`familyday-backend/`**；**無** REST 契約變更；**v0.1.21** 文件維護：`corsOrigins`／mock `eventId` 對齊 **`fdgw.project.json`**；**v0.1.20** 補前端原型：`inZone`／**`pendingStationChallenge`** 與 **`challengeId` query** 綁定註記，避免未掃碼卻進預設題組；**v0.1.19** 任意順序通關：`dashboard.stages[].locked` 語意、`attempts` 回應補 **`completedStageIds`**／**`allStagesCompleted`**；**v0.1.18** 聯調註記 CORS 白名單與 **`familyday-backend/src/index.ts`** 對齊；**v0.1.17** Mock／整合清單與 **`me/progress`** 對齊；**v0.1.16** 補列 **`GET /api/v1/me/progress`** 落地狀態；**v0.1.15** 文件與 §13 流程圖路徑對齊；**v0.1.14** 同步 Cloud Functions：`auth/checkin` 改走 Firestore roster 驗證，`admin/roster/import` 實作 Firestore 寫入；**v0.1.13** 完成 CORS allowlist 收斂驗證；**不改**端點定義）。
 
 ---
 
@@ -12,9 +12,9 @@
 |------|------|
 | API Base | `/api/v1` |
 | 格式 | `Content-Type: application/json` |
-| 認證 | 簽到／闖關登入成功後建議使用 **HTTP-only Cookie（session）**；需登入的 API 未帶有效 session 時回 **401** |
+| 認證 | **需登入端點（2026-05 定案）：** `POST /api/v1/auth/login` 成功後回應 JSON 含 **`token`**（字串）；後續請求應附 **`Authorization: Bearer <token>`**。後端若仍下發 **HTTP-only session Cookie**，可比對 Cookie **或** Bearer（實作以 **`familyday-backend`** 為準）；皆無效時回 **401**。細節與 iOS 跨網域背景見 [`docs/setup/ios-mobile-auth-fix-2026-05-13.md`](../setup/ios-mobile-auth-fix-2026-05-13.md)。 |
 | 傳輸加密 | **正式環境必須使用 HTTPS（TLS 1.2+）**；禁止明文 HTTP 傳輸個資或 token |
-| Cookie 安全 | Session Cookie 應設定 `HttpOnly`、`Secure`、`SameSite=Lax`（跨站需求再評估 `SameSite=None; Secure`） |
+| Cookie／token 安全 | **Cookie（選用）：** `HttpOnly`、`Secure`、`SameSite` 依網域評估（Hosting 與 API **不同站**時常需 **`SameSite=None; Secure`**）。**Bearer：** 前端慣存 **`sessionStorage`**，須控管 **XSS**（見上連結之安全注意）。 |
 | 敏感資料保護 | 工號、姓名、token、JWT 不可寫入前端可見 URL query；日誌需遮罩（mask）個資與憑證 |
 | 錯誤 | 建議 `{ "code": "STRING", "message": "人可讀說明" }` |
 | 限流 | **每位使用者每分鐘最多 30 次請求**（可再細分 bucket）；`login`、`checkin` 建議獨立或較嚴格 |
@@ -32,7 +32,7 @@
 | 架構定案來源 | 以 `docs/architecture/summary-backend.md`（v1.6）為準：Firebase（Firestore 為主，Realtime Database 視場景啟用） |
 | API 契約定位 | 本文件維持「HTTP API 契約層」；底層可由 Cloud Functions / Cloud Run / Server 介面實作，對前端契約不變 |
 | 資料主來源 | 簽到、闖關進度、作答、領獎等交易資料以 Firestore 為主；Google Sheet 僅作匯入/匯出與報表輔助 |
-| 認證與授權 | `auth/*`、`staff/*` 端點之身份驗證與權限檢查，需對齊 Firebase Authentication 與 Security Rules/後端授權策略 |
+| 認證與授權 | 後端 **`authGuard`**：**`Authorization: Bearer`**（SPA 主路徑）與 **session Cookie**（選用相容）；**`staff/*`**／**`admin/*`** 仍依路由各自檢查；CORS 須允許 **`Authorization`** header（見 **`familyday-backend/src/index.ts`**）；Security Rules 與 Admin SDK 邊界見 `summary-backend.md` |
 | 站點 QR 安全 | `stations/verify` 仍以 signed JWT 驗簽、`exp`、`jti` 防重播為最低要求；不得僅信任前端傳入站點參數 |
 | 成本與容量 | 用量估算、預算告警與連線策略以 `summary-backend.md`、`summary-traffic.md`、`summary-deployment.md` 為準，本檔不重複維護計價表 |
 
@@ -60,9 +60,9 @@
 |------|------|------|
 | `GET /api/v1/health` | 已落地 | 存活檢查 |
 | `GET /api/v1/health/ready` | 已落地 | 就緒檢查 |
-| `POST /api/v1/auth/login` | 已落地 | 以員編+姓名比對 **Firestore `roster`**，回傳 HTTP-only cookie session |
-| `GET /api/v1/auth/me` | 已落地 | 需帶有效 session；否則 401 |
-| `POST /api/v1/auth/logout` | 已落地 | 清除 session cookie |
+| `POST /api/v1/auth/login` | 已落地 | 以員編+姓名比對 **Firestore `roster`**；回應 JSON **`token`**（SPA 主路徑）；可另設 **HTTP-only Cookie** 作相容 |
+| `GET /api/v1/auth/me` | 已落地 | 需有效 **Bearer** 或（若啟用）session **Cookie**；否則 **401** |
+| `POST /api/v1/auth/logout` | 已落地 | 清除伺服器 session／Cookie；前端應清除 **`sessionStorage`** 內 token |
 | `POST /api/v1/checkin` | 已落地 | 名冊比對通過後寫入 `checkins`（`FDGW_USE_FIRESTORE=true` 時落地 Firestore） |
 | `GET /api/v1/checkin/status` | 已落地 | 回傳最新或指定員編報到狀態 |
 | `GET /api/v1/me/dashboard` | 已落地 | 回傳 stages + progress 最小欄位集 |
@@ -142,7 +142,7 @@
 
 | 方法 | 路徑 | 說明 |
 |------|------|------|
-| POST | `/api/v1/auth/login` | 工號＋姓名驗證（名冊），建立**闖關用 session** |
+| POST | `/api/v1/auth/login` | 工號＋姓名驗證（名冊），建立闖關身分；回 **`token`**（Bearer）；Cookie 為選用相容 |
 | POST | `/api/v1/auth/logout` | 登出 |
 | GET | `/api/v1/auth/me` | 目前登入者摘要（工號、顯示名等） |
 
@@ -154,6 +154,21 @@
   "name": "王小明"
 }
 ```
+
+**`POST /api/v1/auth/login` 回應體（示例）**
+
+```json
+{
+  "ok": true,
+  "token": "<opaque_signed_payload>",
+  "user": {
+    "employeeId": "E12345",
+    "name": "王小明"
+  }
+}
+```
+
+> 與 **`familyday-backend/src/routes/auth.ts`** 一致；另可 **`Set-Cookie`**（**`fdgw_session`**）。前端 **`authLogin.ts`** 至少需要 **`token`** 字串以組 **`Authorization: Bearer`**。**`GET /api/v1/auth/me`** 另回 **`displayName`**（等於 **`name`**），與登入 **`user`** 欄位命名不必相同。
 
 ---
 
@@ -388,7 +403,7 @@ flowchart LR
 |------|------|--------------|
 | Player | `/entry/verify` | 入口 QR 驗證（選用） |
 | Player | `/checkin`、`/checkin/status` | 報到送出與報到狀態回查 |
-| Player | `/auth/login`、`/auth/logout`、`/auth/me` | 闖關登入、登出、頁面重整後 session 恢復 |
+| Player | `/auth/login`、`/auth/logout`、`/auth/me` | 闖關登入（取 **`token`**）、登出、**Bearer**／Cookie 下查 **`auth/me`** |
 | Player | `/me/dashboard` | 關卡總覽、進度刷新、領取成功頁狀態顯示 |
 | Player | `/me/progress` | 除錯／聯調讀取 raw **`player_progress`**（主流程仍以 **`/me/dashboard`** 為準） |
 | Player | `/stations/verify`、`/challenges/*` | 到站驗證與作答循環 |
@@ -426,9 +441,8 @@ sequenceDiagram
   else 闖關路徑
     U->>FE: 填闖關登入
     FE->>API: POST /api/v1/auth/login
-    API-->>FE: Session 建立成功
-
-    FE->>API: GET /api/v1/me/dashboard
+    API-->>FE: 200 + JSON（含 token；SPA 存 sessionStorage）
+    FE->>API: GET /api/v1/me/dashboard（Authorization: Bearer）
     API->>DB: 讀取關卡與進度
     API-->>FE: stages + progress
 
@@ -497,4 +511,6 @@ sequenceDiagram
 | v0.1.22 | 2026-05-11 | 實作路徑註記與 monorepo 對齊：**Mock** 改為 **`familyday-frontend/mock`**；**MVP 落地**敘述改為 **`familyday-backend/`**（`src/index.ts`）；CORS 載入說明同步；**無** REST 或 JSON 契約變更 |
 | v0.1.23 | 2026-05-11 | **§11**：**Vitest** 示例路徑 **`source/src/api/`** → **`familyday-frontend/src/api/rewardClaimStatus.test.ts`**（與 mono-repo 目錄一致）；**無** REST 或 JSON 契約變更 |
 | v0.1.24 | 2026-05-11 | **後端 MVP 落地狀態**表格：補 **`admin/reports/attendance`**（**`roster`／`checkins`**）與 **`admin/reports/progress`**（**`redeemed`** vs **`players`／`fullClear`** 占位）與 **`admin.ts`** 一致；**無** REST 或 JSON 契約變更 |
+| v0.1.25 | 2026-05-13 | **全域約定**／**MVP 表**／**§12–§13**：SPA **`Bearer`** + 登入 **`token`**；Cookie 相容；§4 先補示例草稿（**v0.1.26** 改與 **`auth.ts`** 一致：**`ok`**／**`user`**）；**無** REST 路徑契約變更 |
+| v0.1.26 | 2026-05-13 | **§4**：登入成功 JSON 示例改與 **`auth.ts`** 一致（**`ok`**、**`user`**）；釐清 **`auth/me`** 之 **`displayName`**；**無** REST 契約變更 |
 

@@ -11,7 +11,7 @@
 ## 0) 測試前準備（必做）
 
 - `VITE_API_BASE` 已指向目標 API（本機常用 `/fdgw-emulator-api`）。
-- 已清除瀏覽器 session / localStorage（避免前次狀態污染）。
+- 已清除瀏覽器 **`sessionStorage`**（含前端 **`sessionToken`**／`STORAGE_KEYS.sessionToken`）、Cookie、`localStorage`（避免殘留登入／報到狀態）。
 - 若用 Firestore：已設定 `GOOGLE_APPLICATION_CREDENTIALS`、`GOOGLE_CLOUD_PROJECT`、`FDGW_USE_FIRESTORE=true`。
 - `fdgw.project.json` 與 `familyday-backend/.firebaserc` 的專案 ID 一致。
 
@@ -39,10 +39,10 @@
 
 ## 3) 登入與主畫面
 
-- `POST /api/v1/auth/login` 可建立 session。
-- `GET /api/v1/auth/me` 可回傳登入者。
+- `POST /api/v1/auth/login` 成功回 **`token`**（與 **`ok`**、**`user`**；見 **`api-v0.1` §4**）；後端可併發 **`Set-Cookie`**（**`fdgw_session`**）。後續需授權呼叫附 **`Authorization: Bearer <token>`**（與 **`familyday-frontend/src/lib/sessionToken.ts`** 一致）。
+- `GET /api/v1/auth/me` 以 Bearer／Cookie 皆可（**`getSessionUser`**），應回登入者摘要。
 - `GET /api/v1/me/dashboard` 回傳 `stages + progress`。
-- `POST /api/v1/auth/logout` 後再呼叫需授權 API 應回 401。
+- `POST /api/v1/auth/logout` 後再呼叫需授權 API 應回 401；前端應清除 **`sessionStorage`** 內 token。
 
 ---
 
@@ -58,7 +58,7 @@
 
 - `POST /api/v1/me/playthrough/restart`：條件符合成功，不符合回 409。
 - `POST /api/v1/me/reward/claim`：符合規則成功，不符合回 409。
-- 若啟用 staff：`/staff/redeem/token`、`/staff/redeem/confirm` 正常且防重覆核銷。
+- 若啟用 staff：**`POST /staff/redeem/token`** 須**已登入玩家**（Bearer／Cookie，`getSessionUser`）；**`POST /staff/redeem/confirm`** 以 body **`staffId`**／**`token`** 為準，流程正常且防重覆核銷。
 
 ---
 
@@ -73,7 +73,17 @@
 
 ## 7) 執行結果
 
-### 最新一次完整執行（2026-04-30）
+### Firebase Hosting 全端驗收（2026-05-13）
+
+- **執行日期：** 2026-05-13
+- **環境：** **Firebase Hosting** 上架後之線上前後端（與生產／stage 對齊之 **`VITE_API_BASE`**、CORS、Firestore／後端設定依實際部署）
+- **方式：** 手動端到端（報到 **check-in** 路由與表單 → 闖關登入／地圖／到站／作答等主流程）
+- **涵蓋：** 產品需求書與主文件所述之**報到**與**闖關**操作動線（功能與 UX）
+- **結論：** **Go** — **功能與操作皆符合需求**（全端驗收）
+- **實際入口 URL：** 報到 **`https://rare-lattice-495009-i9.firebaseapp.com/checkin`** · 闖關 **`https://rare-lattice-495009-i9.firebaseapp.com/`**（詳見 [`hosting-public-entry-urls.md`](../setup/hosting-public-entry-urls.md)）
+- **備註：** 本條為**上架環境 UX／功能**判定；**不取代**下列 dated 區塊之 **CLI／Emulator** 或 **`verify:firestore` 本機**紀錄。若需附件證據，請補連結／HAR／截圖至此節或 [`api-integration-history.md`](./api-integration-history.md)。
+
+### 最新一次完整執行（2026-04-30 · CLI／Emulator）
 
 - **執行日期：** 2026-04-30
 - **環境（dev/stage）：** dev — Functions Emulator (port 5003) + in-memory roster
@@ -83,6 +93,10 @@
 - **證據：** CLI 驗證：`health/ready/login/me/checkin/status/dashboard/stations/verify/challenges/attempts/restart(409)/staff/redeem/admin/reports`；CORS allowlist 驗證（`evil.example.com` 無 ACAO）
 - **結論：** **Go（dev in-memory）**；**Blocked（Firestore）** — `PERMISSION_DENIED` on `familyday-greenworld-dev`
 - **備註：** Firestore IAM 授權未完成（`firebase login:list` 顯示 No authorized accounts）；IAM 到位後需重跑 `npm run verify:firestore`
+
+### 驗證說明（2026-05-13 · 文件／認證對齊）
+- **登入主線：** **`POST …/auth/login`** → **`token`** → 後續 **`Authorization: Bearer`**（**`api-v0.1` v0.1.25–v0.1.26**）；後端 Cookie 為相容路徑。
+- **§7 各 dated 區塊**：為該日期當時執行結果；若尚未以 Bearer 主線重跑「§1–§6 自動／半自動證據」，請勿將舊日期等同「含現行 SPA 認證」之完整回歸。
 
 ### Firestore 待驗狀態（截至 2026-05-10）
 

@@ -22,12 +22,12 @@ flowchart LR
 	end
 	User(("參與者\n瀏覽器"))
 	User --> SPA
-	SPA -->|"HTTPS\nfetch(..., credentials: 'include')\n${VITE_API_BASE}/api/v1/..."| BE
+	SPA -->|"HTTPS\nfetch(..., credentials: 'include')\nAuthorization: Bearer（主）\n${VITE_API_BASE}/api/v1/..."| BE
 	BE -->|"firebase-admin\n(服務帳號 / ADC)"| FS
 ```
 
 - **§1 環境**：`VITE_API_BASE` 決定箭頭「前端 → BE」指向哪一個 API 根。  
-- **§2 跨網域**：Staging 前端網域須列入後端 **CORS**；**Cookie** 必須在該瀏覽器路徑下可送達 API。  
+- **§2 跨網域**：Staging 前端網域須列入後端 **CORS**；後端 **`allowedHeaders`** 須含 **`Authorization`**。前端登入後須帶 **`Authorization: Bearer <token>`**（見 **`familyday-frontend/src/lib/sessionToken.ts`**）；**`fetch(..., credentials: "include")`** 仍可保留（Cookie 相容／雙軌）。  
 - **§4 進度／儀表板**：業務資料讀寫經 BE 落入 **Firestore**（非瀏覽器直連）。
 
 ### Staging：闖關掃碼 → Quiz（成功路徑）
@@ -79,7 +79,8 @@ flowchart TB
 ## 2. 跨網域與登入狀態
 
 - [ ] 與後端確認 **CORS** 已允許 staging 前端來源（可比對根目錄 `fdgw.project.json` 之 `corsOrigins`，staging 網域需列入）。
-- [ ] 確認 **`fetch(..., credentials: "include")`** 所需之 **Cookie**（`SameSite`、`Secure`、網域）在瀏覽器實測可帶上。
+- [ ] 確認 **`Authorization`** 已列於後端 CORS **`allowedHeaders`**（Bearer 流程必填）。
+- [ ] **登入後**：DevTools Network 可見後續 **`/api/v1/*`** 請求帶 **`Authorization: Bearer …`**；若後端仍下發 session Cookie，可並行確認 **`credentials: "include"`** 行為。
 - [ ] **先登入成功**再測闖關；未登入時 `stations/verify` 應為 **401** 等預期行為。
 
 ## 3. 六張正式 QR（JWT）

@@ -9,7 +9,7 @@
 
 ## 1. 系統脈絡圖（C4 Context）
 
-現場參加者與工作人員透過瀏覽器存取前端；前端以 **HTTPS + Cookie（session）** 呼叫後端 API；後端經 **Admin SDK** 讀寫 **Cloud Firestore**。靜態預覽時可僅部署前端（無 API，領獎等以 `sessionStorage` 後備）。
+現場參加者與工作人員透過瀏覽器存取前端；前端以 **HTTPS** 呼叫後端 API；**需登入之請求**以 **`Authorization: Bearer`**（登入回 **`token`**，存 **`sessionStorage`**）為主路徑；後端可另接受 **HTTP-only Cookie** 作相容（見 [`docs/api/api-v0.1.md`](../api/api-v0.1.md) **v0.1.25–v0.1.26**、[`docs/setup/ios-mobile-auth-fix-2026-05-13.md`](../setup/ios-mobile-auth-fix-2026-05-13.md)）。後端經 **Admin SDK** 讀寫 **Cloud Firestore**。靜態預覽時可僅部署前端（無 API，領獎等以 `sessionStorage` 後備）。
 
 ```mermaid
 flowchart LR
@@ -33,7 +33,7 @@ flowchart LR
   S --> CDN
   A --> CDN
   CDN -->|"CSR 載入 SPA\n`familyday-frontend/dist`"| P
-  P -->|"REST `/api/v1/*`\nCookie session"| API
+  P -->|"REST `/api/v1/*`\nBearer（+ Cookie 相容）"| API
   S -->|"staff 端點"| API
   A -->|"admin 端點"| API
   API --> FS
@@ -139,7 +139,7 @@ flowchart LR
 
 ## 5. 後端與資料層
 
-路由處理常式呼叫 `src/state/*`（`roster`、`checkins`、`game`、`redeem` 等），再經 **`src/utils/store.ts`** 切換 **Firestore** 或 **in-memory**。Session／Cookie 與防護見 `utils/session.ts`、`utils/authGuard.ts`。
+路由處理常式呼叫 `src/state/*`（`roster`、`checkins`、`game`、`redeem` 等），再經 **`src/utils/store.ts`** 切換 **Firestore** 或 **in-memory**。Session 驗證（**Bearer** 優先，Cookie 相容）見 **`utils/authGuard.ts`**、**`utils/session.ts`**。
 
 ```mermaid
 flowchart TB
@@ -177,9 +177,9 @@ sequenceDiagram
   B->>API: POST /api/v1/auth/login（員編、姓名）
   API->>FS: 比對 roster
   FS-->>API: OK
-  API-->>B: Set-Cookie（session）
+  API-->>B: JSON（含 token；SPA 存 sessionStorage）
 
-  B->>API: GET /api/v1/me/dashboard
+  B->>API: GET /api/v1/me/dashboard（Authorization: Bearer）
   API->>FS: 讀 stages / player_progress
   FS-->>API: 文件
   API-->>B: JSON（stages + progress）
@@ -235,7 +235,7 @@ sequenceDiagram
 | 項目 | 作法 |
 |------|------|
 | **契約** | [`api-v0.1.md`](../api/api-v0.1.md) **§「後端 MVP 落地狀態」**表格；並另列 **§2 活動／進場**之選用端點（未列入 MVP 表者標示「§2」）。 |
-| **後端** | 列舉 `familyday-backend/src/routes/*.ts` 內 **`Router` 註冊路徑**（掛載於 `src/index.ts` 之 `/api/v1` 前綴下）。掃描日：2026-05-11。 |
+| **後端** | 列舉 `familyday-backend/src/routes/*.ts` 內 **`Router` 註冊路徑**（掛載於 `src/index.ts` 之 `/api/v1` 前綴下）。掃描日：2026-05-13（複核：**19** 端點；契約 **`api-v0.1` v0.1.26** 登入示例對齊 **`auth.ts`**）。 |
 | **正式 SPA** | 於 `familyday-frontend/src` 搜尋 `` `/api/v1` ``；**僅統計執行期會發請求之模組**（`src/api/*.ts`，不含 `*.test.ts`）。 |
 | **Mock** | `familyday-frontend/mock/server.js` 以 pathname 分派之路由（本機聯調／`test-all-api.js` 等）。 |
 
@@ -299,4 +299,6 @@ sequenceDiagram
 | 1.0 | 2026-05-11 | 初稿：依 `familyday-frontend`／`familyday-backend`／`api-v0.1` 彙整之全系統架構圖 |
 | 1.1 | 2026-05-11 | **§8**：程式碼掃描對齊證明（契約 MVP 表 ↔ `routes/*.ts` ↔ `src/api` ↔ `mock/server.js`）；§2 選用端點與後端落差表 |
 | 1.2 | 2026-05-11 | **§8.2**：補 **`admin/reports/*`** 資料來源敘述（**`roster`／`checkins`**、**`redeemed`** vs **`players`／`fullClear`** 占位）；與 `admin.ts` 一致 |
+| 1.3 | 2026-05-13 | **§1／§5／§6.1**：認證敘述改為 **Bearer** 主路徑（**`api-v0.1` v0.1.25–v0.1.26**）；Mermaid 與後端 utils 說明同步 |
+| 1.4 | 2026-05-13 | **§8.1**：掃描日更新；契約登入 JSON 對齊 **`api-v0.1` v0.1.26** |
 

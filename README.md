@@ -26,6 +26,15 @@ npm run dev
 
 **Windows 一鍵（前端 + API + 雲端 Firestore）**、環境變數與故障排除：[`docs/setup/README.md`](docs/setup/README.md)、[`docs/setup/local-firestore-gcp.md`](docs/setup/local-firestore-gcp.md)。
 
+**Firebase Hosting（實際上架 · `firebaseapp.com`）**
+
+| 用途 | URL |
+|------|-----|
+| **報到**（報到歡迎／流程入口） | [https://rare-lattice-495009-i9.firebaseapp.com/checkin](https://rare-lattice-495009-i9.firebaseapp.com/checkin) |
+| **闖關**（首頁歡迎 → 說明／登入） | [https://rare-lattice-495009-i9.firebaseapp.com/](https://rare-lattice-495009-i9.firebaseapp.com/) |
+
+同專案另有 **`https://rare-lattice-495009-i9.web.app`**（與上列路徑相同）。**現場入口 QR：** 已內建於 [`familyday-frontend/public/qr-entry-links/`](familyday-frontend/public/qr-entry-links/)（**`entry-check-in.png`** → **`/check-in`** 報到；**`entry-game.png`** → **`/game`** 闖關與**登入**）；部署後亦可自 **`/qr-entry-links/…`** 下載列印。詳見該目錄 **`README.md`** 與 [`docs/setup/hosting-public-entry-urls.md`](docs/setup/hosting-public-entry-urls.md)。
+
 核心入口：
 
 | 用途 | 連結 |
@@ -44,15 +53,15 @@ npm run dev
 
 > **工作約定：** **本表**為**進度現況**之**權威**來源（View／API 函式數／測試檔數等）。**待辦勾選與完整行動清單**以 [`docs/project/project-master.md` § 待辦事項](docs/project/project-master.md#work-backlog) 為準。
 
-> 2026-05-11 依原始碼掃描更新；同日 **對齊**後端：`admin/reports/attendance` 之 **`total`／`checkedIn`**、`admin/reports/progress` **占位欄位**見 [`familyday-backend/src/routes/admin.ts`](familyday-backend/src/routes/admin.ts)。
+> **計數／端點：** 2026-05-11 依原始碼掃描（仍有效；後端 **19** 端點、前端 **10** View／**11** API 函式／**14** 測試檔）。**2026-05-13** 起 **文件完整對齊**：**SPA** **`Authorization: Bearer`** + **`sessionStorage`**；契約 **`api-v0.1` v0.1.25–v0.1.26**（含 **`POST …/auth/login`** 回 **`ok`**／**`token`**／**`user`**，見 **`familyday-backend/src/routes/auth.ts`**）；**`system-architecture` v1.4**（§8.1 掃描日）；**`api-integration-checklist`** Bearer 前置與 §7 說明；**`project-master` v1.3.52**。**同日：** **Firebase Hosting 上架後**已做**全端手動驗收**——**報到（check-in）**與**闖關**主流程之功能與操作**符合需求**（紀錄見 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §7、`docs/testing/api-integration-history.md`）。背景見 [`docs/setup/ios-mobile-auth-fix-2026-05-13.md`](docs/setup/ios-mobile-auth-fix-2026-05-13.md)。**admin/reports**：**`total`／`checkedIn`**、**`progress`** 占位見 [`familyday-backend/src/routes/admin.ts`](familyday-backend/src/routes/admin.ts)。
 
 | 面向 | 現況 |
 |------|------|
-| 前端 | 10 個 View **全數完整實作**（WelcomeView → FinishView；舊 **`/finish/claimed`** 僅 redirect **`/finish`**）；API 層 11 支函式對應真實端點；14 個測試檔無 skip/stub；CI 通過 |
+| 前端 | 10 個 View **全數完整實作**（WelcomeView → FinishView；舊 **`/finish/claimed`** 僅 redirect **`/finish`**）；API 層 11 支函式對應真實端點；14 個測試檔無 skip/stub；CI 通過；**闖關 API 呼叫附 Bearer**（`familyday-frontend/src/lib/sessionToken.ts`） |
 | API | **19** 個端點均已實作。**`GET /admin/reports/attendance`**：**`total`**＝Firestore **`roster`**（現行 **`eventId`** 下名冊筆數）；**`checkedIn`**＝**`checkins`** 計數。**`GET /admin/reports/progress`**：**`redeemed`** 取自核銷摘要；**`players`／`fullClear`** 仍為 **`admin.ts`** 占位常數（待對齊 `player_progress` 聚合） |
 | 後端資料層 | roster / checkins / player_progress / redeem 四集合已完整實作 Firestore + in-memory 雙模式切換；阻塞點為本機 IAM 憑證未設定（`GOOGLE_APPLICATION_CREDENTIALS`） |
-| 測試 | 前端 Vitest **14** 檔通過（與上列「前端」列一致）；後端 4/30 聯調驗證 Pass 17（in-memory）；Firestore 驗證 Blocked（憑證未設定）；後端單元測試待補齊 |
-| 部署 | dev/stage 可驗證上架；正式上線需先完成 Firestore IAM 憑證設定、Security Rules 與安全基線 |
+| 測試 | 前端 Vitest **14** 檔通過（與上列「前端」列一致）；後端 4/30 聯調驗證 Pass 17（in-memory）；**Firebase Hosting 上架環境**：報到＋闖關**全端手動驗收 Pass**（符合需求；2026-05-13）；Firestore **本機腳本**驗證仍可能 Blocked（憑證未設定）；後端單元測試待補齊 |
+| 部署 | **Firebase Hosting 已上架**並完成上述主流程驗收；正式上線仍須完成 Firestore IAM／Security Rules／安全基線與主辦簽核事項 |
 
 ---
 
@@ -63,7 +72,7 @@ npm run dev
 
 **本週摘要（與主文件對齊；勾選以 `project-master` 為準）**
 
-- **高優先：** Firestore IAM、`verify:firestore`、回填 `api-integration-checklist`、安全基線清單、`VITE_API_BASE`／CORS
+- **高優先：** Firestore IAM、`verify:firestore`、回填 `api-integration-checklist`、安全基線清單（**Bearer／XSS**、`VITE_API_BASE`）、CORS
 - **中優先：** runbook、Security Rules、後端單元測試、**補強 `GET …/admin/reports/progress`（`players`／`fullClear`）聚合**  
 - **低優先：** 見主文件
 
@@ -81,4 +90,4 @@ npm run dev
 
 ---
 
-*README v2.71 · 2026-05-11（移除 **`familyday-api-contract/`**；契約／CODEOWNERS 收斂 **`docs/api/`**＋根 **`.github/`**；前版 v2.69）*
+*README v2.76 · 2026-05-13（補 **`public/qr-entry-links`** 入口 QR 說明；前版 v2.75）*

@@ -4,6 +4,8 @@
 
 ## [Unreleased]
 
+- Docs: `api-v0.1.md` **v0.1.26** — §4 **`POST …/auth/login`** response example aligned with `familyday-backend/src/routes/auth.ts` (`ok`, `user`, `token`); **no REST contract change**.
+- Docs: `api-v0.1.md` **v0.1.25** — auth narrative aligned with SPA **Bearer** + login **`token`** (cross-origin Hosting ↔ API); Cookie optional/compat; §13 sequence + MVP table; **no REST path change**.
 - Docs (monorepo): remove **`familyday-api-contract/`** directory; contract governance text merged into **`docs/api/README.md`**; root **`.github/CODEOWNERS`** (was nested) for **`docs/api/*`**; no REST contract change.
 - Docs (monorepo): move **`CHANGELOG.md`** from **`familyday-api-contract/`** to **`docs/api/CHANGELOG.md`** (unified **`docs/`** management); CI paths updated; **`CODEOWNERS`** entries now **`docs/api/api-v0.1.md`** · **`docs/api/CHANGELOG.md`**; no REST contract change.
 - Docs (monorepo): REST spec text only **`docs/api/api-v0.1.md`**; **`familyday-api-contract/api-v0.1.md`** stub removed; CI paths updated; no REST contract change.

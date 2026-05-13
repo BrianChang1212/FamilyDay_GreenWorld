@@ -4,6 +4,7 @@
 
 | 項目 | 說明 |
 |------|------|
+| **現況（修訂）** | 正文修訂 **v0.1.26**（2026-05-13）：SPA **`Bearer`** + 登入 **`ok`**／**`token`**／**`user`**；詳見 [`api-v0.1.md`](./api-v0.1.md) 檔首長註與文末修訂表 |
 | **契約正文** | [`api-v0.1.md`](./api-v0.1.md) |
 | **變更紀錄（Keep-a-changelog 風格）** | [`CHANGELOG.md`](./CHANGELOG.md) |
 | **程式碼審查指派** | 倉庫根 **[`.github/CODEOWNERS`](../../.github/CODEOWNERS)**（覆寫 **`docs/api/api-v0.1.md`**、**`docs/api/CHANGELOG.md`**） |

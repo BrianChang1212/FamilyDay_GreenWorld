@@ -102,7 +102,8 @@
 | --- | --- |
 | 前端 | Vue 3 + Vite + TypeScript + Tailwind + Vue Router（`familyday-frontend/`） |
 | 後端 | Firebase（Firestore 為主，Realtime Database 視場景啟用） |
-| API 契約 | `docs/api/`（正文、CHANGELOG、發佈約定）； **`contract-v*`** Git 標籤；根 **`.github/CODEOWNERS`**（**`docs/api/*`**） |
+| API 契約 | `docs/api/`（正文、CHANGELOG、發佈約定）； **`contract-v*`** Git 標籤；根 **`.github/CODEOWNERS`**（**`docs/api/*`**）；正文現況 **`api-v0.1` v0.1.26**（見 [`docs/api/README.md`](../api/README.md)） |
+| SPA 認證 | **`Authorization: Bearer`** + **`sessionStorage`**（跨 Hosting／Cloud Run）；Cookie（**`fdgw_session`**）相容；契約與排查見 [`api-v0.1.md`](../api/api-v0.1.md)、[`ios-mobile-auth-fix-2026-05-13.md`](../setup/ios-mobile-auth-fix-2026-05-13.md) |
 | 架構摘要 | 前端：`docs/architecture/summary-frontend.md`、後端：`docs/architecture/summary-backend.md`、部署：`docs/architecture/summary-deployment.md`、流量：`docs/architecture/summary-traffic.md` |
 
 ### API 觸發時機（簡短版）
@@ -123,6 +124,7 @@ flowchart LR
 
 ### 快速路由（原型）
 
+- **上架實際連結（`firebaseapp.com`）：** 報到 **`https://rare-lattice-495009-i9.firebaseapp.com/checkin`** · 闖關 **`https://rare-lattice-495009-i9.firebaseapp.com/`**（詳見 [`setup/hosting-public-entry-urls.md`](../setup/hosting-public-entry-urls.md)）；**入口 QR PNG** 見 [`familyday-frontend/public/qr-entry-links/README.md`](../../familyday-frontend/public/qr-entry-links/README.md)
 - 報到入口：`/check-in` -> `/checkin` -> `/checkin/complete`
 - 闖關入口：`/game` -> `/` -> `/register` -> `/stage`
 - 領獎頁：**`/finish`**（舊 **`/finish/claimed`** → redirect **`/finish`**）
@@ -204,8 +206,9 @@ flowchart LR
 | 技術選型 | Cloud Functions + Firestore 路線已落地實作；正式維運參數待簽核 |
 | UI/UX 設計（設計稿／KV） | 進行中（功能流程先行，正式視覺資產持續補齊） |
 | 開發 | 前端 **100% 實作完整**（**10** View、11 API 函式、無 TODO）；後端 **95% 實作完整**（19 端點；出席報表 **`total`／`checkedIn`** 已動態：**`roster`＋`checkins`**；**進度報表** **`players`／`fullClear`** 仍占位）；Firestore 四集合雙模式完整 |
-| 測試 | 前端 Vitest **14** 檔無 skip 全通過 + CI；後端 in-memory 聯調 Pass 17；**Firestore Blocked**（IAM 憑證）；後端單元測試待補齊 |
-| 部署 | **dev/stage 可驗證上架**；正式上線需完成 Firestore IAM 憑證設定、Security Rules 與安全基線 |
+| 測試 | 前端 Vitest **14** 檔無 skip 全通過 + CI；後端 in-memory 聯調 Pass 17；**Firebase Hosting**：報到＋闖關全端手動驗收 **Pass**（2026-05-13）；**Firestore 本機腳本**仍可能 Blocked（IAM 憑證）；後端單元測試待補齊 |
+| 文件／契約鏈 | 與根 **`README`** [**即時進度**](../../README.md#readme-live-progress) 對齊：**`api-v0.1` v0.1.25–v0.1.26**、**`system-architecture` v1.4**、**`project-master` v1.3.52**、[`api-integration-checklist.md`](../testing/api-integration-checklist.md) §0／§3／§7 |
+| 部署 | **Firebase Hosting 已上架**並完成報到／闖關主流程驗收；正式上線仍須 Firestore IAM、Security Rules 與安全基線 |
 
 ### 下一步（本週）— 完整條列
 
@@ -219,7 +222,7 @@ flowchart LR
 - 將 Firestore 驗證結果回填 `docs/testing/api-integration-checklist.md`（解除 Blocked；主文件為 §7）
 - （可選）依主辦確認 **`GET /admin/reports/attendance` 之 `total` 語意**是否即以 **Firestore `roster`**（現行 **`eventId`**）筆數代表「預計出席人數」（實作已動態：**`checkedIn`**＝**`checkins`** 計數；見 **`familyday-backend/src/routes/admin.ts`**）。
 - （可選）實作 **`GET /admin/reports/progress`** 之 **`players`／`fullClear`**（目前 **`admin.ts`** 為占位常數；**`redeemed`** 已來自 **`getRedeemSummary()`**）。
-- 產出正式上線前**最小安全基線確認單**（憑證、權限、CORS、Cookie）
+- 產出正式上線前**最小安全基線確認單**（憑證、權限、CORS、**Bearer／`sessionStorage`（XSS）**、Cookie 相容）
 - 確認 `VITE_API_BASE`、CORS allowlist 與目標驗證網域一致
 
 **中優先級**
@@ -273,4 +276,4 @@ flowchart LR
 
 ---
 
-*補充篇 · 自根 README 拆出 · 與根 README 頁尾版本列同步維護*
+*補充篇 · 自根 README 拆出 · 與根 README **v2.76**（2026-05-13）頁尾版本列同步維護*
