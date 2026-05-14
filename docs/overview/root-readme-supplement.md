@@ -206,8 +206,8 @@ flowchart LR
 | 技術選型 | Cloud Functions + Firestore 路線已落地實作；正式維運參數待簽核 |
 | UI/UX 設計（設計稿／KV） | 進行中（功能流程先行，正式視覺資產持續補齊） |
 | 開發 | 前端 **100% 實作完整**（**10** View、11 API 函式、無 TODO）；後端 **95% 實作完整**（19 端點；出席報表 **`total`／`checkedIn`** 已動態：**`roster`＋`checkins`**；**進度報表** **`players`／`fullClear`** 仍占位）；Firestore 四集合雙模式完整 |
-| 測試 | 前端 Vitest **14** 檔無 skip 全通過 + CI；後端 in-memory 聯調 Pass 17；**Firebase Hosting**：報到＋闖關全端手動驗收 **Pass**（2026-05-13）；**Firestore 本機腳本**仍可能 Blocked（IAM 憑證）；後端單元測試待補齊 |
-| 文件／契約鏈 | 與根 **`README`** [**即時進度**](../../README.md#readme-live-progress) 對齊：**`api-v0.1` v0.1.25–v0.1.26**、**`system-architecture` v1.4**、**`project-master` v1.3.52**、[`api-integration-checklist.md`](../testing/api-integration-checklist.md) §0／§3／§7 |
+| 測試 | 前端 Vitest **14** 檔無 skip 全通過 + CI；後端 Vitest **5** 檔／**27** 測通過（http／session／authGuard／game state／health）；後端 in-memory 聯調 Pass 17；**Firebase Hosting**：報到＋闖關全端手動驗收 **Pass**（2026-05-13）；**Firestore 本機腳本**仍可能 Blocked（IAM 憑證） |
+| 文件／契約鏈 | 與根 **`README`** [**即時進度**](../../README.md#readme-live-progress) 對齊：**`api-v0.1` v0.1.25–v0.1.26**、**`system-architecture` v1.4**、**`project-master` v1.3.53**、[`api-integration-checklist.md`](../testing/api-integration-checklist.md) §0／§3／§7 |
 | 部署 | **Firebase Hosting 已上架**並完成報到／闖關主流程驗收；正式上線仍須 Firestore IAM、Security Rules 與安全基線 |
 
 ### 下一步（本週）— 完整條列
