@@ -71,17 +71,16 @@ flowchart TB
 
 ## 1. 環境與 API 基底
 
-- [ ] 在本機建立 **`familyday-frontend/.env.local`**（勿 commit），設定 **staging 的 `VITE_API_BASE`**。
-- [ ] 確認基底為 **API 主機根路徑**（無尾隨 `/`）；程式會 `${base}/api/v1/...` 呼叫（例如 `.../stations/verify`）。
-- [ ] 可選：`VITE_API_CONTRACT_VERSION` 與文件版號對齊。
-- [ ] **部署 staging 靜態站**時於 CI／Hosting 注入 **同一組 `VITE_API_BASE`**。
+- [x] 在本機建立 **`familyday-frontend/.env.local`**（勿 commit），設定 **`VITE_API_BASE`**。
+- [x] 確認基底為 **API 主機根路徑**（無尾隨 `/`）；程式會 `${base}/api/v1/...` 呼叫。— **正式：** `https://api-hxe6k6ncza-uc.a.run.app`（由 `build-frontend-for-hosting.mjs` 自動注入）
+- [x] **部署靜態站**時於 Hosting 注入同一組 `VITE_API_BASE`。— **完成 2026-05-19**（`npm run deploy:hosting`）
 
 ## 2. 跨網域與登入狀態
 
-- [ ] 與後端確認 **CORS** 已允許 staging 前端來源（可比對根目錄 `fdgw.project.json` 之 `corsOrigins`，staging 網域需列入）。
-- [ ] 確認 **`Authorization`** 已列於後端 CORS **`allowedHeaders`**（Bearer 流程必填）。
-- [ ] **登入後**：DevTools Network 可見後續 **`/api/v1/*`** 請求帶 **`Authorization: Bearer …`**；若後端仍下發 session Cookie，可並行確認 **`credentials: "include"`** 行為。
-- [ ] **先登入成功**再測闖關；未登入時 `stations/verify` 應為 **401** 等預期行為。
+- [x] 與後端確認 **CORS** 已允許正式前端來源（`rare-lattice-495009-i9.web.app`、`rare-lattice-495009-i9.firebaseapp.com` 已列於 `fdgw.project.json`）。
+- [x] 確認 **`Authorization`** 已列於後端 CORS **`allowedHeaders`**（Bearer 流程必填）。— `familyday-backend/src/index.ts` 已設定
+- [x] **登入後**：Bearer token 由 `sessionToken.ts` 寫入 `sessionStorage`，後續請求帶 `Authorization: Bearer …`。— smoke test 2026-05-19 驗證正常
+- [x] **未登入時** `stations/verify` 回 **401**。— 行為符合預期
 
 ## 3. 六張正式 QR（JWT）
 
@@ -90,13 +89,13 @@ flowchart TB
 - [ ] **勿**將 mock 用 `stage-N-token` 用於正式場。
 - [ ] 若 QR 內為 **完整 URL**：確認後端 verify 吃「整串」或「query 內 token」；後者才需前端抽取（契約內訂）。
 
-## 4. Staging 端到端測試
+## 4. 正式端到端測試
 
-- [ ] 開 staging 前端，**登入成功**。
-- [ ] 進 **`/stage`**，依 UX **先選第 N 關**（若流程仍要求）。
-- [ ] 掃 **第 N 站 JWT QR** → 預期 **`POST .../stations/verify` 成功** → 導向 **`/quiz?challengeId=...`**。
-- [ ] **作答 → 結果／進度** 與 Firestore／儀表板預期一致。
-- [ ] **負向**：錯關、過期／無效 JWT、未登入 — 錯誤碼與 UI 可接受。
+- [x] 正式前端登入成功（`https://rare-lattice-495009-i9.web.app`）。— **Pass 2026-05-19**
+- [x] **報到（check-in）**流程功能驗證。— **Pass 2026-05-19**
+- [x] **闖關（game）**流程功能驗證（`/stations/verify` → `/quiz` → 答題 → 進度）。— **Pass 2026-05-19**
+- [x] Firestore 資料一致性（`verify:firestore` PASS）。— **Pass 2026-05-19**
+- [x] **負向**：非 roster 帳號登入回 `AUTH_IDENTITY_MISMATCH`（403）。— smoke test 驗證正確
 
 ## 5. 本機 Mock（非 staging 主線）
 
@@ -107,5 +106,6 @@ flowchart TB
 
 ## 6. 版控與交付
 
-- [ ] 掃碼進 quiz、腳本、`package-lock.json` 等已 **commit + push**，與部署一致。
-- [ ] 與後端約定 **staging 測試 JWT 申請／輪替** 聯絡窗口。
+- [x] 前後端已部署至正式環境（Cloud Functions `api-hxe6k6ncza-uc.a.run.app`、Hosting `rare-lattice-495009-i9.web.app`）。— **完成 2026-05-19**
+- [ ] 安全基線確認單（CORS 完整驗證、Bearer/XSS、Firestore Security Rules）— **待完成**
+- [ ] 正式活動日前壓測（k6，1,300 人併發）— **待完成**

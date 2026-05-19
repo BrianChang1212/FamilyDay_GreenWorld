@@ -279,20 +279,20 @@
 
 ## 專案狀態
 
-> **最後更新：** 2026-05-13。**所有計數與阻塞敘述**以根 [`README.md`](../../README.md#readme-live-progress) **即時進度**為準（與本段若有差異，**以 README 表格為準**）。  
-> **專案階段：** **Firebase Hosting 已上架**；報到／闖關**全端手動驗收通過**（2026-05-13，見 [`api-integration-checklist.md`](../testing/api-integration-checklist.md) §7）。仍待：**本機／自動化** Firestore 閉環、正式簽核、壓測與上線安全基線。
+> **最後更新：** 2026-05-19。**所有計數與阻塞敘述**以根 [`README.md`](../../README.md#readme-live-progress) **即時進度**為準（與本段若有差異，**以 README 表格為準**）。  
+> **專案階段：** **Firebase Hosting 已上架**（`rare-lattice-495009-i9.web.app`）；前後端重新部署完成（2026-05-19）；**報到（check-in）＋闖關（game）於正式環境功能驗證 Pass**（2026-05-19）。仍待：正式簽核、壓測與上線安全基線。
 
 ### 里程碑（概估）
 
 需求與**前端主力功能**已落地；技術簽核、Firestore 端到端實證、壓測與正式部署仍待收斂。細部百分比不再於此重複維護。
 
-### 快照（與 README 對齊 · 2026-05-13）
+### 快照（與 README 對齊 · 2026-05-19）
 
 | 面向 | 摘要 |
 |------|------|
 | 前端 | **10** View（Welcome → Finish）；**11** 支 `api/` 函式；Vitest **14** 測試檔、CI 通過；**`/finish`** 領獎與三格狀態；舊 **`/finish/claimed`** → **`/finish`**；**認證：** Bearer + **`sessionStorage`**（[`ios-mobile-auth-fix-2026-05-13.md`](../setup/ios-mobile-auth-fix-2026-05-13.md)、**`api-v0.1` v0.1.25–v0.1.26**） |
 | 後端 | **19** 端點；四集合 Firestore + in-memory；redeem transaction；**出席報表** **`total`**＝**`roster`** 計數、**`checkedIn`**＝**`checkins`**；**進度報表** **`players`／`fullClear`** 仍占位 |
-| 驗證 | **Firebase Hosting**：報到＋闖關全流程手動驗收 **Pass**（符合需求；Bearer 主線；2026-05-13）。整合測試 in-memory Pass 17（歷史）；**`verify:firestore` 本機**仍可能 **Blocked**（缺 `GOOGLE_APPLICATION_CREDENTIALS`） |
+| 驗證 | 整合測試 in-memory Pass 17（歷史）；`verify:firestore` 正式端點 **PASS**（四集合讀寫；2026-05-19）；**報到（check-in）＋闖關（game）正式環境功能驗證 Pass**（2026-05-19） |
 | 產品／主辦 | [待確認與會議](#待確認與會議) H1～H5；設計 D1/D2 |
 
 **細節：** [`summary-frontend.md`](../architecture/summary-frontend.md)、[`api-v0.1.md`](../api/api-v0.1.md)、[§ 待辦事項](#work-backlog)。
@@ -328,7 +328,7 @@
 |------|------|----------|--------|:----:|
 | 1,300 人併發可能超出系統負載 | 系統崩潰，活動無法進行 | 提前壓力測試、準備擴展方案 | | 監控中 |
 | 活動日前驗收窗口緊（目標六月底／七月初） | 功能不完整或品質不佳 | MVP、倒排驗收；5 月下旬場勘後凍結動線相關需求 | | 監控中 |
-| Firestore IAM 未完成導致最終實證未閉環 | 正式資料層無法完成 Go 証明，影響正式上線判定 | 立即補齊專案 IAM（Cloud Datastore User+）並重跑 `npm run verify:firestore` | Brian / 專案 Owner | 阻塞中 |
+| Firestore IAM 未完成導致最終實證未閉環 | 正式資料層無法完成 Go 証明，影響正式上線判定 | 立即補齊專案 IAM（Cloud Datastore User+）並重跑 `npm run verify:firestore` | Brian / 專案 Owner | ✅ 已解決（2026-05-19） |
 
 #### 中風險 🟡
 
@@ -347,13 +347,13 @@
 
 <a id="work-backlog"></a>
 
-### 待辦事項（2026-05-13 更新）
+### 待辦事項（2026-05-19 更新）
 
 **工作約定：** 日常跟進以本節為**待辦權威**；**進度數字**以根 [`README.md`](../../README.md#readme-live-progress) **即時進度**為準。完成項目請於此勾選並視需要同步 README 摘要。
 
 #### 高優先級
-- [ ] **Firestore IAM 憑證設定**（擇一）：安裝 gcloud → `gcloud auth application-default login`；或 Firebase Console 下載 SA JSON → 設定 `GOOGLE_APPLICATION_CREDENTIALS`
-- [ ] 重跑 `familyday-backend/`：`npm run verify:firestore` 並確認 Firestore 四集合寫入/讀取成功
+- [x] **Firestore IAM 憑證設定**（SA JSON `GOOGLE_APPLICATION_CREDENTIALS`）— 完成 2026-05-19
+- [x] 重跑 `familyday-backend/`：`npm run verify:firestore` 對正式 Cloud Functions 端點，四集合讀寫 **PASS** — 完成 2026-05-19
 - [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、**Bearer／sessionStorage（XSS）**、Cookie 相容）
 
 #### 中優先級
@@ -434,4 +434,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.53 · 2026-05-13（補後端 Vitest 單元測試基線；根 **`README` v2.77**；前版 **v1.3.52**）
+**文件版本：** 合併版 v1.3.55 · 2026-05-19（前後端重新部署；check-in＋game 正式環境驗證 Pass；根 **`README` v2.79**；前版 **v1.3.54**）

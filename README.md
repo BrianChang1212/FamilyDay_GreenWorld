@@ -53,15 +53,15 @@ npm run dev
 
 > **工作約定：** **本表**為**進度現況**之**權威**來源（View／API 函式數／測試檔數等）。**待辦勾選與完整行動清單**以 [`docs/project/project-master.md` § 待辦事項](docs/project/project-master.md#work-backlog) 為準。
 
-> **計數／端點：** 2026-05-11 依原始碼掃描（仍有效；後端 **19** 端點、前端 **10** View／**11** API 函式／**14** 測試檔）。**2026-05-13** 起 **文件完整對齊**：**SPA** **`Authorization: Bearer`** + **`sessionStorage`**；契約 **`api-v0.1` v0.1.25–v0.1.26**（含 **`POST …/auth/login`** 回 **`ok`**／**`token`**／**`user`**，見 **`familyday-backend/src/routes/auth.ts`**）；**`system-architecture` v1.4**（§8.1 掃描日）；**`api-integration-checklist`** Bearer 前置與 §7 說明；**`project-master` v1.3.53**。**同日：** **Firebase Hosting 上架後**已做**全端手動驗收**——**報到（check-in）**與**闖關**主流程之功能與操作**符合需求**（紀錄見 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §7、`docs/testing/api-integration-history.md`）。背景見 [`docs/setup/ios-mobile-auth-fix-2026-05-13.md`](docs/setup/ios-mobile-auth-fix-2026-05-13.md)。**admin/reports**：**`total`／`checkedIn`**、**`progress`** 占位見 [`familyday-backend/src/routes/admin.ts`](familyday-backend/src/routes/admin.ts)。
+> **計數／端點：** 2026-05-11 依原始碼掃描（仍有效；後端 **19** 端點、前端 **10** View／**11** API 函式／**14** 測試檔）。**2026-05-13** 起 **文件完整對齊**：**SPA** **`Authorization: Bearer`** + **`sessionStorage`**；契約 **`api-v0.1` v0.1.25–v0.1.26**（含 **`POST …/auth/login`** 回 **`ok`**／**`token`**／**`user`**，見 **`familyday-backend/src/routes/auth.ts`**）；**`system-architecture` v1.4**（§8.1 掃描日）；**`api-integration-checklist`** Bearer 前置與 §7 說明；**`project-master` v1.3.53**。**同日：** **Firebase Hosting 上架後**已做**全端手動驗收**——**報到（check-in）**與**闖關**主流程之功能與操作**符合需求**（紀錄見 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §7、`docs/testing/api-integration-history.md`）。背景見 [`docs/setup/ios-mobile-auth-fix-2026-05-13.md`](docs/setup/ios-mobile-auth-fix-2026-05-13.md)。**admin/reports**：**`total`／`checkedIn`**、**`progress`** 占位見 [`familyday-backend/src/routes/admin.ts`](familyday-backend/src/routes/admin.ts)。**2026-05-19：** Firestore IAM 憑證設定完成（SA JSON）；**`npm run verify:firestore`** 對正式 Cloud Functions 端點執行，四集合讀寫 **PASS**；前後端重新部署（Functions `api-hxe6k6ncza-uc.a.run.app`、Hosting `rare-lattice-495009-i9.web.app`）；**報到（check-in）＋闖關（game）功能於正式環境驗證完成**；**`project-master` v1.3.55**。
 
 | 面向 | 現況 |
 |------|------|
 | 前端 | 10 個 View **全數完整實作**（WelcomeView → FinishView；舊 **`/finish/claimed`** 僅 redirect **`/finish`**）；API 層 11 支函式對應真實端點；14 個測試檔無 skip/stub；CI 通過；**闖關 API 呼叫附 Bearer**（`familyday-frontend/src/lib/sessionToken.ts`） |
 | API | **19** 個端點均已實作。**`GET /admin/reports/attendance`**：**`total`**＝Firestore **`roster`**（現行 **`eventId`** 下名冊筆數）；**`checkedIn`**＝**`checkins`** 計數。**`GET /admin/reports/progress`**：**`redeemed`** 取自核銷摘要；**`players`／`fullClear`** 仍為 **`admin.ts`** 占位常數（待對齊 `player_progress` 聚合） |
-| 後端資料層 | roster / checkins / player_progress / redeem 四集合已完整實作 Firestore + in-memory 雙模式切換；阻塞點為本機 IAM 憑證未設定（`GOOGLE_APPLICATION_CREDENTIALS`） |
-| 測試 | 前端 Vitest **14** 檔通過（與上列「前端」列一致）；後端 Vitest **5** 檔／**27** 測試通過（http／session／authGuard／game state／health route；含「完成一次後可連續領獎至上限」規則）；後端 4/30 聯調驗證 Pass 17（in-memory）；**Firebase Hosting 上架環境**：報到＋闖關**全端手動驗收 Pass**（符合需求；2026-05-13）；Firestore **本機腳本**驗證仍可能 Blocked（憑證未設定） |
-| 部署 | **Firebase Hosting 已上架**並完成上述主流程驗收；正式上線仍須完成 Firestore IAM／Security Rules／安全基線與主辦簽核事項 |
+| 後端資料層 | roster / checkins / player_progress / redeem 四集合已完整實作 Firestore + in-memory 雙模式切換；**Firestore IAM 憑證已設定**（2026-05-19） |
+| 測試 | 前端 Vitest **14** 檔通過；後端 Vitest **5** 檔／**27** 測試通過；`verify:firestore` 正式端點 **PASS**（2026-05-19）；**報到（check-in）＋闖關（game）功能於正式環境手動驗證 Pass**（2026-05-19） |
+| 部署 | **Firebase Hosting `rare-lattice-495009-i9.web.app` 已上架**；Cloud Functions `api-hxe6k6ncza-uc.a.run.app`；Firestore 端到端閉環完成；正式上線仍須完成 Security Rules／安全基線與主辦簽核 |
 
 ---
 
@@ -72,7 +72,7 @@ npm run dev
 
 **本週摘要（與主文件對齊；勾選以 `project-master` 為準）**
 
-- **高優先：** Firestore IAM、`verify:firestore`、回填 `api-integration-checklist`、安全基線清單（**Bearer／XSS**、`VITE_API_BASE`）、CORS
+- **高優先：** ~~Firestore IAM、`verify:firestore`~~（**已完成 2026-05-19**）、安全基線確認單（**Bearer／XSS**、CORS、Security Rules）
 - **中優先：** runbook、Security Rules、後端 checkin／redeem／admin 自動化擴充、**補強 `GET …/admin/reports/progress`（`players`／`fullClear`）聚合**  
 - **低優先：** 見主文件
 
@@ -90,4 +90,4 @@ npm run dev
 
 ---
 
-*README v2.77 · 2026-05-13（補後端 Vitest 單元測試基線；前版 v2.76）*
+*README v2.79 · 2026-05-19（前後端重新部署；check-in＋game 正式環境驗證 Pass；前版 v2.78）*

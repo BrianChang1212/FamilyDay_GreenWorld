@@ -13,6 +13,8 @@
 
 | 執行日期 | 環境 | Seed 版本 | 範圍（章節） | Pass | Fail | Blocked | 證據連結 | 執行者 | 備註 |
 |----------|------|-----------|--------------|------|------|---------|----------|--------|------|
+| 2026-05-19 | Firebase Hosting（正式）+ Cloud Functions（正式）`api-hxe6k6ncza-uc.a.run.app` | 正式 Firestore（`rare-lattice-495009-i9`） | 報到（check-in）＋闖關（game）功能端到端手動驗證 | 1 | 0 | 0 | 前端：`https://rare-lattice-495009-i9.web.app`；API smoke test：`/health`、`/health/ready`、`/auth/login`（Bearer）、`/auth/me`、`/me/dashboard` 全部 200；roster 驗證（非白名單回 `AUTH_IDENTITY_MISMATCH`）正確 | Brian | **Go**：check-in＋game 正式環境功能驗證完成 |
+| 2026-05-19 | Cloud Functions 正式端點（`us-central1-rare-lattice-495009-i9.cloudfunctions.net`） | 正式 Firestore（SA JSON 憑證） | `verify:firestore` 四集合（roster／checkins／player_progress／redeem_records）讀寫閉環 | 1 | 0 | 0 | `VERIFY_API_BASE=https://api-hxe6k6ncza-uc.a.run.app/api/v1`；`PASS firestore verification employee=verify-fresh-001 challenge=c1 rewardRedeemCount=1` | Brian | **Go**：Firestore IAM 閉環完成；`GOOGLE_APPLICATION_CREDENTIALS` SA JSON 已設定 |
 | 2026-05-13 | Firebase Hosting + 線上 API（上架環境） | 線上實際設定／資料 | 報到＋闖關端到端 UI（對應 checklist §2～§5 操作面） | 1 | 0 | 0 | 入口：`https://rare-lattice-495009-i9.firebaseapp.com/checkin`（報到）、`https://rare-lattice-495009-i9.firebaseapp.com/`（闖關）；手動驗收可另補截圖／HAR | Brian | **Go**：功能與操作符合需求；見 [`api-integration-checklist.md`](./api-integration-checklist.md) §7 |
 | 2026-04-30 | dev (Functions + Firestore verification script) | ADC (`C:\Users\Brian Chang\AppData\Roaming\gcloud\application_default_credentials.json`) | 0, 3, 5（Firestore 真切換驗證） | 0 | 0 | 1 | `FDGW_USE_FIRESTORE=true` + `GOOGLE_CLOUD_PROJECT=familyday-greenworld-dev` + `GOOGLE_APPLICATION_CREDENTIALS=...` 後執行 `npm run verify:firestore`：`7 PERMISSION_DENIED: Permission denied on resource project familyday-greenworld-dev.`；`npx firebase login:list` 顯示 `No authorized accounts` | Codex | Blocked 仍存在：需先完成目標專案 IAM 授權並完成 Firebase CLI/GCP 身份對齊 |
 | 2026-04-30 | dev (Functions + Firestore verification script) | ADC (`application_default_credentials.json`) | 0, 3, 5（Firestore 真切換驗證） | 0 | 0 | 1 | `npm run verify:firestore`：先缺 Project ID，補 `GOOGLE_CLOUD_PROJECT` 後回 `PERMISSION_DENIED` | Codex | Blocked: Firestore IAM permission pending（已建憑證，待專案授權） |
@@ -25,8 +27,8 @@
 
 ## 當前結論（Go/No-Go）
 
+- **Go（正式環境 · 2026-05-19）**：前後端重新部署完成；check-in＋game 功能於正式環境驗證 Pass；Firestore 四集合 `verify:firestore` PASS。
 - **Go（Firebase Hosting · UX／功能）**：2026-05-13 上架環境全端手動驗收——**報到**與**闖關**主流程符合需求（詳見 [`api-integration-checklist.md`](./api-integration-checklist.md) §7）。
 - **Go（dev/stage）**：前端 + API + 後端（in-memory）整合可運作。
-- **Conditional Go（Firestore）**：流程就緒，但 IAM 未完成前不算 fully verified。
-- **No-Go（正式）**：若 IAM 與安全基線未完成，不可對外上線。
-- **Blocked 標準用語**：`Firestore IAM permission pending`。
+- **Go（Firestore IAM）**：SA JSON 憑證設定完成；`verify:firestore` 正式端點 PASS（2026-05-19）。
+- **Pending（安全基線）**：Security Rules、CORS 完整驗證、Bearer/XSS 確認單仍待完成後才算正式上線 fully verified。
