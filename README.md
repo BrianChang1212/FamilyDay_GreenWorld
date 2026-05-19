@@ -72,8 +72,8 @@ npm run dev
 
 **本週摘要（與主文件對齊；勾選以 `project-master` 為準）**
 
-- **高優先：** ~~Firestore IAM、`verify:firestore`~~（**已完成 2026-05-19**）、安全基線確認單（**Bearer／XSS**、CORS、Security Rules）
-- **中優先：** runbook、Security Rules、後端 checkin／redeem／admin 自動化擴充、**補強 `GET …/admin/reports/progress`（`players`／`fullClear`）聚合**  
+- **高優先：** ~~Firestore IAM、`verify:firestore`~~（**已完成 2026-05-19**）、~~六張正式 QR（JWT）`public/qr-staging-stations/`~~（**已完成 2026-05-19**）、安全基線確認單（**Bearer／XSS**、CORS、Security Rules）
+- **中優先：** runbook、Security Rules、後端 checkin／redeem／admin 自動化擴充、~~補強 `GET …/admin/reports/progress`（`players`／`fullClear`）聚合~~（**已完成**：`state/game.ts` `getProgressSummary()` 已對接）
 - **低優先：** 見主文件
 
 ---
@@ -90,4 +90,4 @@ npm run dev
 
 ---
 
-*README v2.79 · 2026-05-19（前後端重新部署；check-in＋game 正式環境驗證 Pass；前版 v2.78）*
+*README v2.80 · 2026-05-19（六張正式 QR PNG 產出；admin/reports/progress 聚合確認完成；前版 v2.79）*

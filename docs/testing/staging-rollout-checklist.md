@@ -84,10 +84,10 @@ flowchart TB
 
 ## 3. 六張正式 QR（JWT）
 
-- [ ] 向後端索取 **staging 可用的 6 段 payload**（每站不同 signed JWT）。
-- [ ] 以工具或 `npm run qr:staging-stations`（見 `familyday-frontend/scripts/`）產出 6 張 PNG。
-- [ ] **勿**將 mock 用 `stage-N-token` 用於正式場。
-- [ ] 若 QR 內為 **完整 URL**：確認後端 verify 吃「整串」或「query 內 token」；後者才需前端抽取（契約內訂）。
+- [x] 向後端索取 **staging 可用的 6 段 payload**（每站不同 signed JWT）。— **完成 2026-05-19**（HS256 self-signed，secret: `familyday-2026-greenworld-station`）
+- [x] 以工具或 `npm run qr:staging-stations`（見 `familyday-frontend/scripts/`）產出 6 張 PNG。— **完成 2026-05-19**（`public/qr-staging-stations/station-{1..6}.png`）
+- [x] **勿**將 mock 用 `stage-N-token` 用於正式場。— JWT payload 含 `stageId`，前端 `extractQrStageId` 可正確解析
+- [x] 若 QR 內為 **完整 URL**：確認後端 verify 吃「整串」或「query 內 token」；後者才需前端抽取（契約內訂）。— QR 內容為純 JWT（非 URL），前端直接送 `qrJwt` + `stageId`
 
 ## 4. 正式端到端測試
 
@@ -107,5 +107,6 @@ flowchart TB
 ## 6. 版控與交付
 
 - [x] 前後端已部署至正式環境（Cloud Functions `api-hxe6k6ncza-uc.a.run.app`、Hosting `rare-lattice-495009-i9.web.app`）。— **完成 2026-05-19**
+- [x] `GET /admin/reports/progress`（`players`／`fullClear`）Firestore 聚合。— **已完成**（`state/game.ts` `getProgressSummary()` 已實作；`admin.ts` 已對接）
 - [ ] 安全基線確認單（CORS 完整驗證、Bearer/XSS、Firestore Security Rules）— **待完成**
 - [ ] 正式活動日前壓測（k6，1,300 人併發）— **待完成**
