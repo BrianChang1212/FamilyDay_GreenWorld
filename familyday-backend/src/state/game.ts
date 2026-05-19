@@ -276,6 +276,34 @@ export async function claimFinishRewardProgress(
 	return { ok: true, rewardRedeemCount: progress.rewardRedeemCount };
 }
 
+export async function getProgressSummary(): Promise<{ players: number; fullClear: number }> {
+	if (useFirestoreStore()) {
+		const db = getDb();
+		const snap = await db.collection("player_progress").get();
+		let players = 0;
+		let fullClear = 0;
+		for (const doc of snap.docs) {
+			players++;
+			const p = coercePlayerProgress(doc.data() as Record<string, unknown>);
+			if (p.bankedFullClears >= 1) {
+				fullClear++;
+			}
+		}
+		return { players, fullClear };
+	}
+
+	let players = 0;
+	let fullClear = 0;
+	for (const [, raw] of playerProgress) {
+		players++;
+		const p = coercePlayerProgress(raw as unknown as Record<string, unknown>);
+		if (p.bankedFullClears >= 1) {
+			fullClear++;
+		}
+	}
+	return { players, fullClear };
+}
+
 export async function restartPlaythrough(employeeId: string): Promise<{
 	ok: boolean;
 	fullClearCount: number;

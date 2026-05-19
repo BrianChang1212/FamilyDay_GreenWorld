@@ -2,6 +2,7 @@ import { Router } from "express";
 import { getRedeemSummary } from "../state/redeem";
 import { countCheckins } from "../state/checkins";
 import { upsertRosterEntries, countRosterEmployeesForCurrentEvent } from "../state/roster";
+import { getProgressSummary } from "../state/game";
 import { badRequest } from "../utils/http";
 
 export const adminRouter = Router();
@@ -39,10 +40,13 @@ adminRouter.get("/admin/reports/attendance", async (_req, res) => {
 });
 
 adminRouter.get("/admin/reports/progress", async (_req, res) => {
-	const redeem = await getRedeemSummary();
+	const [redeem, progress] = await Promise.all([
+		getRedeemSummary(),
+		getProgressSummary(),
+	]);
 	res.status(200).json({
-		players: 1,
-		fullClear: 0,
+		players: progress.players,
+		fullClear: progress.fullClear,
 		redeemed: redeem.totalRedeemed,
 	});
 });
