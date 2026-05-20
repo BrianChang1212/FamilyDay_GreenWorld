@@ -12,6 +12,7 @@ import {
 } from "@/lib/demoState";
 import { clearEntryIntent } from "@/lib/entryIntent";
 import { submitCheckin } from "@/api/submitCheckin";
+import { fetchRosterLookup } from "@/api/rosterLookup";
 import { useI18n } from "@/composables/useI18n";
 import { APP_CONFIG } from "@/constants";
 
@@ -25,6 +26,7 @@ const companionCount = ref(getCompanionCount());
 const showConfirm = ref(false);
 const isSubmitting = ref(false);
 const submitError = ref("");
+const nameLookupState = ref<"idle" | "loading" | "found" | "not_found">("idle");
 
 const companionOptions = Array.from(
 	{ length: APP_CONFIG.MAX_COMPANIONS },
@@ -34,15 +36,39 @@ const companionOptions = Array.from(
 const inputClass =
 	"w-full rounded-xl border-0 bg-[#f6f7f6] px-4 py-3.5 pr-12 text-base text-gw-navy outline-none ring-1 ring-black/[0.03] transition focus:bg-white focus:ring-2 focus:ring-[#2f7354]/30 placeholder:text-neutral-400";
 
+let lookupTimer: ReturnType<typeof setTimeout> | null = null;
+
+function onEmployeeIdInput() {
+	name.value = "";
+	nameLookupState.value = "idle";
+	if (lookupTimer) clearTimeout(lookupTimer);
+	const id = employeeId.value.trim();
+	if (id.length < 7) return;
+	lookupTimer = setTimeout(async () => {
+		nameLookupState.value = "loading";
+		try {
+			const result = await fetchRosterLookup(id);
+			if (result) {
+				name.value = result.name;
+				nameLookupState.value = "found";
+			} else {
+				nameLookupState.value = "not_found";
+			}
+		} catch {
+			nameLookupState.value = "not_found";
+		}
+	}, 500);
+}
+
 function friendlyCheckinError(err: unknown): string {
 	if (!(err instanceof Error)) {
 		return "報到失敗，請稍後再試。";
 	}
 	if (err.message.includes("CHECKIN_IDENTITY_MISMATCH")) {
-		return "姓名與員工編號不一致，請確認後再試。";
+		return "員工編號查無此人，請確認後再試。";
 	}
 	if (err.message.includes("INVALID_CHECKIN_PAYLOAD")) {
-		return "報到資料不完整，請確認姓名、員工編號與同行人數。";
+		return "報到資料不完整，請確認員工編號與同行人數。";
 	}
 	if (err.message.includes("Failed to fetch")) {
 		return "無法連線到伺服器，請確認網路與 API 服務狀態。";
@@ -52,6 +78,7 @@ function friendlyCheckinError(err: unknown): string {
 
 function formValid(): boolean {
 	return (
+		nameLookupState.value === "found" &&
 		name.value.trim().length > 0 &&
 		employeeId.value.trim().length > 0 &&
 		Number.isFinite(companionCount.value) &&
@@ -127,39 +154,6 @@ async function commitCheckIn() {
 					class="space-y-5 rounded-2xl border border-neutral-200/80 bg-white px-5 py-6 shadow-sm ring-1 ring-black/[0.02]"
 				>
 					<div class="space-y-2">
-						<label for="checkin-name" class="text-sm font-bold text-neutral-700">{{ t('checkin.form.name') }}</label>
-						<div class="relative">
-							<input
-								id="checkin-name"
-								v-model="name"
-								type="text"
-								name="name"
-								autocomplete="name"
-								:placeholder="t('checkin.form.namePlaceholder')"
-								:class="inputClass"
-							/>
-							<span
-								class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-300"
-								aria-hidden="true"
-							>
-								<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
-									<path
-										d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
-										stroke="currentColor"
-										stroke-width="1.8"
-									/>
-									<path
-										d="M5 20a7 7 0 0 1 14 0"
-										stroke="currentColor"
-										stroke-linecap="round"
-										stroke-width="1.8"
-									/>
-								</svg>
-							</span>
-						</div>
-					</div>
-
-					<div class="space-y-2">
 						<label for="checkin-employee-id" class="text-sm font-bold text-neutral-700">{{ t('checkin.form.employeeId') }}</label>
 						<div class="relative">
 							<input
@@ -170,6 +164,7 @@ async function commitCheckIn() {
 								autocomplete="username"
 								:placeholder="t('checkin.form.employeeIdPlaceholder')"
 								:class="inputClass"
+								@input="onEmployeeIdInput"
 							/>
 							<span
 								class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-300"
@@ -197,6 +192,39 @@ async function commitCheckIn() {
 					</div>
 
 					<div class="space-y-2">
+						<label for="checkin-name" class="text-sm font-bold text-neutral-700">{{ t('checkin.form.name') }}</label>
+						<div class="relative">
+							<input
+								id="checkin-name"
+								:value="nameLookupState === 'loading' ? '查詢中…' : name"
+								type="text"
+								name="name"
+								readonly
+								:placeholder="nameLookupState === 'not_found' ? '查無此員工編號' : '輸入員工編號後自動帶入'"
+								:class="[inputClass, 'cursor-default select-none', nameLookupState === 'not_found' ? 'ring-red-300 placeholder:text-red-400' : 'bg-neutral-100 text-neutral-500']"
+							/>
+							<span
+								class="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-neutral-300"
+								aria-hidden="true"
+							>
+								<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none">
+									<path
+										d="M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z"
+										stroke="currentColor"
+										stroke-width="1.8"
+									/>
+									<path
+										d="M5 20a7 7 0 0 1 14 0"
+										stroke="currentColor"
+										stroke-linecap="round"
+										stroke-width="1.8"
+									/>
+								</svg>
+							</span>
+						</div>
+					</div>
+
+					<div class="space-y-2">
 						<label for="checkin-companions" class="text-sm font-bold text-neutral-700">{{ t('checkin.form.companions') }}</label>
 						<div class="relative">
 							<select
@@ -205,7 +233,7 @@ async function commitCheckIn() {
 								:class="[inputClass, 'cursor-pointer appearance-none']"
 							>
 								<option v-for="n in companionOptions" :key="n" :value="n">
-									{{ n }} {{ t('checkin.form.companionUnit') }}{{ n === 1 ? t('checkin.form.self') : "" }}
+									{{ n }} {{ t('checkin.form.companionUnit') }}
 								</option>
 							</select>
 							<span

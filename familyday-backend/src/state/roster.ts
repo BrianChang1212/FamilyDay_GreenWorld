@@ -76,6 +76,18 @@ export async function upsertRosterEntries(
 	return importedCount;
 }
 
+export async function lookupRosterByEmployeeId(
+	employeeId: string,
+): Promise<{ employeeId: string; name: string } | null> {
+	const eventId = getEventId();
+	const db = getDb();
+	const snap = await db.collection("roster").doc(rosterDocId(eventId, employeeId)).get();
+	if (!snap.exists) return null;
+	const data = snap.data() as Partial<RosterRecord> | undefined;
+	if (!data?.name) return null;
+	return { employeeId, name: data.name };
+}
+
 /** Employees on the roster for the configured `eventId` (one document per employee). */
 export async function countRosterEmployeesForCurrentEvent(): Promise<number> {
 	const eventId = getEventId();

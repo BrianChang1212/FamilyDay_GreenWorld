@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { verifyRosterIdentity } from "../state/roster";
+import { lookupRosterByEmployeeId, verifyRosterIdentity } from "../state/roster";
 import { getCheckin, upsertCheckin } from "../state/checkins";
 import { badRequest, normalizeText, toPositiveInt } from "../utils/http";
 
@@ -48,6 +48,20 @@ checkinRouter.post("/checkin", async (req, res) => {
 			.status(500)
 			.json(badRequest("CHECKIN_BACKEND_ERROR", "failed to validate roster"));
 	}
+});
+
+checkinRouter.get("/checkin/roster-lookup", async (req, res) => {
+	const employeeId = normalizeText(req.query.employeeId);
+	if (!employeeId) {
+		res.status(400).json(badRequest("MISSING_EMPLOYEE_ID", "employeeId is required"));
+		return;
+	}
+	const result = await lookupRosterByEmployeeId(employeeId);
+	if (!result) {
+		res.status(404).json(badRequest("EMPLOYEE_NOT_FOUND", "employeeId not found in roster"));
+		return;
+	}
+	res.status(200).json({ ok: true, employeeId: result.employeeId, name: result.name });
 });
 
 checkinRouter.get("/checkin/status", async (req, res) => {
