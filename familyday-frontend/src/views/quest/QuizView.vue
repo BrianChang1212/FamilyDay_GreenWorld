@@ -12,6 +12,7 @@ import {
 import { GAME_CONFIG } from "@/constants";
 import {
 	addCompletedStageId,
+	getCompletedStageIds,
 	setCompletedStageIdsFromApi,
 	getStage,
 	stageTitle,
@@ -93,6 +94,8 @@ function loadChallenge() {
 
 function confirm() {
 	if (!selected.value) return;
+	/* 用於 ResultView 區分「首次全破」vs「已是 6/6 又重玩答對」 */
+	const priorCompletedLen = getCompletedStageIds().length;
 	submitLoading.value = true;
 	submitError.value = "";
 	submitChallengeAttempt(challengeId.value, selected.value)
@@ -107,12 +110,18 @@ function confirm() {
 					}
 				}
 			}
+			const newCompletedLen = getCompletedStageIds().length;
+			const firstClear =
+				r.correct &&
+				priorCompletedLen < GAME_CONFIG.TOTAL_STAGES &&
+				newCompletedLen >= GAME_CONFIG.TOTAL_STAGES;
 			router.push({
 				name: "result",
 				query: {
 					ok: r.correct ? "1" : "0",
 					challengeId: challengeId.value,
 					nextChallengeId: r.nextChallengeId || "",
+					firstClear: firstClear ? "1" : "0",
 				},
 			});
 		})

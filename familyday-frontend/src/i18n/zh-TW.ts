@@ -143,6 +143,10 @@ export const zhTW = {
     correctMessage: "你對大自然的觀察入微，成功解開了這個謎題！",
     wrongMessage: "別灰心，請繼續探索大自然的美好",
     nextButton: "前往下一關 >",
+    /** 首次達成 6/6 全破時的按鈕（一行顯示） */
+    claimRewardButton: "闖關成功！領取闖關禮",
+    /** 已是 6/6 全破狀態下重玩答對時的按鈕 */
+    backToStageButton: "回到關卡列表",
     retryButton: "< 重新回答",
   },
   stage: {
@@ -158,6 +162,8 @@ export const zhTW = {
     startQuizButton: "開始作答挑戰 →",
     routeTitle:
       "六站進度（按相機掃描該站 QR 進題；順序不拘，此處不支援手動點選切站）",
+    /** 6/6 全破時於進度區塊下方的領獎入口按鈕 */
+    goClaimRewardButton: "前往領取闖關禮",
     heroBannerAlt:
       "森林探索風格主視覺：放大鏡、相機、寶箱、地圖與林間小徑",
     heroTitle: "一起完成挑戰吧！",

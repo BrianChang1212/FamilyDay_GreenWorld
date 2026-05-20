@@ -92,6 +92,13 @@ const scanUiMessage = computed(
 );
 
 const doneStationCount = computed(() => getCompletedStageIds().length);
+const allStagesCleared = computed(
+	() => doneStationCount.value >= GAME_CONFIG.TOTAL_STAGES,
+);
+
+function goClaimReward() {
+	router.push({ name: "finish" });
+}
 
 onMounted(() => {
 	const pending = getPendingStationVerification();
@@ -464,6 +471,16 @@ function rowState(id: number): "done" | "open" {
 					</li>
 				</ul>
 			</section>
+
+			<!-- 6/6 全破：領獎入口（圖中紅框） -->
+			<button
+				v-if="allStagesCleared"
+				type="button"
+				class="mt-6 w-full rounded-2xl bg-[#2f7354] px-6 py-[1.05rem] text-lg font-bold text-white shadow-lg ring-1 ring-black/[0.05] transition hover:brightness-110 active:scale-[0.99] sm:py-[1.15rem]"
+				@click="goClaimReward"
+			>
+				{{ t("stage.goClaimRewardButton") }}
+			</button>
 		</main>
 
 		<AppFooter v-if="viewPhase === 'arrival'" class="relative z-[2]" />

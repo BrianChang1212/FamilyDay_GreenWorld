@@ -7,6 +7,7 @@ import {
 	getCompletedStageIds,
 	setInZone,
 } from "@/lib/demoState";
+import { resolveResultAction } from "@/lib/resultAction";
 import { useI18n } from "@/composables/useI18n";
 import { GAME_CONFIG } from "@/constants";
 
@@ -18,9 +19,21 @@ const currentChallengeId = computed(() => {
 	return typeof v === "string" ? v : "";
 });
 const ok = computed(() => route.query.ok === "1");
+const firstClear = computed(() => route.query.firstClear === "1");
+const allCleared = computed(
+	() => getCompletedStageIds().length >= GAME_CONFIG.TOTAL_STAGES,
+);
+
+const action = computed(() =>
+	resolveResultAction({
+		ok: ok.value,
+		firstClear: firstClear.value,
+		allCleared: allCleared.value,
+	}),
+);
 
 function next() {
-	if (!ok.value) {
+	if (action.value.target === "quiz") {
 		router.push({
 			name: "quiz",
 			query: currentChallengeId.value
@@ -29,7 +42,7 @@ function next() {
 		});
 		return;
 	}
-	if (getCompletedStageIds().length >= GAME_CONFIG.TOTAL_STAGES) {
+	if (action.value.target === "finish") {
 		router.push({ name: "finish" });
 		return;
 	}
@@ -137,7 +150,7 @@ function next() {
 					class="w-full rounded-2xl bg-[#2f7354] py-[1.05rem] text-lg font-bold text-white shadow-lg transition hover:brightness-110 active:scale-[0.99] sm:py-5"
 					@click="next"
 				>
-					{{ ok ? t("result.nextButton") : t("result.retryButton") }}
+					{{ t(action.labelKey) }}
 				</button>
 			</div>
 		</main>
