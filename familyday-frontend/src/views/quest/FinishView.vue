@@ -379,18 +379,25 @@ function goHome() {
 					class="rounded-2xl bg-neutral-100/95 px-4 py-6 ring-1 ring-neutral-200/80"
 				>
 					<div class="flex items-center justify-center gap-2">
+						<!-- 領獎狀態：圓形獎章 + 五角星 + 雙緞帶 V 底 (與設計稿對齊) -->
 						<svg
 							class="h-6 w-6 shrink-0 text-[#2f7354]"
 							viewBox="0 0 24 24"
-							fill="none"
-							stroke="currentColor"
-							stroke-width="1.6"
-							stroke-linecap="round"
-							stroke-linejoin="round"
 							aria-hidden="true"
 						>
-							<circle cx="12" cy="9" r="5" />
-							<path d="M8 14l-1.5 8 5.5-3 5.5 3L16 14" />
+							<path
+								fill="currentColor"
+								d="M 9.2 12 L 7.5 21 L 10 19 L 11.6 21 L 11 12 Z"
+							/>
+							<path
+								fill="currentColor"
+								d="M 13 12 L 12.4 21 L 14 19 L 16.5 21 L 14.8 12 Z"
+							/>
+							<circle fill="currentColor" cx="12" cy="9" r="5.5" />
+							<path
+								fill="#fff"
+								d="M 12 6 L 12.71 8.07 L 14.86 8.07 L 13.07 9.35 L 13.76 11.43 L 12 10.15 L 10.24 11.43 L 10.93 9.35 L 9.14 8.07 L 11.29 8.07 Z"
+							/>
 						</svg>
 						<h2 class="text-center text-base font-bold text-neutral-800">
 							{{ t("finish.statusTitle") }}
@@ -411,36 +418,20 @@ function goHome() {
 							:key="i"
 							class="flex min-w-0 flex-1 flex-col items-center"
 						>
-							<div
-								:class="[
-									'flex h-[4.75rem] w-full max-w-[6.5rem] items-center justify-center rounded-xl border-2 transition sm:h-[5.25rem]',
-									slotActive(i)
-										? 'border-orange-200 bg-orange-50/90 shadow-sm'
-										: 'border-dashed border-neutral-300 bg-white',
-								]"
-							>
-								<svg
-									class="h-9 w-9 sm:h-10 sm:w-10"
-									viewBox="0 0 24 24"
-									fill="none"
-									stroke="currentColor"
-									stroke-width="1.5"
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									:class="
-										slotActive(i) ? 'text-orange-500' : 'text-neutral-400'
-									"
-									aria-hidden="true"
-								>
-									<path
-										d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"
-									/>
-									<path
-										d="M4 12h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3.5a3.5 3.5 0 0 1-7 0H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2Z"
-									/>
-									<path d="M12 8v13" />
-								</svg>
-							</div>
+							<!-- 已領取：橘色禮盒；未領取：灰色虛線禮盒（設計師原版 PNG） -->
+							<img
+								:src="slotActive(i)
+									? '/images/Icon_gift_s_active.png'
+									: '/images/Icon_gift_s_disabled.png'"
+								width="222"
+								height="222"
+								:alt="slotActive(i)
+									? t('claimSuccess.slotClaimed')
+									: t('claimSuccess.slotPending')"
+								class="h-[4.75rem] w-full max-w-[6.5rem] object-contain sm:h-[5.25rem]"
+								loading="lazy"
+								decoding="async"
+							/>
 							<p
 								:class="[
 									'mt-2.5 text-center text-[11px] font-semibold sm:text-xs',

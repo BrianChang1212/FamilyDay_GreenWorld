@@ -405,9 +405,18 @@ function rowState(id: number): "done" | "open" {
 							class="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#c8e6d6] text-[#2f7354]"
 							aria-hidden="true"
 						>
-							<svg class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-								<path d="M4 21v-9M4 21h16M10 21V9M10 9l8-6" stroke-linecap="round" stroke-linejoin="round" />
-								<path d="M18 21V7" stroke-linecap="round" />
+							<!-- 闖關進度 icon：山峰 + 旗（與設計稿對齊） -->
+							<svg
+								class="h-5 w-5"
+								viewBox="0 0 24 24"
+								fill="none"
+								stroke="currentColor"
+								stroke-width="1.8"
+								stroke-linecap="round"
+								stroke-linejoin="round"
+							>
+								<path d="M 3 19 L 8.5 10 L 12 15 L 14.5 11.5 L 21 19 Z" fill="currentColor" />
+								<path d="M14 5v9M14 5l5 1.8-5 1.8" />
 							</svg>
 						</span>
 						<h3 id="gw-stage-progress-heading" class="text-sm font-bold text-gw-navy">
