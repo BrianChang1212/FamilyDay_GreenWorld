@@ -108,6 +108,17 @@ export const zhTW = {
     modalConfirmButton: "確定",
     fallbackName: "{DEFAULT_PLAYER_NAME}",
     imageAlt: "森林慶祝場景：動物們與派對元素，恭喜完成闖關",
+    /** 點「領取闖關禮」→ 全屏掃 QR 防誤領（工作人員手持 QR） */
+    claimScanAlignTitle: "請對準QRCode",
+    claimScanBackButton: "返回",
+    claimScanVerifying: "領取中…",
+    claimScanVideoAria: "相機取景畫面，請將領獎 QR code 對準方框",
+    claimScanQrUnrecognized:
+      "QR code 不正確，請確認是否為現場領獎 QR。",
+    claimScanCameraDenied:
+      "已拒絕相機權限，請在瀏覽器設定允許取用相機後重試。",
+    claimScanCameraUnavailable:
+      "無法開啟相機，請檢查裝置是否在通話或被其他程式佔用。",
   },
   claimSuccess: {
     bannerTitle: "CELEBRATION TIME!",

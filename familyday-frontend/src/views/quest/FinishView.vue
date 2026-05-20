@@ -15,13 +15,14 @@ import { parseApiErrorCode } from "@/lib/parseApiErrorJson";
 import { getViteApiBase } from "@/lib/apiBase";
 import { useI18n } from "@/composables/useI18n";
 import { FINISH_REWARD_SLOTS } from "@/constants";
+import { useQrCameraScan } from "@/composables/useQrCameraScan";
+import { isClaimToken } from "@/lib/claimPayload";
 
 const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
 const name = ref("");
 const employeeId = ref("");
-const showClaimModal = ref(false);
 const claimedCount = ref(0);
 const bankedFullClears = ref(0);
 const maxSlots = ref(FINISH_REWARD_SLOTS);
@@ -31,6 +32,13 @@ const actionLoading = ref(false);
 const actionError = ref("");
 const claimSubmitting = ref(false);
 const claimError = ref("");
+
+/** 領獎防誤領：點按鈕 → 進掃 QR 全屏；掃到工作人員 QR 才呼叫 claim API */
+const viewPhase = ref<"main" | "scanning">("main");
+const scanVideoRef = ref<HTMLVideoElement | null>(null);
+const scanError = ref("");
+const qrScanLive = computed(() => viewPhase.value === "scanning");
+const qrDecodePaused = computed(() => claimSubmitting.value);
 
 const userLine = computed(() => {
 	const id = employeeId.value.trim();
@@ -45,10 +53,6 @@ const isClaimFull = computed(
 /** 通關過至少一輪（bankedFullClears >= 1）且未達上限 */
 const hasClaimCredit = computed(
 	() => bankedFullClears.value >= 1,
-);
-
-const nextClaimIndex = computed(() =>
-	Math.min(claimedCount.value + 1, maxSlots.value),
 );
 
 const slotLabels = computed(() => {
@@ -103,7 +107,7 @@ watch(
 	},
 );
 
-function openClaimModal() {
+function openClaimScanner() {
 	if (
 		isClaimFull.value ||
 		statusLoadState.value !== "ok" ||
@@ -112,48 +116,72 @@ function openClaimModal() {
 		return;
 	}
 	claimError.value = "";
-	showClaimModal.value = true;
+	scanError.value = "";
+	cameraSetupError.value = "";
+	viewPhase.value = "scanning";
 }
 
-function closeClaimModal() {
+function closeScanUi() {
 	if (claimSubmitting.value) return;
-	showClaimModal.value = false;
-	claimError.value = "";
+	viewPhase.value = "main";
+	scanError.value = "";
+	cameraSetupError.value = "";
 }
 
-async function confirmClaim() {
+async function submitClaim(): Promise<void> {
 	claimError.value = "";
-	if (getViteApiBase()) {
-		claimSubmitting.value = true;
-		try {
-			await claimFinishReward();
-			showClaimModal.value = false;
-			await refreshClaimed();
-		} catch (err) {
-			const msg = err instanceof Error ? err.message : String(err);
-			const code = parseApiErrorCode(msg);
-			if (code === "REWARD_CLAIM_LIMIT_REACHED") {
-				claimError.value = t("finish.rewardLimitReached", {
-					maxSlots: maxSlots.value,
-				});
-			} else if (code === "REWARD_CLAIM_NOT_ELIGIBLE") {
-				claimError.value = t("finish.rewardClaimNotEligible");
-			} else if (code === "FINISH_CLAIM_NOT_READY") {
-				claimError.value = t("finish.rewardClaimNotReady");
-			} else {
-				claimError.value =
-					msg.length > 180 ? `${msg.slice(0, 180)}…` : msg;
-			}
-			void refreshClaimed();
-		} finally {
-			claimSubmitting.value = false;
-		}
+	if (!getViteApiBase()) {
+		incrementLocalFinishClaimIfNoApiBase();
+		viewPhase.value = "main";
+		await refreshClaimed();
 		return;
 	}
-	showClaimModal.value = false;
-	incrementLocalFinishClaimIfNoApiBase();
-	await refreshClaimed();
+	claimSubmitting.value = true;
+	try {
+		await claimFinishReward();
+		viewPhase.value = "main";
+		await refreshClaimed();
+	} catch (err) {
+		const msg = err instanceof Error ? err.message : String(err);
+		const code = parseApiErrorCode(msg);
+		if (code === "REWARD_CLAIM_LIMIT_REACHED") {
+			claimError.value = t("finish.rewardLimitReached", {
+				maxSlots: maxSlots.value,
+			});
+		} else if (code === "REWARD_CLAIM_NOT_ELIGIBLE") {
+			claimError.value = t("finish.rewardClaimNotEligible");
+		} else if (code === "FINISH_CLAIM_NOT_READY") {
+			claimError.value = t("finish.rewardClaimNotReady");
+		} else {
+			claimError.value =
+				msg.length > 180 ? `${msg.slice(0, 180)}…` : msg;
+		}
+		viewPhase.value = "main";
+		void refreshClaimed();
+	} finally {
+		claimSubmitting.value = false;
+	}
 }
+
+async function onScanDecode(payload: string): Promise<void> {
+	if (!isClaimToken(payload)) {
+		scanError.value = t("finish.claimScanQrUnrecognized");
+		return;
+	}
+	scanError.value = "";
+	await submitClaim();
+}
+
+const cameraSetupError = useQrCameraScan({
+	videoRef: scanVideoRef,
+	active: qrScanLive,
+	paused: qrDecodePaused,
+	onDecode: onScanDecode,
+});
+
+const scanUiMessage = computed(
+	() => cameraSetupError.value || scanError.value,
+);
 
 function goHome() {
 	actionLoading.value = true;
@@ -172,11 +200,126 @@ function goHome() {
 
 <template>
 	<div
-		class="gw-page-fill relative flex min-h-min flex-1 flex-col bg-[#eef0eb]"
+		class="gw-page-fill relative flex flex-1 flex-col bg-[#eef0eb]"
+		:class="viewPhase === 'scanning' ? 'min-h-0 overflow-hidden' : 'min-h-min'"
 	>
-		<GwBrandBar />
+		<GwBrandBar v-if="viewPhase === 'main'" />
+
+		<!-- 領獎掃 QR：與 StageView 同款（深灰底、置中取景框、返回鍵） -->
+		<div
+			v-if="viewPhase === 'scanning'"
+			class="gw-scan-sheet relative z-[2] flex min-h-0 flex-1 flex-col overflow-hidden bg-[#757575]"
+		>
+			<div
+				class="pointer-events-none absolute inset-0 overflow-hidden"
+				aria-hidden="true"
+			>
+				<div
+					class="absolute inset-0 bg-[radial-gradient(ellipse_75%_55%_at_50%_30%,rgba(255,255,255,0.055)_0%,transparent_58%)]"
+				/>
+			</div>
+
+			<div
+				class="relative flex min-h-0 flex-1 flex-col overflow-hidden pb-[max(0.65rem,env(safe-area-inset-bottom,0px))]
+					ps-[max(1.25rem,env(safe-area-inset-left,0px))] pe-[max(1.25rem,env(safe-area-inset-right,0px))]
+					pt-[max(0.5rem,env(safe-area-inset-top,0px))]
+					sm:px-8 sm:pb-5 sm:pt-8"
+			>
+				<div class="relative flex min-h-0 flex-1 flex-col overflow-hidden pb-3 pt-1 sm:py-3">
+					<div
+						class="flex min-h-0 w-full flex-1 flex-col items-center justify-center overflow-hidden px-0"
+					>
+						<div class="flex w-full flex-col items-center gap-2 sm:gap-2.5">
+							<p
+								class="w-full max-w-[min(100%,88vmin,28rem,calc(100dvh-12.5rem))] shrink-0 px-1 text-center text-[2.12rem] font-bold leading-tight tracking-wide text-white"
+							>
+								{{ t("finish.claimScanAlignTitle") }}
+							</p>
+							<p
+								v-if="claimSubmitting"
+								class="-mt-1 w-full shrink-0 text-center text-xs font-semibold text-white/80"
+							>
+								{{ t("finish.claimScanVerifying") }}
+							</p>
+							<div
+								class="gw-scan-frame relative box-border aspect-square shrink-0 overflow-hidden rounded-[2rem]
+									bg-black shadow-[inset_0_0_0_2px_rgba(255,255,255,0.45)] ring-[3px] ring-black/45
+									w-[min(100%,88vmin,28rem,calc(100dvh-12.5rem))]"
+							>
+								<video
+									ref="scanVideoRef"
+									class="absolute inset-0 block h-full w-full object-cover"
+									autoplay
+									muted
+									playsinline
+									:aria-label="t('finish.claimScanVideoAria')"
+								/>
+								<div
+									class="gw-scan-corner gw-scan-corner--tl pointer-events-none absolute left-4 top-4 z-[3]"
+									aria-hidden="true"
+								/>
+								<div
+									class="gw-scan-corner gw-scan-corner--tr pointer-events-none absolute right-4 top-4 z-[3]"
+									aria-hidden="true"
+								/>
+								<div
+									class="gw-scan-corner gw-scan-corner--bl pointer-events-none absolute bottom-4 left-4 z-[3]"
+									aria-hidden="true"
+								/>
+								<div
+									class="gw-scan-corner gw-scan-corner--br pointer-events-none absolute bottom-4 right-4 z-[3]"
+									aria-hidden="true"
+								/>
+								<div
+									class="gw-scan-beam-mask pointer-events-none absolute inset-4 z-[4] overflow-hidden rounded-2xl"
+									aria-hidden="true"
+								>
+									<div class="gw-scan-beam-line" />
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<button
+					type="button"
+					class="relative mx-auto w-full max-w-[min(min(88vmin,28rem),calc(100vw-2.5rem))] shrink-0 rounded-[1.75rem] bg-[#2d5a41] px-6 py-[0.9rem] text-base font-semibold text-white shadow-[0_6px_22px_rgba(0,0,0,0.32)] ring-1 ring-black/10 transition hover:brightness-[1.05] active:brightness-95 disabled:cursor-not-allowed disabled:opacity-60 sm:rounded-[2rem] sm:py-[0.95rem]"
+					:disabled="claimSubmitting"
+					@click="closeScanUi"
+				>
+					<span class="flex items-center justify-center gap-2">
+						<svg
+							class="h-[1.05em] w-[1.05em] shrink-0"
+							viewBox="0 0 24 24"
+							fill="none"
+							stroke="currentColor"
+							stroke-width="2.35"
+							stroke-linecap="round"
+							stroke-linejoin="round"
+							aria-hidden="true"
+						>
+							<polyline points="15 18 9 12 15 6" />
+						</svg>
+						{{ t("finish.claimScanBackButton") }}
+					</span>
+				</button>
+
+				<p
+					v-if="scanUiMessage"
+					class="relative shrink-0 overflow-hidden px-2 text-center text-[0.75rem] leading-snug text-red-100"
+					role="alert"
+				>
+					<span
+						class="inline-block max-w-full break-words rounded-xl border border-red-300/45 bg-red-950/55 px-3 py-2 text-center line-clamp-3"
+					>
+						{{ scanUiMessage }}
+					</span>
+				</p>
+			</div>
+		</div>
 
 		<main
+			v-else
 			class="relative z-[2] flex flex-1 flex-col px-4 pb-8 pt-5 sm:mx-auto sm:w-full sm:max-w-md"
 		>
 			<div
@@ -337,10 +480,17 @@ function goHome() {
 					:disabled="
 						isClaimFull || statusLoadState !== 'ok' || !hasClaimCredit
 					"
-					@click="openClaimModal"
+					@click="openClaimScanner"
 				>
 					{{ isClaimFull ? t("finish.claimButtonDone") : t("finish.claimButton") }}
 				</button>
+				<p
+					v-if="claimError"
+					class="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-800"
+					role="alert"
+				>
+					{{ claimError }}
+				</p>
 				<div
 					v-if="isClaimFull && statusLoadState === 'ok'"
 					class="pt-2"
@@ -364,84 +514,69 @@ function goHome() {
 			</div>
 		</main>
 
-		<AppFooter class="relative z-[2]" />
-
-		<Teleport to="body">
-			<div
-				v-if="showClaimModal"
-				class="fixed inset-0 z-[200] flex items-center justify-center bg-black/55 px-5 backdrop-blur-sm"
-				role="dialog"
-				aria-modal="true"
-				aria-labelledby="finish-claim-modal-title"
-				@click.self="closeClaimModal"
-			>
-				<div
-					class="w-full max-w-[min(22rem,calc(100vw-2.5rem))] overflow-hidden rounded-[1.35rem] border border-neutral-200/90 bg-[#fafaf8] p-8 shadow-2xl ring-1 ring-black/[0.03]"
-					@click.stop
-				>
-					<div class="flex flex-col items-center">
-						<div
-							class="flex h-20 w-20 items-center justify-center rounded-full bg-[#d9ead3] shadow-inner ring-1 ring-[#2f7354]/10"
-							aria-hidden="true"
-						>
-							<svg
-								class="h-11 w-11 text-[#2f7354]"
-								viewBox="0 0 24 24"
-								fill="none"
-								stroke="currentColor"
-								stroke-width="1.5"
-								stroke-linecap="round"
-								stroke-linejoin="round"
-							>
-								<path
-									d="M20 12v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-8"
-								/>
-								<path
-									d="M4 12h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3.5a3.5 3.5 0 0 1-7 0H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2Z"
-								/>
-								<path d="M12 8v13" />
-							</svg>
-						</div>
-						<h2
-							id="finish-claim-modal-title"
-							class="mt-6 text-center text-xl font-bold text-neutral-900"
-						>
-							{{ t("finish.modalTitle") }}
-						</h2>
-						<p class="mt-3 text-center text-[0.95rem] leading-relaxed text-neutral-600">
-							{{ t("finish.modalMessage", { nextClaimIndex }) }}
-						</p>
-						<p class="mt-5 text-center text-sm text-neutral-400">
-							{{ t("finish.modalStaffInstruction") }}
-						</p>
-					</div>
-					<p
-						v-if="claimError"
-						class="mt-4 rounded-xl border border-red-200 bg-red-50/95 px-3 py-2.5 text-center text-[12px] leading-snug text-red-900"
-						role="alert"
-					>
-						{{ claimError }}
-					</p>
-					<div class="mt-8 flex flex-col gap-3">
-						<button
-							type="button"
-							class="w-full rounded-2xl bg-[#2f7354] py-4 text-lg font-bold text-white shadow-md transition enabled:hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-60"
-							:disabled="claimSubmitting"
-							@click="confirmClaim"
-						>
-							{{ claimSubmitting ? t("common.loading") : t("finish.modalConfirmButton") }}
-						</button>
-						<button
-							type="button"
-							class="w-full rounded-2xl bg-neutral-200 py-[0.95rem] text-base font-bold text-neutral-600 transition enabled:hover:bg-neutral-300 disabled:cursor-not-allowed disabled:opacity-50"
-							:disabled="claimSubmitting"
-							@click="closeClaimModal"
-						>
-							{{ t("common.cancel") }}
-						</button>
-					</div>
-				</div>
-			</div>
-		</Teleport>
+		<AppFooter v-if="viewPhase === 'main'" class="relative z-[2]" />
 	</div>
 </template>
+
+<style scoped>
+.gw-scan-corner {
+	position: absolute;
+	width: var(--corner);
+	height: var(--corner);
+	border: 4px solid #fff;
+	--corner: 3.125rem;
+}
+
+.gw-scan-corner--tl {
+	border-right: none;
+	border-bottom: none;
+	border-top-left-radius: 1rem;
+}
+
+.gw-scan-corner--tr {
+	border-left: none;
+	border-bottom: none;
+	border-top-right-radius: 1rem;
+}
+
+.gw-scan-corner--bl {
+	border-right: none;
+	border-top: none;
+	border-bottom-left-radius: 1rem;
+}
+
+.gw-scan-corner--br {
+	border-left: none;
+	border-top: none;
+	border-bottom-right-radius: 1rem;
+}
+
+@keyframes gw-scan-beam-bounce {
+	0%,
+	100% {
+		top: 18%;
+	}
+	50% {
+		top: 72%;
+	}
+}
+
+.gw-scan-beam-line {
+	position: absolute;
+	left: 0;
+	right: 0;
+	top: 18%;
+	height: 3px;
+	border-radius: 9999px;
+	background: linear-gradient(
+		90deg,
+		rgba(0, 242, 120, 0),
+		rgba(0, 255, 157, 0.95),
+		rgba(0, 235, 120, 0)
+	);
+	box-shadow:
+		0 0 14px rgba(0, 255, 157, 0.85),
+		0 0 4px rgba(255, 255, 255, 0.9);
+	animation: gw-scan-beam-bounce 2.15s ease-in-out infinite;
+}
+</style>

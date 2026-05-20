@@ -15,7 +15,8 @@
     "test:coverage": "vitest run --coverage",
     "qr:mock-stations": "node ./scripts/generate-mock-station-qr.mjs",
     "qr:staging-stations": "node ./scripts/generate-staging-station-qr.mjs",
-    "qr:entry-links": "node ./scripts/generate-entry-link-qr.mjs"
+    "qr:entry-links": "node ./scripts/generate-entry-link-qr.mjs",
+    "qr:claim": "node ./scripts/generate-claim-qr.mjs"
   },
   "dependencies": {
     "jsqr": "^1.4.0",
