@@ -53,14 +53,14 @@ npm run dev
 
 > **工作約定：** **本表**為**進度現況**之**權威**來源（View／API 函式數／測試檔數等）。**待辦勾選與完整行動清單**以 [`docs/project/project-master.md` § 待辦事項](docs/project/project-master.md#work-backlog) 為準。
 
-> **計數／端點：** 2026-05-11 依原始碼掃描（仍有效；後端 **19** 端點、前端 **10** View／**11** API 函式／**14** 測試檔）。**2026-05-13** 起 **文件完整對齊**：**SPA** **`Authorization: Bearer`** + **`sessionStorage`**；契約 **`api-v0.1` v0.1.25–v0.1.26**（含 **`POST …/auth/login`** 回 **`ok`**／**`token`**／**`user`**，見 **`familyday-backend/src/routes/auth.ts`**）；**`system-architecture` v1.4**（§8.1 掃描日）；**`api-integration-checklist`** Bearer 前置與 §7 說明；**`project-master` v1.3.53**。**同日：** **Firebase Hosting 上架後**已做**全端手動驗收**——**報到（check-in）**與**闖關**主流程之功能與操作**符合需求**（紀錄見 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §7、`docs/testing/api-integration-history.md`）。背景見 [`docs/setup/ios-mobile-auth-fix-2026-05-13.md`](docs/setup/ios-mobile-auth-fix-2026-05-13.md)。**admin/reports**：**`total`／`checkedIn`**、**`progress`** 占位見 [`familyday-backend/src/routes/admin.ts`](familyday-backend/src/routes/admin.ts)。**2026-05-19：** Firestore IAM 憑證設定完成（SA JSON）；**`npm run verify:firestore`** 對正式 Cloud Functions 端點執行，四集合讀寫 **PASS**；前後端重新部署（Functions `api-hxe6k6ncza-uc.a.run.app`、Hosting `rare-lattice-495009-i9.web.app`）；**報到（check-in）＋闖關（game）功能於正式環境驗證完成**；**`project-master` v1.3.55**。
+> **計數／端點：** 2026-05-11 依原始碼掃描（仍有效；後端 **19** 端點、前端 **10** View／**11** API 函式／**16** 測試檔）。**2026-05-13** 起 **文件完整對齊**：**SPA** **`Authorization: Bearer`** + **`sessionStorage`**；契約 **`api-v0.1` v0.1.25–v0.1.26**（含 **`POST …/auth/login`** 回 **`ok`**／**`token`**／**`user`**，見 **`familyday-backend/src/routes/auth.ts`**）；**`system-architecture` v1.5**（§6.3 新增外部 QR scanner 序列）；**`api-integration-checklist`** Bearer 前置與 §7 說明；**`project-master` v1.3.56**。**同日：** **Firebase Hosting 上架後**已做**全端手動驗收**——**報到（check-in）**與**闖關**主流程之功能與操作**符合需求**（紀錄見 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §7、`docs/testing/api-integration-history.md`）。背景見 [`docs/setup/ios-mobile-auth-fix-2026-05-13.md`](docs/setup/ios-mobile-auth-fix-2026-05-13.md)。**admin/reports**：**`total`／`checkedIn`**、**`progress`** 占位見 [`familyday-backend/src/routes/admin.ts`](familyday-backend/src/routes/admin.ts)。**2026-05-19：** Firestore IAM 憑證設定完成（SA JSON）；**`npm run verify:firestore`** 對正式 Cloud Functions 端點執行，四集合讀寫 **PASS**；前後端重新部署（Functions `api-hxe6k6ncza-uc.a.run.app`、Hosting `rare-lattice-495009-i9.web.app`）；**報到（check-in）＋闖關（game）功能於正式環境驗證完成**；**`project-master` v1.3.55**。**2026-05-20：** 外部 QR scanner 相容（站台 PNG 改編為 `https://<host>/scan?t=<JWT>` 深連結 + SPA `/scan` dispatcher）；闖關紀錄保留（`RegisterView` 登入不再 `restartPlaythrough`、`applyAttemptResult` 移除 stage-1 auto-reset，全破玩家再登入與重玩皆保留 6/6 ✓）；前後端重新部署；commit `4bdfb5d`；**`project-master` v1.3.56**。
 
 | 面向 | 現況 |
 |------|------|
-| 前端 | 10 個 View **全數完整實作**（WelcomeView → FinishView；舊 **`/finish/claimed`** 僅 redirect **`/finish`**）；API 層 11 支函式對應真實端點；14 個測試檔無 skip/stub；CI 通過；**闖關 API 呼叫附 Bearer**（`familyday-frontend/src/lib/sessionToken.ts`） |
+| 前端 | 10 個 View **全數完整實作**（WelcomeView → FinishView；舊 **`/finish/claimed`** 僅 redirect **`/finish`**）；API 層 11 支函式對應真實端點；16 個測試檔無 skip/stub；CI 通過；**闖關 API 呼叫附 Bearer**（`familyday-frontend/src/lib/sessionToken.ts`）；**外部 QR scanner 進入點 `/scan`**（`src/lib/scanEntry.ts` + `qrPayload.ts`） |
 | API | **19** 個端點均已實作。**`GET /admin/reports/attendance`**：**`total`**＝Firestore **`roster`**（現行 **`eventId`** 下名冊筆數）；**`checkedIn`**＝**`checkins`** 計數。**`GET /admin/reports/progress`**：**`redeemed`** 取自核銷摘要；**`players`／`fullClear`** 仍為 **`admin.ts`** 占位常數（待對齊 `player_progress` 聚合） |
 | 後端資料層 | roster / checkins / player_progress / redeem 四集合已完整實作 Firestore + in-memory 雙模式切換；**Firestore IAM 憑證已設定**（2026-05-19） |
-| 測試 | 前端 Vitest **14** 檔通過；後端 Vitest **5** 檔／**27** 測試通過；`verify:firestore` 正式端點 **PASS**（2026-05-19）；**報到（check-in）＋闖關（game）功能於正式環境手動驗證 Pass**（2026-05-19） |
+| 測試 | 前端 Vitest **16** 檔／**113** 測試通過（加入 `qrPayload`／`scanEntry`／`/scan` redirect 三組）；後端 Vitest **5** 檔／**28** 測試通過（加入「全破後重玩不清紀錄」回歸守門）；`verify:firestore` 正式端點 **PASS**（2026-05-19）；**報到（check-in）＋闖關（game）功能於正式環境手動驗證 Pass**（2026-05-19） |
 | 部署 | **Firebase Hosting `rare-lattice-495009-i9.web.app` 已上架**；Cloud Functions `api-hxe6k6ncza-uc.a.run.app`；Firestore 端到端閉環完成；正式上線仍須完成 Security Rules／安全基線與主辦簽核 |
 
 ---
@@ -90,4 +90,4 @@ npm run dev
 
 ---
 
-*README v2.80 · 2026-05-19（六張正式 QR PNG 產出；admin/reports/progress 聚合確認完成；前版 v2.79）*
+*README v2.81 · 2026-05-20（外部 QR scanner 深連結 `/scan` 上線；闖關紀錄全程保留；commit `4bdfb5d`；前版 v2.80）*

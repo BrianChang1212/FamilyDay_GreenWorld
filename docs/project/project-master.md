@@ -347,13 +347,16 @@
 
 <a id="work-backlog"></a>
 
-### 待辦事項（2026-05-19 更新）
+### 待辦事項（2026-05-20 更新）
 
 **工作約定：** 日常跟進以本節為**待辦權威**；**進度數字**以根 [`README.md`](../../README.md#readme-live-progress) **即時進度**為準。完成項目請於此勾選並視需要同步 README 摘要。
 
 #### 高優先級
 - [x] **Firestore IAM 憑證設定**（SA JSON `GOOGLE_APPLICATION_CREDENTIALS`）— 完成 2026-05-19
 - [x] 重跑 `familyday-backend/`：`npm run verify:firestore` 對正式 Cloud Functions 端點，四集合讀寫 **PASS** — 完成 2026-05-19
+- [x] **外部 QR scanner 相容** — 站台 PNG 改編碼為 `https://<host>/scan?t=<JWT>` 深連結；SPA 新增 `/scan` dispatcher（已登入直接進 quiz、未登入導 register 後接續）；內嵌 scanner 與外部相機共用 `src/lib/qrPayload.ts` 解析器 — 完成 2026-05-20
+- [x] **闖關紀錄保留** — `RegisterView` 登入移除 `restartPlaythrough`；`applyAttemptResult` 移除 stage-1 auto-reset：全破玩家再登入或重玩任一站，`completedStageIds` 永久保留；獎勵領取仍由 `claimFinishRewardProgress` 控管（maxRounds=3） — 完成 2026-05-20
+- [x] **站點重玩擋阻移除** — `StageView` 不再以 `isStageCompleted` 擋掉同關 QR；後端 `applyAttemptResult` 對重複作答 idempotent — 完成 2026-05-20
 - [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、**Bearer／sessionStorage（XSS）**、Cookie 相容）
 
 #### 中優先級
@@ -434,4 +437,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.55 · 2026-05-19（前後端重新部署；check-in＋game 正式環境驗證 Pass；根 **`README` v2.79**；前版 **v1.3.54**）
+**文件版本：** 合併版 v1.3.56 · 2026-05-20（外部 QR scanner 深連結 `/scan` + 闖關紀錄保留：`RegisterView` 移除 `restartPlaythrough`、`applyAttemptResult` 移除 stage-1 auto-reset；前後端重新部署；commit `4bdfb5d`；前版 **v1.3.55**）

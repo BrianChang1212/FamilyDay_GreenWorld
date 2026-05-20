@@ -201,7 +201,38 @@ sequenceDiagram
   API-->>B: correct、allStagesCompleted…
 ```
 
-### 6.3 報到（與闖關分流）
+### 6.3 外部 QR scanner 進入闖關（2026-05-20 起 · 新增）
+
+活動正式站台 QR PNG（**`familyday-frontend/public/qr-staging-stations/`**）內含 deep-link URL **`https://<host>/scan?t=<JWT>`**；玩家用**手機內建相機或任意 QR scanner** 都可掃碼跳轉 SPA。SPA 路由 **`/scan`** 為 dispatcher（**無 UI**），依登入狀態分流：
+
+```mermaid
+sequenceDiagram
+  participant Cam as 手機相機 / QR scanner
+  participant SPA as Vue Router (/scan)
+  participant SS as sessionStorage
+  participant API as Cloud Function API
+
+  Cam->>SPA: GET /scan?t=<JWT>
+  SPA->>SPA: extractQrStageId(t)<br/>(src/lib/qrPayload.ts)
+  alt 解析失敗
+    SPA-->>Cam: redirect → /stage
+  else 解析成功
+    SPA->>SS: setEntryIntent("game")<br/>setStage(N) / setInZone(1)<br/>setPendingStationVerification(N, cN)
+    alt 已登入（sessionToken 存在）
+      SPA-->>Cam: redirect → /quiz?challengeId=cN
+    else 未登入
+      SPA-->>Cam: redirect → /register
+      Note over SPA,API: 玩家於 RegisterView 填員編、API loginGame()<br/>後 RegisterView 讀 pending → push /quiz?challengeId=cN
+    end
+  end
+```
+
+**設計重點：**
+- QR payload 仍是後端簽章的 JWT，僅由 generator 包成 URL（**`scripts/generate-staging-station-qr.mjs`**）。
+- 內嵌 scanner（`StageView` + `composables/useQrCameraScan.ts`）與外部相機**共用同一解析器** `src/lib/qrPayload.ts`，支援 URL / JWT / mock token 三種 payload，向下相容。
+- **無 REST 契約變更**：仍透過既有 `/api/v1/auth/login`、`/api/v1/me/dashboard`、`/api/v1/challenges/...` 完成後續流程。
+
+### 6.4 報到（與闖關分流）
 
 ```mermaid
 sequenceDiagram
@@ -301,4 +332,5 @@ sequenceDiagram
 | 1.2 | 2026-05-11 | **§8.2**：補 **`admin/reports/*`** 資料來源敘述（**`roster`／`checkins`**、**`redeemed`** vs **`players`／`fullClear`** 占位）；與 `admin.ts` 一致 |
 | 1.3 | 2026-05-13 | **§1／§5／§6.1**：認證敘述改為 **Bearer** 主路徑（**`api-v0.1` v0.1.25–v0.1.26**）；Mermaid 與後端 utils 說明同步 |
 | 1.4 | 2026-05-13 | **§8.1**：掃描日更新；契約登入 JSON 對齊 **`api-v0.1` v0.1.26** |
+| 1.5 | 2026-05-20 | **§6.3**：新增「外部 QR scanner 進入闖關」序列（SPA `/scan` dispatcher、`qrPayload.ts` 共用解析器）；原 §6.3 報到流程順延為 §6.4；**無** REST 契約變更 |
 
