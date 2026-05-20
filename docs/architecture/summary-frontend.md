@@ -72,7 +72,9 @@
 
 **FinishView 領獎防誤領（2026-05-20 起）：** 玩家點「領取闖關禮」按鈕不再直接呼叫 API，而是切到全屏掃 QR UI（`viewPhase: "main" | "scanning"`，與 StageView 同款邊框 + 掃描線）。掃到工作人員手持 QR（payload `fdgw-claim-token`，PNG 位於 `public/qr-staff-stations/claim-token.png`）才會呼叫 **`POST /api/v1/me/reward/claim`**。解析邏輯：**`src/lib/claimPayload.ts::isClaimToken`**；scan 中按返回不消耗領獎次數。後端 `maxRounds=3` 仍為硬上限，避免人為失誤。
 
-**Hero 視圖 fullBleed（2026-05-20 起）：** `App.vue` 讀 `route.meta.fullBleed === true` 時跳過外層 90vw 圓角白卡與 safe-area padding，背景圖直接鋪到 viewport 邊（適用 `WelcomeView`、`CheckInWelcomeView`）。一般頁仍包在白卡內。WelcomeView 主視覺更新為 **`/images/01_welcomeBG.jpg`**（9:16 直式裁切自設計師新版 2048×2048 高解析叢林圖、1152×2048 q90），保留 `familyday-logotype.png` 作為頂部 badge。BriefingView 地圖更新為 **`/images/02_mapIllu.png`**（688×752 扁平風新版）。
+**Hero 視圖 fullBleed（2026-05-20 起）：** `App.vue` 讀 `route.meta.fullBleed === true` 時跳過外層 90vw 圓角白卡與 safe-area padding，背景圖直接鋪到 viewport 邊（適用 `WelcomeView`、`CheckInWelcomeView`）。一般頁仍包在白卡內。WelcomeView 最終仍使用既有 **`/images/game-welcome-enroll-04.jpg`** 與頂部 `familyday-logotype.png`（中間曾換 `01_welcomeBG.jpg` 後復原，見 commit `6ce9b52`）。BriefingView 地圖更新為 **`/images/02_mapIllu.png`**（688×752 扁平風新版）。
+
+**設計師原版 icon 套用（2026-05-20 起）：** StageView「闖關進度」標題前 icon 由長條圖 inline SVG 改為**山+旗 silhouette**；FinishView「領獎狀態」標題前 icon 由獎杯輪廓改為**獎章+星+雙緞帶 silhouette**（兩者皆以 inline SVG 維護，用 `currentColor` 跟隨主題色）。FinishView 領獎三格 slot 取消 inline gift-box SVG 與外框 wrapper，直接顯示設計師 PNG：已領 → **`/images/Icon_gift_s_active.png`**（橘色禮盒+淺橘背景圓角），未領 → **`/images/Icon_gift_s_disabled.png`**（灰禮盒+白底虛線邊框）。
 
 **QR 內容格式（2026-05-20 起 · 外部相機相容）：** `familyday-frontend/public/qr-staging-stations/station-{1..6}.png` 之內容為 **`https://rare-lattice-495009-i9.web.app/scan?t=<JWT>`**（產生器 `scripts/generate-staging-station-qr.mjs`，host 可用 `STAGING_QR_HOST` env 覆寫）。SPA 內嵌 scanner 與外部相機共用此格式：解析邏輯集中於 **`src/lib/qrPayload.ts`**（支援 URL `?t=`／`?stage=`、`stage-N-token` mock、bare JWT 三種），由 **`/scan` 路由與 `StageView` 共用**。
 

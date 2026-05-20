@@ -360,7 +360,8 @@
 - [x] **ResultView 三向分流 + StageView 領獎入口** — 首次全破 → 「闖關成功！領取闖關禮」(/finish)；已 6/6 重玩答對 → 「回到關卡列表」(/stage)；StageView 6/6 時下方常駐「前往領取闖關禮」CTA → /finish。決策邏輯 `src/lib/resultAction.ts` 純函式，6 個單元測試覆蓋 — 完成 2026-05-20
 - [x] **領獎入口 QR (`/reward`)** — 新增第 7 張 `entry-reward.png`（編碼為 `https://<host>/reward`）；已登入 → `/finish`；未登入 → `/register` → 登入後讀 `pendingFinish` 跳 `/finish`。`/scan` 與 `/reward` 互斥清除對方旗標。Router test 加 2 case；qr-entry-links README 同步更新 — 完成 2026-05-20
 - [x] **領獎防誤領（掃 QR 才能領）** — FinishView 點「領取闖關禮」改成全屏掃 QR；掃到工作人員手持 QR (`fdgw-claim-token`) 才呼叫 `/me/reward/claim`。解析邏輯 `src/lib/claimPayload.ts`（6 unit tests）。PNG `public/qr-staff-stations/claim-token.png`；`npm run qr:claim` 重新產生 — 完成 2026-05-20
-- [x] **Hero 視圖 fullBleed + 換新版主視覺** — App.vue 對 `route.meta.fullBleed` 跳過白卡 / safe-area padding；WelcomeView 換 9:16 高解析叢林圖（`01_welcomeBG.jpg`，1152×2048）並保留 logotype 不疊文字；BriefingView 地圖換新版扁平風（`02_mapIllu.png`，688×752）— 完成 2026-05-20
+- [x] **Hero 視圖 fullBleed + 換新版主視覺** — App.vue 對 `route.meta.fullBleed` 跳過白卡 / safe-area padding；WelcomeView 最終維持原 `game-welcome-enroll-04.jpg` 並保留 logotype（中間曾換 `01_welcomeBG.jpg` 1152×2048 後復原，commit `6ce9b52`）；BriefingView 地圖換新版扁平風（`02_mapIllu.png`，688×752）— 完成 2026-05-20
+- [x] **設計師原版 icon 套用** — StageView 闖關進度標題 icon 換為山+旗 silhouette；FinishView 領獎狀態標題 icon 換為獎章+星+雙緞帶 silhouette；領獎三格 slot 改用設計師 PNG（`Icon_gift_s_active.png` 已領 / `Icon_gift_s_disabled.png` 未領），取代 inline SVG 與 wrapper 樣式 — 完成 2026-05-20
 - [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、**Bearer／sessionStorage（XSS）**、Cookie 相容）
 
 #### 中優先級
@@ -441,4 +442,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.60 · 2026-05-20（Hero 視圖 fullBleed：App.vue 對 `meta.fullBleed` 路由跳過白卡與 safe-area padding；WelcomeView 換 9:16 高解析新版主視覺（`01_welcomeBG.jpg` 1152×2048）；BriefingView 換新版扁平風地圖（`02_mapIllu.png` 688×752）；前版 **v1.3.59**）
+**文件版本：** 合併版 v1.3.61 · 2026-05-20（WelcomeView 背景復原至 `game-welcome-enroll-04.jpg`（commit `6ce9b52`）；StageView 闖關進度 icon 換山+旗、FinishView 領獎狀態 icon 換獎章+星+雙緞帶、領獎三格 slot 改用設計師 PNG `Icon_gift_s_active.png` / `Icon_gift_s_disabled.png`（commit `e597632`）；前版 **v1.3.60**）
