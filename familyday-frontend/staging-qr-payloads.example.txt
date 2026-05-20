@@ -1,5 +1,11 @@
 # Copy to staging-qr-payloads.local.txt (gitignored) and replace with six lines
 # of backend-signed JWT (or agreed payload), one per station in order 1..6.
+#
+# 產生 QR 時，generate-staging-station-qr.mjs 會把每行包成 deep-link URL：
+#   https://<STAGING_QR_HOST>/scan?t=<this line, URL-encoded>
+# 預設 host：https://rare-lattice-495009-i9.web.app
+# 自訂：STAGING_QR_HOST=https://example.com npm run qr:staging-stations
+#
 # Example placeholders — not valid for production:
 replace-with-staging-jwt-for-station-1
 replace-with-staging-jwt-for-station-2

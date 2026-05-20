@@ -167,8 +167,6 @@ export const zhTW = {
     /** 列表「未完成」狀態（僅展示，解鎖靠掃 QR） */
     statusLocked: "待解鎖",
     scanVideoAria: "相機取景畫面，請將 QR code 對準方框",
-    scanQrStageAlreadyDone:
-      "此關已完成，請掃描尚未完成之站點 QR code。",
     scanQrMismatch:
       "此 QR 與站台驗證不符，請確認掃描的是正確關卡之現場 QR。",
     scanQrUnrecognized:

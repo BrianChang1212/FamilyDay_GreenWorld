@@ -132,7 +132,8 @@ export function isStageCompleted(stageId: number): boolean {
 /**
  * 重置關卡進度（站點、到站狀態、已完成站點列表）。
  * 不會清除姓名、員編、報到。不會清除終點 **闖關禮已領取次數**（僅領獎路徑受 `FINISH_REWARD_SLOTS` 上限；關卡可反复通關）。
- * 由歡迎／說明頁進入時呼叫；闖關登入另於 `RegisterView` 在 `restartPlaythrough` 成功後才 `syncLocalProgressFromDashboard`。
+ * 由歡迎／說明頁進入時呼叫；`RegisterView` 登入流程亦會先呼叫此函式以清空本地殘留，
+ * 接著 `syncLocalProgressFromDashboard` 從後端 `/me/dashboard` 還原已完成站點。
  */
 export function resetScavengerRun(): void {
 	setStage(GAME_CONFIG.MIN_STAGE);

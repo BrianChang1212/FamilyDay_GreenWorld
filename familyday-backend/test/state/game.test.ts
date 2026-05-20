@@ -93,6 +93,28 @@ describe("game state", () => {
 		expect(progress.bankedFullClears).toBe(1);
 	});
 
+	it("全破後重玩任一關不會清掉 completedStageIds（保留闖關紀錄）", async () => {
+		const employeeId = nextEmployeeId();
+		await completeAllStages(employeeId);
+
+		expect(await claimFinishRewardProgress(employeeId)).toEqual({
+			ok: true,
+			rewardRedeemCount: 1,
+		});
+
+		const beforeReplay = await getOrInitProgress(employeeId);
+		expect(beforeReplay.completedStageIds).toEqual([1, 2, 3, 4, 5, 6]);
+
+		await applyAttemptResult(employeeId, "c1", "B");
+		await applyAttemptResult(employeeId, "c4", "B");
+		await applyAttemptResult(employeeId, "c6", "C");
+
+		const afterReplay = await getOrInitProgress(employeeId);
+		expect(afterReplay.completedStageIds).toEqual([1, 2, 3, 4, 5, 6]);
+		expect(afterReplay.bankedFullClears).toBe(1);
+		expect(afterReplay.fullClearCount).toBe(0);
+	});
+
 	it("rejects reward claims before a full clear", async () => {
 		const employeeId = nextEmployeeId();
 

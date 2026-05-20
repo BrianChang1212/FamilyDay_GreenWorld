@@ -3,13 +3,17 @@ import { onMounted, ref } from "vue";
 import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import GwBrandBar from "@/components/GwBrandBar.vue";
-import { resetScavengerRun, setProfile } from "@/lib/demoState";
+import {
+	getPendingStationVerification,
+	resetScavengerRun,
+	setInZone,
+	setPendingStationVerification,
+	setProfile,
+	setStage,
+} from "@/lib/demoState";
 import { getEntryIntent } from "@/lib/entryIntent";
 import { loginGame } from "@/api/authLogin";
-import {
-	restartPlaythrough,
-	syncLocalProgressFromDashboard,
-} from "@/api/gameFlow";
+import { syncLocalProgressFromDashboard } from "@/api/gameFlow";
 import { getViteApiBase } from "@/lib/apiBase";
 import { useI18n } from "@/composables/useI18n";
 import { fetchRosterLookup } from "@/api/rosterLookup";
@@ -89,28 +93,44 @@ async function submit() {
 	const employeeIdValue = employeeId.value.trim();
 	if (!formValid()) return;
 
+	/*
+	 * 外部 QR scanner → /scan → /register 的情境：先讀目標關卡，因為
+	 * resetScavengerRun() 會清掉 pendingStationVerification。
+	 */
+	const pendingScan = getPendingStationVerification();
+
 	isSubmitting.value = true;
 	submitError.value = "";
 	try {
 		await submitAuthApi(nameValue, employeeIdValue);
 		setProfile(nameValue, employeeIdValue);
 		resetScavengerRun();
-		/* 後端若仍保留上一輪通關紀錄，sync 會把舊進度寫回；須先 restart 再 sync。 */
+		/*
+		 * 登入後直接 sync 後端進度，**不**呼叫 restartPlaythrough：
+		 * - 6/6 全破玩家再登入仍能看到完成狀態與領獎入口（不清紀錄）
+		 * - 部分完成（如 3/6）玩家也能還原進度繼續玩
+		 * - 想再玩一輪的全破玩家直接掃任一站 QR 重新作答；後端 applyAttemptResult
+		 *   不會清空 completedStageIds，闖關紀錄一律保留
+		 */
 		if (getViteApiBase()) {
-			let restarted = false;
 			try {
-				await restartPlaythrough();
-				restarted = true;
+				await syncLocalProgressFromDashboard();
 			} catch {
-				/* 離線或 API 不可用：維持僅清除 session，避免 sync 拉回舊儀表板 */
+				/* 離線或 API 不可用：維持本地空白進度 */
 			}
-			if (restarted) {
-				try {
-					await syncLocalProgressFromDashboard();
-				} catch {
-					/* ignore when dashboard is unreachable */
-				}
-			}
+		}
+		if (pendingScan) {
+			setStage(pendingScan.stage);
+			setInZone(true);
+			setPendingStationVerification(
+				pendingScan.stage,
+				pendingScan.challengeId,
+			);
+			router.push({
+				name: "quiz",
+				query: { challengeId: pendingScan.challengeId },
+			});
+			return;
 		}
 		router.push({ name: "stage" });
 	} catch (err) {

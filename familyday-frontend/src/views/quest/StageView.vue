@@ -6,6 +6,7 @@ import GwBrandBar from "@/components/GwBrandBar.vue";
 import { GAME_CONFIG } from "@/constants";
 import { useQrCameraScan } from "@/composables/useQrCameraScan";
 import { challengeIdForStage } from "@/lib/challengeOptionLabels";
+import { extractQrStageId } from "@/lib/qrPayload";
 import {
 	getCompletedStageIds,
 	getInZone,
@@ -37,40 +38,6 @@ const scanVideoRef = ref<HTMLVideoElement | null>(null);
 const qrScanLive = computed(() => viewPhase.value === "scanning");
 const qrDecodePaused = computed(() => scanLoading.value);
 
-/**
- * QR payload → 站台編號（1…TOTAL_STAGES）。
- * Supports:
- *   - Mock: stage-{n}-token
- *   - JWT-shaped: base64url payload with stageId / stage_id / sid
- */
-function extractQrStageId(payload: string): number | null {
-	const mockMatch = payload.match(/^stage-(\d+)-token$/);
-	if (mockMatch) {
-		const n = Number(mockMatch[1]);
-		return Number.isFinite(n) &&
-			n >= GAME_CONFIG.MIN_STAGE &&
-			n <= GAME_CONFIG.TOTAL_STAGES
-			? n
-			: null;
-	}
-	const parts = payload.split(".");
-	if (parts.length === 3) {
-		try {
-			const padded = parts[1].replace(/-/g, "+").replace(/_/g, "/");
-			const json = JSON.parse(atob(padded)) as Record<string, unknown>;
-			const n = Number(json.stageId ?? json.stage_id ?? json.sid);
-			return Number.isFinite(n) &&
-				n >= GAME_CONFIG.MIN_STAGE &&
-				n <= GAME_CONFIG.TOTAL_STAGES
-				? n
-				: null;
-		} catch {
-			return null;
-		}
-	}
-	return null;
-}
-
 async function verifyFromDecodedQr(payload: string) {
 	const token = payload.trim();
 	if (!token) return;
@@ -81,15 +48,11 @@ async function verifyFromDecodedQr(payload: string) {
 		return;
 	}
 
-	if (isStageCompleted(qrStage)) {
-		scanError.value = t("stage.scanQrStageAlreadyDone");
-		return;
-	}
-
 	/*
 	 * QR 決定進哪一關：前端解析關卡後直接進測驗（challengeId 與後端
 	 * stageIdToChallengeId 一致：c1…cN）。不呼叫 /stations/verify，避免
 	 * 依賴該端點連線／session 才能進題（實體到站仍由活動方 QR 內容控管）。
+	 * 已通關之站點允許重新作答（後端 applyAttemptResult idempotent）。
 	 */
 	setStage(qrStage);
 	stage.value = qrStage;

@@ -16,6 +16,13 @@ import {
 	normalizeQueryEntry,
 	setEntryIntent,
 } from "@/lib/entryIntent";
+import {
+	setInZone,
+	setPendingStationVerification,
+	setStage,
+} from "@/lib/demoState";
+import { resolveScanIntent } from "@/lib/scanEntry";
+import { getSessionToken } from "@/lib/sessionToken";
 
 const router = createRouter({
 	history: createWebHistory(import.meta.env.BASE_URL),
@@ -41,6 +48,36 @@ const router = createRouter({
 			redirect: () => {
 				setEntryIntent("game");
 				return { name: "welcome" };
+			},
+		},
+		/*
+		 * 外部相機／QR scanner 進入點：QR PNG 編碼為
+		 *   https://<host>/scan?t=<JWT>
+		 * 命中本路由 → 解析 stage → 已登入直接到題目；未登入導 /register，
+		 * RegisterView 登入完成後讀 pending 跳回對應題目。
+		 */
+		{
+			path: "/scan",
+			name: "scan",
+			redirect: (to) => {
+				const intent = resolveScanIntent(to.query);
+				if (intent.type === "invalid") {
+					return { name: "stage" };
+				}
+				setEntryIntent("game");
+				setStage(intent.stageId);
+				setInZone(true);
+				setPendingStationVerification(
+					intent.stageId,
+					intent.challengeId,
+				);
+				if (getSessionToken()) {
+					return {
+						name: "quiz",
+						query: { challengeId: intent.challengeId },
+					};
+				}
+				return { name: "register" };
 			},
 		},
 		{ path: "/briefing", name: "briefing", component: BriefingView },

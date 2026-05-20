@@ -18,6 +18,12 @@ const normalizeQueryEntryMock = vi.fn();
 const clearCheckinWelcomePassedMock = vi.fn();
 const isCheckinWelcomePassedMock = vi.fn(() => true);
 
+const setStageMock = vi.fn();
+const setInZoneMock = vi.fn();
+const setPendingStationVerificationMock = vi.fn();
+const resolveScanIntentMock = vi.fn();
+const getSessionTokenMock = vi.fn(() => "");
+
 vi.mock("vue-router", () => ({
 	createRouter: createRouterMock,
 	createWebHistory: createWebHistoryMock,
@@ -28,6 +34,20 @@ vi.mock("@/lib/entryIntent", () => ({
 	normalizeQueryEntry: normalizeQueryEntryMock,
 	clearCheckinWelcomePassed: clearCheckinWelcomePassedMock,
 	isCheckinWelcomePassed: () => isCheckinWelcomePassedMock(),
+}));
+
+vi.mock("@/lib/demoState", () => ({
+	setStage: setStageMock,
+	setInZone: setInZoneMock,
+	setPendingStationVerification: setPendingStationVerificationMock,
+}));
+
+vi.mock("@/lib/scanEntry", () => ({
+	resolveScanIntent: (q: unknown) => resolveScanIntentMock(q),
+}));
+
+vi.mock("@/lib/sessionToken", () => ({
+	getSessionToken: () => getSessionTokenMock(),
 }));
 
 vi.mock("@/views/home/WelcomeView.vue", () => ({ default: {} }));
@@ -68,6 +88,12 @@ describe("router config and guard", () => {
 		normalizeQueryEntryMock.mockReset();
 		clearCheckinWelcomePassedMock.mockClear();
 		isCheckinWelcomePassedMock.mockImplementation(() => true);
+		setStageMock.mockClear();
+		setInZoneMock.mockClear();
+		setPendingStationVerificationMock.mockClear();
+		resolveScanIntentMock.mockReset();
+		getSessionTokenMock.mockReset();
+		getSessionTokenMock.mockReturnValue("");
 	});
 
 	it("registers check-in and game entry redirects", async () => {
@@ -126,6 +152,65 @@ describe("router config and guard", () => {
 			query: { x: "1" },
 			hash: "#h",
 		});
+	});
+
+	it("/scan invalid 時導向 stage（並不寫入 pending）", async () => {
+		resolveScanIntentMock.mockReturnValue({ type: "invalid" });
+		await import("@/router");
+		const config = getRouterConfig();
+		const routes = config.routes as Array<Record<string, unknown>>;
+		const scan = routes.find((r) => r.name === "scan");
+		expect(scan).toBeTruthy();
+		const redirect = scan?.redirect as (
+			to: { query: Record<string, unknown> },
+		) => unknown;
+		expect(redirect({ query: { t: "garbage" } })).toEqual({ name: "stage" });
+		expect(setStageMock).not.toHaveBeenCalled();
+		expect(setPendingStationVerificationMock).not.toHaveBeenCalled();
+	});
+
+	it("/scan 已登入 → 直接導 quiz（並寫入 pending、entryIntent=game）", async () => {
+		resolveScanIntentMock.mockReturnValue({
+			type: "valid",
+			stageId: 3,
+			challengeId: "c3",
+		});
+		getSessionTokenMock.mockReturnValue("session-jwt-abc");
+		await import("@/router");
+		const config = getRouterConfig();
+		const routes = config.routes as Array<Record<string, unknown>>;
+		const scan = routes.find((r) => r.name === "scan");
+		const redirect = scan?.redirect as (
+			to: { query: Record<string, unknown> },
+		) => unknown;
+		expect(redirect({ query: { t: "anything" } })).toEqual({
+			name: "quiz",
+			query: { challengeId: "c3" },
+		});
+		expect(setEntryIntentMock).toHaveBeenCalledWith("game");
+		expect(setStageMock).toHaveBeenCalledWith(3);
+		expect(setInZoneMock).toHaveBeenCalledWith(true);
+		expect(setPendingStationVerificationMock).toHaveBeenCalledWith(3, "c3");
+	});
+
+	it("/scan 未登入 → 導 register（pending 仍寫入供登入後復原）", async () => {
+		resolveScanIntentMock.mockReturnValue({
+			type: "valid",
+			stageId: 5,
+			challengeId: "c5",
+		});
+		getSessionTokenMock.mockReturnValue("");
+		await import("@/router");
+		const config = getRouterConfig();
+		const routes = config.routes as Array<Record<string, unknown>>;
+		const scan = routes.find((r) => r.name === "scan");
+		const redirect = scan?.redirect as (
+			to: { query: Record<string, unknown> },
+		) => unknown;
+		expect(redirect({ query: { t: "anything" } })).toEqual({
+			name: "register",
+		});
+		expect(setPendingStationVerificationMock).toHaveBeenCalledWith(5, "c5");
 	});
 
 	it("checkin beforeEnter allows form when welcome passed", async () => {

@@ -180,20 +180,10 @@ export async function applyAttemptResult(
 	}
 
 	/*
-	 * 前端若從首頁／說明重置本地關卡但未呼叫 restart API，伺服器仍為 6/6，
-	 * 第二輪無法再累加 bankedFullClears。在「上一輪獎勵已領」（redeem >= banked）
-	 * 時於第 1 關答對自動開新一輪，等同補做 playthrough/restart。
+	 * 全破玩家（6/6）重複作答任一關 → 視為「再玩一輪」UX：不清除 completedStageIds，
+	 * 後續 includes 檢查會直接跳過寫入。獎勵領取由 claimFinishRewardProgress 控管
+	 * （bankedFullClears>=1 + rewardRedeemCount<maxRounds），不依賴本路徑的重置。
 	 */
-	if (
-		stageId === 1 &&
-		progress.completedStageIds.length >= CHALLENGES.length &&
-		progress.rewardRedeemCount >= progress.bankedFullClears
-	) {
-		progress.completedStageIds = [];
-		progress.currentStageId = 1;
-		progress.fullClearCount += 1;
-	}
-
 	const priorCompletedLen = progress.completedStageIds.length;
 
 	if (stageId > 0 && !progress.completedStageIds.includes(stageId)) {
