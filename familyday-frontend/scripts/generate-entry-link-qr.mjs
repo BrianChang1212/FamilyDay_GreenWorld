@@ -1,9 +1,10 @@
 /**
- * PNG QR codes for hosted entry URLs (報到 / 闖關).
+ * PNG QR codes for hosted entry URLs (報到 / 闖關 / 領獎).
  *
  * Payloads match router redirects:
  *   /check-in → check-in welcome + session intent
  *   /game     → game welcome + session intent
+ *   /reward   → finish view (or register if not logged in, with pendingFinish)
  *
  * Usage:
  *   npm run qr:entry-links
@@ -38,6 +39,7 @@ const base = baseRaw.replace(/\/$/, "");
 const pairs = [
 	{ name: "entry-check-in", path: "/check-in", label: "報到入口" },
 	{ name: "entry-game", path: "/game", label: "闖關入口" },
+	{ name: "entry-reward", path: "/reward", label: "領獎入口" },
 ];
 
 const outDir = path.join(root, "public", "qr-entry-links");

@@ -17,7 +17,10 @@ import {
 	setEntryIntent,
 } from "@/lib/entryIntent";
 import {
+	clearPendingFinish,
+	clearPendingStationVerification,
 	setInZone,
+	setPendingFinish,
 	setPendingStationVerification,
 	setStage,
 } from "@/lib/demoState";
@@ -71,11 +74,30 @@ const router = createRouter({
 					intent.stageId,
 					intent.challengeId,
 				);
+				clearPendingFinish();
 				if (getSessionToken()) {
 					return {
 						name: "quiz",
 						query: { challengeId: intent.challengeId },
 					};
+				}
+				return { name: "register" };
+			},
+		},
+		/*
+		 * 領獎入口 QR：PNG 編碼為 `https://<host>/reward`。
+		 * 已登入直接到 /finish；未登入導 /register，RegisterView 登入完成讀
+		 * pendingFinish 旗標跳回 /finish。
+		 */
+		{
+			path: "/reward",
+			name: "rewardEntry",
+			redirect: () => {
+				setEntryIntent("game");
+				setPendingFinish(true);
+				clearPendingStationVerification();
+				if (getSessionToken()) {
+					return { name: "finish" };
 				}
 				return { name: "register" };
 			},

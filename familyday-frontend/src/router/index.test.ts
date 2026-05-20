@@ -21,6 +21,9 @@ const isCheckinWelcomePassedMock = vi.fn(() => true);
 const setStageMock = vi.fn();
 const setInZoneMock = vi.fn();
 const setPendingStationVerificationMock = vi.fn();
+const clearPendingStationVerificationMock = vi.fn();
+const setPendingFinishMock = vi.fn();
+const clearPendingFinishMock = vi.fn();
 const resolveScanIntentMock = vi.fn();
 const getSessionTokenMock = vi.fn(() => "");
 
@@ -40,6 +43,9 @@ vi.mock("@/lib/demoState", () => ({
 	setStage: setStageMock,
 	setInZone: setInZoneMock,
 	setPendingStationVerification: setPendingStationVerificationMock,
+	clearPendingStationVerification: clearPendingStationVerificationMock,
+	setPendingFinish: setPendingFinishMock,
+	clearPendingFinish: clearPendingFinishMock,
 }));
 
 vi.mock("@/lib/scanEntry", () => ({
@@ -91,6 +97,9 @@ describe("router config and guard", () => {
 		setStageMock.mockClear();
 		setInZoneMock.mockClear();
 		setPendingStationVerificationMock.mockClear();
+		clearPendingStationVerificationMock.mockClear();
+		setPendingFinishMock.mockClear();
+		clearPendingFinishMock.mockClear();
 		resolveScanIntentMock.mockReset();
 		getSessionTokenMock.mockReset();
 		getSessionTokenMock.mockReturnValue("");
@@ -211,6 +220,33 @@ describe("router config and guard", () => {
 			name: "register",
 		});
 		expect(setPendingStationVerificationMock).toHaveBeenCalledWith(5, "c5");
+		expect(clearPendingFinishMock).toHaveBeenCalledTimes(1);
+	});
+
+	it("/reward 已登入 → 直接導 finish（並寫入 pendingFinish、清掉 pendingStation）", async () => {
+		getSessionTokenMock.mockReturnValue("session-token-xyz");
+		await import("@/router");
+		const config = getRouterConfig();
+		const routes = config.routes as Array<Record<string, unknown>>;
+		const reward = routes.find((r) => r.name === "rewardEntry");
+		expect(reward).toBeTruthy();
+		const redirect = reward?.redirect as () => unknown;
+		expect(redirect()).toEqual({ name: "finish" });
+		expect(setEntryIntentMock).toHaveBeenCalledWith("game");
+		expect(setPendingFinishMock).toHaveBeenCalledWith(true);
+		expect(clearPendingStationVerificationMock).toHaveBeenCalledTimes(1);
+	});
+
+	it("/reward 未登入 → 導 register（pendingFinish 寫入供登入後跳 finish）", async () => {
+		getSessionTokenMock.mockReturnValue("");
+		await import("@/router");
+		const config = getRouterConfig();
+		const routes = config.routes as Array<Record<string, unknown>>;
+		const reward = routes.find((r) => r.name === "rewardEntry");
+		const redirect = reward?.redirect as () => unknown;
+		expect(redirect()).toEqual({ name: "register" });
+		expect(setPendingFinishMock).toHaveBeenCalledWith(true);
+		expect(clearPendingStationVerificationMock).toHaveBeenCalledTimes(1);
 	});
 
 	it("checkin beforeEnter allows form when welcome passed", async () => {

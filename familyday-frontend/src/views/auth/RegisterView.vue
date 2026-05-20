@@ -4,6 +4,7 @@ import { useRouter } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import GwBrandBar from "@/components/GwBrandBar.vue";
 import {
+	getPendingFinish,
 	getPendingStationVerification,
 	resetScavengerRun,
 	setInZone,
@@ -96,8 +97,11 @@ async function submit() {
 	/*
 	 * 外部 QR scanner → /scan → /register 的情境：先讀目標關卡，因為
 	 * resetScavengerRun() 會清掉 pendingStationVerification。
+	 * 領獎入口 QR → /reward → /register 走 pendingFinish 旗標，同樣需先讀。
+	 * （/scan 與 /reward 互斥清除對方旗標，理論上只有一個會為 true。）
 	 */
 	const pendingScan = getPendingStationVerification();
+	const pendingFinish = getPendingFinish();
 
 	isSubmitting.value = true;
 	submitError.value = "";
@@ -130,6 +134,10 @@ async function submit() {
 				name: "quiz",
 				query: { challengeId: pendingScan.challengeId },
 			});
+			return;
+		}
+		if (pendingFinish) {
+			router.push({ name: "finish" });
 			return;
 		}
 		router.push({ name: "stage" });

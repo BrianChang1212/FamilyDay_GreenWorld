@@ -35,6 +35,8 @@ export const STORAGE_KEYS = {
 	inZone: "fdgw_inZone",
 	/** 本站掃碼驗證後暫存的 challengeId（與 stage 綁定，避免 inZone 與題組不一致） */
 	pendingStationChallenge: "fdgw_pending_station_challenge",
+	/** 領獎入口 QR 掃描後暫存，登入完成讀此旗標決定是否直接 push /finish */
+	pendingFinish: "fdgw_pending_finish",
 	finishClaimed: "fdgw_finishClaimed",
 	companionCount: "fdgw_companionCount",
 	checkinDone: "fdgw_checkin_done",

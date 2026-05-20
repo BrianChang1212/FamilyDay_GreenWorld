@@ -13,6 +13,7 @@ const K = {
 	employeeId: STORAGE_KEYS.employeeId,
 	inZone: STORAGE_KEYS.inZone,
 	pendingStationChallenge: STORAGE_KEYS.pendingStationChallenge,
+	pendingFinish: STORAGE_KEYS.pendingFinish,
 	/** 終點領獎已領次數 0…FINISH_REWARD_SLOTS（僅此路徑有「最多 N 次」上限） */
 	finishClaimed: STORAGE_KEYS.finishClaimed,
 	/** 現場報到：同行人數（原型暫存） */
@@ -139,6 +140,7 @@ export function resetScavengerRun(): void {
 	setStage(GAME_CONFIG.MIN_STAGE);
 	setInZone(false);
 	clearPendingStationVerification();
+	clearPendingFinish();
 	sessionStorage.removeItem(K.completedStageIds);
 }
 
@@ -199,6 +201,23 @@ export function setPendingStationVerification(
 
 export function clearPendingStationVerification(): void {
 	sessionStorage.removeItem(K.pendingStationChallenge);
+}
+
+/**
+ * 領獎入口（`/reward`）QR 掃描後寫入此旗標；未登入導 `/register`，
+ * 登入完成讀此值決定是否直接 push `/finish`。
+ */
+export function getPendingFinish(): boolean {
+	return sessionStorage.getItem(K.pendingFinish) === "1";
+}
+
+export function setPendingFinish(v: boolean): void {
+	if (v) sessionStorage.setItem(K.pendingFinish, "1");
+	else sessionStorage.removeItem(K.pendingFinish);
+}
+
+export function clearPendingFinish(): void {
+	sessionStorage.removeItem(K.pendingFinish);
 }
 
 /** 答對後前進一站並重置到站狀態（最後一站不遞增） */
