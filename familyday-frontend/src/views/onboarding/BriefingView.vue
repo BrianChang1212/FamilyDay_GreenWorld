@@ -27,9 +27,9 @@ function next() {
 				class="overflow-hidden rounded-2xl border border-neutral-200/70 bg-white p-3 shadow-md ring-1 ring-black/[0.04]"
 			>
 				<img
-					src="/images/game-board-map-flat-generated.png"
-					width="1376"
-					height="768"
+					src="/images/02_mapIllu.png"
+					width="688"
+					height="752"
 					:alt="t('briefing.mapAlt')"
 					class="block h-auto w-full rounded-xl"
 					loading="eager"

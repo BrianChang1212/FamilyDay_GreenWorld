@@ -14,15 +14,16 @@ function next() {
 
 <template>
 	<!--
-		與報到歡迎頁同款：闖關背景滿铺；Logotype 自頂留白後置中；CTA 疊底。
+		闖關歡迎頁：滿版叢林背景圖（01_welcomeBG.jpg）；familyday-logotype 自頂置中；
+		底部「開始闖關」CTA。App.vue 對 route.meta.fullBleed 跳過白卡，確保背景貼邊。
 	-->
 	<div
-		class="box-border flex h-full max-h-full min-h-0 min-w-0 w-full flex-col overflow-hidden bg-[#2B5038]"
+		class="box-border flex h-full max-h-full min-h-dvh w-full flex-col overflow-hidden bg-[#2B5038]"
 	>
 		<div class="relative min-h-0 flex-1 overflow-hidden">
 			<img
-				src="/images/game-welcome-enroll-04.jpg"
-				alt=""
+				src="/images/01_welcomeBG.jpg"
+				:alt="t('welcome.backgroundAlt')"
 				class="absolute inset-0 h-full w-full object-cover object-center"
 				loading="eager"
 				fetchpriority="high"
