@@ -359,6 +359,7 @@
 - [x] **站點重玩擋阻移除** — `StageView` 不再以 `isStageCompleted` 擋掉同關 QR；後端 `applyAttemptResult` 對重複作答 idempotent — 完成 2026-05-20
 - [x] **ResultView 三向分流 + StageView 領獎入口** — 首次全破 → 「闖關成功！領取闖關禮」(/finish)；已 6/6 重玩答對 → 「回到關卡列表」(/stage)；StageView 6/6 時下方常駐「前往領取闖關禮」CTA → /finish。決策邏輯 `src/lib/resultAction.ts` 純函式，6 個單元測試覆蓋 — 完成 2026-05-20
 - [x] **領獎入口 QR (`/reward`)** — 新增第 7 張 `entry-reward.png`（編碼為 `https://<host>/reward`）；已登入 → `/finish`；未登入 → `/register` → 登入後讀 `pendingFinish` 跳 `/finish`。`/scan` 與 `/reward` 互斥清除對方旗標。Router test 加 2 case；qr-entry-links README 同步更新 — 完成 2026-05-20
+- [x] **領獎防誤領（掃 QR 才能領）** — FinishView 點「領取闖關禮」改成全屏掃 QR；掃到工作人員手持 QR (`fdgw-claim-token`) 才呼叫 `/me/reward/claim`。解析邏輯 `src/lib/claimPayload.ts`（6 unit tests）。PNG `public/qr-staff-stations/claim-token.png`；`npm run qr:claim` 重新產生 — 完成 2026-05-20
 - [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、**Bearer／sessionStorage（XSS）**、Cookie 相容）
 
 #### 中優先級
@@ -439,4 +440,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.58 · 2026-05-20（新增 `/reward` 入口路由 + `entry-reward.png`：第 7 張 QR 給領獎台用；`/scan` 與 `/reward` 互斥清除 pending 旗標；前後端重新部署；前版 **v1.3.57**）
+**文件版本：** 合併版 v1.3.59 · 2026-05-20（FinishView 領獎防誤領：點按鈕後改為全屏掃 QR，掃到 `fdgw-claim-token` 才呼叫 reward claim API；工作人員手持 QR `qr-staff-stations/claim-token.png`；前後端重新部署；前版 **v1.3.58**）
