@@ -367,7 +367,7 @@
 - [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、**Bearer／sessionStorage（XSS）**、Cookie 相容）
 
 #### 中優先級
-- [ ] **`GET /admin/reports/progress` 占位欄位** — 將 **`players`／`fullClear`** 改為 **`player_progress`**（及／或 **`attempts`**）真實聚合；現 **`redeemed`** 已來自 **`getRedeemSummary()`**（見 **`familyday-backend/src/routes/admin.ts`**）
+- [x] **`GET /admin/reports/progress` 占位欄位** — `players`／`fullClear` 已改為 `state/game.ts::getProgressSummary()` 對 `player_progress` 集合的真實聚合（Firestore + in-memory 雙模式）；`redeemed` 來自 `getRedeemSummary()`。見 `familyday-backend/src/routes/admin.ts:42-52`、`familyday-backend/src/state/game.ts:289-315`、commit `b91b7a3` — 完成 2026-05-19
 - [ ] 完成 dev/stage 驗證 runbook（含 `VITE_API_BASE`、`FDGW_USE_FIRESTORE`、憑證設定步驟）
 - [x] 建立後端 Vitest 單元測試基線（http/session/authGuard/game state/health route；**5** 檔／**27** 測試；含「完成一次後可連續領獎至上限」規則）
 - [ ] 擴充後端關鍵路徑自動化（checkin/redeem/admin/Firestore mock 或 emulator）
@@ -444,4 +444,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.63 · 2026-05-21（PlayerProgress 加 `rewardRedeemAt: string[]`；每次領獎成功 push ISO 時間到陣列、寫回 Firestore，預備匯出至活動日資料紀錄表；commit `b8e0822`；前版 **v1.3.62**）
+**文件版本：** 合併版 v1.3.64 · 2026-05-21（待辦同步：補勾「`GET /admin/reports/progress` 占位欄位」中優先項——實際已於 2026-05-19 完成（commit `b91b7a3`）並已記錄於根 `README.md` v2.88，僅本檔待辦清單未同步；前版 **v1.3.63**）
