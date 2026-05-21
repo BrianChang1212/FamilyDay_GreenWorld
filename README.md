@@ -26,14 +26,22 @@ npm run dev
 
 **Windows 一鍵（前端 + API + 雲端 Firestore）**、環境變數與故障排除：[`docs/setup/README.md`](docs/setup/README.md)、[`docs/setup/local-firestore-gcp.md`](docs/setup/local-firestore-gcp.md)。
 
-**Firebase Hosting（實際上架 · `firebaseapp.com`）**
+**Firebase Hosting — 並行兩專案（2026-05-21 起）**
+
+| 環境 | Project ID | Hosting URL | Functions URL |
+|------|-----------|-------------|---------------|
+| **正式** | `familyday-greenworld` | **[https://familyday-greenworld.web.app](https://familyday-greenworld.web.app)** | `api-jwvq2npioq-uc.a.run.app` |
+| 測試 | `rare-lattice-495009-i9` | [https://rare-lattice-495009-i9.web.app](https://rare-lattice-495009-i9.web.app) | `api-hxe6k6ncza-uc.a.run.app` |
+
+**正式環境入口：**
 
 | 用途 | URL |
 |------|-----|
-| **報到**（報到歡迎／流程入口） | [https://rare-lattice-495009-i9.firebaseapp.com/checkin](https://rare-lattice-495009-i9.firebaseapp.com/checkin) |
-| **闖關**（首頁歡迎 → 說明／登入） | [https://rare-lattice-495009-i9.firebaseapp.com/](https://rare-lattice-495009-i9.firebaseapp.com/) |
+| **報到** | [https://familyday-greenworld.web.app/check-in](https://familyday-greenworld.web.app/check-in) |
+| **闖關**（首頁／活動入口） | [https://familyday-greenworld.web.app/](https://familyday-greenworld.web.app/) |
+| **領獎入口** | [https://familyday-greenworld.web.app/reward](https://familyday-greenworld.web.app/reward) |
 
-同專案另有 **`https://rare-lattice-495009-i9.web.app`**（與上列路徑相同）。**現場入口 QR：** 已內建於 [`familyday-frontend/public/qr-entry-links/`](familyday-frontend/public/qr-entry-links/)（**`entry-check-in.png`** → **`/check-in`** 報到；**`entry-game.png`** → **`/game`** 闖關與**登入**）；部署後亦可自 **`/qr-entry-links/…`** 下載列印。詳見該目錄 **`README.md`** 與 [`docs/setup/hosting-public-entry-urls.md`](docs/setup/hosting-public-entry-urls.md)。
+部署指令對應：`firebase deploy ... --project=production`（正式）／ 不帶 `--project`（測試 default）。**現場入口 QR：** 已內建於 [`familyday-frontend/public/qr-entry-links/`](familyday-frontend/public/qr-entry-links/)（`entry-check-in.png` / `entry-game.png` / `entry-reward.png`，已重產對應正式 host）；部署後亦可自 `/qr-entry-links/…` 下載列印。詳見該目錄 `README.md` 與 [`docs/setup/hosting-public-entry-urls.md`](docs/setup/hosting-public-entry-urls.md)。
 
 核心入口：
 
@@ -53,7 +61,7 @@ npm run dev
 
 > **工作約定：** **本表**為**進度現況**之**權威**來源（View／API 函式數／測試檔數等）。**待辦勾選與完整行動清單**以 [`docs/project/project-master.md` § 待辦事項](docs/project/project-master.md#work-backlog) 為準。
 
-> **計數／端點：** 2026-05-11 依原始碼掃描（仍有效；後端 **19** 端點、前端 **10** View／**11** API 函式／**16** 測試檔）。**2026-05-13** 起 **文件完整對齊**：**SPA** **`Authorization: Bearer`** + **`sessionStorage`**；契約 **`api-v0.1` v0.1.25–v0.1.26**（含 **`POST …/auth/login`** 回 **`ok`**／**`token`**／**`user`**，見 **`familyday-backend/src/routes/auth.ts`**）；**`system-architecture` v1.5**（§6.3 新增外部 QR scanner 序列）；**`api-integration-checklist`** Bearer 前置與 §7 說明；**`project-master` v1.3.56**。**同日：** **Firebase Hosting 上架後**已做**全端手動驗收**——**報到（check-in）**與**闖關**主流程之功能與操作**符合需求**（紀錄見 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §7、`docs/testing/api-integration-history.md`）。背景見 [`docs/setup/ios-mobile-auth-fix-2026-05-13.md`](docs/setup/ios-mobile-auth-fix-2026-05-13.md)。**admin/reports**：**`total`／`checkedIn`**、**`progress`** 占位見 [`familyday-backend/src/routes/admin.ts`](familyday-backend/src/routes/admin.ts)。**2026-05-19：** Firestore IAM 憑證設定完成（SA JSON）；**`npm run verify:firestore`** 對正式 Cloud Functions 端點執行，四集合讀寫 **PASS**；前後端重新部署（Functions `api-hxe6k6ncza-uc.a.run.app`、Hosting `rare-lattice-495009-i9.web.app`）；**報到（check-in）＋闖關（game）功能於正式環境驗證完成**；**`project-master` v1.3.55**。**2026-05-20：** 外部 QR scanner 相容（站台 PNG 改編為 `https://<host>/scan?t=<JWT>` 深連結 + SPA `/scan` dispatcher）；闖關紀錄保留（`RegisterView` 登入不再 `restartPlaythrough`、`applyAttemptResult` 移除 stage-1 auto-reset，全破玩家再登入與重玩皆保留 6/6 ✓）；前後端重新部署；commit `4bdfb5d`；**`project-master` v1.3.56`**。**同日（合併部署）：** ResultView 三向分流（首次全破 → 領獎、重玩答對 → 關卡列表）；StageView 6/6 常駐「前往領取闖關禮」CTA；決策抽離至 `src/lib/resultAction.ts`（6 unit tests）；commit `08d60ee`；**`project-master` v1.3.57`**。**同日：** 新增 `/reward` 入口路由 + `entry-reward.png`（領獎台 QR），對應 `pendingFinish` 旗標讓未登入掃描者登入後直接落地 `/finish`；qr-entry-links 共 3 張入口 QR（報到 / 闖關 / 領獎）；**`project-master` v1.3.58`**。**同日：** FinishView 領獎防誤領 — 點「領取闖關禮」改全屏掃 QR，掃到 `fdgw-claim-token` 才呼叫 `/me/reward/claim`；工作人員手持 QR `public/qr-staff-stations/claim-token.png`；解析 `src/lib/claimPayload.ts`（6 unit tests）；**`project-master` v1.3.59`**。**同日：** Hero 視圖 fullBleed —`App.vue` 對 `route.meta.fullBleed` 跳過 90vw 白卡與 safe-area padding，WelcomeView/CheckInWelcomeView 背景圖鋪滿 viewport；WelcomeView 中間換過 `01_welcomeBG.jpg` 9:16 高解析後**復原**至原 `game-welcome-enroll-04.jpg`（commit `6ce9b52`）；BriefingView 地圖換 `02_mapIllu.png`；**`project-master` v1.3.60`**。**同日：** 設計師原版 icon 套用 — StageView 闖關進度 icon 換為山+旗 silhouette、FinishView 領獎狀態 icon 換為獎章+星+雙緞帶 silhouette、領獎三格 slot 改用 `Icon_gift_s_active.png` / `Icon_gift_s_disabled.png`（commit `e597632`）；**`project-master` v1.3.61`**。
+> **計數／端點：** 2026-05-11 依原始碼掃描（仍有效；後端 **19** 端點、前端 **10** View／**11** API 函式／**16** 測試檔）。**2026-05-13** 起 **文件完整對齊**：**SPA** **`Authorization: Bearer`** + **`sessionStorage`**；契約 **`api-v0.1` v0.1.25–v0.1.26**（含 **`POST …/auth/login`** 回 **`ok`**／**`token`**／**`user`**，見 **`familyday-backend/src/routes/auth.ts`**）；**`system-architecture` v1.5**（§6.3 新增外部 QR scanner 序列）；**`api-integration-checklist`** Bearer 前置與 §7 說明；**`project-master` v1.3.56**。**同日：** **Firebase Hosting 上架後**已做**全端手動驗收**——**報到（check-in）**與**闖關**主流程之功能與操作**符合需求**（紀錄見 [`docs/testing/api-integration-checklist.md`](docs/testing/api-integration-checklist.md) §7、`docs/testing/api-integration-history.md`）。背景見 [`docs/setup/ios-mobile-auth-fix-2026-05-13.md`](docs/setup/ios-mobile-auth-fix-2026-05-13.md)。**admin/reports**：**`total`／`checkedIn`**、**`progress`** 占位見 [`familyday-backend/src/routes/admin.ts`](familyday-backend/src/routes/admin.ts)。**2026-05-19：** Firestore IAM 憑證設定完成（SA JSON）；**`npm run verify:firestore`** 對正式 Cloud Functions 端點執行，四集合讀寫 **PASS**；前後端重新部署（Functions `api-hxe6k6ncza-uc.a.run.app`、Hosting `rare-lattice-495009-i9.web.app`）；**報到（check-in）＋闖關（game）功能於正式環境驗證完成**；**`project-master` v1.3.55**。**2026-05-20：** 外部 QR scanner 相容（站台 PNG 改編為 `https://<host>/scan?t=<JWT>` 深連結 + SPA `/scan` dispatcher）；闖關紀錄保留（`RegisterView` 登入不再 `restartPlaythrough`、`applyAttemptResult` 移除 stage-1 auto-reset，全破玩家再登入與重玩皆保留 6/6 ✓）；前後端重新部署；commit `4bdfb5d`；**`project-master` v1.3.56`**。**同日（合併部署）：** ResultView 三向分流（首次全破 → 領獎、重玩答對 → 關卡列表）；StageView 6/6 常駐「前往領取闖關禮」CTA；決策抽離至 `src/lib/resultAction.ts`（6 unit tests）；commit `08d60ee`；**`project-master` v1.3.57`**。**同日：** 新增 `/reward` 入口路由 + `entry-reward.png`（領獎台 QR），對應 `pendingFinish` 旗標讓未登入掃描者登入後直接落地 `/finish`；qr-entry-links 共 3 張入口 QR（報到 / 闖關 / 領獎）；**`project-master` v1.3.58`**。**同日：** FinishView 領獎防誤領 — 點「領取闖關禮」改全屏掃 QR，掃到 `fdgw-claim-token` 才呼叫 `/me/reward/claim`；工作人員手持 QR `public/qr-staff-stations/claim-token.png`；解析 `src/lib/claimPayload.ts`（6 unit tests）；**`project-master` v1.3.59`**。**同日：** Hero 視圖 fullBleed —`App.vue` 對 `route.meta.fullBleed` 跳過 90vw 白卡與 safe-area padding，WelcomeView/CheckInWelcomeView 背景圖鋪滿 viewport；WelcomeView 中間換過 `01_welcomeBG.jpg` 9:16 高解析後**復原**至原 `game-welcome-enroll-04.jpg`（commit `6ce9b52`）；BriefingView 地圖換 `02_mapIllu.png`；**`project-master` v1.3.60`**。**同日：** 設計師原版 icon 套用 — StageView 闖關進度 icon 換為山+旗 silhouette、FinishView 領獎狀態 icon 換為獎章+星+雙緞帶 silhouette、領獎三格 slot 改用 `Icon_gift_s_active.png` / `Icon_gift_s_disabled.png`（commit `e597632`）；**`project-master` v1.3.61`**。**2026-05-21：** 正式 Firebase 專案 `familyday-greenworld` 並行上架（Hosting `familyday-greenworld.web.app`、Functions `api-jwvq2npioq-uc.a.run.app`、Firestore 已匯入 111 筆 zh roster）；`.firebaserc` 新增 `staging`/`production` aliases；backend `src/utils/store.ts::getDb()` 修正預設 Firestore database 取得（避免 5 NOT_FOUND）；entry-link QR PNG 已重產對應正式 host；登入功能於正式環境驗證 Pass；commit `acf112b`；**`project-master` v1.3.62`**。
 
 | 面向 | 現況 |
 |------|------|
@@ -90,4 +98,4 @@ npm run dev
 
 ---
 
-*README v2.86 · 2026-05-20（WelcomeView 復原 + StageView/FinishView 設計師原版 icon 套用；commits `6ce9b52` / `e597632`；前版 v2.85）*
+*README v2.87 · 2026-05-21（正式 Firebase 專案 `familyday-greenworld` 並行上架、entry-link QR 換 host、backend 預設 DB 修正；commit `acf112b`；前版 v2.86）*

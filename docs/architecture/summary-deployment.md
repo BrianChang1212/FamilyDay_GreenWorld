@@ -36,6 +36,19 @@
 - 前端原型仍可用 Netlify / GitHub Pages 做靜態預覽。  
 - 正式資料與身分驗證走 Firebase 專案（建議分 `dev/stage/prod`）。
 
+### 2.3 Firebase 並行專案（2026-05-21 起）
+
+兩個 Firebase 專案並存，由 `familyday-backend/.firebaserc` aliases 管理（`default`／`staging` = 測試；`production` = 正式）：
+
+| 環境 | Project ID | Hosting | Functions API URL | 主要 owner |
+|------|-----------|---------|-------------------|------------|
+| 測試 | `rare-lattice-495009-i9` | `rare-lattice-495009-i9.web.app` | `api-hxe6k6ncza-uc.a.run.app` | 個人 |
+| 正式 | `familyday-greenworld` | **`familyday-greenworld.web.app`** | `api-jwvq2npioq-uc.a.run.app` | AmTRAN（`familyday.amtran@gmail.com`） |
+
+**部署正式**：`$env:GOOGLE_APPLICATION_CREDENTIALS = "<SA-json>"; $env:VITE_API_BASE = "<production Functions URL>"; npx firebase deploy --only hosting,functions:api,firestore --project=production`。**部署測試**：`firebase deploy ...`（不帶 `--project`，採用 default）。
+
+**SA JSON**：正式專案 Admin SDK 用 `firebase-adminsdk-fbsvc@familyday-greenworld.iam.gserviceaccount.com` 對應之 key（**不能 commit 到 repo**，預設置於 `D:\Brian\` 工作區外或環境變數）。
+
 ---
 
 ## 3. 區域與延遲
@@ -75,3 +88,4 @@
 | 1.4 | 2026-04-19 | **§1.1**：補 **`.github/workflows/ci.yml`**（`npm run test` → build）與靜態預覽 workflow 之分流說明 |
 | 1.5 | 2026-04-27 | 後端部署主線改為 **Firebase**，移除舊 PaaS/DMZ 主方案敘事 |
 | 1.6 | 2026-05-03 | **§1.1**：測試 Web UI 細節改指向 [`docs/setup/static-preview-netlify-github.md`](../setup/static-preview-netlify-github.md)；根 **README** 僅保留錨點與摘要 |
+| 1.7 | 2026-05-21 | **§2.3**：新增「Firebase 並行專案」段；`familyday-greenworld` 上架為正式環境並列 Project ID / Hosting / Functions URL 對照；說明 `--project=production` 部署流程與 SA JSON 安全準則 |
