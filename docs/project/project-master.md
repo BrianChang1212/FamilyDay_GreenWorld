@@ -363,6 +363,7 @@
 - [x] **Hero 視圖 fullBleed + 換新版主視覺** — App.vue 對 `route.meta.fullBleed` 跳過白卡 / safe-area padding；WelcomeView 最終維持原 `game-welcome-enroll-04.jpg` 並保留 logotype（中間曾換 `01_welcomeBG.jpg` 1152×2048 後復原，commit `6ce9b52`）；BriefingView 地圖換新版扁平風（`02_mapIllu.png`，688×752）— 完成 2026-05-20
 - [x] **設計師原版 icon 套用** — StageView 闖關進度標題 icon 換為山+旗 silhouette；FinishView 領獎狀態標題 icon 換為獎章+星+雙緞帶 silhouette；領獎三格 slot 改用設計師 PNG（`Icon_gift_s_active.png` 已領 / `Icon_gift_s_disabled.png` 未領），取代 inline SVG 與 wrapper 樣式 — 完成 2026-05-20
 - [x] **正式 Firebase 專案上架 — 並行部署** — 新增 `familyday-greenworld` 為正式專案，與測試 `rare-lattice-495009-i9` 並存（`.firebaserc` 加 `staging`/`production` aliases）；首次上架完成 Hosting/Functions/Firestore；111 筆 zh roster 已匯入正式 Firestore；entry-link QR PNG 已改指正式 host；登入功能於正式環境驗證 Pass。同步修 backend `store.ts::getDb()`（預設 DB 用 `getFirestore()` 不帶參數，避免 5 NOT_FOUND）— 完成 2026-05-21
+- [x] **領獎時間戳記** — `PlayerProgress` 加 `rewardRedeemAt: string[]`；每次 `claimFinishRewardProgress` 成功時 push 當下 ISO 時間並寫回 Firestore。為活動日資料紀錄表 (家庭日當天資料紀錄表.xlsx) 之「領獎時間一/二/三」欄位預備直接資料源；無 REST 契約變更；coercePlayerProgress 對舊文件 fallback `[]` — 完成 2026-05-21
 - [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、**Bearer／sessionStorage（XSS）**、Cookie 相容）
 
 #### 中優先級
@@ -443,4 +444,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.62 · 2026-05-21（正式 Firebase 專案 `familyday-greenworld` 並行上架完成；Hosting `familyday-greenworld.web.app`、Functions `api-jwvq2npioq-uc.a.run.app`、111 筆 zh roster 已匯入；backend `store.ts` 修正預設 Firestore database 取得；commit `acf112b`；前版 **v1.3.61**）
+**文件版本：** 合併版 v1.3.63 · 2026-05-21（PlayerProgress 加 `rewardRedeemAt: string[]`；每次領獎成功 push ISO 時間到陣列、寫回 Firestore，預備匯出至活動日資料紀錄表；commit `b8e0822`；前版 **v1.3.62**）
