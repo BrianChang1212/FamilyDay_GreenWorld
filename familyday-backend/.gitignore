@@ -6,6 +6,7 @@ lib/
 .env.*
 !.env.example
 !.env.rare-lattice-495009-i9
+!.env.familyday-greenworld
 .DS_Store
 Thumbs.db
 .firebase/
