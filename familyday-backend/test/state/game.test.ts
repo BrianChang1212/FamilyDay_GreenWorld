@@ -51,6 +51,7 @@ describe("game state", () => {
 			fullClearCount: 0,
 			bankedFullClears: 0,
 			rewardRedeemCount: 0,
+			rewardRedeemAt: [],
 			maxRounds: 3,
 		});
 	});
@@ -146,6 +147,27 @@ describe("game state", () => {
 			code: "REWARD_CLAIM_LIMIT_REACHED",
 			message: "reward claim limit reached",
 		});
+	});
+
+	it("每次領獎都會記錄 ISO 時間戳記到 rewardRedeemAt 陣列", async () => {
+		const employeeId = nextEmployeeId();
+		await completeAllStages(employeeId);
+
+		const t0 = Date.now();
+		await claimFinishRewardProgress(employeeId);
+		await claimFinishRewardProgress(employeeId);
+		await claimFinishRewardProgress(employeeId);
+		const t1 = Date.now();
+
+		const progress = await getOrInitProgress(employeeId);
+		expect(progress.rewardRedeemCount).toBe(3);
+		expect(progress.rewardRedeemAt).toHaveLength(3);
+		for (const iso of progress.rewardRedeemAt) {
+			const ts = Date.parse(iso);
+			expect(Number.isFinite(ts)).toBe(true);
+			expect(ts).toBeGreaterThanOrEqual(t0);
+			expect(ts).toBeLessThanOrEqual(t1);
+		}
 	});
 
 	it("restarts a completed playthrough and increments the full clear counter", async () => {

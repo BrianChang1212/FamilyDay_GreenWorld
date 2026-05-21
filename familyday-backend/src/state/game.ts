@@ -15,6 +15,8 @@ export type PlayerProgress = {
 	/** 已成功通關完整一輪的累計次數（每次答完最後一關 +1）；>= 1 即可領獎（至多 maxRounds 次） */
 	bankedFullClears: number;
 	rewardRedeemCount: number;
+	/** 每次領獎成功時 push 當下 ISO 8601 時間字串；長度 = rewardRedeemCount。匯出至活動紀錄表用。 */
+	rewardRedeemAt: string[];
 	/** 闖關禮最多可領次數（目前 3）；闖關本身不限次數 */
 	maxRounds: number;
 };
@@ -50,6 +52,15 @@ function coerceStageIds(arr: unknown): number[] {
 	return Array.from(s).sort((a, b) => a - b);
 }
 
+function coerceIsoStringArray(arr: unknown): string[] {
+	if (!Array.isArray(arr)) return [];
+	const out: string[] = [];
+	for (const x of arr) {
+		if (typeof x === "string" && x.length > 0) out.push(x);
+	}
+	return out;
+}
+
 /** 合併預設值、舊文件缺欄位時推斷 `bankedFullClears` */
 function coercePlayerProgress(raw: Record<string, unknown>): PlayerProgress {
 	const d = defaultProgress();
@@ -65,6 +76,7 @@ function coercePlayerProgress(raw: Record<string, unknown>): PlayerProgress {
 		fullClearCount: Math.max(0, Math.floor(Number(raw.fullClearCount) || 0)),
 		bankedFullClears: 0,
 		rewardRedeemCount: Math.max(0, Math.floor(Number(raw.rewardRedeemCount) || 0)),
+		rewardRedeemAt: coerceIsoStringArray(raw.rewardRedeemAt),
 		maxRounds: Math.max(1, Math.floor(Number(raw.maxRounds) || d.maxRounds)),
 	};
 
@@ -93,6 +105,7 @@ export function defaultProgress(): PlayerProgress {
 		fullClearCount: 0,
 		bankedFullClears: 0,
 		rewardRedeemCount: 0,
+		rewardRedeemAt: [],
 		maxRounds: getMaxRewardRounds(),
 	};
 }
@@ -254,12 +267,19 @@ export async function claimFinishRewardProgress(
 	}
 
 	progress.rewardRedeemCount += 1;
+	progress.rewardRedeemAt.push(new Date().toISOString());
 	if (useFirestoreStore()) {
 		const db = getDb();
 		await db
 			.collection("player_progress")
 			.doc(employeeId)
-			.set({ rewardRedeemCount: progress.rewardRedeemCount }, { merge: true });
+			.set(
+				{
+					rewardRedeemCount: progress.rewardRedeemCount,
+					rewardRedeemAt: progress.rewardRedeemAt,
+				},
+				{ merge: true },
+			);
 	} else {
 		playerProgress.set(employeeId, progress);
 	}
