@@ -34,3 +34,11 @@ npm-debug.log*
 # Local design / exports — do not commit
 UI_0505/
 
+# Real activity data & reference material — contain PII (roster, screenshots, design assets).
+# Public repo, so blanket-ignore by directory name and by spreadsheet extension.
+ref_no_push/
+ref_pic/
+*.xlsx
+*.xlsm
+*.xls
+
