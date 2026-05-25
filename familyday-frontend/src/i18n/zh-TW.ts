@@ -104,7 +104,6 @@ export const zhTW = {
       "目前尚無新一輪可領取之結算（每領取一次後，須重新完成整輪關卡通關後，伺服器才會再累積下一次）。請離開此頁後回到闖關地圖／掃描站點 QR 繼續作答並通關，完成後再回到本頁；或請現場工作人員協助確認與操作。",
     staffHint: "請由現場工作人員協助點擊「確認領取」。",
     modalStaffInstruction: "請交由工作人員點選操作",
-    backHomeButton: "返回首頁",
     modalTitle: "確認領取?",
     modalMessage: "您即將領取第 {nextClaimIndex} 次獎品，確認領取後無法取消喔!",
     modalConfirmButton: "確定",

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, onMounted, ref, watch } from "vue";
-import { useRouter, useRoute } from "vue-router";
+import { useRoute } from "vue-router";
 import AppFooter from "@/components/AppFooter.vue";
 import GwBrandBar from "@/components/GwBrandBar.vue";
-import { claimFinishReward, logoutGame } from "@/api/gameFlow";
+import { claimFinishReward } from "@/api/gameFlow";
 import {
 	FINISH_PAGE_HERO_SRC,
 	getProfile,
@@ -18,7 +18,6 @@ import { FINISH_REWARD_SLOTS } from "@/constants";
 import { useQrCameraScan } from "@/composables/useQrCameraScan";
 import { isClaimToken } from "@/lib/claimPayload";
 
-const router = useRouter();
 const route = useRoute();
 const { t } = useI18n();
 const name = ref("");
@@ -28,8 +27,6 @@ const bankedFullClears = ref(0);
 const maxSlots = ref(FINISH_REWARD_SLOTS);
 const statusLoadState = ref<"loading" | "ok" | "error">("loading");
 const statusError = ref("");
-const actionLoading = ref(false);
-const actionError = ref("");
 const claimSubmitting = ref(false);
 const claimError = ref("");
 
@@ -182,19 +179,6 @@ const cameraSetupError = useQrCameraScan({
 const scanUiMessage = computed(
 	() => cameraSetupError.value || scanError.value,
 );
-
-function goHome() {
-	actionLoading.value = true;
-	actionError.value = "";
-	logoutGame()
-		.catch(() => {
-			actionError.value = "登出 API 失敗，已改用前端返回首頁。";
-		})
-		.finally(() => {
-			actionLoading.value = false;
-			router.push({ name: "welcome" });
-		});
-}
 
 </script>
 
@@ -481,26 +465,6 @@ function goHome() {
 					role="alert"
 				>
 					{{ claimError }}
-				</p>
-				<div
-					v-if="isClaimFull && statusLoadState === 'ok'"
-					class="pt-2"
-				>
-					<button
-						type="button"
-						class="w-full rounded-2xl border-2 border-[#2f7354]/25 bg-transparent py-3.5 text-base font-bold text-[#2f7354] transition hover:bg-white/80"
-						:disabled="actionLoading"
-						@click="goHome"
-					>
-						{{ actionLoading ? t("common.loading") : t("finish.backHomeButton") }}
-					</button>
-				</div>
-				<p
-					v-if="actionError"
-					class="rounded-xl border border-red-200 bg-red-50 px-3 py-2 text-center text-xs text-red-800"
-					role="alert"
-				>
-					{{ actionError }}
 				</p>
 			</div>
 		</main>
