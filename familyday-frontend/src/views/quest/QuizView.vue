@@ -3,6 +3,7 @@ import { computed, onMounted, ref } from "vue";
 import { useRoute } from "vue-router";
 import { useRouter } from "vue-router";
 import GwBrandBar from "@/components/GwBrandBar.vue";
+import StageScanLoginModal from "@/components/StageScanLoginModal.vue";
 import { fetchChallenge, submitChallengeAttempt, type ChallengeHttpError } from "@/api/gameFlow";
 import {
 	choiceRowsForChallenge,
@@ -13,10 +14,12 @@ import { GAME_CONFIG } from "@/constants";
 import {
 	addCompletedStageId,
 	getCompletedStageIds,
+	getPendingStationVerification,
 	setCompletedStageIdsFromApi,
 	getStage,
 	stageTitle,
 } from "@/lib/demoState";
+import { getSessionToken } from "@/lib/sessionToken";
 import { useI18n } from "@/composables/useI18n";
 
 const route = useRoute();
@@ -30,6 +33,11 @@ const loadState = ref<"loading" | "ok" | "error">("loading");
 const submitLoading = ref(false);
 const loadErrorText = ref("");
 const submitError = ref("");
+/*
+ * 外部 QR scanner → /scan → /quiz 未登入時：QuizView mount 不直接 fetch 題目，
+ * 改成在前景跳 StageScanLoginModal 強制登入。modal 唯一退路是登入成功。
+ */
+const showLoginModal = ref(false);
 
 function challengeStageIndex(): number {
 	return stageIndexFromChallengeId(challengeId.value) ?? getStage();
@@ -65,8 +73,17 @@ onMounted(() => {
 	}
 	selected.value = null;
 	submitError.value = "";
+	if (!getSessionToken() && getPendingStationVerification()) {
+		showLoginModal.value = true;
+		return;
+	}
 	loadChallenge();
 });
+
+function onScanLoginSuccess() {
+	showLoginModal.value = false;
+	loadChallenge();
+}
 
 function loadChallenge() {
 	loadState.value = "loading";
@@ -157,6 +174,7 @@ const levelBadgeText = computed(() =>
 
 <template>
 	<div class="gw-page-fill relative flex min-h-min flex-1 flex-col bg-[#eef0eb]">
+		<StageScanLoginModal v-if="showLoginModal" @success="onScanLoginSuccess" />
 		<GwBrandBar />
 
 		<main

@@ -202,7 +202,7 @@ describe("router config and guard", () => {
 		expect(setPendingStationVerificationMock).toHaveBeenCalledWith(3, "c3");
 	});
 
-	it("/scan 未登入 → 導 register（pending 仍寫入供登入後復原）", async () => {
+	it("/scan 未登入 → 導 quiz（背景頁面，由 QuizView 偵測無 session 後跳 modal）", async () => {
 		resolveScanIntentMock.mockReturnValue({
 			type: "valid",
 			stageId: 5,
@@ -217,7 +217,8 @@ describe("router config and guard", () => {
 			to: { query: Record<string, unknown> },
 		) => unknown;
 		expect(redirect({ query: { t: "anything" } })).toEqual({
-			name: "register",
+			name: "quiz",
+			query: { challengeId: "c5" },
 		});
 		expect(setPendingStationVerificationMock).toHaveBeenCalledWith(5, "c5");
 		expect(clearPendingFinishMock).toHaveBeenCalledTimes(1);

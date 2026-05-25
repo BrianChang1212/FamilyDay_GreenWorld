@@ -55,8 +55,11 @@ const router = createRouter({
 		/*
 		 * 外部相機／QR scanner 進入點：QR PNG 編碼為
 		 *   https://<host>/scan?t=<JWT>
-		 * 命中本路由 → 解析 stage → 已登入直接到題目；未登入導 /register，
-		 * RegisterView 登入完成後讀 pending 跳回對應題目。
+		 * 命中本路由 → 解析 stage → 一律導到對應題目頁面 /quiz?challengeId=...。
+		 * 未登入時 QuizView mount 偵測無 session + 有 pendingStation → 跳
+		 * StageScanLoginModal 在前景強制登入；登入成功 modal 關閉、QuizView
+		 * 自然 fetch 題目。pendingStationVerification 在進站時寫入，登入後
+		 * 由 QuizView 直接讀 query / lib 還原即可。
 		 */
 		{
 			path: "/scan",
@@ -74,13 +77,10 @@ const router = createRouter({
 					intent.challengeId,
 				);
 				clearPendingFinish();
-				if (getSessionToken()) {
-					return {
-						name: "quiz",
-						query: { challengeId: intent.challengeId },
-					};
-				}
-				return { name: "register" };
+				return {
+					name: "quiz",
+					query: { challengeId: intent.challengeId },
+				};
 			},
 		},
 		/*

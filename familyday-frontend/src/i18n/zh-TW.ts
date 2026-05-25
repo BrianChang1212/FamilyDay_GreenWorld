@@ -84,6 +84,10 @@ export const zhTW = {
       "資料與兌換闖關禮有關，請確保資訊正確。",
     submitButton: "我準備好了",
   },
+  scanLogin: {
+    title: "登入帳號開始答題",
+    submitButton: "確定登入",
+  },
   finish: {
     bannerTitle: "Congratulations",
     headline: "恭喜您完成闖關",
