@@ -72,6 +72,41 @@ npm run purge:firestore-app
 npm run seed:roster
 ```
 
+### E) 對「正式」環境（`familyday-greenworld`）執行 admin CLI
+
+> **重要前提：** `fdgw.project.json::firebaseProjectId` 目前指向 **staging**（`rare-lattice-495009-i9`）。對 production 跑任何 admin CLI 必須**用環境變數覆寫**，否則 SA 雖然合法但會對 staging 專案發 request → `7 PERMISSION_DENIED`。
+
+PowerShell 範本（**請替換 `<production-sa.json>` 為實際路徑，金鑰絕對路徑勿入 docs/Git**）：
+
+```powershell
+$env:GOOGLE_APPLICATION_CREDENTIALS = "<production-sa.json>"
+$env:FDGW_FIREBASE_PROJECT_ID = "familyday-greenworld"   # 覆寫 fdgw.project.json 的 staging 預設
+$env:GOOGLE_CLOUD_PROJECT = "familyday-greenworld"        # 雙保險
+cd familyday-backend
+```
+
+**典型操作：以新名冊 dump 覆蓋現有 roster**
+
+1. 把 xlsx 轉成 `ref_no_push/firestore-dumps/roster-YYYYMMDD-zh.json`（schema 對齊既有 dump：`{dumpedAt, projectId, databaseId, collection:"roster", count, docs:[{id, eventId, partySizePlanned, employeeId, source:"import", name, updatedAt}]}`，`id` = `${eventId}_${employeeId}`）。
+2. （可選但建議）盤點 pre-purge 計數：用一個臨時 `_tmp-count-all.mjs` 對 5 個集合做 `.count().get()`，紀錄基準。
+3. Purge 五個集合：
+   ```powershell
+   $env:FDGW_PURGE_CONFIRM = "YES"
+   $env:FDGW_EXPECT_PROJECT_ID = "familyday-greenworld"
+   $env:FDGW_PURGE_COLLECTIONS = "redeem_tokens,redeem_records,player_progress,checkins,roster"
+   node ./scripts/purge-firestore-app-data.mjs
+   ```
+4. Import 新 roster：
+   ```powershell
+   node ./scripts/import-roster-dump.mjs ..\ref_no_push\firestore-dumps\roster-YYYYMMDD-zh.json
+   ```
+5. 驗證：再跑一次 pre-purge 的計數腳本，確認 `roster=<期望數>`、其他集合=0。
+6. 同步：用 `npm run verify:firestore` 對正式 Cloud Functions 端點再 smoke 一次（同樣需要設好上面三條 env）。
+
+**為什麼需要 `FDGW_FIREBASE_PROJECT_ID` 覆寫：** `scripts/read-fdgw-project.mjs::getFirebaseProjectId()` 預設讀 `fdgw.project.json`（staging），所有 admin script 都會傳這個 project ID 給 firebase-admin。SA 對非自己 project 的 Firestore 沒權限 → `PERMISSION_DENIED`。
+
+**為什麼 5 個 script 不再有「default」字串 NOT_FOUND 問題：** commit `05c667f` 後，scripts 對齊了 `src/utils/store.ts::getDb()` 的 db ID 解析（空 / `default` / `(default)` → `getFirestore()` 不帶參數）。production 專案的 Firestore 預設資料庫沒有名字，必須這樣呼叫；staging 因為有名為 "default" 的 db 一直沒事。
+
 ---
 
 ## 安全注意（必讀）
