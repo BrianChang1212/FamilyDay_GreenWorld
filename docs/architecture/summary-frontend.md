@@ -72,7 +72,9 @@
 
 **FinishView 領獎防誤領（2026-05-20 起）：** 玩家點「領取闖關禮」按鈕不再直接呼叫 API，而是切到全屏掃 QR UI（`viewPhase: "main" | "scanning"`，與 StageView 同款邊框 + 掃描線）。掃到工作人員手持 QR（payload `fdgw-claim-token`，PNG 位於 `public/qr-staff-stations/claim-token.png`）才會呼叫 **`POST /api/v1/me/reward/claim`**。解析邏輯：**`src/lib/claimPayload.ts::isClaimToken`**；scan 中按返回不消耗領獎次數。後端 `maxRounds=3` 仍為硬上限，避免人為失誤。
 
-**Hero 視圖 fullBleed（2026-05-20 起）：** `App.vue` 讀 `route.meta.fullBleed === true` 時跳過外層 90vw 圓角白卡與 safe-area padding，背景圖直接鋪到 viewport 邊（適用 `WelcomeView`、`CheckInWelcomeView`）。一般頁仍包在白卡內。WelcomeView 最終仍使用既有 **`/images/game-welcome-enroll-04.jpg`** 與頂部 `familyday-logotype.png`（中間曾換 `01_welcomeBG.jpg` 後復原，見 commit `6ce9b52`）。BriefingView 地圖更新為 **`/images/02_mapIllu.png`**（688×752 扁平風新版）。
+**全畫面 fullBleed（2026-05-25 起 · 全面套用）：** `App.vue` 移除外層 90vw 圓角白卡與 safe-area padding 包裝，所有 view 之 root `bg-[#xxx]` 直接鋪到 viewport 邊（commit `64abdc2`）。`route.meta.fullBleed` 機制與兩處冗餘旗標同時移除——fullBleed 成為唯一 layout、不再有「白卡內 vs 外」雙分支。`PageCritters` viewport 變體引用一併移除（component 檔案保留為 orphan）。bundle 縮減：`index.js 310 → 306 kB`、`index.css 47 → 45.5 kB`。歷史脈絡：原本（2026-05-20 起）僅 `WelcomeView`／`CheckInWelcomeView` 兩個 hero 套 fullBleed、其餘包在 90vw 白卡內；此次依設計需求（`ref_pic/image copy 4.png` 紅斜線標示外圍白邊）擴及全部畫面。WelcomeView 最終仍使用既有 **`/images/game-welcome-enroll-04.jpg`** 與頂部 `familyday-logotype.png`（中間曾換 `01_welcomeBG.jpg` 後復原，見 commit `6ce9b52`）。BriefingView 地圖更新為 **`/images/02_mapIllu.png`**（688×752 扁平風新版）。
+
+**FinishView 全領完去按鈕（2026-05-22 起）：** `isClaimFull` 狀態下（rewardRedeemCount = maxRounds = 3）原本顯示「闖關禮已領取完畢」狀態文字 +「返回首頁」按鈕；按鈕已移除（commit `c4740e5`），同步清掉 `goHome()` handler、`useRouter`／`logoutGame` imports、`actionLoading`／`actionError` refs 與 `finish.backHomeButton` i18n key。理由：UX 上玩家領完後應由現場流程引導，不需要 App 內回首頁；移除可避免誤觸登出。
 
 **設計師原版 icon 套用（2026-05-20 起）：** StageView「闖關進度」標題前 icon 由長條圖 inline SVG 改為**山+旗 silhouette**；FinishView「領獎狀態」標題前 icon 由獎杯輪廓改為**獎章+星+雙緞帶 silhouette**（兩者皆以 inline SVG 維護，用 `currentColor` 跟隨主題色）。FinishView 領獎三格 slot 取消 inline gift-box SVG 與外框 wrapper，直接顯示設計師 PNG：已領 → **`/images/Icon_gift_s_active.png`**（橘色禮盒+淺橘背景圓角），未領 → **`/images/Icon_gift_s_disabled.png`**（灰禮盒+白底虛線邊框）。
 
