@@ -34,7 +34,6 @@ const router = createRouter({
 			path: "/",
 			name: "welcome",
 			component: WelcomeView,
-			meta: { fullBleed: true },
 		},
 		{
 			path: "/check-in",
@@ -137,7 +136,6 @@ const router = createRouter({
 			path: "/checkin",
 			name: "checkinWelcome",
 			component: CheckInWelcomeView,
-			meta: { fullBleed: true },
 		},
 		{ path: "/stage", name: "stage", component: StageView },
 		{ path: "/quiz", name: "quiz", component: QuizView },

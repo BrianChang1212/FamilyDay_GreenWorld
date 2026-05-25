@@ -16,7 +16,6 @@ function next() {
 	<!--
 		闖關歡迎頁：滿版叢林背景圖（game-welcome-enroll-04.jpg）；
 		familyday-logotype 自頂置中；底部「開始闖關」CTA。
-		App.vue 對 route.meta.fullBleed 跳過白卡，確保背景貼邊。
 	-->
 	<div
 		class="box-border flex h-full max-h-full min-h-dvh w-full flex-col overflow-hidden bg-[#2B5038]"
