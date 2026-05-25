@@ -36,8 +36,9 @@ function initDb() {
 			projectId,
 		});
 	}
-	const id = process.env.FDGW_FIRESTORE_DATABASE_ID || "default";
-	return getFirestore(id);
+	const raw = (process.env.FDGW_FIRESTORE_DATABASE_ID || "").trim();
+	const dbId = !raw || raw === "default" || raw === "(default)" ? null : raw;
+	return dbId ? getFirestore(dbId) : getFirestore();
 }
 
 function loadDump(dumpPath) {

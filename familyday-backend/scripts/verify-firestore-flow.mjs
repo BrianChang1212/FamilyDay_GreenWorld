@@ -37,7 +37,9 @@ function initDb() {
 	if (getApps().length === 0) {
 		initializeApp({ credential: applicationDefault() });
 	}
-	return getFirestore(FIRESTORE_DATABASE_ID);
+	const raw = (FIRESTORE_DATABASE_ID || "").trim();
+	const dbId = !raw || raw === "default" || raw === "(default)" ? null : raw;
+	return dbId ? getFirestore(dbId) : getFirestore();
 }
 
 async function api(path, options = {}, cookie = "") {

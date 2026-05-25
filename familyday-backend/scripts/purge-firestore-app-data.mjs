@@ -63,7 +63,9 @@ function initDb() {
 	if (getApps().length === 0) {
 		initializeApp({ credential: applicationDefault() });
 	}
-	return getFirestore(process.env.FDGW_FIRESTORE_DATABASE_ID || "default");
+	const raw = (process.env.FDGW_FIRESTORE_DATABASE_ID || "").trim();
+	const dbId = !raw || raw === "default" || raw === "(default)" ? null : raw;
+	return dbId ? getFirestore(dbId) : getFirestore();
 }
 
 async function deleteCollection(db, collectionId) {
