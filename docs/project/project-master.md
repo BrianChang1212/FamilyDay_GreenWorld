@@ -319,6 +319,7 @@
 | 2026-05-13 | **Firebase Hosting 上架後全端驗收（報到＋闖關）** | 於線上環境走完整使用者動線，確認 UI／API 與需求一致 | **Go（UX／功能）**；紀錄於 [`api-integration-checklist.md`](../testing/api-integration-checklist.md) §7 與 [`api-integration-history.md`](../testing/api-integration-history.md)；不等同 §1–§6 CLI 全自動逐項 |
 | 2026-05-22 | **FinishView 全領完移除「返回首頁」按鈕** | UX 上玩家於 3/3 領完後應由現場流程引導，App 內回首頁按鈕易誤觸登出且無實際必要 | commit `c4740e5`；同步清掉 `goHome()` handler、`useRouter`／`logoutGame` imports、`actionLoading`／`actionError` refs 與 `finish.backHomeButton` i18n key；正式環境 `familyday-greenworld.web.app` 部署完成並驗證 |
 | 2026-05-25 | **全畫面 fullBleed（移除 90vw 白卡 layout）** | 設計需求（`ref_pic/image copy 4.png`）標示所有畫面外圍白邊應消除；既有 8 個 view 皆已自帶 root `bg-[#xxx]`，App.vue 拆掉白卡分支後 view 自身底色直接接管 viewport | commit `64abdc2`；同時移除 `route.meta.fullBleed` 機制與兩處冗餘旗標、`PageCritters` viewport 引用；bundle 縮 `index.js 310→306 kB`／`index.css 47→45.5 kB`；正式環境部署完成 |
+| 2026-05-25 | **外部 QR 未登入彈窗（取代轉跳登入頁）** | 過往外部相機掃站台 QR + 無 session → redirect `/register` 整頁登入，離開闖關脈絡；設計需求（`ref_pic/image copy 5.png` + `image copy 6.png`）要求改為「背景留在對應關卡題目頁，前景跳 modal 登入」 | commit `fa982ba`；`/scan` redirect 不再分流（有無 session 都導 `/quiz?challengeId=<N>`），改由 `QuizView` mount 偵測 `!getSessionToken() && getPendingStationVerification()` 決定是否在前景 mount `StageScanLoginModal`；modal 無取消鍵、無 backdrop dismiss、唯一退路是登入成功；登入不動 `completedStageIds`；i18n 新增 `scanLogin.title`／`scanLogin.submitButton`；router test 同步更新；正式環境部署完成並驗證 |
 
 ---
 
@@ -446,4 +447,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.66 · 2026-05-25（新增兩條關鍵決策：2026-05-22 FinishView 全領完移除「返回首頁」按鈕 commit `c4740e5`、2026-05-25 全畫面 fullBleed 移除 90vw 白卡 layout commit `64abdc2`；兩變更皆已部署正式環境 `familyday-greenworld.web.app` 並驗證；前版 **v1.3.64**）
+**文件版本：** 合併版 v1.3.67 · 2026-05-25（新增關鍵決策：2026-05-25 外部 QR 未登入彈窗 commit `fa982ba` 取代過往掃 QR 未登入轉跳 `/register` 行為，改為背景留在 `/quiz` 對應關卡題目頁、前景 mount `StageScanLoginModal`；無取消鍵、無 backdrop dismiss；正式環境已部署並驗證；前版 **v1.3.66**）
