@@ -23,7 +23,7 @@ function nextEmployeeId(): string {
 
 async function completeAllStages(employeeId: string): Promise<void> {
 	for (const [challengeId, choiceId] of [
-		["c1", "B"],
+		["c1", "C"],
 		["c2", "B"],
 		["c3", "B"],
 		["c4", "B"],
@@ -84,8 +84,8 @@ describe("game state", () => {
 	it("records completed stages once and banks a full clear after all stages pass", async () => {
 		const employeeId = nextEmployeeId();
 
-		await applyAttemptResult(employeeId, "c1", "B");
-		await applyAttemptResult(employeeId, "c1", "B");
+		await applyAttemptResult(employeeId, "c1", "C");
+		await applyAttemptResult(employeeId, "c1", "C");
 		await completeAllStages(employeeId);
 		const progress = await getOrInitProgress(employeeId);
 
@@ -106,7 +106,7 @@ describe("game state", () => {
 		const beforeReplay = await getOrInitProgress(employeeId);
 		expect(beforeReplay.completedStageIds).toEqual([1, 2, 3, 4, 5, 6]);
 
-		await applyAttemptResult(employeeId, "c1", "B");
+		await applyAttemptResult(employeeId, "c1", "C");
 		await applyAttemptResult(employeeId, "c4", "B");
 		await applyAttemptResult(employeeId, "c6", "C");
 

@@ -22,7 +22,7 @@ describe("challengeOptionLabels", () => {
 		expect(questionForChallenge("c1", "API title")).toContain("天鵝湖");
 		const rows = choiceRowsForChallenge("c1", ["A", "B", "C", "D"]);
 		expect(rows.map((r) => r.key).join("")).toBe("ABCD");
-		expect(rows[1].label).toBe("10種");
+		expect(rows[1].label).toBe("貝多芬");
 	});
 
 	it("falls back to API strings when options are not A–D", () => {
@@ -36,6 +36,6 @@ describe("challengeOptionLabels", () => {
 	it("uses A–D when API omits options (minimal challenge payload)", () => {
 		const rows = choiceRowsForChallenge("c1", []);
 		expect(rows.map((r) => r.key).join("")).toBe("ABCD");
-		expect(rows[1].label).toBe("10種");
+		expect(rows[1].label).toBe("貝多芬");
 	});
 });

@@ -22,7 +22,7 @@ export type PlayerProgress = {
 };
 
 const CHALLENGES: ChallengeSpec[] = [
-	{ id: "c1", correctChoiceId: "B" },
+	{ id: "c1", correctChoiceId: "C" },
 	{ id: "c2", correctChoiceId: "B" },
 	{ id: "c3", correctChoiceId: "B" },
 	{ id: "c4", correctChoiceId: "B" },

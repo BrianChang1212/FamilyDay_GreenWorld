@@ -13,10 +13,10 @@ export type StageQuiz = {
 
 export const STAGE_QUIZZES: Record<number, StageQuiz> = {
 	1: {
-		question: "請問天鵝湖裡有幾種品種的天鵝？",
-		options: ["5種", "10種", "30種", "42種"],
-		correct: "10種",
-		successTip: "天鵝湖裡有多種天鵝，常見的包含黑天鵝與大天鵝，是很好的觀察主題。",
+		question: "世界著名的《天鵝湖》芭蕾舞劇是由下面哪位作曲家創作的呢？",
+		options: ["柴犬夫斯基", "貝多芬", "柴可夫斯基", "莫札特"],
+		correct: "柴可夫斯基",
+		successTip: "《天鵝湖》是俄國作曲家柴可夫斯基的經典芭蕾舞作，於 1875–76 年創作。",
 	},
 	2: {
 		question: "開闊草原最能支持下列哪一種生態角色？",
