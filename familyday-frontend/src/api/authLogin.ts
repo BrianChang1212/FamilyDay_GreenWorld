@@ -1,7 +1,7 @@
 import { getViteApiBase } from "@/lib/apiBase";
 import { setSessionToken } from "@/lib/sessionToken";
 
-/** POST /api/v1/auth/login — stores bearer token in sessionStorage. */
+/** POST /api/v1/auth/login — stores bearer token in localStorage. */
 export async function loginGame(
 	name: string,
 	employeeId: string,

@@ -8,7 +8,9 @@ import {
 	FINISH_PAGE_HERO_SRC,
 	getProfile,
 	getFinishClaimedCount,
+	setProfile,
 } from "@/lib/demoState";
+import { fetchAuthMe } from "@/api/authMe";
 import { incrementLocalFinishClaimIfNoApiBase } from "@/lib/provisionalFinishClaim";
 import { resolveRewardClaimPresentation, parseMockClaimedQueryParam } from "@/lib/rewardClaimPresentation";
 import { parseApiErrorCode } from "@/lib/parseApiErrorJson";
@@ -90,10 +92,23 @@ function retryLoadStatus() {
 	void refreshClaimed();
 }
 
-onMounted(() => {
+onMounted(async () => {
 	const p = getProfile();
 	name.value = p.name || t("finish.fallbackName");
 	employeeId.value = p.employeeId || "—";
+	/*
+	 * 相機掃 QR 常在新分頁開啟，此分頁的 sessionStorage profile 是空的（未走過
+	 * 登入表單），名字會退回「夥伴」。但 token 已在 localStorage / cookie 仍有效，
+	 * 故向 /auth/me 取真實身分回填，讓 finish 頁顯示正確姓名與員編。
+	 */
+	if (!p.name || !p.employeeId) {
+		const me = await fetchAuthMe();
+		if (me?.name) {
+			name.value = me.name;
+			employeeId.value = me.employeeId || employeeId.value;
+			setProfile(me.name, me.employeeId);
+		}
+	}
 	void refreshClaimed();
 });
 

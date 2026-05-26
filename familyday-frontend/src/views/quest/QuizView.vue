@@ -5,6 +5,7 @@ import { useRouter } from "vue-router";
 import GwBrandBar from "@/components/GwBrandBar.vue";
 import StageScanLoginModal from "@/components/StageScanLoginModal.vue";
 import { fetchChallenge, submitChallengeAttempt, type ChallengeHttpError } from "@/api/gameFlow";
+import { fetchAuthMe } from "@/api/authMe";
 import {
 	choiceRowsForChallenge,
 	questionForChallenge,
@@ -15,7 +16,9 @@ import {
 	addCompletedStageId,
 	getCompletedStageIds,
 	getPendingStationVerification,
+	getProfile,
 	setCompletedStageIdsFromApi,
+	setProfile,
 	getStage,
 	stageTitle,
 } from "@/lib/demoState";
@@ -66,7 +69,7 @@ function friendlyQuizLoadError(err: unknown): string {
 	return t("quiz.loadErrorGeneric");
 }
 
-onMounted(() => {
+onMounted(async () => {
 	const q = route.query.challengeId;
 	if (typeof q === "string" && q.trim()) {
 		challengeId.value = q.trim();
@@ -74,8 +77,25 @@ onMounted(() => {
 	selected.value = null;
 	submitError.value = "";
 	if (!getSessionToken() && getPendingStationVerification()) {
-		showLoginModal.value = true;
-		return;
+		/*
+		 * 無本地 token，但相機常在新分頁/內建瀏覽器開啟 /scan，跨情境仍可能有
+		 * 有效的 cookie session。先探 GET /auth/me（帶 cookie）；確認確有 server
+		 * session 才略過登入框，避免已登入者被迫重新輸入員編。
+		 */
+		const me = await fetchAuthMe();
+		if (!me) {
+			showLoginModal.value = true;
+			return;
+		}
+		if (me.name) setProfile(me.name, me.employeeId);
+	} else if (!getProfile().name) {
+		/*
+		 * 已用 localStorage 共享 token 登入，但相機新開的分頁沒有 profile（未走過
+		 * 登入表單）。從 /auth/me 回填，讓後續 Result / Stage / Finish 全程顯示
+		 * 正確姓名，而非預設「夥伴」。
+		 */
+		const me = await fetchAuthMe();
+		if (me?.name) setProfile(me.name, me.employeeId);
 	}
 	loadChallenge();
 });
