@@ -375,7 +375,7 @@
 - [ ] 完成 dev/stage 驗證 runbook（含 `VITE_API_BASE`、`FDGW_USE_FIRESTORE`、憑證設定步驟）
 - [x] 建立後端 Vitest 單元測試基線（http/session/authGuard/game state/health route；**5** 檔／**27** 測試；含「完成一次後可連續領獎至上限」規則）
 - [ ] 擴充後端關鍵路徑自動化（checkin/redeem/admin/Firestore mock 或 emulator）
-- [ ] 補齊 Firestore Security Rules 初稿
+- [-] 補齊 Firestore Security Rules 初稿 — **2026-05-29 決議:不補**:本 App 架構下後端走 `firebase-admin` Admin SDK(自動 bypass rules)、前端不直連 Firestore(無 onSnapshot、無 `db.collection().get()`,所有資料走 `/api/v1/*` REST),目前 deny-all 即實質最安全狀態(對 client 直連嘗試 100% 阻擋、對後端 0 影響)。寫 expressive rules 反而引入「不小心開了 path 暴露真實 roster」的回歸風險。若未來引入 client-direct 讀寫(例:dashboard 直連、real-time listener),須先寫對應 explicit allow + emulator unit test 再放寬
 
 #### 低優先級
 - [x] 規劃 k6 壓測腳本（1,300 人併發）與活動日前演練節點 — **2026-05-29 完成**：1,300 VU × 10× hot-doc 與 3,000 VU × 23× hot-doc 雙輪皆 PASS、0 RMW race（commit `f8ccad3`）
