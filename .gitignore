@@ -26,6 +26,8 @@ Thumbs.db
 .idea/
 .vscode/*
 !.vscode/extensions.json
+# Claude Code session-local settings (per-machine, do not version-control)
+.claude/
 
 # Logs
 *.log
