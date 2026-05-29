@@ -98,4 +98,4 @@ npm run dev
 
 ---
 
-*README v2.96 · 2026-05-29（新增 `scripts/convert-roster-dump-to-txt.{ps1,cmd}` 工具腳本（roster JSON → 人可讀 txt，輸入/輸出皆在 gitignored `ref_no_push/`）；勾掉 `staging-rollout-checklist` k6 壓測項、`summary-deployment.md` 補上 `apiLoadtest` 與監控基線段落；前版 v2.95）*
+*README v2.97 · 2026-05-29（Cloud Functions runtime 升級 `nodejs20 → nodejs22`：`firebase.json` runtime 與 `package.json` engines 同步；`api` + `apiLoadtest` 雙函式部署 Successful、smoke 全綠，避開 2026-10-30 decommission；前版 v2.96）*
