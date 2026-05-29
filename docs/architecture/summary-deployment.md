@@ -49,6 +49,10 @@
 
 **SA JSON**：正式專案 Admin SDK 用 `firebase-adminsdk-fbsvc@familyday-greenworld.iam.gserviceaccount.com` 對應之 key（**不能 commit 到 repo**，預設置於 `D:\Brian\` 工作區外或環境變數）。
 
+**壓測入口（apiLoadtest）**：正式專案下另側掛 `apiLoadtest` 函式（同專案、`loadtest` 具名 Firestore database 隔離、idle 0 instance），由 k6 壓測使用，**不影響正式 `api` 與 `(default)` db**。詳見 `familyday-backend/src/index.ts` 與壓測腳本 `familyday-backend/scripts/{generate-loadtest-roster,loadtest-consistency-check,delete-player-progress}.mjs`。1,300/3,000 VU 雙輪驗證紀錄見 README live-progress 2026-05-29 entry。
+
+**監控／預算告警**：正式專案已配置 5 條 GCP 告警（Budget $50/月、Hosting/API Uptime checks、Cloud Run failure rate + p95 latency），通知 email `familyday.amtran@gmail.com`（透過 `familyday-amtran-primary` notification channel）。設定步驟與 threshold 細節見 [`docs/setup/monitoring-and-alerts.md`](../setup/monitoring-and-alerts.md)。
+
 ---
 
 ## 3. 區域與延遲

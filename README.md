@@ -98,4 +98,4 @@ npm run dev
 
 ---
 
-*README v2.95 · 2026-05-29（`apiLoadtest` 側掛 export ＋ 載入測試工具鏈 `f8ccad3`；k6 1,300 / 3,000 VU 雙輪 PASS、0 RMW race；GCP 監控與預算告警基線(5 條告警 + runbook `3ba0dba`)寄至 `familyday.amtran@gmail.com`,end-to-end 已驗證;前版 v2.94）*
+*README v2.96 · 2026-05-29（新增 `scripts/convert-roster-dump-to-txt.{ps1,cmd}` 工具腳本（roster JSON → 人可讀 txt，輸入/輸出皆在 gitignored `ref_no_push/`）；勾掉 `staging-rollout-checklist` k6 壓測項、`summary-deployment.md` 補上 `apiLoadtest` 與監控基線段落；前版 v2.95）*

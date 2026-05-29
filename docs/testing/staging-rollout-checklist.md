@@ -109,4 +109,4 @@ flowchart TB
 - [x] 前後端已部署至正式環境（Cloud Functions `api-hxe6k6ncza-uc.a.run.app`、Hosting `rare-lattice-495009-i9.web.app`）。— **完成 2026-05-19**
 - [x] `GET /admin/reports/progress`（`players`／`fullClear`）Firestore 聚合。— **已完成**（`state/game.ts` `getProgressSummary()` 已實作；`admin.ts` 已對接）
 - [ ] 安全基線確認單（CORS 完整驗證、Bearer/XSS、Firestore Security Rules）— **待完成**
-- [ ] 正式活動日前壓測（k6，1,300 人併發）— **待完成**
+- [x] 正式活動日前壓測（k6，1,300 人併發）— **2026-05-29 完成**：1,300 VU × 10× hot-doc 與 3,000 VU × 23× hot-doc 雙輪皆 PASS、0 RMW race（commit `f8ccad3`、runbook 見 README live-progress 2026-05-29 entry）
