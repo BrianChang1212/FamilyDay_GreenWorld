@@ -415,7 +415,7 @@
 - [ ] 建立 Firebase `dev/stage/prod` 專案與權限分層  
 - [ ] 補齊 Security Rules 初稿與審查清單  
 - [ ] 完成簽到尖峰與闖關混合壓測（k6 劇本）  
-- [ ] 盤點正式上線前必要監控與預算告警門檻  
+- [x] 盤點正式上線前必要監控與預算告警門檻 — **2026-05-29 完成**:5 條 GCP 告警(Budget $50、Hosting/API Uptime checks、Cloud Run failure rate + p95 latency)全部設定並驗證,寄至 `familyday.amtran@gmail.com`,runbook 入版 `docs/setup/monitoring-and-alerts.md`（commit `3ba0dba`）  
 
 ---
 
