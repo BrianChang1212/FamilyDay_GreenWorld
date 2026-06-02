@@ -61,17 +61,15 @@ export const zhTW = {
   },
   briefing: {
     title: "遊戲說明",
-    intro:
-      "歡迎來到家園探索之旅！跟隨地圖上的腳印，尋找 6 個神秘站點，完成挑戰領取限量勳章。",
     mapAlt: "闖關路線示意：START 至 FINISH，沿途六個彩色站點與森林背景",
     mapCaption: "ESTATE EXPLORATION MAP",
     giftsTitle: "闖關拿好禮",
-    giftsBullet1: "輸入姓名及員工編號，開始你的冒險！",
+    giftsBullet1: "輸入員工編號並確認姓名，開始你的冒險。",
     giftsBullet2: "完成挑戰就能帶走闖關禮，最多可拿3份喔！",
     locationsTitle: "關卡地點",
     locationsExploreLead: "探索園區內6大關卡：",
     locationsList:
-      "天鵝湖、大探奇區、水生植物公園、鳥園、蝴蝶園、生物多樣性探索區",
+      "天鵝湖、可愛動物區、雨林空中步道、羊駝之家、蝴蝶生態公園、鳥類生態公園",
     locationsAnyOrder: "關卡不限順序，隨時開啟你的探險！",
     startButton: "我知道了",
   },

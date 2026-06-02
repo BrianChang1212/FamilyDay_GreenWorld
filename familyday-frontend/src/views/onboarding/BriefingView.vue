@@ -47,9 +47,6 @@ function next() {
 			>
 				{{ t("briefing.title") }}
 			</h1>
-			<p class="mt-3 text-center text-sm leading-relaxed text-neutral-700">
-				{{ t("briefing.intro") }}
-			</p>
 
 			<div class="mt-5 flex flex-col gap-4">
 				<section

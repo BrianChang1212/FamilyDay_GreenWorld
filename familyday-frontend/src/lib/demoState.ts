@@ -275,11 +275,11 @@ export function setCheckInDone(v: boolean): void {
 /** 與線框／專案文件「關卡地點」順序一致（場勘後可再調） */
 const STAGE_NAMES: Record<number, string> = {
 	1: "天鵝湖",
-	2: "大探奇區",
-	3: "水生植物公園",
-	4: "鳥園",
-	5: "蝴蝶園",
-	6: "生物多樣性探索區",
+	2: "可愛動物區",
+	3: "雨林空中步道",
+	4: "羊駝之家",
+	5: "蝴蝶生態公園",
+	6: "鳥類生態公園",
 };
 
 export function stageTitle(n: number): string {

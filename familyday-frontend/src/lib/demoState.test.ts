@@ -117,6 +117,11 @@ describe("demoState", () => {
 	describe("stageTitle / stageStickerSrc / stageIds", () => {
 		it("stageTitle returns known station or fallback", () => {
 			expect(stageTitle(1)).toBe("天鵝湖");
+			expect(stageTitle(2)).toBe("可愛動物區");
+			expect(stageTitle(3)).toBe("雨林空中步道");
+			expect(stageTitle(4)).toBe("羊駝之家");
+			expect(stageTitle(5)).toBe("蝴蝶生態公園");
+			expect(stageTitle(6)).toBe("鳥類生態公園");
 			expect(stageTitle(99)).toBe("第 99 站");
 		});
 
