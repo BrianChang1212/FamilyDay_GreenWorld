@@ -97,7 +97,7 @@ export const zhTW = {
     claimButton: "領取闖關禮",
     claimButtonDone: "闖關禮已領取完畢",
     rewardLimitReached:
-      "您已達本活動闖關禮領取上限（共 {maxSlots} 次）。仍可繼續體驗闖關或返回首頁。",
+      "您已達闖關禮領取上限（共 {maxSlots} 次），仍可繼續闖關體驗。",
     rewardClaimNotEligible:
       "尚無可領取的結算額度（伺服器判定尚未累積新的完整通關禮）。請確認已完成並通關本輪關卡後再試，或請工作人員協助確認紀錄。",
     rewardClaimNotReady: "尚未完成全部關卡，無法領取闖關禮。",
