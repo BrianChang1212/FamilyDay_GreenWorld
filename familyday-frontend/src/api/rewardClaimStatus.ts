@@ -7,6 +7,8 @@ export type RewardClaimStatusPayload = {
 	maxSlots: number;
 	/** 伺服器已結算、可用於領獎的完整通關次數（見後端 `bankedFullClears`） */
 	bankedFullClears: number;
+	/** 本輪是否已通關全部關卡（後端 `progress.allCompleted` = completedStageIds.length >= total） */
+	allCompleted: boolean;
 };
 
 function clampCount(n: number, max: number): number {
@@ -24,6 +26,7 @@ type DashboardProgress = {
 	fullClearCount?: number;
 	bankedFullClears?: number;
 	rewardRedeemCount?: number;
+	allCompleted?: boolean;
 };
 
 type DashboardJson = {
@@ -66,5 +69,6 @@ export async function fetchRewardClaimStatus(): Promise<RewardClaimStatusPayload
 		claimedCount: clampCount(Number(rawClaimed), maxSlots),
 		maxSlots,
 		bankedFullClears: nonNegativeInt(Number(rawBanked)),
+		allCompleted: p?.allCompleted === true,
 	};
 }

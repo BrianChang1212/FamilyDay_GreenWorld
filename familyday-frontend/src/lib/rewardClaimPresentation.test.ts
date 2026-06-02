@@ -61,6 +61,7 @@ describe("resolveRewardClaimPresentation", () => {
 			claimed: 2,
 			maxSlots: FINISH_REWARD_SLOTS,
 			bankedFullClears: FINISH_REWARD_SLOTS,
+			allCompleted: true,
 			statusSource: "mock-query",
 		});
 		expect(rewardApi.fetchRewardClaimStatus).not.toHaveBeenCalled();
@@ -74,6 +75,7 @@ describe("resolveRewardClaimPresentation", () => {
 			claimed: 2,
 			maxSlots: FINISH_REWARD_SLOTS,
 			bankedFullClears: FINISH_REWARD_SLOTS,
+			allCompleted: true,
 			statusSource: "local-fallback",
 		});
 	});
@@ -84,6 +86,7 @@ describe("resolveRewardClaimPresentation", () => {
 			claimedCount: 1,
 			maxSlots: 5,
 			bankedFullClears: 2,
+			allCompleted: true,
 		});
 		const r = await resolveRewardClaimPresentation(null, () => 0);
 		expect(r).toEqual({
@@ -91,6 +94,7 @@ describe("resolveRewardClaimPresentation", () => {
 			claimed: 1,
 			maxSlots: 5,
 			bankedFullClears: 2,
+			allCompleted: true,
 			statusSource: "api",
 		});
 		expect(rewardApi.fetchRewardClaimStatus).toHaveBeenCalledOnce();

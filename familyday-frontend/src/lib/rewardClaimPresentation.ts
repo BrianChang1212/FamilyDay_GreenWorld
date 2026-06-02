@@ -10,6 +10,7 @@ export type RewardClaimPresentationResult =
 			claimed: number;
 			maxSlots: number;
 			bankedFullClears: number;
+			allCompleted: boolean;
 			statusSource: RewardClaimStatusSource;
 	  }
 	| {
@@ -47,6 +48,7 @@ export async function resolveRewardClaimPresentation(
 			claimed: mockClaimed,
 			maxSlots: FINISH_REWARD_SLOTS,
 			bankedFullClears: FINISH_REWARD_SLOTS,
+			allCompleted: true,
 			statusSource: "mock-query",
 		};
 	}
@@ -59,6 +61,7 @@ export async function resolveRewardClaimPresentation(
 				claimed: s.claimedCount,
 				maxSlots: s.maxSlots,
 				bankedFullClears: s.bankedFullClears,
+				allCompleted: s.allCompleted,
 				statusSource: "api",
 			};
 		} catch (e) {
@@ -76,6 +79,7 @@ export async function resolveRewardClaimPresentation(
 		claimed: getLocalFallbackCount(),
 		maxSlots: FINISH_REWARD_SLOTS,
 		bankedFullClears: FINISH_REWARD_SLOTS,
+		allCompleted: true,
 		statusSource: "local-fallback",
 	};
 }

@@ -79,6 +79,23 @@ describe("fetchRewardClaimStatus", () => {
 		expect(r.bankedFullClears).toBe(0);
 	});
 
+	it("parses allCompleted: true only when progress.allCompleted === true", async () => {
+		const make = (progress: Record<string, unknown>) =>
+			vi.fn().mockResolvedValue({
+				ok: true,
+				json: () => Promise.resolve({ progress }),
+			}) as typeof fetch;
+
+		globalThis.fetch = make({ allCompleted: true, maxRounds: 3 });
+		expect((await fetchRewardClaimStatus()).allCompleted).toBe(true);
+
+		globalThis.fetch = make({ allCompleted: false, maxRounds: 3 });
+		expect((await fetchRewardClaimStatus()).allCompleted).toBe(false);
+
+		globalThis.fetch = make({ maxRounds: 3 });
+		expect((await fetchRewardClaimStatus()).allCompleted).toBe(false);
+	});
+
 	it("uses rewardRedeemCount only; ignores fullClearCount when redeem absent", async () => {
 		globalThis.fetch = vi.fn().mockResolvedValue({
 			ok: true,

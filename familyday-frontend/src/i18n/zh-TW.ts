@@ -90,8 +90,12 @@ export const zhTW = {
   finish: {
     bannerTitle: "Congratulations",
     headline: "恭喜您完成闖關",
+    /** 尚未完成全部關卡就進到領獎頁時顯示 */
+    headlineIncomplete: "闖關尚未完成",
     title: "恭喜完成闖關",
     completeMessage: "請至服務台領取闖關禮。",
+    /** 尚未完成全部關卡時的說明文字 */
+    incompleteMessage: "完成全部關卡挑戰，即可領取闖關禮。",
     statusTitle: "領獎狀態",
     loopHint: "點擊可再次領取，最多 {maxSlots} 份。",
     claimButton: "領取闖關禮",

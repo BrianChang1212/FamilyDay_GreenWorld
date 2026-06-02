@@ -26,6 +26,7 @@ const name = ref("");
 const employeeId = ref("");
 const claimedCount = ref(0);
 const bankedFullClears = ref(0);
+const allCompleted = ref(false);
 const maxSlots = ref(FINISH_REWARD_SLOTS);
 const statusLoadState = ref<"loading" | "ok" | "error">("loading");
 const statusError = ref("");
@@ -52,6 +53,11 @@ const isClaimFull = computed(
 /** 通關過至少一輪（bankedFullClears >= 1）且未達上限 */
 const hasClaimCredit = computed(
 	() => bankedFullClears.value >= 1,
+);
+
+/** 本輪尚未完成全部關卡（以後端 allCompleted 為準）：顯示「闖關尚未完成」文案 */
+const notYetCleared = computed(
+	() => statusLoadState.value === "ok" && !allCompleted.value,
 );
 
 const slotLabels = computed(() => {
@@ -85,6 +91,7 @@ async function refreshClaimed(): Promise<void> {
 	claimedCount.value = r.claimed;
 	maxSlots.value = r.maxSlots;
 	bankedFullClears.value = r.bankedFullClears;
+	allCompleted.value = r.allCompleted;
 	statusLoadState.value = "ok";
 }
 
@@ -338,12 +345,12 @@ const scanUiMessage = computed(
 			<h1
 				class="mt-8 text-center font-display text-[2rem] font-extrabold leading-[1.15] tracking-tight text-[#2f7354] sm:text-[2.5rem] md:text-[2.65rem]"
 			>
-				{{ t("finish.headline") }}
+				{{ notYetCleared ? t("finish.headlineIncomplete") : t("finish.headline") }}
 			</h1>
 			<p
 				class="mx-auto mt-4 max-w-[26rem] text-center text-[0.95rem] leading-relaxed text-neutral-600 sm:text-base"
 			>
-				{{ t("finish.completeMessage") }}
+				{{ notYetCleared ? t("finish.incompleteMessage") : t("finish.completeMessage") }}
 			</p>
 			<p
 				class="mt-5 text-center text-lg font-bold tabular-nums tracking-tight text-gw-navy sm:text-xl"
@@ -445,7 +452,7 @@ const scanUiMessage = computed(
 			</section>
 
 			<p
-				v-if="statusLoadState === 'ok' && !isClaimFull && !hasClaimCredit"
+				v-if="statusLoadState === 'ok' && !isClaimFull && !hasClaimCredit && !notYetCleared"
 				class="mx-auto mt-8 max-w-[26rem] rounded-xl border border-amber-200/90 bg-amber-50/95 px-3 py-3 text-center text-[12px] font-medium leading-relaxed text-amber-950"
 				role="status"
 			>
