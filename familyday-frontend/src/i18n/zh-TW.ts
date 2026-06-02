@@ -172,7 +172,7 @@ export const zhTW = {
     scanSuccessButton: "模擬掃描成功",
     scanBackButton: "返回",
     prototypeLabel: "The Living Journal · prototype",
-    scanAriaLabel: "開啟掃碼",
+    scanAriaLabel: "點我掃描QRcode",
     unlocked: "任務已解鎖",
     startQuizButton: "開始作答挑戰 →",
     routeTitle:
@@ -183,7 +183,7 @@ export const zhTW = {
       "森林探索風格主視覺：放大鏡、相機、寶箱、地圖與林間小徑",
     heroTitle: "一起完成挑戰吧！",
     heroSubtitle:
-      "請點選相機並掃描各關現場 QR code，將直接進入該關選擇題；完成後回到本頁更新進度。下方列表僅顯示狀態，無法手動選站。",
+      "【不限闖關順序】前往任意關卡，點擊下方相機掃描 QR Code 開始挑戰！",
     statusCompleted: "已完成",
     /** 列表「未完成」狀態（僅展示，解鎖靠掃 QR） */
     statusLocked: "待解鎖",

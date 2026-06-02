@@ -294,6 +294,10 @@ export const CHECKIN_COMPLETE_STICKER_SRC =
 export const STAGE_PAGE_HERO_SRC =
 	"/images/stage-hero-forest-exploration-flat.png" as const;
 
+/** 關卡頁掃碼按鈕圖（設計師完整按鈕圖，文字＋相機 icon 內嵌；@2x retina，`public/images/`） */
+export const SCAN_QR_BUTTON_SRC = "/images/scan-qr-button.png" as const;
+export const SCAN_QR_BUTTON_SRC_2X = "/images/scan-qr-button@2x.png" as const;
+
 /** 闖關完成頁主視覺（慶典森林扁平插畫，與過關中頁面區隔，`public/images/`） */
 export const FINISH_PAGE_HERO_SRC =
 	"/images/stage-hero-festive-forest-flat.png" as const;

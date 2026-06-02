@@ -20,6 +20,8 @@ import {
 	stageStickerSrc,
 	stageTitle,
 	STAGE_PAGE_HERO_SRC,
+	SCAN_QR_BUTTON_SRC,
+	SCAN_QR_BUTTON_SRC_2X,
 } from "@/lib/demoState";
 import { useI18n } from "@/composables/useI18n";
 
@@ -329,36 +331,31 @@ function rowState(id: number): "done" | "open" {
 					</div>
 				</div>
 
-				<button
-					type="button"
-					class="mt-8 flex h-[4.5rem] w-[4.5rem] shrink-0 items-center justify-center rounded-full bg-[#2f7354] text-[#c8e6d6] shadow-[0_12px_32px_rgba(47,115,84,0.35)] ring-4 ring-white/90 transition hover:brightness-110 active:scale-95"
-					:aria-label="t('stage.scanAriaLabel')"
-					@click="openScanUi"
-				>
-					<svg
-						class="h-10 w-10"
-						viewBox="0 0 24 24"
-						fill="none"
-						stroke="currentColor"
-						stroke-width="1.75"
-						stroke-linecap="round"
-						stroke-linejoin="round"
-						aria-hidden="true"
-					>
-						<path d="M14.5 4h-5L8 6H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-3l-1.5-2Z" />
-						<circle cx="12" cy="13" r="3.5" />
-						<path d="M5 9h1" />
-					</svg>
-				</button>
-
 				<h2
-					class="font-display mt-6 max-w-md px-2 text-center text-xl font-extrabold leading-snug text-[#2f7354] sm:text-[1.35rem]"
+					class="font-display mt-7 max-w-md px-2 text-center text-xl font-extrabold leading-snug text-[#2f7354] sm:text-[1.35rem]"
 				>
 					{{ t("stage.heroTitle") }}
 				</h2>
-				<p class="mt-4 max-w-md px-2 text-center text-sm leading-relaxed text-neutral-600">
+				<p class="mt-3 max-w-md px-3 text-center text-sm leading-relaxed text-neutral-600">
 					{{ t("stage.heroSubtitle") }}
 				</p>
+
+				<button
+					type="button"
+					class="mt-6 block w-full max-w-[18.8rem] shrink-0 transition hover:brightness-[1.04] active:scale-95"
+					:aria-label="t('stage.scanAriaLabel')"
+					@click="openScanUi"
+				>
+					<img
+						:src="SCAN_QR_BUTTON_SRC"
+						:srcset="`${SCAN_QR_BUTTON_SRC} 1x, ${SCAN_QR_BUTTON_SRC_2X} 2x`"
+						width="301"
+						height="111"
+						alt=""
+						class="block h-auto w-full"
+						decoding="async"
+					/>
+				</button>
 			</div>
 
 			<!-- 已掃碼：開始作答 -->
