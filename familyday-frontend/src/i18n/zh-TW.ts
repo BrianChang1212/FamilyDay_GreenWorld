@@ -77,7 +77,7 @@ export const zhTW = {
     heroRocketAlt: "闖關登入火箭圖示",
     heroTitle: "完成登入，開始闖關",
     namePlaceholder: "請輸入您的真實姓名",
-    employeeIdPlaceholder: "例：1110000",
+    employeeIdPlaceholder: "例如：1141157",
     signingIn: "登入中…",
     infoNotice:
       "資料與兌換闖關禮有關，請確保資訊正確。",
