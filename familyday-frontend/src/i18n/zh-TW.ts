@@ -91,13 +91,11 @@ export const zhTW = {
     bannerTitle: "Congratulations",
     headline: "恭喜您完成闖關",
     title: "恭喜完成闖關",
-    completeMessage:
-      "恭喜您完成所有關卡，請至服務台領取闖關禮。",
+    completeMessage: "請至服務台領取闖關禮。",
     statusTitle: "領獎狀態",
     loopHint: "點擊可再次領取，最多 {maxSlots} 份。",
     claimButton: "領取闖關禮",
     claimButtonDone: "闖關禮已領取完畢",
-    staffHintClaim: "請交由工作人員點選領取",
     rewardLimitReached:
       "您已達本活動闖關禮領取上限（共 {maxSlots} 次）。仍可繼續體驗闖關或返回首頁。",
     rewardClaimNotEligible:

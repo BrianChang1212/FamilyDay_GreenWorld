@@ -445,13 +445,7 @@ const scanUiMessage = computed(
 			</section>
 
 			<p
-				v-if="statusLoadState === 'ok' && !isClaimFull && hasClaimCredit"
-				class="mt-8 text-center text-sm font-medium text-neutral-600"
-			>
-				{{ t("finish.staffHintClaim") }}
-			</p>
-			<p
-				v-else-if="statusLoadState === 'ok' && !isClaimFull && !hasClaimCredit"
+				v-if="statusLoadState === 'ok' && !isClaimFull && !hasClaimCredit"
 				class="mx-auto mt-8 max-w-[26rem] rounded-xl border border-amber-200/90 bg-amber-50/95 px-3 py-3 text-center text-[12px] font-medium leading-relaxed text-amber-950"
 				role="status"
 			>
