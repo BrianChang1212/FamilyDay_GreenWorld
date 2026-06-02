@@ -28,9 +28,10 @@ const isSubmitting = ref(false);
 const submitError = ref("");
 const nameLookupState = ref<"idle" | "loading" | "found" | "not_found">("idle");
 
+// 從 0 開始（0 = 沒有攜伴），最多 MAX_COMPANIONS
 const companionOptions = Array.from(
-	{ length: APP_CONFIG.MAX_COMPANIONS },
-	(_, i) => i + 1,
+	{ length: APP_CONFIG.MAX_COMPANIONS + 1 },
+	(_, i) => i,
 );
 
 const inputClass =
@@ -82,7 +83,7 @@ function formValid(): boolean {
 		name.value.trim().length > 0 &&
 		employeeId.value.trim().length > 0 &&
 		Number.isFinite(companionCount.value) &&
-		companionCount.value >= 1
+		companionCount.value >= 0
 	);
 }
 
@@ -112,7 +113,7 @@ async function submitCheckInApi(
 async function commitCheckIn() {
 	if (isSubmitting.value) return;
 	let n = companionCount.value;
-	if (!Number.isFinite(n) || n < 1) n = 1;
+	if (!Number.isFinite(n) || n < 0) n = 0;
 	companionCount.value = n;
 	isSubmitting.value = true;
 	submitError.value = "";
@@ -233,7 +234,7 @@ async function commitCheckIn() {
 								:class="[inputClass, 'cursor-pointer appearance-none']"
 							>
 								<option v-for="n in companionOptions" :key="n" :value="n">
-									{{ n }} {{ t('checkin.form.companionUnit') }}
+									{{ n === 0 ? t('checkin.form.companionUnitZero') : `${n} ${t('checkin.form.companionUnit')}` }}
 								</option>
 							</select>
 							<span
@@ -320,7 +321,7 @@ async function commitCheckIn() {
 						</div>
 						<div class="flex justify-between gap-3 py-3 text-sm">
 							<dt class="text-neutral-500">{{ t('checkin.form.companions') }}</dt>
-							<dd class="font-bold text-gw-navy">{{ companionCount }} {{ t('checkin.form.companionUnit') }}</dd>
+							<dd class="font-bold text-gw-navy">{{ companionCount === 0 ? t('checkin.form.companionUnitZero') : `${companionCount} ${t('checkin.form.companionUnit')}` }}</dd>
 						</div>
 					</dl>
 					<div class="mt-6 flex flex-col gap-3">

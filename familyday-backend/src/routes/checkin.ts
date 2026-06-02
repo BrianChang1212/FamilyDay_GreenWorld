@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { lookupRosterByEmployeeId, verifyRosterIdentity } from "../state/roster";
 import { getCheckin, upsertCheckin } from "../state/checkins";
-import { badRequest, normalizeText, toPositiveInt } from "../utils/http";
+import { badRequest, normalizeText, toNonNegativeInt } from "../utils/http";
 
 export const checkinRouter = Router();
 
@@ -9,8 +9,11 @@ checkinRouter.post("/checkin", async (req, res) => {
 	try {
 		const employeeId = normalizeText(req.body?.employeeId);
 		const name = normalizeText(req.body?.name);
-		const partySize = toPositiveInt(req.body?.partySize);
-		if (!employeeId || !name || !partySize) {
+		// partySize 允許 0(同行人數,0 = 沒有攜伴)
+		const partySizeRaw = req.body?.partySize;
+		const partySizeMissing = partySizeRaw === undefined || partySizeRaw === null || partySizeRaw === "";
+		const partySize = toNonNegativeInt(partySizeRaw);
+		if (!employeeId || !name || partySizeMissing || partySize < 0 || !Number.isFinite(partySize)) {
 			res.status(400).json(
 				badRequest(
 					"INVALID_CHECKIN_PAYLOAD",

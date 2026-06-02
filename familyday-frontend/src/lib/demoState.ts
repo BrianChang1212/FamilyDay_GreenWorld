@@ -252,15 +252,15 @@ export function setProfile(name: string, employeeId: string): void {
 
 export function getCompanionCount(): number {
 	const v = sessionStorage.getItem(K.companionCount);
-	const n = v ? parseInt(v, 10) : 1;
-	if (!Number.isFinite(n)) return 1;
-	return Math.max(1, Math.min(99, n));
+	const n = v ? parseInt(v, 10) : 0;
+	if (!Number.isFinite(n)) return 0;
+	return Math.max(0, Math.min(99, n));
 }
 
 export function setCompanionCount(n: number): void {
 	sessionStorage.setItem(
 		K.companionCount,
-		String(Math.max(1, Math.min(99, n))),
+		String(Math.max(0, Math.min(99, n))),
 	);
 }
 

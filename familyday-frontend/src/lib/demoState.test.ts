@@ -154,19 +154,21 @@ describe("demoState", () => {
 	});
 
 	describe("companion & check-in flags", () => {
-		it("companion count defaults and clamps", () => {
-			expect(getCompanionCount()).toBe(1);
+		it("companion count defaults to 0 (no companion) and clamps to [0, 99]", () => {
+			expect(getCompanionCount()).toBe(0);
 			setCompanionCount(50);
 			expect(getCompanionCount()).toBe(50);
 			setCompanionCount(0);
-			expect(getCompanionCount()).toBe(1);
+			expect(getCompanionCount()).toBe(0); // 0 is now a valid value (沒有攜伴)
+			setCompanionCount(-3);
+			expect(getCompanionCount()).toBe(0); // negative clamps up to 0
 			setCompanionCount(200);
 			expect(getCompanionCount()).toBe(99);
 		});
 
-		it("getCompanionCount treats non-finite stored value as default 1", () => {
+		it("getCompanionCount treats non-finite stored value as default 0", () => {
 			sessionStorage.setItem(STORAGE_KEYS.companionCount, "NaN");
-			expect(getCompanionCount()).toBe(1);
+			expect(getCompanionCount()).toBe(0);
 		});
 
 		it("check-in done flag", () => {
