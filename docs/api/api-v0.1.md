@@ -48,7 +48,7 @@
 | `GET /api/v1/events/{eventId}` | 僅實作固定路徑 `/api/v1/events/<eventId>`，`<eventId>` 與 backend repo `fdgw.project.json` 的 `eventId` 一致（目前為 `familyday-2026`） | 正式版維持 `{eventId}` 動態路由 |
 | `POST /api/v1/stations/verify` | 僅 smoke 回應，未實作 JWT 驗簽/exp/jti；回傳之 **`challengeId`** 須與請求 **`stageId`** 對應（原型與 `familyday-backend` 一致） | 正式版需完整 JWT 安全檢查 |
 | `GET /api/v1/me/dashboard` | 回應為前端驗證所需最小欄位集 | 正式版回應以本文件示例為準 |
-| `POST /api/v1/challenges/{challengeId}/attempts` | request 用 `answer`，response 含 **`correct`**、**`nextStageId`**、**`completedStageIds`**、**`allStagesCompleted`**（與 `familyday-backend` 一致） | 正式版請求仍以 **`choiceId`**（相容 `answer`）為準 |
+| `POST /api/v1/challenges/{challengeId}/attempts` | request 用 `answer`，response 含 **`correct`**、**`nextStageId`**、**`completedStageIds`**、**`allStagesCompleted`**、**`justFullCleared`**（與 `familyday-backend` 一致） | 正式版請求仍以 **`choiceId`**（相容 `answer`）為準 |
 
 ---
 
@@ -268,12 +268,14 @@
   "correct": true,
   "nextStageId": 3,
   "completedStageIds": [1, 2, 3],
-  "allStagesCompleted": false
+  "allStagesCompleted": false,
+  "justFullCleared": false
 }
 ```
 
 - **`completedStageIds`**：答對後**當輪**已通關之站別（1–6，遞增排序）。  
 - **`allStagesCompleted`**：本輪是否已集滿 6 站（`true` 時 **`nextStageId`** 可為 **`null`**）。  
+- **`justFullCleared`**（v0.1.27 新增）：本次作答是否「**首次**達成全破」（伺服器端 `prior < 6 && 本次後 >= 6`，與 `bankedFullClears += 1` 同一條件）。**全破玩家重玩**任一關時為 `false`（此時 `allStagesCompleted` 仍為 `true`）。前端 ResultView 以此分流（首次全破→領獎 / 重玩→關卡列表），不再依賴本地 `completedStageIds`。  
 - **`nextStageId`**：與 **`currentStageId`** 對齊之提示欄位（**非**強制下一線性關）；答錯時可省略或沿用請求前之進度。
 
 答錯時可回 `{ "correct": false, "nextStageId": <unchanged>, "completedStageIds": [...] }`；仍受每分鐘請求上限約束。
@@ -513,4 +515,5 @@ sequenceDiagram
 | v0.1.24 | 2026-05-11 | **後端 MVP 落地狀態**表格：補 **`admin/reports/attendance`**（**`roster`／`checkins`**）與 **`admin/reports/progress`**（**`redeemed`** vs **`players`／`fullClear`** 占位）與 **`admin.ts`** 一致；**無** REST 或 JSON 契約變更 |
 | v0.1.25 | 2026-05-13 | **全域約定**／**MVP 表**／**§12–§13**：SPA **`Bearer`** + 登入 **`token`**；Cookie 相容；§4 先補示例草稿（**v0.1.26** 改與 **`auth.ts`** 一致：**`ok`**／**`user`**）；**無** REST 路徑契約變更 |
 | v0.1.26 | 2026-05-13 | **§4**：登入成功 JSON 示例改與 **`auth.ts`** 一致（**`ok`**、**`user`**）；釐清 **`auth/me`** 之 **`displayName`**；**無** REST 契約變更 |
+| v0.1.27 | 2026-06-03 | **§7**：`attempts` 回應**新增 `justFullCleared: boolean`**（首次達成 6/6 才 `true`，全破重玩為 `false`）；前端 `QuizView` 改以此判定 `firstClear`，修正「全破後關閉分頁→重掃 QR→重玩誤判首次全破、ResultView 顯示領獎鈕」之 bug。**加性契約變更，向後相容** |
 
