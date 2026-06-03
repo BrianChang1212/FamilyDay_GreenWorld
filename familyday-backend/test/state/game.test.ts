@@ -76,6 +76,7 @@ describe("game state", () => {
 			nextStageId: 1,
 			completedStageIds: [],
 			allStagesCompleted: false,
+			justFullCleared: false,
 		});
 		expect(progress.completedStageIds).toEqual([]);
 		expect(progress.bankedFullClears).toBe(0);
@@ -92,6 +93,35 @@ describe("game state", () => {
 		expect(progress.completedStageIds).toEqual([1, 2, 3, 4, 5, 6]);
 		expect(progress.currentStageId).toBe(6);
 		expect(progress.bankedFullClears).toBe(1);
+	});
+
+	it("justFullCleared: true 只在首次達成 6/6 的那次作答，全破後重玩皆為 false", async () => {
+		const employeeId = nextEmployeeId();
+		const order: [string, string][] = [
+			["c1", "C"],
+			["c2", "B"],
+			["c3", "B"],
+			["c4", "B"],
+			["c5", "B"],
+			["c6", "C"],
+		];
+
+		const results = [];
+		for (const [challengeId, choiceId] of order) {
+			results.push(await applyAttemptResult(employeeId, challengeId, choiceId));
+		}
+		// 前 5 關尚未全破
+		for (let i = 0; i < 5; i++) {
+			expect(results[i].justFullCleared).toBe(false);
+		}
+		// 第 6 關完成 → 首次全破
+		expect(results[5].justFullCleared).toBe(true);
+		expect(results[5].allStagesCompleted).toBe(true);
+
+		// 全破後重玩任一關：allStagesCompleted 仍 true，但 justFullCleared 必為 false
+		const replay = await applyAttemptResult(employeeId, "c3", "B");
+		expect(replay.allStagesCompleted).toBe(true);
+		expect(replay.justFullCleared).toBe(false);
 	});
 
 	it("全破後重玩任一關不會清掉 completedStageIds（保留闖關紀錄）", async () => {

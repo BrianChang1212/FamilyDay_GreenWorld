@@ -155,18 +155,26 @@ export type AttemptApplyResult = {
 	nextStageId: number | null;
 	completedStageIds: number[];
 	allStagesCompleted: boolean;
+	/**
+	 * 本次作答是否「首次達成全破」（伺服器端 prior < TOTAL 且本次後 >= TOTAL）。
+	 * 與 `bankedFullClears += 1` 同一條件；全破玩家重玩任一關時為 false。
+	 * 前端 ResultView 以此分流（首次全破→領獎 / 重玩→關卡列表），不再依賴本地 state。
+	 */
+	justFullCleared: boolean;
 };
 
 function attemptSnapshot(
 	progress: PlayerProgress,
 	correct: boolean,
 	nextStageId: number | null,
+	justFullCleared = false,
 ): AttemptApplyResult {
 	return {
 		correct,
 		nextStageId,
 		completedStageIds: [...progress.completedStageIds],
 		allStagesCompleted: progress.completedStageIds.length >= CHALLENGES.length,
+		justFullCleared,
 	};
 }
 
@@ -206,10 +214,9 @@ export async function applyAttemptResult(
 
 	if (progress.completedStageIds.length >= CHALLENGES.length) {
 		progress.currentStageId = CHALLENGES.length;
-		if (
-			priorCompletedLen < CHALLENGES.length &&
-			progress.completedStageIds.length >= CHALLENGES.length
-		) {
+		/* 首次達成全破：prior < TOTAL（已在 length >= TOTAL 分支內，故本次後必 >= TOTAL） */
+		const justFullCleared = priorCompletedLen < CHALLENGES.length;
+		if (justFullCleared) {
 			progress.bankedFullClears += 1;
 		}
 		if (useFirestoreStore()) {
@@ -218,7 +225,7 @@ export async function applyAttemptResult(
 		} else {
 			playerProgress.set(employeeId, progress);
 		}
-		return attemptSnapshot(progress, true, null);
+		return attemptSnapshot(progress, true, null, justFullCleared);
 	}
 
 	/* 任意順序通關：`currentStageId` 僅記錄「最後答對的站」，不表示下一必玩站 */

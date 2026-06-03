@@ -14,6 +14,7 @@ type AttemptJson = {
 	nextStageId?: number;
 	completedStageIds?: number[];
 	allStagesCompleted?: boolean;
+	justFullCleared?: boolean;
 };
 
 type VerifyJson = {
@@ -142,6 +143,7 @@ export async function submitChallengeAttempt(
 	nextChallengeId: string | null;
 	completedStageIds: number[];
 	allStagesCompleted: boolean;
+	justFullCleared: boolean;
 }> {
 	const base = getBaseOrThrow();
 	const res = await fetch(
@@ -180,6 +182,7 @@ export async function submitChallengeAttempt(
 		nextChallengeId,
 		completedStageIds,
 		allStagesCompleted: data.allStagesCompleted === true,
+		justFullCleared: data.justFullCleared === true,
 	};
 }
 

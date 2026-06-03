@@ -115,6 +115,7 @@ gameRouter.post("/challenges/:challengeId/attempts", async (req, res) => {
 		nextStageId: result.nextStageId,
 		completedStageIds: result.completedStageIds,
 		allStagesCompleted: result.allStagesCompleted,
+		justFullCleared: result.justFullCleared,
 	});
 });
 

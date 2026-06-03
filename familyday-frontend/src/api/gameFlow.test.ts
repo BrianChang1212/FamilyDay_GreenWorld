@@ -131,7 +131,26 @@ describe("gameFlow api", () => {
 			nextChallengeId: "c3",
 			completedStageIds: [],
 			allStagesCompleted: false,
+			justFullCleared: false,
 		});
+	});
+
+	it("submitChallengeAttempt surfaces justFullCleared / allStagesCompleted from API", async () => {
+		globalThis.fetch = vi.fn().mockResolvedValue({
+			ok: true,
+			json: () =>
+				Promise.resolve({
+					correct: true,
+					completedStageIds: [1, 2, 3, 4, 5, 6],
+					allStagesCompleted: true,
+					justFullCleared: true,
+				}),
+		}) as typeof fetch;
+
+		const r = await submitChallengeAttempt("c6", "C");
+		expect(r.allStagesCompleted).toBe(true);
+		expect(r.justFullCleared).toBe(true);
+		expect(r.completedStageIds).toEqual([1, 2, 3, 4, 5, 6]);
 	});
 
 	it("restartPlaythrough resolves when API returns ok=true", async () => {

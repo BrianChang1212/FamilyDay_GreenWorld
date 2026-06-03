@@ -14,7 +14,6 @@ import {
 import { GAME_CONFIG } from "@/constants";
 import {
 	addCompletedStageId,
-	getCompletedStageIds,
 	getPendingStationVerification,
 	getProfile,
 	setCompletedStageIdsFromApi,
@@ -131,8 +130,6 @@ function loadChallenge() {
 
 function confirm() {
 	if (!selected.value) return;
-	/* 用於 ResultView 區分「首次全破」vs「已是 6/6 又重玩答對」 */
-	const priorCompletedLen = getCompletedStageIds().length;
 	submitLoading.value = true;
 	submitError.value = "";
 	submitChallengeAttempt(challengeId.value, selected.value)
@@ -147,11 +144,12 @@ function confirm() {
 					}
 				}
 			}
-			const newCompletedLen = getCompletedStageIds().length;
-			const firstClear =
-				r.correct &&
-				priorCompletedLen < GAME_CONFIG.TOTAL_STAGES &&
-				newCompletedLen >= GAME_CONFIG.TOTAL_STAGES;
+			/*
+			 * 「首次全破」由後端權威判定（r.justFullCleared，與 bankedFullClears += 1 同一條件），
+			 * 不再以本地 sessionStorage completedStageIds 重算 —— 否則關閉頁面後重新掃 QR 進入
+			 * （sessionStorage 已清空、未同步後端進度）會把全破玩家的重玩誤判為首次全破。
+			 */
+			const firstClear = r.correct && r.justFullCleared;
 			router.push({
 				name: "result",
 				query: {
