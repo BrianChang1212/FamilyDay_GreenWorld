@@ -1,6 +1,7 @@
 node_modules/
 hosting-dist/
 lib/
+.secrets/
 *.log
 .env
 .env.*

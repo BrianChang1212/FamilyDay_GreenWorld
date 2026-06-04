@@ -10,6 +10,9 @@ import { gameRouter } from "./routes/game";
 import { healthRouter } from "./routes/health";
 import { staffRouter } from "./routes/staff";
 
+/* 每日排程：dump checkins 寄信（Cloud Scheduler，全雲端，不需 local 觸發） */
+export { dumpCheckinsDaily } from "./scheduled/dumpCheckins";
+
 const app = express();
 const corsAllowlist = getCorsAllowlistResolved();
 
