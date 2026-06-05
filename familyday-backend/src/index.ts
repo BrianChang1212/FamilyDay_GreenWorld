@@ -13,6 +13,9 @@ import { staffRouter } from "./routes/staff";
 /* 每日排程：dump checkins 寄信（Cloud Scheduler，全雲端，不需 local 觸發） */
 export { dumpCheckinsDaily } from "./scheduled/dumpCheckins";
 
+/* 一次性排程：2026-07-17 23:00 Asia/Taipei 自動對外下架前後端（最小權限專用 SA） */
+export { scheduledTeardown } from "./scheduled/scheduledTeardown";
+
 const app = express();
 const corsAllowlist = getCorsAllowlistResolved();
 
