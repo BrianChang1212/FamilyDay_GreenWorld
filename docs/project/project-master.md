@@ -414,7 +414,7 @@
 
 ### 近期技術待辦（精簡）
 
-- [ ] 建立 Firebase `dev/stage/prod` 專案與權限分層  
+- [-] 建立 Firebase `dev/stage/prod` 專案與權限分層 — **決議不做**：dev 已由 Firebase Emulator 取代（本機完全隔離）；staging `rare-lattice-495009-i9` + prod `familyday-greenworld` 已具備三層；一次性活動無長期維護需求，建立獨立 GCP 專案效益不足  
 - [-] 補齊 Security Rules 初稿與審查清單 — **2026-05-29 決議：不補**（前端不直連 Firestore，deny-all 即最安全狀態；見主 backlog）  
 - [x] 完成簽到尖峰與闖關混合壓測（k6 劇本）— **2026-05-29 完成**：1,300 VU & 3,000 VU 雙輪 PASS（commit `f8ccad3`）  
 - [x] 盤點正式上線前必要監控與預算告警門檻 — **2026-05-29 完成**:5 條 GCP 告警(Budget $50、Hosting/API Uptime checks、Cloud Run failure rate + p95 latency)全部設定並驗證,寄至 `familyday.amtran@gmail.com`,runbook 入版 `docs/setup/monitoring-and-alerts.md`（commit `3ba0dba`）  
@@ -450,4 +450,4 @@
 
 ---
 
-**文件版本：** v1.3.88 · 2026-06-08（補齊勾選：安全基線確認單 ✓、dev/stage runbook ✓、後端關鍵路徑自動化 ✓；前版 **v1.3.87**）
+**文件版本：** v1.3.89 · 2026-06-08（Firebase dev/stage/prod 分層決議不做 [-]；backlog 全數結案；前版 **v1.3.88**）
