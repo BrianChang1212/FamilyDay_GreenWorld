@@ -14,10 +14,30 @@ import { onSchedule } from "firebase-functions/v2/scheduler";
 import { defineSecret } from "firebase-functions/params";
 import * as logger from "firebase-functions/logger";
 import nodemailer from "nodemailer";
+import { FieldPath } from "firebase-admin/firestore";
 import { getDb } from "../utils/store";
 import { getFunctionsRegion, getEventId } from "../config/fdgwProject";
 import { type CheckinDoc } from "./checkinCsv";
 import { buildDailyDumpReport, type ProgressDocInput } from "./dumpReport";
+
+/** 批次刪除集合所有文件，回傳刪除總筆數 */
+async function deleteAllDocs(
+	db: FirebaseFirestore.Firestore,
+	collectionId: string,
+): Promise<number> {
+	const ref = db.collection(collectionId);
+	const batchSize = 400;
+	let total = 0;
+	for (;;) {
+		const snap = await ref.orderBy(FieldPath.documentId()).limit(batchSize).get();
+		if (snap.empty) break;
+		const batch = db.batch();
+		for (const doc of snap.docs) batch.delete(doc.ref);
+		await batch.commit();
+		total += snap.size;
+	}
+	return total;
+}
 
 /** CSV 字串 → 附件（前置 UTF-8 BOM，讓 Excel 直接開中文不亂碼） */
 function csvAttachment(filename: string, csv: string) {
@@ -111,5 +131,23 @@ export const dumpCheckinsDaily = onSchedule(
 			progressCount: report.progressCount,
 			recipient: RECIPIENT,
 		});
+
+		// Email confirmed sent — purge app collections
+		try {
+			const [purgedCheckins, purgedProgress] = await Promise.all([
+				deleteAllDocs(db, "checkins"),
+				deleteAllDocs(db, "player_progress"),
+			]);
+			logger.info("dumpCheckinsDaily purged", {
+				date: dateStr,
+				checkins: purgedCheckins,
+				playerProgress: purgedProgress,
+			});
+		} catch (err) {
+			// Purge failure must not re-throw: a retry would re-send the email
+			logger.warn("dumpCheckinsDaily purge failed (email already sent)", {
+				error: err instanceof Error ? err.message : String(err),
+			});
+		}
 	},
 );
