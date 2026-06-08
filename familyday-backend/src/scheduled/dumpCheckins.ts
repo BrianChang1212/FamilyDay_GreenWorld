@@ -132,21 +132,30 @@ export const dumpCheckinsDaily = onSchedule(
 			recipient: RECIPIENT,
 		});
 
-		// Email confirmed sent — purge app collections
-		try {
-			const [purgedCheckins, purgedProgress] = await Promise.all([
-				deleteAllDocs(db, "checkins"),
-				deleteAllDocs(db, "player_progress"),
-			]);
-			logger.info("dumpCheckinsDaily purged", {
+		// Email confirmed sent — purge app collections (pre-activity-day only)
+		// On 2026-06-27 (activity day) and after, retain data for reconciliation
+		const PURGE_CUTOFF = "2026-06-27";
+		if (dateStr < PURGE_CUTOFF) {
+			try {
+				const [purgedCheckins, purgedProgress] = await Promise.all([
+					deleteAllDocs(db, "checkins"),
+					deleteAllDocs(db, "player_progress"),
+				]);
+				logger.info("dumpCheckinsDaily purged", {
+					date: dateStr,
+					checkins: purgedCheckins,
+					playerProgress: purgedProgress,
+				});
+			} catch (err) {
+				// Purge failure must not re-throw: a retry would re-send the email
+				logger.warn("dumpCheckinsDaily purge failed (email already sent)", {
+					error: err instanceof Error ? err.message : String(err),
+				});
+			}
+		} else {
+			logger.info("dumpCheckinsDaily purge skipped (activity day or later)", {
 				date: dateStr,
-				checkins: purgedCheckins,
-				playerProgress: purgedProgress,
-			});
-		} catch (err) {
-			// Purge failure must not re-throw: a retry would re-send the email
-			logger.warn("dumpCheckinsDaily purge failed (email already sent)", {
-				error: err instanceof Error ? err.message : String(err),
+				cutoff: PURGE_CUTOFF,
 			});
 		}
 	},
