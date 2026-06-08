@@ -368,13 +368,15 @@
 - [x] **設計師原版 icon 套用** — StageView 闖關進度標題 icon 換為山+旗 silhouette；FinishView 領獎狀態標題 icon 換為獎章+星+雙緞帶 silhouette；領獎三格 slot 改用設計師 PNG（`Icon_gift_s_active.png` 已領 / `Icon_gift_s_disabled.png` 未領），取代 inline SVG 與 wrapper 樣式 — 完成 2026-05-20
 - [x] **正式 Firebase 專案上架 — 並行部署** — 新增 `familyday-greenworld` 為正式專案，與測試 `rare-lattice-495009-i9` 並存（`.firebaserc` 加 `staging`/`production` aliases）；首次上架完成 Hosting/Functions/Firestore；111 筆 zh roster 已匯入正式 Firestore；entry-link QR PNG 已改指正式 host；登入功能於正式環境驗證 Pass。同步修 backend `store.ts::getDb()`（預設 DB 用 `getFirestore()` 不帶參數，避免 5 NOT_FOUND）— 完成 2026-05-21
 - [x] **領獎時間戳記** — `PlayerProgress` 加 `rewardRedeemAt: string[]`；每次 `claimFinishRewardProgress` 成功時 push 當下 ISO 時間並寫回 Firestore。為活動日資料紀錄表 (家庭日當天資料紀錄表.xlsx) 之「領獎時間一/二/三」欄位預備直接資料源；無 REST 契約變更；coercePlayerProgress 對舊文件 fallback `[]` — 完成 2026-05-21
-- [ ] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、**Bearer／sessionStorage（XSS）**、Cookie 相容）
+- [x] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、**Bearer／sessionStorage（XSS）**、Cookie 相容）— **完成**：`docs/testing/staging-rollout-checklist.md` §2 全部驗證通過；Security Rules deny-all；正式環境 smoke 2026-05-19 PASS
+- [x] **每日 CSV dump 工號排序** — `checkinCsv.ts` 新增 `sortCheckinByEmployeeId()`；`progressCsv.ts` 改為數字升冪；`dumpReport.ts` 報到紀錄表改呼叫新排序；測試同步更新 — 完成 2026-06-08（commit `9ea02de`）
+- [x] **每日 dump 後自動清除 checkins / player_progress** — email 確認送出後批次刪除（`deleteAllDocs` 400 docs/batch）；失敗只 warn 不 re-throw；**2026-06-27 起停止刪除**（活動日及之後保留資料）— 完成 2026-06-08（commits `29f2aef` `816a85f`）
 
 #### 中優先級
 - [x] **`GET /admin/reports/progress` 占位欄位** — `players`／`fullClear` 已改為 `state/game.ts::getProgressSummary()` 對 `player_progress` 集合的真實聚合（Firestore + in-memory 雙模式）；`redeemed` 來自 `getRedeemSummary()`。見 `familyday-backend/src/routes/admin.ts:42-52`、`familyday-backend/src/state/game.ts:289-315`、commit `b91b7a3` — 完成 2026-05-19
-- [ ] 完成 dev/stage 驗證 runbook（含 `VITE_API_BASE`、`FDGW_USE_FIRESTORE`、憑證設定步驟）
+- [x] 完成 dev/stage 驗證 runbook（含 `VITE_API_BASE`、`FDGW_USE_FIRESTORE`、憑證設定步驟）— **完成**：`docs/setup/local-firestore-gcp.md`（含 §E 正式環境 CLI）、`smoke-api.mjs` 自動化驗證、`verify-firestore-flow.mjs`
 - [x] 建立後端 Vitest 單元測試基線（http/session/authGuard/game state/health route；**5** 檔／**27** 測試；含「完成一次後可連續領獎至上限」規則）
-- [ ] 擴充後端關鍵路徑自動化（checkin/redeem/admin/Firestore mock 或 emulator）
+- [x] 擴充後端關鍵路徑自動化（checkin/redeem/admin/Firestore mock 或 emulator）— **完成**：`smoke-api.mjs` 覆蓋全部 19 端點（含 checkin/redeem/admin）；`verify-firestore-flow.mjs` 覆蓋四集合；後端 Vitest 9 檔 / 55 tests
 - [-] 補齊 Firestore Security Rules 初稿 — **2026-05-29 決議:不補**:本 App 架構下後端走 `firebase-admin` Admin SDK(自動 bypass rules)、前端不直連 Firestore(無 onSnapshot、無 `db.collection().get()`,所有資料走 `/api/v1/*` REST),目前 deny-all 即實質最安全狀態(對 client 直連嘗試 100% 阻擋、對後端 0 影響)。寫 expressive rules 反而引入「不小心開了 path 暴露真實 roster」的回歸風險。若未來引入 client-direct 讀寫(例:dashboard 直連、real-time listener),須先寫對應 explicit allow + emulator unit test 再放寬
 
 #### 低優先級
@@ -386,7 +388,7 @@
 ### 資源與節點
 
 - **人力／預算：** [待指定]／[待評估]  
-- **活動日：** 確認中（六月底／七月初優先）；**節點：** KV 4/17、流程 4/24、5 月下旬場勘  
+- **活動日：** **2026-06-27（確認）**；**節點：** KV 4/17、流程 4/24、5 月下旬場勘  
 - **維護：** 建議每週五 10:00 會後更新本檔與根 README「即時進度」；會議前複核 [待確認與會議](#待確認與會議) H1～H5。
 
 ---
@@ -448,4 +450,4 @@
 
 ---
 
-**文件版本：** v1.3.84 · 2026-06-08（backlog 補齊勾選：設計資產 UI 一致性檢查 ✓、Security Rules 決議不補 [-]、混合壓測 ✓；前版 **v1.3.68 · 2026-05-25**）
+**文件版本：** v1.3.88 · 2026-06-08（補齊勾選：安全基線確認單 ✓、dev/stage runbook ✓、後端關鍵路徑自動化 ✓；前版 **v1.3.87**）
