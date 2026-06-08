@@ -36,20 +36,21 @@ describe("buildDailyDumpReport (每日匯出操作)", () => {
 		]);
 	});
 
-	it("checkins → 報到紀錄表 CSV：依報到時間排序、台北時間", () => {
+	it("checkins → 報到紀錄表 CSV：依工號數字升冪排序、台北時間", () => {
+		// 8411007 報到時間較早，但工號較大 → 應排在 1141157 後面
 		const report = buildDailyDumpReport({
 			dateStr: DATE,
 			checkins: [
-				{ employeeId: "b", name: "乙", checkinAt: "2026-06-04T03:00:00Z", partySize: 2 },
-				{ employeeId: "a", name: "甲", checkinAt: "2026-06-04T01:00:00Z", partySize: 0 },
+				{ employeeId: "8411007", name: "吳春發", checkinAt: "2026-06-04T01:00:00Z", partySize: 0 },
+				{ employeeId: "1141157", name: "王小明", checkinAt: "2026-06-04T03:00:00Z", partySize: 2 },
 			],
 			progressDocs: [],
 			rosterNameMap: new Map(),
 		});
 		const lines = report.attachments[0].csv.split("\r\n");
 		expect(lines[0]).toBe("工號,姓名,報到時間,攜伴人數(不含本人)");
-		expect(lines[1]).toBe("a,甲,2026-06-04 09:00:00,0"); // 早的排前
-		expect(lines[2]).toBe("b,乙,2026-06-04 11:00:00,2");
+		expect(lines[1]).toBe("1141157,王小明,2026-06-04 11:00:00,2"); // 工號小的排前
+		expect(lines[2]).toBe("8411007,吳春發,2026-06-04 09:00:00,0");
 	});
 
 	it("player_progress → 闖關遊戲紀錄表：姓名由 roster join、依工號排序、領獎時間轉台北", () => {

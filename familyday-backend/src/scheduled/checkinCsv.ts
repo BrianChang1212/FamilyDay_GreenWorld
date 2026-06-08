@@ -68,3 +68,10 @@ export function sortByCheckinAt(rows: CheckinDoc[]): CheckinDoc[] {
 		String(a.checkinAt ?? "").localeCompare(String(b.checkinAt ?? "")),
 	);
 }
+
+/** 依工號數字升冪排序，回傳新陣列 */
+export function sortCheckinByEmployeeId(rows: CheckinDoc[]): CheckinDoc[] {
+	return [...rows].sort(
+		(a, b) => Number(a.employeeId ?? 0) - Number(b.employeeId ?? 0),
+	);
+}

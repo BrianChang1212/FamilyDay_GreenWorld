@@ -6,7 +6,7 @@
  * 不含 Firebase / nodemailer，純資料轉換，便於單元測試此「匯出操作」。
  * I/O（讀 Firestore、寄信）留在 dumpCheckins.ts 的 onSchedule handler。
  */
-import { buildCheckinCsv, sortByCheckinAt, type CheckinDoc } from "./checkinCsv";
+import { buildCheckinCsv, sortCheckinByEmployeeId, type CheckinDoc } from "./checkinCsv";
 import {
 	buildProgressCsv,
 	sortByEmployeeId,
@@ -57,8 +57,8 @@ function toProgressRow(
 export function buildDailyDumpReport(input: DailyDumpInput): DailyDumpReport {
 	const { dateStr } = input;
 
-	// Sheet 1「報到紀錄表」← checkins（依報到時間排序）
-	const checkinRows = sortByCheckinAt(input.checkins);
+	// Sheet 1「報到紀錄表」← checkins（依工號升冪排序）
+	const checkinRows = sortCheckinByEmployeeId(input.checkins);
 	const checkinCsv = buildCheckinCsv(checkinRows);
 
 	// Sheet 2「闖關遊戲紀錄表」← player_progress（姓名 join roster，依工號排序）

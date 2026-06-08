@@ -379,7 +379,7 @@
 
 #### 低優先級
 - [x] 規劃 k6 壓測腳本（1,300 人併發）與活動日前演練節點 — **2026-05-29 完成**：1,300 VU × 10× hot-doc 與 3,000 VU × 23× hot-doc 雙輪皆 PASS、0 RMW race（commit `f8ccad3`）
-- [ ] 設計資產到位後進行 UI 文案與視覺一致性檢查
+- [x] 設計資產到位後進行 UI 文案與視覺一致性檢查 — **2026-06-02 完成**：design spec v9（image copy 29–35）批次套用，報到／闖關進度／題庫／領獎頁文案與 UI 全數對齊
 
 ---
 
@@ -413,8 +413,8 @@
 ### 近期技術待辦（精簡）
 
 - [ ] 建立 Firebase `dev/stage/prod` 專案與權限分層  
-- [ ] 補齊 Security Rules 初稿與審查清單  
-- [ ] 完成簽到尖峰與闖關混合壓測（k6 劇本）  
+- [-] 補齊 Security Rules 初稿與審查清單 — **2026-05-29 決議：不補**（前端不直連 Firestore，deny-all 即最安全狀態；見主 backlog）  
+- [x] 完成簽到尖峰與闖關混合壓測（k6 劇本）— **2026-05-29 完成**：1,300 VU & 3,000 VU 雙輪 PASS（commit `f8ccad3`）  
 - [x] 盤點正式上線前必要監控與預算告警門檻 — **2026-05-29 完成**:5 條 GCP 告警(Budget $50、Hosting/API Uptime checks、Cloud Run failure rate + p95 latency)全部設定並驗證,寄至 `familyday.amtran@gmail.com`,runbook 入版 `docs/setup/monitoring-and-alerts.md`（commit `3ba0dba`）  
 
 ---
@@ -448,4 +448,4 @@
 
 ---
 
-**文件版本：** 合併版 v1.3.68 · 2026-05-25（正式環境 roster 替換 111 → 508 真實活動資料 + 5 個 admin script 修正 production unnamed default Firestore db bug commit `05c667f` + 新增 `docs/setup/local-firestore-gcp.md` §E 正式環境 admin CLI runbook；前版 **v1.3.67**）
+**文件版本：** v1.3.84 · 2026-06-08（backlog 補齊勾選：設計資產 UI 一致性檢查 ✓、Security Rules 決議不補 [-]、混合壓測 ✓；前版 **v1.3.68 · 2026-05-25**）

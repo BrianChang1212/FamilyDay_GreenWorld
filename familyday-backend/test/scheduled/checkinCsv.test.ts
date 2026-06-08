@@ -4,6 +4,7 @@ import {
 	buildCheckinCsv,
 	escapeCsvCell,
 	sortByCheckinAt,
+	sortCheckinByEmployeeId,
 	toTaipeiDateTime,
 } from "../../src/scheduled/checkinCsv";
 
@@ -76,5 +77,16 @@ describe("checkinCsv", () => {
 		const sorted = sortByCheckinAt(input);
 		expect(sorted.map((r) => r.employeeId)).toEqual(["a", "b"]);
 		expect(input[0].employeeId).toBe("b"); // 原陣列不變
+	});
+
+	it("sortCheckinByEmployeeId sorts numerically ascending and does not mutate input", () => {
+		// 數字排序：1141157 < 8411007，即使報到時間順序相反
+		const input = [
+			{ employeeId: "8411007", checkinAt: "2026-06-04T01:00:00Z" },
+			{ employeeId: "1141157", checkinAt: "2026-06-04T03:00:00Z" },
+		];
+		const sorted = sortCheckinByEmployeeId(input);
+		expect(sorted.map((r) => r.employeeId)).toEqual(["1141157", "8411007"]);
+		expect(input[0].employeeId).toBe("8411007"); // 原陣列不變
 	});
 });

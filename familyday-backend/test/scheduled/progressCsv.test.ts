@@ -66,12 +66,19 @@ describe("progressCsv", () => {
 		);
 	});
 
-	it("sortByEmployeeId sorts ascending and does not mutate input", () => {
+	it("sortByEmployeeId sorts numerically ascending and does not mutate input", () => {
+		// 數字排序：1141157 < 8411007，字串排序結果相同；加入兩位數驗證純數字比較
 		const input = [
-			{ employeeId: "b", name: "", rewardRedeemCount: 0, rewardRedeemAt: [] },
-			{ employeeId: "a", name: "", rewardRedeemCount: 0, rewardRedeemAt: [] },
+			{ employeeId: "8411007", name: "", rewardRedeemCount: 0, rewardRedeemAt: [] },
+			{ employeeId: "1141157", name: "", rewardRedeemCount: 0, rewardRedeemAt: [] },
+			{ employeeId: "200000", name: "", rewardRedeemCount: 0, rewardRedeemAt: [] },
 		];
-		expect(sortByEmployeeId(input).map((r) => r.employeeId)).toEqual(["a", "b"]);
-		expect(input[0].employeeId).toBe("b");
+		// 數字升冪：200000 < 1141157 < 8411007（字串排序會把 "8" 排在 "2" 後，但 "1141157" 排在 "200000" 前 → 驗證為數字排序）
+		expect(sortByEmployeeId(input).map((r) => r.employeeId)).toEqual([
+			"200000",
+			"1141157",
+			"8411007",
+		]);
+		expect(input[0].employeeId).toBe("8411007"); // 原陣列不變
 	});
 });

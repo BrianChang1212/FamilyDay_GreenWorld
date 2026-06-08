@@ -49,9 +49,7 @@ export function buildProgressCsv(rows: ProgressRow[]): string {
 	return body ? `${header}\r\n${body}` : header;
 }
 
-/** 依工號升冪排序，回傳新陣列 */
+/** 依工號數字升冪排序，回傳新陣列 */
 export function sortByEmployeeId(rows: ProgressRow[]): ProgressRow[] {
-	return [...rows].sort((a, b) =>
-		String(a.employeeId).localeCompare(String(b.employeeId)),
-	);
+	return [...rows].sort((a, b) => Number(a.employeeId) - Number(b.employeeId));
 }
