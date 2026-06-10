@@ -18,6 +18,7 @@ import { syncLocalProgressFromDashboard } from "@/api/gameFlow";
 import { getViteApiBase } from "@/lib/apiBase";
 import { useI18n } from "@/composables/useI18n";
 import { fetchRosterLookup } from "@/api/rosterLookup";
+import { shouldLookupEmployeeId } from "@/lib/employeeId";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -43,7 +44,7 @@ function onEmployeeIdInput() {
 	nameLookupState.value = "idle";
 	if (lookupTimer) clearTimeout(lookupTimer);
 	const id = employeeId.value.trim();
-	if (id.length < 7) return;
+	if (!shouldLookupEmployeeId(id)) return;
 	lookupTimer = setTimeout(async () => {
 		nameLookupState.value = "loading";
 		try {

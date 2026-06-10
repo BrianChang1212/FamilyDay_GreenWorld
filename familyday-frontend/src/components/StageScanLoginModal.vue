@@ -4,6 +4,7 @@ import { loginGame } from "@/api/authLogin";
 import { fetchRosterLookup } from "@/api/rosterLookup";
 import { setProfile } from "@/lib/demoState";
 import { useI18n } from "@/composables/useI18n";
+import { shouldLookupEmployeeId } from "@/lib/employeeId";
 
 /*
  * 外部 QR scanner → /scan → /quiz 的「未登入」彈窗。
@@ -26,7 +27,7 @@ function onEmployeeIdInput() {
 	nameLookupState.value = "idle";
 	if (lookupTimer) clearTimeout(lookupTimer);
 	const id = employeeId.value.trim();
-	if (id.length < 7) return;
+	if (!shouldLookupEmployeeId(id)) return;
 	lookupTimer = setTimeout(async () => {
 		nameLookupState.value = "loading";
 		try {

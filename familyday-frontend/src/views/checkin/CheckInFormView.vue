@@ -15,6 +15,7 @@ import { submitCheckin } from "@/api/submitCheckin";
 import { fetchRosterLookup } from "@/api/rosterLookup";
 import { useI18n } from "@/composables/useI18n";
 import { APP_CONFIG } from "@/constants";
+import { shouldLookupEmployeeId } from "@/lib/employeeId";
 
 const router = useRouter();
 const { t } = useI18n();
@@ -44,7 +45,7 @@ function onEmployeeIdInput() {
 	nameLookupState.value = "idle";
 	if (lookupTimer) clearTimeout(lookupTimer);
 	const id = employeeId.value.trim();
-	if (id.length < 7) return;
+	if (!shouldLookupEmployeeId(id)) return;
 	lookupTimer = setTimeout(async () => {
 		nameLookupState.value = "loading";
 		try {

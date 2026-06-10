@@ -26,6 +26,14 @@ export const GAME_CONFIG = {
 	TOTAL_STAGES: g.totalStages,
 };
 
+/**
+ * 觸發 roster 姓名查詢（自動帶入）所需的員工編號最短長度。
+ * AMTran 為 7 碼、子公司瑞旭通為 6 碼（300xxx），取兩者最小值 6。
+ * 若高於 6，6 碼員編永遠不觸發查詢 → 姓名留空 → 送出鍵一直 disabled，
+ * 表現為登入／報到輸入後「沒有反應」。
+ */
+export const EMPLOYEE_ID_LOOKUP_MIN_LEN = 6;
+
 export const STORAGE_KEYS = {
 	stage: "fdgw_stage",
 	/** JSON number[]：已答對的站點 id，任意順序通關 */
