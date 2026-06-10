@@ -371,6 +371,7 @@
 - [x] 產出正式上線前最小安全基線確認單（憑證、權限、CORS、**Bearer／sessionStorage（XSS）**、Cookie 相容）— **完成**：`docs/testing/staging-rollout-checklist.md` §2 全部驗證通過；Security Rules deny-all；正式環境 smoke 2026-05-19 PASS
 - [x] **每日 CSV dump 工號排序** — `checkinCsv.ts` 新增 `sortCheckinByEmployeeId()`；`progressCsv.ts` 改為數字升冪；`dumpReport.ts` 報到紀錄表改呼叫新排序；測試同步更新 — 完成 2026-06-08（commit `9ea02de`）
 - [x] **每日 dump 後自動清除 checkins / player_progress** — email 確認送出後批次刪除（`deleteAllDocs` 400 docs/batch）；失敗只 warn 不 re-throw；**2026-06-27 起停止刪除**（活動日及之後保留資料）— 完成 2026-06-08（commits `29f2aef` `816a85f`）
+- [x] **子公司「瑞旭通」名單上線** — ① 12 筆瑞旭通名冊匯入正式 `roster`（0 撞號，`scripts/check-ruixu-roster.mjs` 唯讀驗證後 `import-roster-dump.mjs` 匯入，roster 508→520）；② 每日 dump **互斥拆分為 4 附件**（主檔排除瑞旭通＋`…-瑞旭通-…`專屬兩份），辨識依固定員編清單 `src/config/ruixu.ts`（`1003003` 為 7 碼無法以格式區分故採清單），主旨／內文加每公司分項計數；③ 修復 6 碼員編登入／報到「沒有反應」——`shouldLookupEmployeeId` 門檻 7→6（AMTran 7 碼與瑞旭通 6 碼取最小值），`RegisterView`／`StageScanLoginModal`／`CheckInFormView` 三入口共用。後端測試 54→**56**、前端 133→**137**；正式 `functions:dumpCheckinsDaily` 與 hosting 部署、塞測資料觸發實機收信 4 附件驗收 Pass — 完成 2026-06-10（commits `cfce9d6` `6976e26`）
 
 #### 中優先級
 - [x] **`GET /admin/reports/progress` 占位欄位** — `players`／`fullClear` 已改為 `state/game.ts::getProgressSummary()` 對 `player_progress` 集合的真實聚合（Firestore + in-memory 雙模式）；`redeemed` 來自 `getRedeemSummary()`。見 `familyday-backend/src/routes/admin.ts:42-52`、`familyday-backend/src/state/game.ts:289-315`、commit `b91b7a3` — 完成 2026-05-19
@@ -450,4 +451,4 @@
 
 ---
 
-**文件版本：** v1.3.89 · 2026-06-08（Firebase dev/stage/prod 分層決議不做 [-]；backlog 全數結案；前版 **v1.3.88**）
+**文件版本：** v1.3.90 · 2026-06-10（子公司「瑞旭通」名單上線：12 筆匯入正式 roster 508→520；每日 dump 互斥拆分為 4 附件；修復 6 碼員編登入「沒有反應」；後端測試 56、前端 137；commits `cfce9d6` `6976e26`；前版 **v1.3.89**）
