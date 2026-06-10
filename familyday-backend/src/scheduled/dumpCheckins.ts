@@ -129,6 +129,9 @@ export const dumpCheckinsDaily = onSchedule(
 			date: dateStr,
 			checkinCount: report.checkinCount,
 			progressCount: report.progressCount,
+			ruixuCheckinCount: report.ruixuCheckinCount,
+			ruixuProgressCount: report.ruixuProgressCount,
+			attachments: report.attachments.length,
 			recipient: RECIPIENT,
 		});
 
